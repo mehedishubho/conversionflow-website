@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-05-11T11:22:28.243Z"
-last_activity: 2026-05-11 — Project initialized, roadmap created
+milestone: v1.1
+milestone_name: Functional Site
+status: ready_to_plan
+stopped_at: Roadmap created for v1.1 (Phases 5-10)
+last_updated: "2026-05-11T19:00:00.000Z"
+last_activity: 2026-05-11 — Roadmap created for Phases 5-10
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 10
+  completed_phases: 4
+  total_plans: 13
+  completed_plans: 13
+  percent: 40
 ---
 
 # Project State
@@ -20,36 +20,43 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-11)
 
-**Core value:** A polished, high-performance marketing website that converts WooCommerce store owners into WooBooster customers
-**Current focus:** Phase 1: Foundation
+**Core value:** A premium, high-performance marketing website that converts Bangladeshi WooCommerce store owners into WooBooster customers
+**Current focus:** Phase 5: Data Layer
 
 ## Current Position
 
-Phase: 1 of 4 (Foundation)
-Plan: 0 of 3 in current phase
+Phase: 5 of 10 (Data Layer)
+Plan: 0/? in current phase
 Status: Ready to plan
-Last activity: 2026-05-11 — Project initialized, roadmap created
+Last activity: 2026-05-11 — Roadmap created for v1.1 milestone (Phases 5-10)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-
-- Total plans completed: 0
+- Total plans completed: 13 (v1.0 milestone)
 - Average duration: -
-- Total execution time: 0 hours
+- Total execution time: -
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
+| Phase | Plans | Status | Notes |
+|-------|-------|--------|-------|
+| 1. Foundation | 3/3 | Complete | Build + lint pass |
+| 2. Homepage | 3/3 | Complete | 8 sections, responsive, dark/light |
+| 3. Content Pages | 4/4 | Complete | Features, Pricing, Changelog, Support |
+| 4. Polish | 3/3 | Complete | SEO, 404, animations, favicon |
+| 5. Data Layer | 0/? | Not started | Next up |
+| 6. Interactive Features | 0/? | Not started | - |
+| 7. Blog, Docs, Legal | 0/? | Not started | - |
+| 8. SEO Completion | 0/? | Not started | - |
+| 9. Internationalization | 0/? | Not started | - |
+| 10. Polish & Enhancements | 0/? | Not started | - |
 
 **Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
+- Last 13 plans: All completed successfully (v1.0)
+- Trend: Smooth execution, consistent patterns across phases
 
 *Updated after each plan completion*
 
@@ -60,21 +67,29 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Initialization]: Next.js 16 App Router with TailwindCSS 4 chosen as stack
-- [Initialization]: Static marketing site — no backend, no auth
-- [Initialization]: woobooster-v2.html serves as design reference
+- [Phase 1]: Footer is static server component, button CSS uses @apply in @layer utilities
+- [Phase 2]: Dashboard mockup is full React component, not an image
+- [Phase 2]: Video section is decorative (no lightbox), magnetic tilt + custom cursor skipped
+- [Phase 3]: All 4 content pages are server components (FAQAccordion is the only client component)
+- [Phase 3]: Feature tabs are decorative (no filtering JS), just CSS active state
+- [Phase 3]: Pricing tiers data-driven via array map, FAQ accordion client component
+- [Phase 4]: Syne font weights reduced to 600, 700, 800 (removed unused 400)
+- [Phase 4]: ScrollReveal client component wraps below-fold homepage sections
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- Build currently broken: missing `Footer.tsx` and `utils.ts` (Phase 1 addresses this)
-- CSS button classes undefined: `btn`, `btn-primary`, `btn-outline` not in `globals.css` (Phase 1 addresses this)
+- i18n via [lang] route segment is a structural breaking change -- requires route migration for all pages. Best done as a focused Phase 9 after all content pages are stable.
+- Resend API key needed for contact form email sending (Phase 6) -- developer must provide or set up Resend account.
+- External checkout URLs for "Buy Now" buttons (Phase 6) -- developer must provide actual URLs.
+- Legal page content needs to be sourced (Phase 7) -- lawyer-drafted or standard WooCommerce plugin templates.
+- Custom cursor was explicitly skipped in Phase 2 due to performance concerns -- revisit in Phase 10 with performance testing.
 
 ## Session Continuity
 
-Last session: 2026-05-11T11:22:28.241Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-foundation/01-CONTEXT.md
+Last session: 2026-05-11
+Stopped at: Roadmap created for v1.1 (Phases 5-10)
+Resume file: None

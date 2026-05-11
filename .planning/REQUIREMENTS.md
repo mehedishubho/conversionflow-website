@@ -136,37 +136,83 @@
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
-| FOUND-06 | Phase 1 | Pending |
-| FOUND-07 | Phase 1 | Pending |
-| FOUND-08 | Phase 1 | Pending |
-| FOUND-09 | Phase 1 | Pending |
-| FOUND-10 | Phase 1 | Pending |
-| DATA-01 through DATA-07 | Phase 1 | Pending |
-| HOME-01 through HOME-10 | Phase 2 | Pending |
-| FEAT-01 through FEAT-07 | Phase 3 | Pending |
-| PRIC-01 through PRIC-06 | Phase 3 | Pending |
-| CHLOG-01 through CHLOG-03 | Phase 3 | Pending |
-| SUPP-01 through SUPP-05 | Phase 3 | Pending |
-| BLOG-01 through BLOG-04 | Phase 3 | Pending |
-| DOCS-01 through DOCS-02 | Phase 3 | Pending |
-| LEGL-01 through LEGL-04 | Phase 3 | Pending |
-| SEO-01 through SEO-05 | Phase 4 | Pending |
-| I18N-01 through I18N-04 | Phase 4 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 10 | Not started |
+| FOUND-04 | Phase 1 | Complete |
+| FOUND-05 | Phase 10 | Not started |
+| FOUND-06 | Phase 4 | Complete |
+| FOUND-07 | Phase 5 | Not started |
+| FOUND-08 | Phase 10 | Not started |
+| FOUND-09 | Phase 10 | Not started |
+| FOUND-10 | Phase 1 | Complete |
+| HOME-01 | Phase 2 | Complete |
+| HOME-02 | Phase 2 | Complete |
+| HOME-03 | Phase 2 | Complete |
+| HOME-04 | Phase 2 | Complete |
+| HOME-05 | Phase 2 | Complete |
+| HOME-06 | Phase 2 | Complete |
+| HOME-07 | Phase 2 | Complete |
+| HOME-08 | Phase 2 | Complete |
+| HOME-09 | Phase 2 | Complete |
+| HOME-10 | Phase 6 | Not started |
+| FEAT-01 | Phase 3 | Complete |
+| FEAT-02 | Phase 3 | Complete |
+| FEAT-03 | Phase 3 | Complete |
+| FEAT-04 | Phase 3 | Complete |
+| FEAT-05 | Phase 3 | Complete |
+| FEAT-06 | Phase 3 | Complete |
+| FEAT-07 | Phase 3 | Complete |
+| PRIC-01 | Phase 3 | Complete |
+| PRIC-02 | Phase 6 | Not started |
+| PRIC-03 | Phase 3 | Complete |
+| PRIC-04 | Phase 3 | Complete |
+| PRIC-05 | Phase 3 | Complete |
+| PRIC-06 | Phase 6 | Not started |
+| CHLOG-01 | Phase 3 | Complete |
+| CHLOG-02 | Phase 3 | Complete |
+| CHLOG-03 | Phase 5 | Not started |
+| SUPP-01 | Phase 3 | Complete |
+| SUPP-02 | Phase 3 | Complete |
+| SUPP-03 | Phase 6 | Not started |
+| SUPP-04 | Phase 6 | Not started |
+| SUPP-05 | Phase 6 | Not started |
+| DATA-01 | Phase 5 | Not started |
+| DATA-02 | Phase 5 | Not started |
+| DATA-03 | Phase 5 | Not started |
+| DATA-04 | Phase 5 | Not started |
+| DATA-05 | Phase 5 | Not started |
+| DATA-06 | Phase 5 | Not started |
+| DATA-07 | Phase 5 | Not started |
+| BLOG-01 | Phase 7 | Not started |
+| BLOG-02 | Phase 7 | Not started |
+| BLOG-03 | Phase 7 | Not started |
+| BLOG-04 | Phase 7 | Not started |
+| DOCS-01 | Phase 7 | Not started |
+| DOCS-02 | Phase 7 | Not started |
+| LEGL-01 | Phase 7 | Not started |
+| LEGL-02 | Phase 7 | Not started |
+| LEGL-03 | Phase 7 | Not started |
+| LEGL-04 | Phase 7 | Not started |
+| SEO-01 | Phase 4 | Complete |
+| SEO-02 | Phase 4 | Complete |
+| SEO-03 | Phase 8 | Not started |
+| SEO-04 | Phase 8 | Not started |
+| SEO-05 | Phase 8 | Not started |
+| I18N-01 | Phase 9 | Not started |
+| I18N-02 | Phase 9 | Not started |
+| I18N-03 | Phase 9 | Not started |
+| I18N-04 | Phase 9 | Not started |
 
 **Coverage:**
-- v1 requirements: 42 total
-- Mapped to phases: 42
-- Unmapped: 0 ✓
+- v1 requirements: 57 total
+- Mapped to phases: 57
+- Complete (Phases 1-4): 25
+- Remaining (Phases 5-10): 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-11 after initial definition*
+*Last updated: 2026-05-11 after roadmap revision (Phases 5-10)*
