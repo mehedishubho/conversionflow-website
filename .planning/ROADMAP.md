@@ -102,10 +102,10 @@ Transform the WooBooster website from a working visual prototype (Phases 1-4 com
 **Plans**: 4 plans
 
 Plans:
-- [ ] 05-01-PLAN.md -- Extract navigation links to data file, update Navbar + Footer
-- [ ] 05-02-PLAN.md -- Extract pricing, changelog, FAQ data to data files, update consumers
-- [ ] 05-03-PLAN.md -- Extract features, testimonials, support data to data files, update consumers
-- [ ] 05-04-PLAN.md -- Configure standalone output, install sharp, create Dockerfile
+- [x] 05-01-PLAN.md -- Extract navigation links to data file, update Navbar + Footer
+- [x] 05-02-PLAN.md -- Extract pricing, changelog, FAQ data to data files, update consumers
+- [x] 05-03-PLAN.md -- Extract features, testimonials, support data to data files, update consumers
+- [x] 05-04-PLAN.md -- Configure standalone output, install sharp, create Dockerfile
 
 ### Phase 6: Interactive Features
 **Goal**: Existing pages gain real interactive functionality -- users can toggle currencies, submit contact forms that send email, follow buy links, and see count-up animations on stats. Pages stop being static mockups and become functional.
