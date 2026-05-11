@@ -117,8 +117,12 @@ Plans:
   3. Contact form validates required fields and shows inline error messages before submission
   4. "Buy Now" buttons link to external checkout; WhatsApp option visible for BD payments
   5. Trust bar stats and dashboard numbers animate with count-up effect on scroll
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans
+
+Plans:
+- [ ] 06-01-PLAN.md -- Extract useCountUp hook, animate TrustBar stats and HeroSection dashboard
+- [ ] 06-02-PLAN.md -- Currency toggle, checkout links, and WhatsApp BD payment on pricing page
+- [ ] 06-03-PLAN.md -- Validated contact form with success feedback on support page
 
 ### Phase 7: Blog, Docs, and Legal
 **Goal**: The site has three new content sections -- a blog with MDX posts, documentation with structured guides, and legal pages (Privacy, Terms, Refund, License). These are essential for trust, SEO, and compliance.
@@ -182,7 +186,7 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Content Pages | 4/4 | Complete | 2026-05-11 |
 | 4. Polish | 3/3 | Complete | 2026-05-11 |
 | 5. Data Layer | 0/4 | Not started | - |
-| 6. Interactive Features | 0/? | Not started | - |
+| 6. Interactive Features | 0/3 | Not started | - |
 | 7. Blog, Docs, and Legal | 0/? | Not started | - |
 | 8. SEO Completion | 0/? | Not started | - |
 | 9. Internationalization | 0/? | Not started | - |
