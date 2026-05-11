@@ -12,16 +12,26 @@ import { navLinks } from "@/data/navigation";
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [lang, setLang] = useState<"en" | "bn">("en");
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
+    const saved = localStorage.getItem("lang") as "en" | "bn" | null;
+    if (saved) setLang(saved);
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggleLang = () => {
+    const next = lang === "en" ? "bn" : "en";
+    setLang(next);
+    localStorage.setItem("lang", next);
+    document.documentElement.lang = next;
+  };
 
   if (!mounted) {
     return (
@@ -84,6 +94,15 @@ export function Navbar() {
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
+          <button
+            onClick={toggleLang}
+            className="h-9 px-2 border border-border rounded-[9px] flex items-center justify-center text-[12px] font-bold hover:border-accent hover:bg-accent-light transition-all text-text2 gap-1"
+          >
+            <span className={cn(lang === "en" && "text-accent")}>EN</span>
+            <span className="text-border">/</span>
+            <span className={cn(lang === "bn" && "text-accent")}>বাং</span>
+          </button>
+
           <Link
             href="/pricing"
             className="hidden sm:flex btn btn-outline text-[13px] px-4 py-2"
@@ -132,6 +151,16 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
+            <div className="h-px bg-border my-2" />
+            <button
+              onClick={toggleLang}
+              className="p-3 rounded-xl text-sm font-medium transition-colors text-text2 hover:bg-accent-light flex items-center gap-2"
+            >
+              <span>Language:</span>
+              <span className={cn("font-bold", lang === "en" && "text-accent")}>English</span>
+              <span>/</span>
+              <span className={cn("font-bold", lang === "bn" && "text-accent")}>বাংলা</span>
+            </button>
             <div className="h-px bg-border my-2" />
             <Link
               href="/pricing"

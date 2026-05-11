@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Noto_Sans_Bengali, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+const notoSansBengali = Noto_Sans_Bengali({
+  subsets: ["latin", "bengali"],
+  weight: ["400", "600", "700", "800"],
   variable: "--font-syne",
   display: "swap",
 });
@@ -56,7 +56,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`}
+      className={`${notoSansBengali.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground font-[family-name:var(--font-dm-sans)]">
