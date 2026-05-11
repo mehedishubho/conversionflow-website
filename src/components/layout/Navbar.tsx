@@ -38,7 +38,7 @@ export function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "max-w-[1160px] w-full flex items-center justify-between glass rounded-[18px] px-4 py-2 pointer-events-all transition-shadow duration-300",
+          "max-w-[1160px] w-full flex items-center justify-between glass rounded-[18px] px-4 py-2 pointer-events-auto transition-shadow duration-300",
           isScrolled && "shadow-lg border-opacity-50"
         )}
       >
@@ -115,7 +115,7 @@ export function Navbar() {
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            className="absolute top-20 left-5 right-5 glass rounded-2xl p-4 md:hidden flex flex-col gap-2 pointer-events-all shadow-2xl"
+            className="absolute top-20 left-5 right-5 glass rounded-2xl p-4 md:hidden flex flex-col gap-2 pointer-events-auto shadow-2xl"
           >
             {navLinks.map((link) => (
               <Link
