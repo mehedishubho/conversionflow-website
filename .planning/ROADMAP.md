@@ -99,8 +99,13 @@ Transform the WooBooster website from a working visual prototype (Phases 1-4 com
   3. Testimonials, features, FAQ, support info, and navigation links each have dedicated data files in src/data/
   4. `pnpm build` produces standalone output (output: 'standalone' in next.config.ts)
   5. No visual or content changes from user perspective -- pure refactor
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 4 plans
+
+Plans:
+- [ ] 05-01-PLAN.md -- Extract navigation links to data file, update Navbar + Footer
+- [ ] 05-02-PLAN.md -- Extract pricing, changelog, FAQ data to data files, update consumers
+- [ ] 05-03-PLAN.md -- Extract features, testimonials, support data to data files, update consumers
+- [ ] 05-04-PLAN.md -- Configure standalone output, install sharp, create Dockerfile
 
 ### Phase 6: Interactive Features
 **Goal**: Existing pages gain real interactive functionality -- users can toggle currencies, submit contact forms that send email, follow buy links, and see count-up animations on stats. Pages stop being static mockups and become functional.
@@ -176,7 +181,7 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. Homepage | 3/3 | Complete | 2026-05-11 |
 | 3. Content Pages | 4/4 | Complete | 2026-05-11 |
 | 4. Polish | 3/3 | Complete | 2026-05-11 |
-| 5. Data Layer | 0/? | Not started | - |
+| 5. Data Layer | 0/4 | Not started | - |
 | 6. Interactive Features | 0/? | Not started | - |
 | 7. Blog, Docs, and Legal | 0/? | Not started | - |
 | 8. SEO Completion | 0/? | Not started | - |
