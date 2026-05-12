@@ -21,7 +21,7 @@ export const supportChannels: SupportChannel[] = [
     description:
       "Bangladesh-based direct support via WhatsApp. Reply within business hours (9AM–6PM BST).",
     action: "+880 1721-328992",
-    href: "#",
+    href: "https://wa.me/8801721328992",
   },
   {
     icon: "📖",
