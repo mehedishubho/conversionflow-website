@@ -76,22 +76,22 @@
 
 ### Blog
 
-- [ ] **BLOG-01**: Blog listing page displays posts with title, date, excerpt, and reading time
-- [ ] **BLOG-02**: Individual blog posts render from MDX files with frontmatter (title, date, excerpt, author)
+- [x] **BLOG-01**: Blog listing page displays posts with title, date, excerpt, and reading time
+- [x] **BLOG-02**: Individual blog posts render from MDX files with frontmatter (title, date, excerpt, author)
 - [x] **BLOG-03**: MDX supports GitHub-flavored markdown (tables, code blocks, etc.)
 - [x] **BLOG-04**: Blog content lives in src/content/blog/*.mdx
 
 ### Documentation
 
-- [ ] **DOCS-01**: Documentation section displays guides organized by topic
-- [ ] **DOCS-02**: Individual doc pages render from MDX with table of contents
+- [x] **DOCS-01**: Documentation section displays guides organized by topic
+- [x] **DOCS-02**: Individual doc pages render from MDX with table of contents
 
 ### Legal Pages
 
-- [ ] **LEGL-01**: Privacy Policy page with full legal content
-- [ ] **LEGL-02**: Terms of Service page with full legal content
-- [ ] **LEGL-03**: Refund Policy page with full legal content
-- [ ] **LEGL-04**: License Agreement page with full legal content
+- [x] **LEGL-01**: Privacy Policy page with full legal content
+- [x] **LEGL-02**: Terms of Service page with full legal content
+- [x] **LEGL-03**: Refund Policy page with full legal content
+- [x] **LEGL-04**: License Agreement page with full legal content
 
 ### SEO & Analytics
 
