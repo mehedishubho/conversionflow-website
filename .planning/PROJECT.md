@@ -34,9 +34,9 @@ A premium, high-performance marketing website that converts Bangladeshi WooComme
 - [ ] Convert Support page: support cards (Email, WhatsApp, Docs), functional contact form
 
 **Additional Pages**
-- [ ] Build Blog section with MDX-based posts and listing page
-- [ ] Build Documentation section with structured guides
-- [ ] Build Legal pages: Privacy Policy, Terms of Service, Refund Policy, License Agreement — full legal content
+- [x] Build Blog section with MDX-based posts and listing page - Validated in Phase 7: Blog, Docs, and Legal
+- [x] Build Documentation section with structured guides - Validated in Phase 7: Blog, Docs, and Legal
+- [x] Build Legal pages: Privacy Policy, Terms of Service, Refund Policy, License Agreement - Validated in Phase 7: Blog, Docs, and Legal
 
 **Functional Features**
 - [ ] Implement functional contact form with email sending (server action)
@@ -106,7 +106,7 @@ A premium, high-performance marketing website that converts Bangladeshi WooComme
 | Faithful but polished design approach | HTML is a prototype, not production — polish rough edges while maintaining visual identity | — Pending |
 | Enhanced animations beyond HTML | Premium feel differentiates from competitors; page transitions and stagger effects add perceived quality | — Pending |
 | Data files for content (not CMS) | Small team, developer-managed content, version-controlled — simpler than headless CMS for a marketing site | — Pending |
-| MDX for blog posts | Developer-friendly authoring, supports React components in posts, version-controlled | — Pending |
+| MDX for blog posts and docs | Developer-friendly authoring, supports React components in posts, version-controlled | Implemented in Phase 7 with local `src/content` files |
 | i18n infrastructure from start | English primary but Bengali market is core audience — easier to build in now than retrofit later | — Pending |
 | Self-hosted deployment | Team manages own infrastructure — no Vercel dependency | — Pending |
 | USD/BDT currency toggle | BD customers prefer Taka pricing; international visitors need USD — both audiences served | — Pending |
@@ -131,4 +131,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-12 after Phase 6 completion*
+*Last updated: 2026-05-12 after Phase 7 completion*
