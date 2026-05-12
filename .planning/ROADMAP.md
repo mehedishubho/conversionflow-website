@@ -134,8 +134,13 @@ Plans:
   3. Documentation section at /docs displays guides organized by topic with table of contents
   4. Privacy Policy, Terms of Service, Refund Policy, and License Agreement pages each display full legal content
   5. Navigation includes links to blog and legal pages (footer or appropriate location)
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 4 plans
+
+Plans:
+- [x] 07-01-PLAN.md -- Install MDX dependencies, configure Next.js, set up Typography, create content files
+- [ ] 07-02-PLAN.md -- Blog listing page with card grid and individual post pages with MDX rendering
+- [ ] 07-03-PLAN.md -- Documentation section with sidebar navigation, TOC, and individual doc pages
+- [ ] 07-04-PLAN.md -- Legal pages (Privacy, Terms, Refund, License) and footer navigation link updates
 
 ### Phase 8: SEO Completion
 **Goal**: The site is fully discoverable by search engines and has analytics tracking visitor behavior. Technical SEO is complete.
@@ -187,7 +192,7 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. Polish | 3/3 | Complete | 2026-05-11 |
 | 5. Data Layer | 0/4 | Not started | - |
 | 6. Interactive Features | 0/3 | Not started | - |
-| 7. Blog, Docs, and Legal | 0/? | Not started | - |
+| 7. Blog, Docs, and Legal | 0/4 | Not started | - |
 | 8. SEO Completion | 0/? | Not started | - |
 | 9. Internationalization | 0/? | Not started | - |
 | 10. Polish and Enhancements | 0/? | Not started | - |
