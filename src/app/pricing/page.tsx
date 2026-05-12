@@ -1,6 +1,6 @@
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
+import { PricingGrid } from "@/components/sections/PricingGrid";
 import type { Metadata } from "next";
-import { pricingTiers } from "@/data/pricing";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -33,49 +33,7 @@ export default function Pricing() {
 
       <section className="sec">
         <div className="max-w-[1160px] mx-auto px-7">
-          <div className="price-grid">
-            {pricingTiers.map((tier) => (
-              <div key={tier.plan} className={`pc${tier.popular ? " pop" : ""}`}>
-                {tier.popular && <div className="pop-tag">⭐ MOST POPULAR</div>}
-                <div className="p-plan">{tier.plan}</div>
-                <div className="p-price">
-                  {tier.priceUSD}
-                  <span>{tier.period}</span>
-                </div>
-                <div className="p-bdt">{tier.priceBDT}</div>
-                <div className="p-desc">{tier.desc}</div>
-                <ul className="p-features">
-                  {tier.features.map((f) => (
-                    <li key={f.text}>
-                      <span className={f.included ? "p-ck" : "p-no"}>
-                        {f.included ? "✓" : "✗"}
-                      </span>
-                      {f.text}
-                    </li>
-                  ))}
-                </ul>
-                <span
-                  className={`btn ${tier.buttonStyle}`}
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    padding: "13px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {tier.buttonText}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="trust-strip">
-            <div className="ts-it">🔒 Secure Checkout</div>
-            <div className="ts-it">💳 bKash · Nagad · Card</div>
-            <div className="ts-it">🔄 30-Day Full Refund</div>
-            <div className="ts-it">⚡ Instant License Delivery</div>
-            <div className="ts-it">📞 BD Local Support</div>
-          </div>
+          <PricingGrid />
 
           <section style={{ padding: "64px 0 0" }}>
             <div className="sh center">
