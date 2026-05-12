@@ -1,0 +1,28 @@
+---
+title: "Courier Sync"
+category: "Modules"
+order: 2
+---
+
+Courier Sync sends WooCommerce orders to Bangladeshi courier partners and brings tracking status back into your store.
+
+## Supported Couriers
+
+WooBooster supports Steadfast, Pathao, and RedX workflows. Each courier can be enabled independently, so stores can route orders based on coverage or campaign needs.
+
+## API Key Setup
+
+| Field | Description |
+| --- | --- |
+| API Key | Provided by your courier dashboard |
+| Secret | Used to sign courier requests |
+| Default Pickup | Warehouse or branch location |
+| Status Mapping | WooCommerce status applied after courier updates |
+
+## Automatic Tracking Sync
+
+When an order is submitted, WooBooster stores the courier consignment ID. Scheduled sync then checks delivery updates and writes the latest status to WooCommerce order notes.
+
+## Status Flow
+
+Common flow: Pending confirmation, Shipped, Delivered, Returned. You can adjust the matching WooCommerce statuses to fit your team process.

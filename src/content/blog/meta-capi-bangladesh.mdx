@@ -1,0 +1,37 @@
+---
+title: "Meta CAPI Setup for Bangladesh WooCommerce Campaigns"
+date: "2025-08-20"
+excerpt: "Learn how WooBooster helps Bangladeshi stores send cleaner server-side purchase events to Meta for more reliable campaign optimization."
+---
+
+Meta Conversions API helps WooCommerce stores send server-side events when browser tracking is blocked or delayed. For Bangladeshi COD stores, reliable purchase and lead data can make the difference between scaling and guessing.
+
+## Why CAPI Matters
+
+Browser pixels can miss events because of privacy settings, slow mobile networks, or checkout redirects. WooBooster sends important events from your WordPress server, which makes tracking more resilient.
+
+## Basic Pixel Configuration
+
+Use the same Pixel ID in WooBooster that you use in Meta Events Manager:
+
+```js
+const metaPixel = {
+  pixelId: "1234567890",
+  events: ["PageView", "Lead", "Purchase"],
+  testEventCode: "TEST12345",
+};
+```
+
+## Supported Events
+
+| Event | Trigger | Notes |
+| --- | --- | --- |
+| PageView | Product or landing page visit | Helps build retargeting pools |
+| Lead | Checkout form submitted | Useful for COD confirmation teams |
+| Purchase | WooCommerce order created | Includes order value and currency |
+
+## Setup Tips
+
+Use **Test Events** before going live, keep your Pixel ID and access token private, and verify that `Purchase` values match your WooCommerce order totals. A clean setup gives Meta better conversion signals while keeping the store owner in control of tracking.
+
+WooBooster does not replace your strategy, but it gives your campaigns more dependable data to learn from.

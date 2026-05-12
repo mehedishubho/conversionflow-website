@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #F2F4FD;
@@ -506,4 +507,24 @@ textarea.form-input { resize: vertical; min-height: 120px; }
   .footer-grid { grid-template-columns: 1fr; }
   .cta-wrap { padding: 48px 28px; }
   .form-grid { grid-template-columns: 1fr; }
+}
+
+/* PROSE / MDX TYPOGRAPHY */
+.prose {
+  --tw-prose-body: var(--text2);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-links: var(--accent);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-bg: var(--bg2);
+  --tw-prose-pre-border: var(--border);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  font-family: var(--font-dm-sans);
+}
+.prose h2, .prose h3, .prose h4 {
+  font-family: var(--font-syne);
+}
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-family: var(--font-mono);
+  font-weight: 600;
 }

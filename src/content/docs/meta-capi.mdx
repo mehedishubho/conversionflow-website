@@ -1,0 +1,34 @@
+---
+title: "Meta CAPI"
+category: "Modules"
+order: 3
+---
+
+Meta CAPI sends server-side ecommerce events from WooBooster to Meta Events Manager.
+
+## Pixel Setup
+
+Create or select a Meta Pixel, then copy the Pixel ID and access token into WooBooster settings.
+
+```js
+window.wooboosterCapi = {
+  pixelId: "1234567890",
+  currency: "BDT",
+};
+```
+
+## Event Mapping
+
+| WooCommerce action | Meta event |
+| --- | --- |
+| Product page viewed | PageView |
+| Checkout submitted | Lead |
+| Order created | Purchase |
+
+## Test Events
+
+Use the Meta Test Event Code while configuring the integration. Confirm events appear in Events Manager before enabling live campaign optimization.
+
+## Data Quality
+
+Use consistent customer email, phone, and order value fields. Better event matching helps Meta attribute conversions more reliably.
