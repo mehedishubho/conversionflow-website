@@ -151,7 +151,11 @@ Plans:
   2. robots.txt is accessible at /robots.txt and allows search engine crawling
   3. Analytics script loads on all pages and tracks page views without cookies
   4. Google Search Console can verify the site via sitemap submission
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md -- Native Next.js sitemap and robots metadata routes
+- [ ] 08-02-PLAN.md -- Global self-hosted Plausible analytics script
 
 ### Phase 9: Internationalization
 **Goal**: The site structure supports English and Bengali, with a language switcher in the navbar and translatable strings extracted to message files. Bengali-capable font is loaded.
@@ -193,6 +197,6 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Data Layer | 0/4 | Not started | - |
 | 6. Interactive Features | 0/3 | Not started | - |
 | 7. Blog, Docs, and Legal | 4/4 | Complete | 2026-05-12 |
-| 8. SEO Completion | 0/? | Not started | - |
+| 8. SEO Completion | 0/2 | Planned | - |
 | 9. Internationalization | 0/? | Not started | - |
 | 10. Polish and Enhancements | 0/? | Not started | - |
