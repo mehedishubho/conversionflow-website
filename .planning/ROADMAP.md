@@ -120,9 +120,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01-PLAN.md -- Extract useCountUp hook, animate TrustBar stats and HeroSection dashboard
-- [ ] 06-02-PLAN.md -- Currency toggle, checkout links, and WhatsApp BD payment on pricing page
-- [ ] 06-03-PLAN.md -- Validated contact form with success feedback on support page
+- [x] 06-01-PLAN.md -- Extract useCountUp hook, animate TrustBar stats and HeroSection dashboard
+- [x] 06-02-PLAN.md -- Currency toggle, checkout links, and WhatsApp BD payment on pricing page
+- [x] 06-03-PLAN.md -- Validated contact form with success feedback on support page
 
 ### Phase 7: Blog, Docs, and Legal
 **Goal**: The site has three new content sections -- a blog with MDX posts, documentation with structured guides, and legal pages (Privacy, Terms, Refund, License). These are essential for trust, SEO, and compliance.
