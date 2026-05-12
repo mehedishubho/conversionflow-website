@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { supportChannels } from "@/data/support";
+import { ContactForm } from "@/components/sections/ContactForm";
 
 export const metadata: Metadata = {
   title: "Support",
@@ -57,55 +58,7 @@ export default function Support() {
             <div className="sec-title">Send Us a Message</div>
           </div>
 
-          <div className="contact-form">
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Your Name</label>
-                <input
-                  className="form-input"
-                  type="text"
-                  placeholder="Rahim Ahmed"
-                />
-              </div>
-              <div className="form-group">
-                <label>Email Address</label>
-                <input
-                  className="form-input"
-                  type="email"
-                  placeholder="rahim@store.com"
-                />
-              </div>
-              <div className="form-group">
-                <label>License Key</label>
-                <input
-                  className="form-input"
-                  type="text"
-                  placeholder="WB-XXXX-XXXX-XXXX"
-                />
-              </div>
-              <div className="form-group">
-                <label>Subject</label>
-                <input
-                  className="form-input"
-                  type="text"
-                  placeholder="Steadfast sync not working"
-                />
-              </div>
-            </div>
-            <div className="form-group" style={{ marginBottom: "20px" }}>
-              <label>Message</label>
-              <textarea
-                className="form-input"
-                placeholder="Describe your issue in detail..."
-              ></textarea>
-            </div>
-            <span
-              className="btn btn-primary btn-lg"
-              style={{ cursor: "pointer" }}
-            >
-              Send Message →
-            </span>
-          </div>
+          <ContactForm />
         </div>
       </section>
     </>
