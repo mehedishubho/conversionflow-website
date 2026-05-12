@@ -47,6 +47,7 @@ completed: 2026-05-12
 ## Task Commits
 
 1. **Task 1 and 2: Docs layout and pages** - `f5ba54c` (feat)
+2. **Task 1 lint fix: Defer TOC heading state update** - `b3aa0fb` (fix)
 
 ## Files Created/Modified
 
@@ -62,11 +63,24 @@ completed: 2026-05-12
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug] TOC heading discovery set state synchronously inside an effect**
+- **Found during:** Code review/lint gate
+- **Issue:** React lint flagged the `TableOfContents` mount effect for synchronous state update.
+- **Fix:** Deferred heading discovery/state update with `requestAnimationFrame` and cleaned it up with `cancelAnimationFrame`.
+- **Files modified:** `src/components/docs/TableOfContents.tsx`
+- **Verification:** `pnpm exec eslint` on Phase 7 changed source files passes and `pnpm build` passes.
+- **Committed in:** `b3aa0fb`
+
+---
+
+**Total deviations:** 1 auto-fixed (1 bug)
+**Impact on plan:** Improved React lint compatibility without changing docs behavior.
 
 ## Issues Encountered
 
-None.
+None beyond the auto-fixed TOC lint issue.
 
 ## User Setup Required
 
