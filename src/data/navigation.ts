@@ -17,19 +17,19 @@ export const footerProductLinks: NavLink[] = [
   { name: "Features", href: "/features" },
   { name: "Pricing", href: "/pricing" },
   { name: "Changelog", href: "/changelog" },
-  { name: "Documentation", href: "#" },
+  { name: "Documentation", href: "/docs" },
 ];
 
 export const footerCompanyLinks: NavLink[] = [
   { name: "Devsroom", href: "https://devsroom.com" },
   { name: "WPMHS", href: "https://wpmhs.com" },
-  { name: "Blog", href: "#" },
+  { name: "Blog", href: "/blog" },
   { name: "Support", href: "/support" },
 ];
 
 export const footerLegalLinks: NavLink[] = [
-  { name: "Privacy Policy", href: "#" },
-  { name: "Terms of Service", href: "#" },
-  { name: "Refund Policy", href: "#" },
-  { name: "License Agreement", href: "#" },
+  { name: "Privacy Policy", href: "/privacy" },
+  { name: "Terms of Service", href: "/terms" },
+  { name: "Refund Policy", href: "/refund" },
+  { name: "License Agreement", href: "/license" },
 ];
