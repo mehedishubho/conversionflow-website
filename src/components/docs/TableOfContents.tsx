@@ -14,17 +14,21 @@ export function TableOfContents() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    const elements = Array.from(
-      document.querySelectorAll<HTMLHeadingElement>("article.prose h2[id], article.prose h3[id]")
-    );
+    const frame = requestAnimationFrame(() => {
+      const elements = Array.from(
+        document.querySelectorAll<HTMLHeadingElement>("article.prose h2[id], article.prose h3[id]")
+      );
 
-    setHeadings(
-      elements.map((element) => ({
-        id: element.id,
-        text: element.textContent || "",
-        level: Number.parseInt(element.tagName[1], 10),
-      }))
-    );
+      setHeadings(
+        elements.map((element) => ({
+          id: element.id,
+          text: element.textContent || "",
+          level: Number.parseInt(element.tagName[1], 10),
+        }))
+      );
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
