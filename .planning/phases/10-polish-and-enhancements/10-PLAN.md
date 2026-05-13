@@ -1,45 +1,44 @@
 # Phase 10: Polish and Enhancements
 
-This phase brings the site from functional to premium by addressing typographic weight issues, improving animation choreography with Framer Motion, rebuilding the custom cursor for smoother physics, and ensuring consistent responsive degradation across devices.
+This phase brings the site from functional to premium by removing unused typographic elements, improving animation choreography with Framer Motion, rebuilding the custom cursor for smoother physics, and ensuring consistent responsive degradation across devices.
 
 ## Proposed Changes
 
-### 1. Typography Fixes
+### 1. Typography Simplification
 
-#### [MODIFY] src/app/[locale]/layout.tsx
-- Replace the `DM_Sans` override mapped to `--font-syne` with the correct `Syne` Google Font import.
-- Ensure the weight range includes `900` to fix the missing weights in headings.
+#### [MODIFY] src/app/[locale]/layout.tsx & globals.css
+- Completely remove all references to the `Syne` font across the project.
+- Rename the font variable from `--font-syne` to `--font-dm-sans` to accurately reflect the use of `DM_Sans` for all text (headings and body).
+- Update `globals.css` to remove the `.font-syne` utility class and any `font-family: var(--font-syne)` CSS rules, standardizing the entire site on `DM_Sans`.
 
-### 2. Custom Cursor Improvements
+### 2. Header & General Responsiveness
+
+#### [MODIFY] src/components/layout/Navbar.tsx & globals.css
+- **Header Responsiveness:** Audit the padding, flex gap, and alignment in the `Navbar.tsx` specifically for mobile (below 640px) and tablet views. Ensure the Language Toggle, Theme Toggle, and Mobile Menu toggle fit comfortably on narrow screens (e.g., iPhone SE) without overlapping or breaking layout.
+- **General Responsiveness:** Apply the "Balanced Degradation" strategy to the rest of the site (Bento grids drop to 2 columns on tablet, stack to 1 column on mobile).
+
+### 3. Custom Cursor Improvements
 
 #### [MODIFY] src/components/layout/CustomCursor.tsx
-- Refactor the component to use `framer-motion` (`useMotionValue`, `useSpring`) instead of vanilla `requestAnimationFrame`.
-- Retain the check for touch devices `(pointer: coarse)` so it's disabled on mobile/tablet.
+- Refactor the component to use `framer-motion` (`useMotionValue`, `useSpring`) instead of vanilla `requestAnimationFrame` for a premium, buttery-smooth feel.
+- Retain the check for touch devices `(pointer: coarse)` so it's disabled appropriately.
 
-### 3. Animation Choreography
+### 4. Animation Choreography
 
 #### [NEW] src/components/layout/ScrollReveal.tsx
 - Create a reusable `ScrollReveal` Framer Motion wrapper component.
-- Utilize `whileInView` with `viewport={{ once: true, margin: "-100px" }}` to trigger simple, elegant fade-up animations as sections enter the screen.
+- Utilize `whileInView` with `viewport={{ once: true, margin: "-100px" }}` to trigger simple, elegant fade-up animations.
 
 #### [MODIFY] src/app/[locale]/page.tsx (and related structural components)
-- Wrap key structural sections (Hero, Bento Grid, Features, etc.) with the new `ScrollReveal` component to orchestrate the page entrance.
-
-### 4. Responsive Degradation & Layout
-
-#### [MODIFY] src/app/globals.css
-- Audit the existing media queries (`@media (max-width: 960px)` and `640px`).
-- Ensure the "Balanced Degradation" strategy is applied:
-  - Tablet (`960px`): Ensure grids drop to 2 columns appropriately with balanced padding.
-  - Mobile (`640px`): Stack securely to 1 column. 
+- Wrap key structural sections (Hero, Bento Grid, Features, etc.) with the new `ScrollReveal` component to orchestrate the page entrance via elegant fade-ups.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `pnpm lint` and `pnpm build` to verify no typescript errors were introduced by the Framer Motion hooks.
+- Run `pnpm lint` and `pnpm build` to verify no typescript errors were introduced by the Framer Motion hooks and font variables removal.
 
 ### Manual Verification
-- **Visual inspection on desktop:** Verify Syne 900 renders properly in `<h1>` / `.sec-title` tags without synthetic browser bolding.
+- **Visual inspection on desktop:** Verify `DM_Sans` is applied cleanly across all headings.
+- **Responsive test (Header):** Test the Navbar down to 320px width in browser dev tools to confirm all elements are accessible and don't wrap incorrectly.
 - **Visual inspection on desktop:** Verify the custom cursor tracks the pointer smoothly with spring physics and blend-mode styling.
 - **Scroll test:** Confirm sections fade-up elegantly without causing layout shifts or scroll jank.
-- **Responsive test:** Simulate tablet (768px) and mobile (375px) in DevTools to ensure column structures degrade cleanly.
