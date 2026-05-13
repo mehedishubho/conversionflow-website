@@ -140,13 +140,13 @@
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Complete |
-| FOUND-03 | Phase 10 | Not started |
+| FOUND-03 | Phase 10 | Complete |
 | FOUND-04 | Phase 1 | Complete |
-| FOUND-05 | Phase 10 | Not started |
+| FOUND-05 | Phase 10 | Complete |
 | FOUND-06 | Phase 4 | Complete |
 | FOUND-07 | Phase 5 | Not started |
-| FOUND-08 | Phase 10 | Not started |
-| FOUND-09 | Phase 10 | Not started |
+| FOUND-08 | Phase 10 | Complete |
+| FOUND-09 | Phase 10 | Complete |
 | FOUND-10 | Phase 1 | Complete |
 | HOME-01 | Phase 2 | Complete |
 | HOME-02 | Phase 2 | Complete |
@@ -201,10 +201,10 @@
 | SEO-03 | Phase 8 | Not started |
 | SEO-04 | Phase 8 | Not started |
 | SEO-05 | Phase 8 | Not started |
-| I18N-01 | Phase 9 | Not started |
-| I18N-02 | Phase 9 | Not started |
-| I18N-03 | Phase 9 | Not started |
-| I18N-04 | Phase 9 | Not started |
+| I18N-01 | Phase 9 | Complete |
+| I18N-02 | Phase 9 | Complete |
+| I18N-03 | Phase 9 | Complete |
+| I18N-04 | Phase 9 | Complete |
 
 **Coverage:**
 - v1 requirements: 57 total
