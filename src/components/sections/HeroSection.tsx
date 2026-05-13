@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useCountUp } from "@/hooks/useCountUp";
-import { useT } from "@/lib/useT";
+import { useTranslations } from "next-intl";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const chartBarHeights = ["38%", "52%", "46%", "68%", "60%", "82%", "100%"];
@@ -31,7 +31,7 @@ function DashStat({
 }
 
 export function HeroSection() {
-  const t = useT();
+  const t = useTranslations("hero");
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInView = useInView(chartRef, { once: true, amount: 0.3 });
 
@@ -51,7 +51,7 @@ export function HeroSection() {
             >
               <div className="hero-eyebrow">
                 <div className="eyebrow-dot" />
-                {t.hero.eyebrow}
+                {t("eyebrow")}
               </div>
             </motion.div>
 
@@ -60,11 +60,11 @@ export function HeroSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.08, ease }}
-              className="font-syne text-[clamp(34px,4.5vw,58px)] font-black leading-[1.06] tracking-[-2px] text-foreground mb-5"
+              className="font-dm-sans text-[clamp(34px,4.5vw,58px)] font-black leading-[1.06] tracking-[-2px] text-foreground mb-5"
             >
-              {t.hero.title1}{" "}
+              {t("title1")}{" "}
               <span className="text-accent relative inline-block after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[3px] after:bg-accent after:rounded-[3px] after:scale-x-0 after:origin-left after:animate-[underlineIn_.5s_.8s_cubic-bezier(.22,1,.36,1)_forwards]">
-                {t.hero.titleAccent}
+                {t("titleAccent")}
               </span>
             </motion.h1>
 
@@ -75,7 +75,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.16, ease }}
               className="hero-sub"
             >
-              {t.hero.subtitle}
+              {t("subtitle")}
             </motion.p>
 
             <motion.div
@@ -85,8 +85,8 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.24, ease }}
               className="flex gap-3 flex-wrap mb-9"
             >
-              <Link href="/pricing" className="btn btn-primary btn-lg">{t.hero.ctaPrimary}</Link>
-              <Link href="/features" className="btn btn-outline btn-lg">{t.hero.ctaSecondary}</Link>
+              <Link href="/pricing" className="btn btn-primary btn-lg">{t("ctaPrimary")}</Link>
+              <Link href="/features" className="btn btn-outline btn-lg">{t("ctaSecondary")}</Link>
             </motion.div>
 
             <motion.div
@@ -96,9 +96,9 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.32, ease }}
               className="flex flex-wrap gap-5"
             >
-              <div className="trust-pill"><div className="trust-dot" />{t.hero.pill1}</div>
-              <div className="trust-pill"><div className="trust-dot" />{t.hero.pill2}</div>
-              <div className="trust-pill"><div className="trust-dot" />{t.hero.pill3}</div>
+              <div className="trust-pill"><div className="trust-dot" />{t("pill1")}</div>
+              <div className="trust-pill"><div className="trust-dot" />{t("pill2")}</div>
+              <div className="trust-pill"><div className="trust-dot" />{t("pill3")}</div>
             </motion.div>
           </div>
 
@@ -120,12 +120,12 @@ export function HeroSection() {
               </div>
               <div className="mock-body">
                 <div className="mstats">
-                  <DashStat target={42} label={t.hero.dashRevenue} className="g" formatter={(c) => `৳${c}L`} />
-                  <DashStat target={834} label={t.hero.dashOrders} className="b" />
-                  <DashStat target={12} label={t.hero.dashBlocked} className="r" />
+                  <DashStat target={42} label={t("dashRevenue")} className="g" formatter={(c) => `৳${c}L`} />
+                  <DashStat target={834} label={t("dashOrders")} className="b" />
+                  <DashStat target={12} label={t("dashBlocked")} className="r" />
                 </div>
                 <div className="chart-box">
-                  <div className="chart-lbl">{t.hero.chartLabel}</div>
+                  <div className="chart-lbl">{t("chartLabel")}</div>
                   <div className="chart-bars" ref={chartRef}>
                     {chartBarHeights.map((height, i) => (
                       <motion.div
@@ -143,22 +143,22 @@ export function HeroSection() {
                   <div className="orow">
                     <span className="oid">#8821</span>
                     <span className="text-muted text-[9.5px]">Steadfast</span>
-                    <span className="badge bd-ok">{t.hero.statusDelivered}</span>
+                    <span className="badge bd-ok">{t("statusDelivered")}</span>
                   </div>
                   <div className="orow">
                     <span className="oid">#8820</span>
                     <span className="text-muted text-[9.5px]">Pathao</span>
-                    <span className="badge bd-sh">{t.hero.statusTransit}</span>
+                    <span className="badge bd-sh">{t("statusTransit")}</span>
                   </div>
                   <div className="orow">
                     <span className="oid">#8819</span>
                     <span className="text-muted text-[9.5px]">RedX</span>
-                    <span className="badge bd-rt">{t.hero.statusReturned}</span>
+                    <span className="badge bd-rt">{t("statusReturned")}</span>
                   </div>
                   <div className="orow">
                     <span className="oid">#8818</span>
                     <span className="text-muted text-[9.5px]">Steadfast</span>
-                    <span className="badge bd-pn">{t.hero.statusPending}</span>
+                    <span className="badge bd-pn">{t("statusPending")}</span>
                   </div>
                 </div>
               </div>

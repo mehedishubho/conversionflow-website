@@ -56,7 +56,7 @@ export function TableOfContents() {
 
   return (
     <nav className="hidden xl:block float-right w-52 ml-10 mb-8 border-l border-[--border] pl-4">
-      <div className="font-syne text-[11px] font-extrabold uppercase tracking-[1.3px] text-muted mb-3">
+      <div className="font-dm-sans text-[11px] font-extrabold uppercase tracking-[1.3px] text-muted mb-3">
         On This Page
       </div>
       {headings.map((heading) => (

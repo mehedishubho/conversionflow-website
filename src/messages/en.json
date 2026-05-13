@@ -8,7 +8,8 @@
     "docs": "Docs",
     "buyNow": "Buy Now",
     "langEn": "EN",
-    "langBn": "বাং"
+    "langBn": "বাং",
+    "language": "Language"
   },
   "footer": {
     "tagline": "The ultimate WooCommerce automation plugin for Bangladeshi store owners. Courier sync, fraud protection, and tracking — one plugin.",
@@ -27,7 +28,16 @@
     "badge3Num": "v0.0.14",
     "badge3Label": "Latest Version",
     "connectLabel": "Connect with us",
-    "copyright": "© 2025 Devsroom · WooBooster. All rights reserved.",
+    "legal": "Legal",
+    "blog": "Blog",
+    "devsroom": "Devsroom",
+    "wpmhs": "WPMHS",
+    "whatsappBd": "WhatsApp BD",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "refundPolicy": "Refund Policy",
+    "licenseAgreement": "License Agreement",
+    "copyright": "© 2025 WooBooster by Devsroom. All rights reserved.",
     "backToTop": "Back to top ↑"
   },
   "hero": {
@@ -109,7 +119,24 @@
   },
   "testimonials": {
     "eyebrow": "Real Store Owners",
-    "title": "Loved by BD WooCommerce Sellers"
+    "title": "Loved by BD WooCommerce Sellers",
+    "items": {
+      "0": {
+        "quote": "We handle 300+ orders daily. Checking Steadfast and Pathao manually was a waste of time. WooBooster handles everything automatically.",
+        "name": "Rahim Ahmed",
+        "store": "StyleBD.com · Dhaka"
+      },
+      "1": {
+        "quote": "The Fraud Shield alone saved us ৳25,000 last month. Blacklisted a repeat scammer's number — haven't seen a fake order since.",
+        "name": "Tanvir Hossain",
+        "store": "TechGear.com.bd · Chittagong"
+      },
+      "2": {
+        "quote": "Meta CAPI changed our ad results completely. ROAS improved 40% — the algorithm finally had proper delivery and return data.",
+        "name": "Sumaiya Khan",
+        "store": "HomeDecorBD · Sylhet"
+      }
+    }
   },
   "cta": {
     "bdTag": "🇧🇩 Made for Bangladeshi Sellers",
@@ -133,7 +160,67 @@
     "fraudOrder": "Order",
     "fraudPhone": "Phone",
     "fraudStatus": "Status",
-    "fraudAction": "Action"
+    "fraudAction": "Action",
+    "live": "Live",
+    "fraudStatusPending": "Pending",
+    "fraudStatusShipped": "Shipped",
+    "fraudStatusDelivered": "Delivered",
+    "fraudStatusReturned": "Returned",
+    "modules": {
+      "0": {
+        "title": "Automated Courier Sync",
+        "description": "Automatically polls Steadfast, Pathao, and RedX in the background and updates your WooCommerce order statuses in real-time. Zero manual tracking.",
+        "detailDescription": "WooBooster polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
+        "tags": ["Steadfast", "Pathao", "RedX", "Auto Poll", "Status Mapping"],
+        "checks": [
+          "Background polling — no manual action needed",
+          "Real-time status: Delivered / Returned / Cancelled",
+          "Per-courier API key from WordPress admin",
+          "One-click manual sync from order list"
+        ]
+      },
+      "1": {
+        "title": "Advanced Analytics",
+        "description": "Revenue trends, courier performance charts, and live-polling stats — all in one beautiful dashboard.",
+        "tags": ["Live Data", "Charts"]
+      },
+      "2": {
+        "title": "Fraud Shield",
+        "description": "Block bad actors by phone, IP, or email. Velocity limits stop automated abuse before orders are placed.",
+        "detailDescription": "Bangladesh eCommerce has a high fake-order rate. Block bad actors before they cost you money — by phone number, IP address, or email. Velocity limits stop repeat abuse.",
+        "tags": ["Blacklist", "IP Block"],
+        "checks": [
+          "Global blacklist: phone, IP, email",
+          "Velocity limits — max orders per user",
+          "One-click block from the order table",
+          "Blocked orders auto-cancelled pre-payment"
+        ],
+        "blockedThisMonth": "{count} Fraud Orders Blocked",
+        "protectedThisMonth": "৳{amount} protected this month"
+      },
+      "3": {
+        "title": "Meta Pixel + CAPI",
+        "description": "Hybrid browser + server-side tracking that survives iOS 14 and ad-blockers. 100% accurate conversions.",
+        "detailDescription": "Browser-side pixels miss 30–40% of conversions. WooBooster’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
+        "tags": ["CAPI", "iOS 14+", "GA4"],
+        "checks": [
+          "Unified Tracking Hub for all platforms",
+          "GA4, TikTok, Pinterest, GTM supported",
+          "Auto-fire OrderDelivered & OrderReturned",
+          "One-click manual CAPI sync"
+        ]
+      },
+      "4": {
+        "title": "Lead Recovery",
+        "description": "Capture checkout fields in real-time as users type. Convert incomplete orders into paying customers.",
+        "tags": ["Leads", "Abandoned Cart"]
+      },
+      "5": {
+        "title": "Premium UI System",
+        "description": "Light & dark admin themes with glassmorphism, emerald accents, and micro-animations.",
+        "tags": ["Dark Mode", "Animations"]
+      }
+    }
   },
   "pricingPage": {
     "eyebrow": "Pricing",
@@ -141,6 +228,78 @@
     "subtitle": "No subscriptions. No monthly fees. Pay once, own it forever. Updates included. Priced in BDT for Bangladeshi sellers.",
     "faqEyebrow": "FAQ",
     "faqTitle": "Frequently Asked Questions",
+    "tiers": {
+      "0": {
+        "plan": "Starter",
+        "period": "/one-time",
+        "desc": "For a single WooCommerce store",
+        "buttonText": "Get Starter",
+        "features": [
+          "1 WordPress Site",
+          "All 6 Modules",
+          "Steadfast + Pathao + RedX",
+          "Meta Pixel + CAPI",
+          "Fraud Shield",
+          "1 Year Updates",
+          "Email Support",
+          "Priority Support"
+        ]
+      },
+      "1": {
+        "plan": "Professional",
+        "period": "/one-time",
+        "desc": "For agencies managing 3 stores",
+        "buttonText": "Get Professional",
+        "features": [
+          "3 WordPress Sites",
+          "All 6 Modules",
+          "Steadfast + Pathao + RedX",
+          "Meta Pixel + CAPI",
+          "Fraud Shield",
+          "Lifetime Updates",
+          "Priority Email Support",
+          "WhatsApp Support (BD)"
+        ]
+      },
+      "2": {
+        "plan": "Agency",
+        "period": "/one-time",
+        "desc": "Unlimited sites for agencies",
+        "buttonText": "Get Agency",
+        "features": [
+          "Unlimited Sites",
+          "All 6 Modules",
+          "Steadfast + Pathao + RedX",
+          "Meta Pixel + CAPI",
+          "Fraud Shield",
+          "Lifetime Updates",
+          "Priority WhatsApp Support",
+          "White-label Ready"
+        ]
+      }
+    },
+    "faqItems": {
+      "0": {
+        "question": "Is this a one-time payment or subscription?",
+        "answer": "One-time payment. No monthly or annual fees. You own it forever. Updates included for 1 year (Starter) or lifetime (Pro & Agency)."
+      },
+      "1": {
+        "question": "Which couriers are supported?",
+        "answer": "Steadfast, Pathao, and RedX — Bangladesh's top three courier services. More are on the roadmap based on user demand."
+      },
+      "2": {
+        "question": "Do I need a developer?",
+        "answer": "No. If you can install a WordPress plugin, you can fully set up WooBooster. The wizard guides you step-by-step."
+      },
+      "3": {
+        "question": "Can I pay in BDT using bKash or Nagad?",
+        "answer": "Yes. We accept bKash, Nagad, Rocket, and bank transfer. Email mhs@wpmhs.com to arrange local payment."
+      },
+      "4": {
+        "question": "What is your refund policy?",
+        "answer": "30-day money-back guarantee, no questions asked. Email mhs@wpmhs.com within 30 days for a full refund within 24 hours."
+      }
+    },
     "mostPopular": "⭐ MOST POPULAR",
     "whatsappPay": "Pay with bKash/Nagad via WhatsApp",
     "trustSecure": "🔒 Secure Checkout",
@@ -155,14 +314,62 @@
     "subtitle": "Every update documented transparently. Regular releases with new features, improvements, and bug fixes.",
     "tagNew": "🆕 New",
     "tagImp": "⬆ Improved",
-    "tagFix": "🐛 Fixed"
+    "tagFix": "🐛 Fixed",
+    "entries": {
+      "0": {
+        "date": "Released — May 2025",
+        "name": "Analytics Suite Release",
+        "changes": [
+          "Full analytics dashboard with revenue trends and courier performance charts",
+          "Unified Tracking Hub — manage all pixels from one interface",
+          "Live background polling with auto-refresh stats",
+          "Dual-theme design system — glassmorphism light & dark modes",
+          "Missing-file guards for stability during deployments"
+        ]
+      },
+      "1": {
+        "date": "Released — April 2025",
+        "name": "Fraud Shield & CAPI Events",
+        "changes": [
+          "Global blacklist by phone, IP, and email address",
+          "Velocity limits — max orders per user per day",
+          "OrderDelivered & OrderReturned Meta CAPI events",
+          "One-click block buttons in the WooCommerce order table"
+        ]
+      },
+      "2": {
+        "date": "Released — March 2025",
+        "name": "RedX Integration & Lead Capture",
+        "changes": [
+          "RedX courier deep integration with auto status sync",
+          "Incomplete order capture — saves checkout fields in real-time",
+          "Lead management interface to view and convert leads",
+          "Pathao API timeout handling on slow network conditions"
+        ]
+      }
+    }
   },
   "supportPage": {
     "eyebrow": "Support",
     "title": "We've Got Your Back",
     "subtitle": "Dedicated support for Bangladeshi sellers. We respond in your time zone, in Bangla or English.",
     "contactEyebrow": "Contact Form",
-    "contactTitle": "Send Us a Message"
+    "contactTitle": "Send a Message",
+    "channels": {
+      "0": {
+        "title": "Email Support",
+        "description": "Send us a detailed message and we'll respond within 24 hours, usually much faster."
+      },
+      "1": {
+        "title": "WhatsApp (BD)",
+        "description": "Bangladesh-based direct support via WhatsApp. Reply within business hours (9AM–6PM BST)."
+      },
+      "2": {
+        "title": "Documentation",
+        "description": "Step-by-step guides for every module — from first install to advanced CAPI configuration.",
+        "action": "Browse Docs →"
+      }
+    }
   },
   "contactForm": {
     "nameLabel": "Your Name",
@@ -208,11 +415,22 @@
   },
   "docsNav": {
     "gettingStarted": "Getting Started",
-    "modules": "Modules"
+    "modules": "Modules",
+    "items": {
+      "getting-started": "Getting Started",
+      "courier-sync": "Courier Sync",
+      "meta-capi": "Meta CAPI",
+      "fraud-shield": "Fraud Shield",
+      "analytics": "Analytics"
+    }
   },
   "notFound": {
     "title": "Page Not Found",
     "subtitle": "The page you're looking for doesn't exist or has been moved.",
     "back": "Back to Home"
+  },
+  "Metadata": {
+    "title": "WooBooster — WooCommerce Automation for Bangladesh",
+    "description": "All-in-one WooCommerce automation plugin for Bangladeshi stores. Courier sync, Meta CAPI, fraud protection, analytics, and more."
   }
 }

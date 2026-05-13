@@ -21,6 +21,7 @@ export interface DocPostMeta {
 }
 
 export function getBlogPosts(): BlogPostMeta[] {
+  if (!fs.existsSync(BLOG_DIR)) return [];
   const files = fs.readdirSync(BLOG_DIR).filter((file) => file.endsWith(".mdx"));
 
   return files
@@ -41,13 +42,31 @@ export function getBlogPosts(): BlogPostMeta[] {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
-export function getDocPosts(): DocPostMeta[] {
+export function getDocPosts(locale: string = "en"): DocPostMeta[] {
+  if (!fs.existsSync(DOCS_DIR)) return [];
   const files = fs.readdirSync(DOCS_DIR).filter((file) => file.endsWith(".mdx"));
+  
+  // Create a map of base slug to available locales
+  const slugsMap = new Map<string, Set<string>>();
+  files.forEach(file => {
+    const parts = file.split('.');
+    const slug = parts[0];
+    const isLocaleFile = parts.length === 3 && parts[1] !== 'mdx';
+    const fileLocale = isLocaleFile ? parts[1] : 'en';
+    
+    if (!slugsMap.has(slug)) slugsMap.set(slug, new Set());
+    slugsMap.get(slug)?.add(fileLocale);
+  });
 
-  return files
-    .map((file) => {
-      const slug = file.replace(/\.mdx$/, "");
-      const raw = fs.readFileSync(path.join(DOCS_DIR, file), "utf-8");
+  const uniqueSlugs = Array.from(slugsMap.keys());
+
+  return uniqueSlugs
+    .map((slug) => {
+      const availableLocales = slugsMap.get(slug);
+      const targetLocale = (locale === "bn" && availableLocales?.has("bn")) ? "bn" : "en";
+      const fileName = targetLocale === "bn" ? `${slug}.bn.mdx` : `${slug}.mdx`;
+      
+      const raw = fs.readFileSync(path.join(DOCS_DIR, fileName), "utf-8");
       const { data } = matter(raw);
 
       return {
@@ -58,4 +77,20 @@ export function getDocPosts(): DocPostMeta[] {
       };
     })
     .sort((a, b) => a.order - b.order);
+}
+
+export function getMdxBySlug(type: "blog" | "docs", slug: string, locale: string = "en") {
+  const dir = type === "blog" ? BLOG_DIR : DOCS_DIR;
+  const bnPath = path.join(dir, `${slug}.bn.mdx`);
+  const enPath = path.join(dir, `${slug}.mdx`);
+  
+  let targetPath = enPath;
+  if (type === "docs" && locale === "bn" && fs.existsSync(bnPath)) {
+    targetPath = bnPath;
+  }
+
+  if (!fs.existsSync(targetPath)) return null;
+
+  const raw = fs.readFileSync(targetPath, "utf-8");
+  return matter(raw);
 }

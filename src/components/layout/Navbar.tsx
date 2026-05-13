@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon, Menu, X, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLang } from "@/lib/lang";
-import { useT } from "@/lib/useT";
-
-const navHrefs = ["/", "/features", "/pricing", "/changelog", "/support", "/docs"];
+import { useTranslations } from "next-intl";
+import { LanguageToggle } from "./LanguageToggle";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,16 +15,15 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const { lang, setLang } = useLang();
-  const t = useT();
+  const t = useTranslations("nav");
 
   const navLinks = [
-    { name: t.nav.home, href: "/" },
-    { name: t.nav.features, href: "/features" },
-    { name: t.nav.pricing, href: "/pricing" },
-    { name: t.nav.changelog, href: "/changelog" },
-    { name: t.nav.support, href: "/support" },
-    { name: t.nav.docs, href: "/docs" },
+    { name: t("home"), href: "/" },
+    { name: t("features"), href: "/features" },
+    { name: t("pricing"), href: "/pricing" },
+    { name: t("changelog"), href: "/changelog" },
+    { name: t("support"), href: "/support" },
+    { name: t("docs"), href: "/docs" },
   ];
 
   useEffect(() => {
@@ -36,8 +32,6 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const toggleLang = () => setLang(lang === "en" ? "bn" : "en");
 
   if (!mounted) {
     return (
@@ -48,21 +42,21 @@ export function Navbar() {
   }
 
   return (
-    <div className="fixed top-4 left-0 right-0 z-[900] flex justify-center px-5 pointer-events-none">
+    <div className="fixed top-4 left-0 right-0 z-[900] flex justify-center px-4 md:px-5 pointer-events-none">
       <motion.nav
         initial={{ y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "max-w-[1160px] w-full flex items-center justify-between glass rounded-[18px] px-4 py-2 pointer-events-auto transition-shadow duration-300",
+          "max-w-[1160px] w-full flex items-center justify-between glass rounded-[18px] px-3 md:px-4 py-2 pointer-events-auto transition-shadow duration-300",
           isScrolled && "shadow-lg border-opacity-50"
         )}
       >
-        <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-          <div className="w-[34px] h-[34px] bg-accent rounded-[10px] flex items-center justify-center text-lg transition-transform group-hover:rotate-[-8deg] group-hover:scale-110">
+        <Link href="/" className="flex items-center gap-1.5 md:gap-2.5 flex-shrink-0 group">
+          <div className="w-[30px] h-[30px] md:w-[34px] md:h-[34px] bg-accent rounded-[10px] flex items-center justify-center text-base md:text-lg transition-transform group-hover:rotate-[-8deg] group-hover:scale-110">
             🚀
           </div>
-          <div className="font-syne font-black text-[15px] text-foreground tracking-[-0.3px]">
+          <div className="font-black text-[14px] md:text-[15px] text-foreground tracking-[-0.3px]">
             Woo<span className="text-accent">Booster</span>
           </div>
         </Link>
@@ -71,8 +65,9 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-0.5">
           {navLinks.map((link) => (
             <Link
-              key={navHrefs[navLinks.indexOf(link)]}
-              href={link.href}
+              key={link.href}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              href={link.href as any}
               className={cn(
                 "relative text-[13.5px] font-medium px-3.5 py-2 rounded-[9px] transition-all duration-200",
                 pathname === link.href
@@ -92,32 +87,27 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-9 h-9 border border-border rounded-[9px] flex items-center justify-center text-lg hover:border-accent hover:bg-accent-light transition-all text-text2"
+            className="w-8 h-8 md:w-9 md:h-9 border border-border rounded-[9px] flex items-center justify-center text-lg hover:border-accent hover:bg-accent-light transition-all text-text2"
+            aria-label="Toggle Theme"
           >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === "dark" ? <Sun size={16} className="md:w-[18px] md:h-[18px]" /> : <Moon size={16} className="md:w-[18px] md:h-[18px]" />}
           </button>
 
-          <button
-            onClick={toggleLang}
-            className="h-9 px-2 border border-border rounded-[9px] flex items-center justify-center text-[12px] font-bold hover:border-accent hover:bg-accent-light transition-all text-text2 gap-1"
-          >
-            <span className={cn(lang === "en" && "text-accent")}>{t.nav.langEn}</span>
-            <span className="text-border">/</span>
-            <span className={cn(lang === "bn" && "text-accent")}>{t.nav.langBn}</span>
-          </button>
+          <LanguageToggle />
 
           <Link href="/pricing" className="hidden sm:flex btn btn-primary text-[13px] px-4 py-2">
-            {t.nav.buyNow} <ArrowRight size={14} className="ml-1" />
+            {t("buyNow")} <ArrowRight size={14} className="ml-1" />
           </Link>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden w-9 h-9 border border-border rounded-[9px] flex items-center justify-center text-text2 hover:bg-accent-light"
+            className="md:hidden w-8 h-8 border border-border rounded-[9px] flex items-center justify-center text-text2 hover:bg-accent-light"
+            aria-label="Toggle Mobile Menu"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </motion.nav>
@@ -134,7 +124,8 @@ export function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                href={link.href as any}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   "p-3 rounded-xl text-sm font-medium transition-colors",
@@ -147,22 +138,17 @@ export function Navbar() {
               </Link>
             ))}
             <div className="h-px bg-border my-2" />
-            <button
-              onClick={toggleLang}
-              className="p-3 rounded-xl text-sm font-medium transition-colors text-text2 hover:bg-accent-light flex items-center gap-2"
-            >
-              <span>Language:</span>
-              <span className={cn("font-bold", lang === "en" && "text-accent")}>English</span>
-              <span>/</span>
-              <span className={cn("font-bold", lang === "bn" && "text-accent")}>বাংলা</span>
-            </button>
+            <div className="p-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-text2">{t("language")}</span>
+              <LanguageToggle />
+            </div>
             <div className="h-px bg-border my-2" />
             <Link
               href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
               className="btn btn-primary w-full justify-center py-3"
             >
-              {t.nav.buyNow}
+              {t("buyNow")}
             </Link>
           </motion.div>
         )}

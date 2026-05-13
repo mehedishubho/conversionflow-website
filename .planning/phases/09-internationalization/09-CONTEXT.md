@@ -13,8 +13,8 @@ Implementing bilingual support (English & Bengali) using `next-intl`. This inclu
 
 ### 1. Routing Strategy
 - **Approach**: URL-based locale segments using `next-intl`.
-- **Default Locale**: `en` (English).
-- **Prefixing**: Use URL prefixes (e.g., `/bn/...`). The default locale (`en`) should ideally be hidden or redirect from the root (e.g., `/features` serves English content by default).
+- **Default Locale**: `bn` (Bengali).
+- **Prefixing**: Use URL prefixes (e.g., `/en/...`). The default locale (`bn`) should ideally be hidden or redirect from the root (e.g., `/features` serves Bengali content by default).
 - **Structural Change**: Move existing `src/app` routes into `src/app/[locale]` (or equivalent `next-intl` structure) to support the locale segment.
 
 ### 2. User Interface (Switching)

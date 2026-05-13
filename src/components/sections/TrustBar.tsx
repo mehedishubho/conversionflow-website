@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useCountUp } from "@/hooks/useCountUp";
-import { useT } from "@/lib/useT";
+import { useTranslations } from "next-intl";
 
 function StatItem({ number, label, suffix, display, delay }: {
   number: number;
@@ -33,14 +33,14 @@ function StatItem({ number, label, suffix, display, delay }: {
 }
 
 export function TrustBar() {
-  const t = useT();
+  const t = useTranslations("trustBar");
 
   const stats = [
-    { number: 500, label: t.trustBar.activeStores, suffix: "+" },
-    { number: 3, label: t.trustBar.bdCouriers },
-    { number: 6, label: t.trustBar.trackingPlatforms },
-    { number: 100, label: t.trustBar.capiAccuracy, suffix: "%" },
-    { number: 0, label: t.trustBar.bdtPricing, display: "৳৳৳" },
+    { number: 500, label: t("activeStores"), suffix: "+" },
+    { number: 3, label: t("bdCouriers") },
+    { number: 6, label: t("trackingPlatforms") },
+    { number: 100, label: t("capiAccuracy"), suffix: "%" },
+    { number: 0, label: t("bdtPricing"), display: "৳৳৳" },
   ];
 
   return (

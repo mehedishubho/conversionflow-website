@@ -1,21 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
-  const pos = useRef({ x: 0, y: 0 });
-  const ring = useRef({ x: 0, y: 0 });
-  const raf = useRef<number>(0);
+  const [isTouch, setIsTouch] = useState(false);
+
+  // Motion values for the pointer position
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  
+  // Spring configuration for the ring trailing effect
+  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
+  const ringX = useSpring(cursorX, springConfig);
+  const ringY = useSpring(cursorY, springConfig);
 
   useEffect(() => {
+    setMounted(true);
+    
     // Disable on touch devices
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      setIsTouch(true);
+      return;
+    }
 
     const onMove = (e: MouseEvent) => {
-      pos.current = { x: e.clientX, y: e.clientY };
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
       if (!visible) setVisible(true);
     };
 
@@ -26,42 +39,37 @@ export function CustomCursor() {
     document.addEventListener("mouseleave", onLeave);
     document.addEventListener("mouseenter", onEnter);
 
-    const animate = () => {
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate(${pos.current.x - 4}px, ${pos.current.y - 4}px)`;
-      }
-      if (ringRef.current) {
-        ring.current.x += (pos.current.x - ring.current.x) * 0.12;
-        ring.current.y += (pos.current.y - ring.current.y) * 0.12;
-        ringRef.current.style.transform = `translate(${ring.current.x - 18}px, ${ring.current.y - 18}px)`;
-      }
-      raf.current = requestAnimationFrame(animate);
-    };
-
-    raf.current = requestAnimationFrame(animate);
-
     return () => {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("mouseenter", onEnter);
-      cancelAnimationFrame(raf.current);
     };
-  }, [visible]);
+  }, [visible, cursorX, cursorY]);
+
+  if (!mounted || isTouch) return null;
 
   return (
     <>
-      {/* Dot */}
-      <div
-        ref={dotRef}
+      <motion.div
         className="cursor-dot"
-        style={{ opacity: visible ? 1 : 0 }}
+        style={{
+          x: cursorX,
+          y: cursorY,
+          translateX: "-50%",
+          translateY: "-50%",
+          opacity: visible ? 1 : 0,
+        }}
         aria-hidden
       />
-      {/* Ring */}
-      <div
-        ref={ringRef}
+      <motion.div
         className="cursor-ring"
-        style={{ opacity: visible ? 1 : 0 }}
+        style={{
+          x: ringX,
+          y: ringY,
+          translateX: "-50%",
+          translateY: "-50%",
+          opacity: visible ? 1 : 0,
+        }}
         aria-hidden
       />
     </>

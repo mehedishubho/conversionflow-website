@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { getBlogPosts } from "@/lib/mdx";
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
-  return [
-    { slug: "woo-booster-getting-started" },
-    { slug: "bd-ecommerce-courier-guide" },
-    { slug: "meta-capi-bangladesh" },
-  ];
+export async function generateStaticParams() {
+  const posts = getBlogPosts();
+  return posts.flatMap(post => [
+    { locale: "en", slug: post.slug },
+    { locale: "bn", slug: post.slug },
+  ]);
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getBlogPosts().find((item) => item.slug === slug);
@@ -36,7 +36,7 @@ export async function generateMetadata({
 export default async function BlogPostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
   const { slug } = await params;
   const post = getBlogPosts().find((item) => item.slug === slug);

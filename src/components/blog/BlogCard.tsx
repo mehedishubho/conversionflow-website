@@ -16,7 +16,7 @@ export function BlogCard({ post, index }: { post: BlogPostMeta; index: number })
     >
       <GradientThumbnail variant={index % 3} />
       <div className="mt-5 text-xs font-bold text-muted">{date}</div>
-      <h2 className="font-syne text-base font-extrabold text-foreground mt-2 mb-2">
+      <h2 className="font-dm-sans text-base font-extrabold text-foreground mt-2 mb-2">
         {post.title}
       </h2>
       <p className="text-sm text-text2 leading-relaxed">{post.excerpt}</p>

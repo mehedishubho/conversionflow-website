@@ -1,12 +1,18 @@
-import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/LegalLayout";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "WooBooster Privacy Policy -- how we collect, use, and protect your data.",
-};
+export async function generateStaticParams() {
+  return [
+    { locale: "en" },
+    { locale: "bn" },
+  ];
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  await params;
   return (
     <LegalLayout title="Privacy Policy" lastUpdated="June 1, 2025">
       <h2>Information We Collect</h2>
