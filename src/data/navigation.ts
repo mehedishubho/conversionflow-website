@@ -1,5 +1,3 @@
-// src/data/navigation.ts
-
 interface NavLink {
   name: string;
   href: string;
@@ -18,13 +16,15 @@ export const footerProductLinks: NavLink[] = [
   { name: "Pricing", href: "/pricing" },
   { name: "Changelog", href: "/changelog" },
   { name: "Documentation", href: "/docs" },
+  { name: "Support", href: "/support" },
 ];
 
-export const footerCompanyLinks: NavLink[] = [
+export const footerResourceLinks: NavLink[] = [
+  { name: "Blog", href: "/blog" },
   { name: "Devsroom", href: "https://devsroom.com" },
   { name: "WPMHS", href: "https://wpmhs.com" },
-  { name: "Blog", href: "/blog" },
-  { name: "Support", href: "/support" },
+  { name: "WhatsApp BD", href: "https://wa.me/8801721328992" },
+  { name: "mhs@wpmhs.com", href: "mailto:mhs@wpmhs.com" },
 ];
 
 export const footerLegalLinks: NavLink[] = [

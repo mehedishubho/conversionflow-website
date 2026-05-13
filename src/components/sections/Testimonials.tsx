@@ -1,30 +1,34 @@
+"use client";
+
+import { useT } from "@/lib/useT";
 import { testimonials } from "@/data/testimonials";
+import { StaggerReveal, StaggerItem } from "@/components/layout/StaggerReveal";
 
 export function Testimonials() {
+  const t = useT();
+
   return (
     <section className="sec sec-bg">
       <div className="max-w-[1160px] mx-auto px-7">
         <div className="sh center">
-          <div className="eyebrow">Real Store Owners</div>
-          <div className="sec-title">Loved by BD WooCommerce Sellers</div>
+          <div className="eyebrow">{t.testimonials.eyebrow}</div>
+          <div className="sec-title">{t.testimonials.title}</div>
         </div>
-        <div className="tgrid">
-          {testimonials.map((t) => (
-            <div key={t.name} className="tcard">
-              <div className="stars">{t.stars}</div>
-              <div className="tquote">
-                &quot;{t.quote}&quot;
-              </div>
+        <StaggerReveal className="tgrid">
+          {testimonials.map((item) => (
+            <StaggerItem key={item.name} className="tcard">
+              <div className="stars">{item.stars}</div>
+              <div className="tquote">&quot;{item.quote}&quot;</div>
               <div className="tauthor">
-                <div className={`tav ${t.avatarColor}`}>{t.initials}</div>
+                <div className={`tav ${item.avatarColor}`}>{item.initials}</div>
                 <div>
-                  <div className="tname">{t.name}</div>
-                  <div className="tstore">{t.store}</div>
+                  <div className="tname">{item.name}</div>
+                  <div className="tstore">{item.store}</div>
                 </div>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerReveal>
       </div>
     </section>
   );

@@ -7,31 +7,37 @@ import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon, Menu, X, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { navLinks } from "@/data/navigation";
+import { useLang } from "@/lib/lang";
+import { useT } from "@/lib/useT";
+
+const navHrefs = ["/", "/features", "/pricing", "/changelog", "/support", "/docs"];
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [lang, setLang] = useState<"en" | "bn">("en");
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { lang, setLang } = useLang();
+  const t = useT();
+
+  const navLinks = [
+    { name: t.nav.home, href: "/" },
+    { name: t.nav.features, href: "/features" },
+    { name: t.nav.pricing, href: "/pricing" },
+    { name: t.nav.changelog, href: "/changelog" },
+    { name: t.nav.support, href: "/support" },
+    { name: t.nav.docs, href: "/docs" },
+  ];
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
-    const saved = localStorage.getItem("lang") as "en" | "bn" | null;
-    if (saved) setLang(saved);
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const toggleLang = () => {
-    const next = lang === "en" ? "bn" : "en";
-    setLang(next);
-    localStorage.setItem("lang", next);
-    document.documentElement.lang = next;
-  };
+  const toggleLang = () => setLang(lang === "en" ? "bn" : "en");
 
   if (!mounted) {
     return (
@@ -65,12 +71,12 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-0.5">
           {navLinks.map((link) => (
             <Link
-              key={link.name}
+              key={navHrefs[navLinks.indexOf(link)]}
               href={link.href}
               className={cn(
                 "relative text-[13.5px] font-medium px-3.5 py-2 rounded-[9px] transition-all duration-200",
-                pathname === link.href 
-                  ? "text-accent" 
+                pathname === link.href
+                  ? "text-accent"
                   : "text-text2 hover:text-foreground hover:bg-accent-light"
               )}
             >
@@ -98,26 +104,15 @@ export function Navbar() {
             onClick={toggleLang}
             className="h-9 px-2 border border-border rounded-[9px] flex items-center justify-center text-[12px] font-bold hover:border-accent hover:bg-accent-light transition-all text-text2 gap-1"
           >
-            <span className={cn(lang === "en" && "text-accent")}>EN</span>
+            <span className={cn(lang === "en" && "text-accent")}>{t.nav.langEn}</span>
             <span className="text-border">/</span>
-            <span className={cn(lang === "bn" && "text-accent")}>বাং</span>
+            <span className={cn(lang === "bn" && "text-accent")}>{t.nav.langBn}</span>
           </button>
 
-          <Link
-            href="/pricing"
-            className="hidden sm:flex btn btn-outline text-[13px] px-4 py-2"
-          >
-            View Plans
-          </Link>
-          
-          <Link
-            href="/pricing"
-            className="hidden sm:flex btn btn-primary text-[13px] px-4 py-2"
-          >
-            Buy Now <ArrowRight size={14} className="ml-1" />
+          <Link href="/pricing" className="hidden sm:flex btn btn-primary text-[13px] px-4 py-2">
+            {t.nav.buyNow} <ArrowRight size={14} className="ml-1" />
           </Link>
 
-          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden w-9 h-9 border border-border rounded-[9px] flex items-center justify-center text-text2 hover:bg-accent-light"
@@ -138,13 +133,13 @@ export function Navbar() {
           >
             {navLinks.map((link) => (
               <Link
-                key={link.name}
+                key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   "p-3 rounded-xl text-sm font-medium transition-colors",
-                  pathname === link.href 
-                    ? "bg-accent/10 text-accent" 
+                  pathname === link.href
+                    ? "bg-accent/10 text-accent"
                     : "text-text2 hover:bg-accent-light"
                 )}
               >
@@ -167,7 +162,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="btn btn-primary w-full justify-center py-3"
             >
-              Get WooBooster
+              {t.nav.buyNow}
             </Link>
           </motion.div>
         )}

@@ -4,9 +4,9 @@ import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useCountUp } from "@/hooks/useCountUp";
+import { useT } from "@/lib/useT";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-
 const chartBarHeights = ["38%", "52%", "46%", "68%", "60%", "82%", "100%"];
 
 function DashStat({
@@ -21,20 +21,17 @@ function DashStat({
   formatter?: (count: number) => string;
 }) {
   const { count, ref } = useCountUp({ target, duration: 1500 });
-
   const display = formatter ? formatter(count) : String(count);
-
   return (
     <div className="ms">
       <div className="ms-l">{label}</div>
-      <div className={`ms-v ${className}`} ref={ref}>
-        {display}
-      </div>
+      <div className={`ms-v ${className}`} ref={ref}>{display}</div>
     </div>
   );
 }
 
 export function HeroSection() {
+  const t = useT();
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInView = useInView(chartRef, { once: true, amount: 0.3 });
 
@@ -54,7 +51,7 @@ export function HeroSection() {
             >
               <div className="hero-eyebrow">
                 <div className="eyebrow-dot" />
-                v0.0.14 — Analytics Suite Live
+                {t.hero.eyebrow}
               </div>
             </motion.div>
 
@@ -65,9 +62,9 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.08, ease }}
               className="font-syne text-[clamp(34px,4.5vw,58px)] font-black leading-[1.06] tracking-[-2px] text-foreground mb-5"
             >
-              Run Your WooCommerce Store on{" "}
+              {t.hero.title1}{" "}
               <span className="text-accent relative inline-block after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[3px] after:bg-accent after:rounded-[3px] after:scale-x-0 after:origin-left after:animate-[underlineIn_.5s_.8s_cubic-bezier(.22,1,.36,1)_forwards]">
-                Autopilot
+                {t.hero.titleAccent}
               </span>
             </motion.h1>
 
@@ -78,9 +75,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.16, ease }}
               className="hero-sub"
             >
-              Automated courier sync with Steadfast, Pathao &amp; RedX. Meta CAPI
-              tracking that survives iOS 14. Fraud Shield. Real-time analytics.
-              Built for Bangladeshi WooCommerce sellers.
+              {t.hero.subtitle}
             </motion.p>
 
             <motion.div
@@ -90,12 +85,8 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.24, ease }}
               className="flex gap-3 flex-wrap mb-9"
             >
-              <Link href="/pricing" className="btn btn-primary btn-lg">
-                Get WooBooster — ৳3,499
-              </Link>
-              <Link href="/features" className="btn btn-outline btn-lg">
-                See Features
-              </Link>
+              <Link href="/pricing" className="btn btn-primary btn-lg">{t.hero.ctaPrimary}</Link>
+              <Link href="/features" className="btn btn-outline btn-lg">{t.hero.ctaSecondary}</Link>
             </motion.div>
 
             <motion.div
@@ -105,18 +96,9 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.32, ease }}
               className="flex flex-wrap gap-5"
             >
-              <div className="trust-pill">
-                <div className="trust-dot" />
-                500+ Active Stores
-              </div>
-              <div className="trust-pill">
-                <div className="trust-dot" />
-                30-Day Money Back
-              </div>
-              <div className="trust-pill">
-                <div className="trust-dot" />
-                bKash &amp; Nagad Ready
-              </div>
+              <div className="trust-pill"><div className="trust-dot" />{t.hero.pill1}</div>
+              <div className="trust-pill"><div className="trust-dot" />{t.hero.pill2}</div>
+              <div className="trust-pill"><div className="trust-dot" />{t.hero.pill3}</div>
             </motion.div>
           </div>
 
@@ -138,17 +120,12 @@ export function HeroSection() {
               </div>
               <div className="mock-body">
                 <div className="mstats">
-                  <DashStat
-                    target={42}
-                    label="Revenue"
-                    className="g"
-                    formatter={(count) => `৳${count}L`}
-                  />
-                  <DashStat target={834} label="Orders" className="b" />
-                  <DashStat target={12} label="Blocked" className="r" />
+                  <DashStat target={42} label={t.hero.dashRevenue} className="g" formatter={(c) => `৳${c}L`} />
+                  <DashStat target={834} label={t.hero.dashOrders} className="b" />
+                  <DashStat target={12} label={t.hero.dashBlocked} className="r" />
                 </div>
                 <div className="chart-box">
-                  <div className="chart-lbl">Revenue Trend — 7 Days</div>
+                  <div className="chart-lbl">{t.hero.chartLabel}</div>
                   <div className="chart-bars" ref={chartRef}>
                     {chartBarHeights.map((height, i) => (
                       <motion.div
@@ -157,11 +134,7 @@ export function HeroSection() {
                         style={{ height, transformOrigin: "bottom" }}
                         initial={{ scaleY: 0 }}
                         animate={chartInView ? { scaleY: 1 } : { scaleY: 0 }}
-                        transition={{
-                          duration: 0.6,
-                          delay: i * 0.08,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
+                        transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                       />
                     ))}
                   </div>
@@ -170,22 +143,22 @@ export function HeroSection() {
                   <div className="orow">
                     <span className="oid">#8821</span>
                     <span className="text-muted text-[9.5px]">Steadfast</span>
-                    <span className="badge bd-ok">Delivered</span>
+                    <span className="badge bd-ok">{t.hero.statusDelivered}</span>
                   </div>
                   <div className="orow">
                     <span className="oid">#8820</span>
                     <span className="text-muted text-[9.5px]">Pathao</span>
-                    <span className="badge bd-sh">In Transit</span>
+                    <span className="badge bd-sh">{t.hero.statusTransit}</span>
                   </div>
                   <div className="orow">
                     <span className="oid">#8819</span>
                     <span className="text-muted text-[9.5px]">RedX</span>
-                    <span className="badge bd-rt">Returned</span>
+                    <span className="badge bd-rt">{t.hero.statusReturned}</span>
                   </div>
                   <div className="orow">
                     <span className="oid">#8818</span>
                     <span className="text-muted text-[9.5px]">Steadfast</span>
-                    <span className="badge bd-pn">Pending</span>
+                    <span className="badge bd-pn">{t.hero.statusPending}</span>
                   </div>
                 </div>
               </div>

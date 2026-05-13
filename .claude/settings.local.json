@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs commit 'docs: initialize project' --files .planning/PROJECT.md)",
+      "Read(//c/Users/USER/.gsd/**)",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs config-new-project '{\"mode\":\"yolo\",\"granularity\":\"standard\",\"parallelization\":true,\"commit_docs\":true,\"model_profile\":\"quality\",\"workflow\":{\"research\":true,\"plan_check\":true,\"verifier\":true,\"nyquist_validation\":true,\"auto_advance\":true}}')",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs commit 'chore: add project config' --files .planning/config.json)",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs commit 'docs: complete project research' --files .planning/research/STACK.md .planning/research/FEATURES.md .planning/research/ARCHITECTURE.md .planning/research/PITFALLS.md .planning/research/SUMMARY.md)",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs commit 'docs: define v1 requirements' --files .planning/REQUIREMENTS.md)",
+      "Read(//c/Users/mehedishubho/.claude/get-shit-done/templates/**)",
+      "Read(//c/Users/USER/.claude/get-shit-done/templates/**)",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs generate-claude-md --output CLAUDE.md)",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs commit 'docs: create roadmap \\(6 phases\\)' --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md CLAUDE.md)",
+      "WebSearch",
+      "Bash(xcopy /E /I /Y \"src\\\\components\" \"D:\\\\Devsroom-Work\\\\woobooster-website\\\\.claude\\\\worktrees\\\\agent-a5fded0ce97c4964f\\\\src\\\\components\")",
+      "Bash(xcopy /E /I /Y \"src\\\\lib\" \"D:\\\\Devsroom-Work\\\\woobooster-website\\\\.claude\\\\worktrees\\\\agent-a5fded0ce97c4964f\\\\src\\\\lib\")",
+      "Bash(xcopy /E /I /Y \"src\\\\app\\\\changelog\" \"D:\\\\Devsroom-Work\\\\woobooster-website\\\\.claude\\\\worktrees\\\\agent-a5fded0ce97c4964f\\\\src\\\\app\\\\changelog\")",
+      "Bash(xcopy /E /I /Y \"src\\\\app\\\\features\" \"D:\\\\Devsroom-Work\\\\woobooster-website\\\\.claude\\\\worktrees\\\\agent-a5fded0ce97c4964f\\\\src\\\\app\\\\features\")",
+      "Bash(xcopy /E /I /Y \"src\\\\app\\\\pricing\" \"D:\\\\Devsroom-Work\\\\woobooster-website\\\\.claude\\\\worktrees\\\\agent-a5fded0ce97c4964f\\\\src\\\\app\\\\pricing\")",
+      "Bash(git commit --no-verify -m ' *)",
+      "Read(//c/Users/mehedi/.claude/get-shit-done/templates/**)",
+      "Bash(pnpm build *)",
+      "Bash(ls src/components/sections/)",
+      "Bash(ls src/app/features/)",
+      "Bash(ls src/app/support/)",
+      "Bash(ls src/data/)",
+      "Bash(ls src/components/layout/)",
+      "Read(//c/Users/mehed/.claude/get-shit-done/templates/**)"
+    ]
+  }
+}

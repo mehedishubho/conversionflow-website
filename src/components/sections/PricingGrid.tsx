@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { pricingTiers } from "@/data/pricing";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/useT";
 
 export function PricingGrid() {
   const [currency, setCurrency] = useState<"USD" | "BDT">("USD");
+  const t = useT();
 
   return (
     <>
-      {/* Currency Toggle */}
       <div className="flex gap-2 justify-center mb-8">
         <button
           onClick={() => setCurrency("USD")}
@@ -25,26 +26,21 @@ export function PricingGrid() {
         </button>
       </div>
 
-      {/* Pricing Cards */}
       <div className="price-grid">
         {pricingTiers.map((tier) => (
           <div key={tier.plan} className={`pc${tier.popular ? " pop" : ""}`}>
-            {tier.popular && <div className="pop-tag">⭐ MOST POPULAR</div>}
+            {tier.popular && <div className="pop-tag">{t.pricingPage.mostPopular}</div>}
             <div className="p-plan">{tier.plan}</div>
             <div className="p-price">
               {currency === "USD" ? tier.priceUSD : tier.priceBDT}
               <span>{tier.period}</span>
             </div>
-            <div className="p-bdt">
-              {currency === "USD" ? tier.priceBDT : tier.priceUSD}
-            </div>
+            <div className="p-bdt">{currency === "USD" ? tier.priceBDT : tier.priceUSD}</div>
             <div className="p-desc">{tier.desc}</div>
             <ul className="p-features">
               {tier.features.map((f) => (
                 <li key={f.text}>
-                  <span className={f.included ? "p-ck" : "p-no"}>
-                    {f.included ? "✓" : "✗"}
-                  </span>
+                  <span className={f.included ? "p-ck" : "p-no"}>{f.included ? "✓" : "✗"}</span>
                   {f.text}
                 </li>
               ))}
@@ -54,12 +50,7 @@ export function PricingGrid() {
               target="_blank"
               rel="noopener noreferrer"
               className={`btn ${tier.buttonStyle}`}
-              style={{
-                width: "100%",
-                justifyContent: "center",
-                padding: "13px",
-                cursor: "pointer",
-              }}
+              style={{ width: "100%", justifyContent: "center", padding: "13px", cursor: "pointer" }}
             >
               {tier.buttonText}
             </a>
@@ -69,19 +60,18 @@ export function PricingGrid() {
               rel="noopener noreferrer"
               className="block text-center text-[11px] text-muted mt-2 hover:text-accent transition-colors"
             >
-              Pay with bKash/Nagad via WhatsApp
+              {t.pricingPage.whatsappPay}
             </a>
           </div>
         ))}
       </div>
 
-      {/* Trust Strip */}
       <div className="trust-strip">
-        <div className="ts-it">🔒 Secure Checkout</div>
-        <div className="ts-it">💳 bKash · Nagad · Card</div>
-        <div className="ts-it">🔄 30-Day Full Refund</div>
-        <div className="ts-it">⚡ Instant License Delivery</div>
-        <div className="ts-it">📞 BD Local Support</div>
+        <div className="ts-it">{t.pricingPage.trustSecure}</div>
+        <div className="ts-it">{t.pricingPage.trustPayment}</div>
+        <div className="ts-it">{t.pricingPage.trustRefund}</div>
+        <div className="ts-it">{t.pricingPage.trustDelivery}</div>
+        <div className="ts-it">{t.pricingPage.trustSupport}</div>
       </div>
     </>
   );

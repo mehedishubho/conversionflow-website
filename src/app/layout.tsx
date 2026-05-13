@@ -1,30 +1,41 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Bengali, DM_Sans, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { LangProvider } from "@/lib/lang";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { CustomCursor } from "@/components/layout/CustomCursor";
+import { PageTransition } from "@/components/layout/PageTransition";
 import "./globals.css";
 
-const notoSansBengali = Noto_Sans_Bengali({
-  subsets: ["latin", "bengali"],
-  weight: ["400", "600", "700", "800"],
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-syne",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-dm-sans",
+const notoSansBengali = Noto_Sans_Bengali({
+  subsets: ["latin", "bengali"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-bengali",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const dmSansMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "600"],
   variable: "--font-mono",
   display: "swap",
 });
+
+const plausibleDomain =
+  process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "woobooster.com";
+
+const plausibleScriptSrc =
+  process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC ??
+  "https://plausible.woobooster.com/js/script.js";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://woobooster.com"),
@@ -56,18 +67,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${notoSansBengali.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`}
+      className={`${dmSans.variable} ${notoSansBengali.variable} ${dmSansMono.variable} antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col bg-background text-foreground font-[family-name:var(--font-dm-sans)]">
+      <body className="min-h-screen flex flex-col bg-background text-foreground">
+        <Script
+          src={plausibleScriptSrc}
+          data-domain={plausibleDomain}
+          strategy="afterInteractive"
+          defer
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
         >
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <LangProvider>
+            <CustomCursor />
+            <Navbar />
+            <PageTransition>
+              <main className="flex-1">{children}</main>
+            </PageTransition>
+            <Footer />
+          </LangProvider>
         </ThemeProvider>
       </body>
     </html>
