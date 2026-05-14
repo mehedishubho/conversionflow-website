@@ -98,16 +98,20 @@ export default async function LocaleLayout({
       data-scroll-behavior="smooth"
     >
       <body className={`min-h-screen flex flex-col bg-background text-foreground ${locale === 'bn' ? 'font-bengali' : ''}`}>
-        <Script
-          src={plausibleScriptSrc}
-          data-domain={plausibleDomain}
-          strategy="afterInteractive"
-          defer
-        />
-        <Script id="analytics-locale" strategy="afterInteractive">
-          {`window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) };
-            window.plausible('register_props', { locale: '${locale}' });`}
-        </Script>
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Script
+              src={plausibleScriptSrc}
+              data-domain={plausibleDomain}
+              strategy="afterInteractive"
+              defer
+            />
+            <Script id="analytics-locale" strategy="afterInteractive">
+              {`window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) };
+                window.plausible('register_props', { locale: '${locale}' });`}
+            </Script>
+          </>
+        )}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
