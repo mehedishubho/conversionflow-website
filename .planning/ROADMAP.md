@@ -183,9 +183,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 10-01-PLAN.md -- Delete duplicate ScrollReveal, remove legacy CSS classes
-- [ ] 10-02-PLAN.md -- Add ScrollReveal to all content pages
-- [ ] 10-03-PLAN.md -- Widen container to 1280px, responsive audit
+- [x] 10-01-PLAN.md -- Delete duplicate ScrollReveal, remove legacy CSS classes
+- [x] 10-02-PLAN.md -- Add ScrollReveal to all content pages
+- [x] 10-03-PLAN.md -- Widen container to 1280px, responsive audit
 
 ## Progress
 
@@ -205,4 +205,4 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Blog, Docs, and Legal | 4/4 | Complete | 2026-05-12 |
 | 8. SEO Completion | 2/2 | Complete | 2026-05-14 |
 | 9. Internationalization | 2/2 | Complete | 2026-05-14 |
-| 10. Polish and Enhancements | 0/3 | Planning complete | - |
+| 10. Polish and Enhancements | 4/4 | Complete    | 2026-05-14 |
