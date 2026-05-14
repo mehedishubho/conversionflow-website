@@ -78,7 +78,6 @@ export function Footer() {
                 <span className="ft-logo-text">Conversion<span>Flow</span></span>
               </Link>
               <p className="ft-tagline">{t("tagline")}</p>
-              <span className="ft-made-in">{t("madeIn")}</span>
             </div>
 
             {/* Product */}
@@ -169,12 +168,15 @@ export function Footer() {
             <p className="ft-copyright">{t("copyright")}</p>
             <LanguageToggle className="h-7 px-1.5 rounded-md border-opacity-30" />
           </div>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="ft-back-top"
-          >
-            {t("backToTop")}
-          </button>
+          <div className="flex items-center gap-6">
+            <span className="ft-made-in">{t("madeIn")}</span>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="ft-back-top"
+            >
+              {t("backToTop")}
+            </button>
+          </div>
         </div>
       </div>
 
