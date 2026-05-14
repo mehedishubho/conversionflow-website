@@ -170,16 +170,22 @@ Plans:
 **UI hint**: yes
 
 ### Phase 10: Polish and Enhancements
-**Goal**: The site has premium visual polish -- custom cursor on desktop, Syne 900 weight for headings, verified responsive design across all breakpoints, and enhanced animation effects. These are the finishing touches that elevate the site from functional to premium.
+**Goal**: The site has premium visual polish -- DM_Sans standardized for all text, ScrollReveal consolidation, consistent scroll animations across all pages, container widened to 1280px, and verified responsive design. Custom cursor already implemented.
 **Depends on**: Phase 6
 **Requirements**: FOUND-03, FOUND-05, FOUND-08, FOUND-09
 **Success Criteria** (what must be TRUE):
-  1. Syne font renders weight 900 in headings without synthetic bold (font configuration updated in layout.tsx)
-  2. Custom cursor effect (floating dot with blend mode) renders on desktop and is disabled on touch devices
-  3. All pages are verified responsive at mobile (375px), tablet (768px), and desktop (1024px+) breakpoints
-  4. Enhanced Framer Motion animations work smoothly: page transitions, stagger effects, scroll reveals without layout shift
-**Plans**: TBD
-**UI hint**: yes
+  1. Headings render with DM_Sans at correct weights without synthetic bold (Syne removed)
+  2. Custom cursor effect (floating dot with blend mode) renders on desktop and is disabled on touch devices (already implemented)
+  3. All pages are verified responsive at tablet (960px) and mobile (640px) breakpoints
+  4. All pages have consistent ScrollReveal fade-up animations on below-the-fold sections
+  5. Container max-width is 1280px across the entire site
+  6. Only one ScrollReveal component exists (layout/ version), no legacy CSS classes
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md -- Delete duplicate ScrollReveal, remove legacy CSS classes
+- [ ] 10-02-PLAN.md -- Add ScrollReveal to all content pages
+- [ ] 10-03-PLAN.md -- Widen container to 1280px, responsive audit
 
 ## Progress
 
@@ -199,4 +205,4 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Blog, Docs, and Legal | 4/4 | Complete | 2026-05-12 |
 | 8. SEO Completion | 2/2 | Complete | 2026-05-14 |
 | 9. Internationalization | 2/2 | Complete | 2026-05-14 |
-| 10. Polish and Enhancements | 1/1 | Complete | 2026-05-14 |
+| 10. Polish and Enhancements | 0/3 | Planning complete | - |
