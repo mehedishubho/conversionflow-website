@@ -21,9 +21,9 @@ export const pricingTiers: PricingTier[] = [
   {
     plan: "Starter",
     priceUSD: "$29",
-    priceBDT: "≈ ৳3,499 BDT",
+    priceBDT: "≈ ৳2,150 BDT",
     period: "/one-time",
-    desc: "For a single WooCommerce store",
+    desc: "For a single WooCommerce store — 1 year updates",
     popular: false,
     features: [
       { text: "1 WordPress Site", included: true },
@@ -43,9 +43,9 @@ export const pricingTiers: PricingTier[] = [
   {
     plan: "Professional",
     priceUSD: "$69",
-    priceBDT: "≈ ৳8,299 BDT",
+    priceBDT: "≈ ৳3,000 BDT",
     period: "/one-time",
-    desc: "For agencies managing 3 stores",
+    desc: "For agencies managing 3 stores — 2 year updates",
     popular: true,
     features: [
       { text: "3 WordPress Sites", included: true },
@@ -65,9 +65,9 @@ export const pricingTiers: PricingTier[] = [
   {
     plan: "Agency",
     priceUSD: "$129",
-    priceBDT: "≈ ৳15,499 BDT",
+    priceBDT: "≈ ৳8,000 BDT",
     period: "/one-time",
-    desc: "Unlimited sites for agencies",
+    desc: "Unlimited sites for agencies — lifetime updates",
     popular: false,
     features: [
       { text: "Unlimited Sites", included: true },
