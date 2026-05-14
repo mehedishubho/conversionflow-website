@@ -1,4 +1,5 @@
 import { LegalLayout } from "@/components/legal/LegalLayout";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export async function generateStaticParams() {
   return [
@@ -14,7 +15,8 @@ export default async function PrivacyPage({
 }) {
   await params;
   return (
-    <LegalLayout title="Privacy Policy" lastUpdated="June 1, 2025">
+    <ScrollReveal>
+      <LegalLayout title="Privacy Policy" lastUpdated="June 1, 2025">
       <h2>Information We Collect</h2>
       <p>
         We collect account details such as name, email address, license key,
@@ -118,5 +120,6 @@ export default async function PrivacyPage({
         by qualified counsel before production launch.
       </p>
     </LegalLayout>
+    </ScrollReveal>
   );
 }

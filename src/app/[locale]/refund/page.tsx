@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/LegalLayout";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "Refund Policy",
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
 
 export default function RefundPage() {
   return (
-    <LegalLayout title="Refund Policy" lastUpdated="June 1, 2025">
+    <ScrollReveal>
+      <LegalLayout title="Refund Policy" lastUpdated="June 1, 2025">
       <h2>30-Day Money-Back Guarantee</h2>
       <p>
         WooBooster includes a full 30-Day money-back guarantee. If the plugin is
@@ -74,5 +76,6 @@ export default function RefundPage() {
         the product from license abuse.
       </p>
     </LegalLayout>
+    </ScrollReveal>
   );
 }

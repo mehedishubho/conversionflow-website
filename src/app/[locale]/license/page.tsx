@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/LegalLayout";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "License Agreement",
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
 
 export default function LicensePage() {
   return (
-    <LegalLayout title="License Agreement" lastUpdated="June 1, 2025">
+    <ScrollReveal>
+      <LegalLayout title="License Agreement" lastUpdated="June 1, 2025">
       <h2>License Types</h2>
       <p>
         WooBooster offers Starter, Professional, and Agency licenses. Starter
@@ -103,5 +105,6 @@ export default function LicensePage() {
         before publication.
       </p>
     </LegalLayout>
+    </ScrollReveal>
   );
 }

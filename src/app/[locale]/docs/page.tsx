@@ -1,4 +1,5 @@
 import DocsClient from "@/components/docs/DocsClient";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export async function generateStaticParams() {
   return [
@@ -12,5 +13,9 @@ export default async function DocsPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return <DocsClient params={params} />;
+  return (
+    <ScrollReveal>
+      <DocsClient params={params} />
+    </ScrollReveal>
+  );
 }

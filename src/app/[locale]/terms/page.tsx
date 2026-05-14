@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/LegalLayout";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalLayout title="Terms of Service" lastUpdated="June 1, 2025">
+    <ScrollReveal>
+      <LegalLayout title="Terms of Service" lastUpdated="June 1, 2025">
       <h2>Acceptance of Terms</h2>
       <p>
         By purchasing, installing, or using WooBooster, you agree to these Terms
@@ -98,5 +100,6 @@ export default function TermsPage() {
         by counsel before final publication.
       </p>
     </LegalLayout>
+    </ScrollReveal>
   );
 }
