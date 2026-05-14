@@ -57,7 +57,7 @@ export function Navbar() {
             🚀
           </div>
           <div className="font-black text-[14px] md:text-[15px] text-foreground tracking-[-0.3px]">
-            Woo<span className="text-accent">Booster</span>
+            Conversion<span className="text-accent">Flow</span>
           </div>
         </Link>
 

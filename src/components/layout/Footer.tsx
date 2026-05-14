@@ -78,7 +78,7 @@ export function Footer() {
               <div className="ft-brand-left">
                 <Link href="/" className="ft-logo">
                   <div className="ft-logo-icon">🚀</div>
-                  <span className="ft-logo-text">Woo<span>Booster</span></span>
+                  <span className="ft-logo-text">Conversion<span>Flow</span></span>
                 </Link>
 
                 <p className="ft-tagline">{t("tagline")}</p>
