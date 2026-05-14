@@ -1,4 +1,5 @@
 import ChangelogClient from "@/components/changelog/ChangelogClient";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export async function generateStaticParams() {
   return [
@@ -12,5 +13,9 @@ export default async function ChangelogPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return <ChangelogClient params={params} />;
+  return (
+    <ScrollReveal>
+      <ChangelogClient params={params} />
+    </ScrollReveal>
+  );
 }

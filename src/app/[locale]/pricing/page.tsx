@@ -1,4 +1,5 @@
 import PricingClient from "@/components/pricing/PricingClient";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export async function generateStaticParams() {
   return [
@@ -12,5 +13,9 @@ export default async function PricingPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return <PricingClient params={params} />;
+  return (
+    <ScrollReveal>
+      <PricingClient params={params} />
+    </ScrollReveal>
+  );
 }

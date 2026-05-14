@@ -1,4 +1,5 @@
 import FeaturesClient from "@/components/features/FeaturesClient";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export async function generateStaticParams() {
   return [
@@ -12,5 +13,9 @@ export default async function FeaturesPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  return <FeaturesClient params={params} />;
+  return (
+    <ScrollReveal>
+      <FeaturesClient params={params} />
+    </ScrollReveal>
+  );
 }
