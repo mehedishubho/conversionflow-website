@@ -20,9 +20,9 @@ interface PricingTier {
 export const pricingTiers: PricingTier[] = [
   {
     plan: "Starter",
-    priceUSD: "$29",
+    priceUSD: "$18",
     priceBDT: "≈ ৳2,150 BDT",
-    period: "/one-time",
+    period: "/year",
     desc: "For a single WooCommerce store — 1 year updates",
     popular: false,
     features: [
@@ -42,9 +42,9 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     plan: "Professional",
-    priceUSD: "$69",
+    priceUSD: "$28",
     priceBDT: "≈ ৳3,000 BDT",
-    period: "/one-time",
+    period: "/2 years",
     desc: "For agencies managing 3 stores — 2 year updates",
     popular: true,
     features: [
@@ -64,9 +64,9 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     plan: "Agency",
-    priceUSD: "$129",
+    priceUSD: "$75",
     priceBDT: "≈ ৳8,000 BDT",
-    period: "/one-time",
+    period: "/lifetime",
     desc: "Unlimited sites for agencies — lifetime updates",
     popular: false,
     features: [

@@ -48,7 +48,7 @@
     "title1": "Run Your WooCommerce Store on",
     "titleAccent": "Autopilot",
     "subtitle": "Automated courier sync with Steadfast, Pathao & RedX. Meta CAPI tracking that survives iOS 14. Fraud Shield. Real-time analytics. Built for Bangladeshi WooCommerce sellers.",
-    "ctaPrimary": "Get WooBooster — ৳2,150",
+    "ctaPrimary": "Get WooBooster — $18/yr",
     "ctaSecondary": "See Features",
     "pill1": "500+ Active Stores",
     "pill2": "30-Day Money Back",
@@ -145,8 +145,8 @@
     "bdTag": "🇧🇩 Made for Bangladeshi Sellers",
     "title": "Start Automating Your Store Today",
     "subtitle": "Join 500+ WooCommerce store owners who save hours every week with WooBooster.",
-    "button": "Get WooBooster Now — ৳2,150 →",
-    "note": "One-time payment · 30-day refund · bKash / Nagad · Instant delivery"
+    "button": "Get WooBooster Now — $18/yr →",
+    "note": "Per year / one-time payment · 30-day refund · bKash / Nagad · Instant delivery"
   },
   "featuresPage": {
     "eyebrow": "All Features",
@@ -227,15 +227,15 @@
   },
   "pricingPage": {
     "eyebrow": "Pricing",
-    "title": "Simple, One-Time Pricing",
-    "subtitle": "No subscriptions. No monthly fees. Pay once, own it forever. Updates included. Priced in BDT for Bangladeshi sellers.",
+    "title": "Simple Pricing",
+    "subtitle": "Flexible plans — pay per year or own it forever. Updates included. Priced in BDT for Bangladeshi sellers.",
     "faqEyebrow": "FAQ",
     "faqTitle": "Frequently Asked Questions",
     "tiers": {
       "0": {
         "plan": "Starter",
-        "period": "/one-time",
-        "desc": "For a single WooCommerce store",
+        "period": "/year",
+        "desc": "For a single WooCommerce store — 1 year updates",
         "buttonText": "Get Starter",
         "features": [
           "1 WordPress Site",
@@ -250,8 +250,8 @@
       },
       "1": {
         "plan": "Professional",
-        "period": "/one-time",
-        "desc": "For agencies managing 3 stores",
+        "period": "/2 years",
+        "desc": "For agencies managing 3 stores — 2 year updates",
         "buttonText": "Get Professional",
         "features": [
           "3 WordPress Sites",
@@ -266,8 +266,8 @@
       },
       "2": {
         "plan": "Agency",
-        "period": "/one-time",
-        "desc": "Unlimited sites for agencies",
+        "period": "/lifetime",
+        "desc": "Unlimited sites for agencies — lifetime updates",
         "buttonText": "Get Agency",
         "features": [
           "Unlimited Sites",
@@ -283,8 +283,8 @@
     },
     "faqItems": {
       "0": {
-        "question": "Is this a one-time payment or subscription?",
-        "answer": "One-time payment. No monthly or annual fees. You own it forever. Updates included for 1 year (Starter) or lifetime (Pro & Agency)."
+        "question": "Is this a subscription?",
+        "answer": "Starter is $18/year, Professional is $28/2 years, and Agency is $75 one-time (lifetime). No monthly fees. All plans include updates for their duration."
       },
       "1": {
         "question": "Which couriers are supported?",
