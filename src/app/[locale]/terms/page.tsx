@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms of Service for WooBooster WooCommerce automation plugin.",
+  description: "Terms of Service for ConversionFlow WooCommerce automation plugin.",
 };
 
 export default function TermsPage() {
@@ -13,18 +13,18 @@ export default function TermsPage() {
       <LegalLayout title="Terms of Service" lastUpdated="June 1, 2025">
       <h2>Acceptance of Terms</h2>
       <p>
-        By purchasing, installing, or using WooBooster, you agree to these Terms
+        By purchasing, installing, or using ConversionFlow, you agree to these Terms
         of Service. If you do not agree, do not use the plugin.
       </p>
       <p>
-        These terms apply to the WooBooster website, plugin downloads, license
+        These terms apply to the ConversionFlow website, plugin downloads, license
         activation service, product documentation, and support communications.
       </p>
 
       <h2>License Grant</h2>
       <p>
         Devsroom grants you a non-exclusive, non-transferable license to use
-        WooBooster on WordPress and WooCommerce sites according to your purchased
+        ConversionFlow on WordPress and WooCommerce sites according to your purchased
         tier.
       </p>
       <ul>
@@ -36,11 +36,11 @@ export default function TermsPage() {
       <h2>Usage Restrictions</h2>
       <p>
         You may not redistribute, resell, sublicense, reverse engineer, share
-        license keys, remove copyright notices, or use WooBooster on more sites
+        license keys, remove copyright notices, or use ConversionFlow on more sites
         than your license permits.
       </p>
       <p>
-        You may not use WooBooster to violate courier, advertising, ecommerce,
+        You may not use ConversionFlow to violate courier, advertising, ecommerce,
         consumer protection, privacy, or payment-service rules.
       </p>
 
@@ -56,13 +56,13 @@ export default function TermsPage() {
 
       <h2>Intellectual Property</h2>
       <p>
-        WooBooster is proprietary software. Devsroom retains all rights, title,
+        ConversionFlow is proprietary software. Devsroom retains all rights, title,
         and interest in the product, code, brand, design, and documentation.
       </p>
 
       <h2>Limitation of Liability</h2>
       <p>
-        WooBooster is provided as-is. Devsroom is not liable for data loss, lost
+        ConversionFlow is provided as-is. Devsroom is not liable for data loss, lost
         revenue, courier failures, WooCommerce configuration issues, or indirect
         damages arising from plugin use.
       </p>
@@ -93,7 +93,7 @@ export default function TermsPage() {
       <h2>Contact</h2>
       <p>
         For questions about these terms, contact Devsroom at
-        support@woobooster.com.
+        support@conversionflow.com.
       </p>
       <p>
         These terms are product terms, not legal advice, and should be reviewed

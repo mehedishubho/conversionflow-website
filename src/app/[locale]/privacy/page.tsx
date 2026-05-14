@@ -21,16 +21,16 @@ export default async function PrivacyPage({
       <p>
         We collect account details such as name, email address, license key,
         billing records, support messages, and the site URL connected to a
-        WooBooster license.
+        ConversionFlow license.
       </p>
       <p>
-        The WooBooster plugin may process WooCommerce order data, courier
+        The ConversionFlow plugin may process WooCommerce order data, courier
         tracking data, customer phone numbers, delivery addresses, order
         values, and fraud signals on your own WordPress server.
       </p>
       <p>
         Store owners decide which modules to enable. If a module is disabled,
-        WooBooster does not intentionally process the related integration data
+        ConversionFlow does not intentionally process the related integration data
         for that store.
       </p>
 
@@ -55,7 +55,7 @@ export default async function PrivacyPage({
       <p>
         Courier order data may be shared with courier partners such as Steadfast,
         Pathao, and RedX only when you enable the relevant integration and submit
-        orders through WooBooster.
+        orders through ConversionFlow.
       </p>
       <p>
         No online system can be guaranteed perfectly secure, but we use
@@ -65,7 +65,7 @@ export default async function PrivacyPage({
 
       <h2>Cookies and Tracking</h2>
       <p>
-        WooBooster does not set advertising cookies for your shoppers. Meta CAPI
+        ConversionFlow does not set advertising cookies for your shoppers. Meta CAPI
         and pixel behavior is controlled by the store owner through their own
         Meta account and website configuration.
       </p>
@@ -77,7 +77,7 @@ export default async function PrivacyPage({
 
       <h2>Third-Party Services</h2>
       <p>
-        WooBooster can connect with courier APIs, Meta Conversions API, Google
+        ConversionFlow can connect with courier APIs, Meta Conversions API, Google
         Analytics, and payment or checkout services selected by the store owner.
         Each third-party service has its own privacy terms.
       </p>
@@ -101,7 +101,7 @@ export default async function PrivacyPage({
       <h2>Your Rights</h2>
       <p>
         You may request access, correction, or deletion of personal data by
-        contacting support@woobooster.com. We may need to verify ownership before
+        contacting support@conversionflow.com. We may need to verify ownership before
         making changes to license records.
       </p>
       <p>
@@ -112,8 +112,8 @@ export default async function PrivacyPage({
 
       <h2>Contact Us</h2>
       <p>
-        WooBooster is operated by Devsroom in Dhaka, Bangladesh. For privacy
-        questions, contact support@woobooster.com.
+        ConversionFlow is operated by Devsroom in Dhaka, Bangladesh. For privacy
+        questions, contact support@conversionflow.com.
       </p>
       <p>
         This policy is intended for product transparency and should be reviewed

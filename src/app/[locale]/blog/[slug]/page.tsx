@@ -27,7 +27,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     openGraph: {
-      title: `${post.title} | WooBooster`,
+      title: `${post.title} | ConversionFlow`,
       description: post.excerpt,
     },
   };

@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "License Agreement",
-  description: "WooBooster License Agreement -- terms of use for the WooCommerce automation plugin.",
+  description: "ConversionFlow License Agreement -- terms of use for the WooCommerce automation plugin.",
 };
 
 export default function LicensePage() {
@@ -13,7 +13,7 @@ export default function LicensePage() {
       <LegalLayout title="License Agreement" lastUpdated="June 1, 2025">
       <h2>License Types</h2>
       <p>
-        WooBooster offers Starter, Professional, and Agency licenses. Starter
+        ConversionFlow offers Starter, Professional, and Agency licenses. Starter
         covers one site, Professional covers three sites, and Agency covers
         unlimited sites.
       </p>
@@ -29,7 +29,7 @@ export default function LicensePage() {
 
       <h2>License Activation</h2>
       <p>
-        Activate WooBooster by entering your license key in the plugin settings.
+        Activate ConversionFlow by entering your license key in the plugin settings.
         A license may be associated with site domains according to the purchased
         tier.
       </p>
@@ -40,7 +40,7 @@ export default function LicensePage() {
 
       <h2>Permitted Use</h2>
       <p>
-        You may use WooBooster on the licensed number of WordPress and
+        You may use ConversionFlow on the licensed number of WordPress and
         WooCommerce sites, including your own sites or client sites managed by
         your agency.
       </p>
@@ -56,7 +56,7 @@ export default function LicensePage() {
         copyright and attribution notices from plugin files.
       </p>
       <p>
-        You may not modify WooBooster for the purpose of reselling it as a
+        You may not modify ConversionFlow for the purpose of reselling it as a
         competing plugin or service.
       </p>
 
@@ -66,7 +66,7 @@ export default function LicensePage() {
         by email and WhatsApp for license holders in good standing.
       </p>
       <p>
-        Support covers WooBooster configuration and product issues. It does not
+        Support covers ConversionFlow configuration and product issues. It does not
         include custom theme development, unrelated WooCommerce debugging, or
         courier account management.
       </p>
@@ -87,7 +87,7 @@ export default function LicensePage() {
 
       <h2>Warranty Disclaimer</h2>
       <p>
-        WooBooster is provided as-is without warranty of merchantability, fitness
+        ConversionFlow is provided as-is without warranty of merchantability, fitness
         for a particular purpose, uninterrupted operation, or compatibility with
         every WordPress environment.
       </p>
@@ -98,7 +98,7 @@ export default function LicensePage() {
 
       <h2>Contact</h2>
       <p>
-        Questions about licensing may be sent to support@woobooster.com.
+        Questions about licensing may be sent to support@conversionflow.com.
       </p>
       <p>
         This agreement is a product-use draft and should be reviewed by a lawyer

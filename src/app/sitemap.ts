@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getBlogPosts, getDocPosts } from "@/lib/mdx";
 
-const siteUrl = "https://woobooster.com";
+const siteUrl = "https://conversionflow.com";
 const locales = ["en", "bn"];
 
 function getUrl(locale: string, path: string) {

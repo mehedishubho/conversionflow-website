@@ -37,7 +37,7 @@
     "termsOfService": "Terms of Service",
     "refundPolicy": "Refund Policy",
     "licenseAgreement": "License Agreement",
-    "copyright": "© 2025 WooBooster by Devsroom. All rights reserved.",
+    "copyright": "© 2025 ConversionFlow by Devsroom. All rights reserved.",
     "backToTop": "Back to top ↑",
     "bdCouriers": "BD Couriers",
     "trackingPlatforms": "Tracking Platforms",
@@ -48,7 +48,7 @@
     "title1": "Run Your WooCommerce Store on",
     "titleAccent": "Autopilot",
     "subtitle": "Automated courier sync with Steadfast, Pathao & RedX. Meta CAPI tracking that survives iOS 14. Fraud Shield. Real-time analytics. Built for Bangladeshi WooCommerce sellers.",
-    "ctaPrimary": "Get WooBooster — $18/yr",
+    "ctaPrimary": "Get ConversionFlow — $18/yr",
     "ctaSecondary": "See Features",
     "pill1": "500+ Active Stores",
     "pill2": "30-Day Money Back",
@@ -72,16 +72,16 @@
   "featuresBento": {
     "eyebrow": "Everything You Need",
     "title": "6 Powerful Modules. One Plugin.",
-    "subtitle": "WooBooster replaces 6 separate tools with one seamlessly integrated plugin built specifically for Bangladeshi WooCommerce stores."
+    "subtitle": "ConversionFlow replaces 6 separate tools with one seamlessly integrated plugin built specifically for Bangladeshi WooCommerce stores."
   },
   "videoSection": {
     "label": "Watch it in action",
-    "title": "See WooBooster Transform Your Store",
+    "title": "See ConversionFlow Transform Your Store",
     "subtitle": "A 3-minute overview of every module — no fluff, just results.",
     "ordersLabel": "Orders Synced",
     "revenueLabel": "Revenue",
     "fraudLabel": "Fraud Blocked",
-    "caption": "▶ WooBooster Full Overview — 3 min · See how 500+ BD stores use it"
+    "caption": "▶ ConversionFlow Full Overview — 3 min · See how 500+ BD stores use it"
   },
   "bdSection": {
     "eyebrow": "🇧🇩 Built for Bangladesh",
@@ -89,7 +89,7 @@
     "title2": "Built for BD Sellers",
     "subtitle": "Deep native integration with Bangladesh's top 3 courier services. Auto-synced, auto-updated — no manual dashboard checking ever again.",
     "flowTitle": "Automated Order Flow",
-    "flowDesc": "Stop checking courier dashboards manually 10 times a day. WooBooster polls all three in the background and updates WooCommerce automatically.",
+    "flowDesc": "Stop checking courier dashboards manually 10 times a day. ConversionFlow polls all three in the background and updates WooCommerce automatically.",
     "statusPending": "Pending",
     "statusShipped": "Shipped",
     "statusDelivered": "Delivered",
@@ -112,20 +112,20 @@
   "howItWorks": {
     "eyebrow": "Getting Started",
     "title": "Up and Running in 10 Minutes",
-    "subtitle": "No developer needed. Install, activate, and WooBooster handles everything automatically.",
+    "subtitle": "No developer needed. Install, activate, and ConversionFlow handles everything automatically.",
     "step1Title": "Install & Activate License",
     "step1Desc": "Upload the plugin, activate, enter your license key from the purchase email. Done in under 2 minutes.",
     "step2Title": "Connect Couriers & Pixels",
     "step2Desc": "Paste your Steadfast / Pathao / RedX API keys and Meta Pixel ID + CAPI token. Simple copy-paste.",
     "step3Title": "Watch It Run on Autopilot",
-    "step3Desc": "WooBooster polls couriers, updates statuses, fires tracking events, and blocks fraud — 24/7, automatically."
+    "step3Desc": "ConversionFlow polls couriers, updates statuses, fires tracking events, and blocks fraud — 24/7, automatically."
   },
   "testimonials": {
     "eyebrow": "Real Store Owners",
     "title": "Loved by BD WooCommerce Sellers",
     "items": {
       "0": {
-        "quote": "We handle 300+ orders daily. Checking Steadfast and Pathao manually was a waste of time. WooBooster handles everything automatically.",
+        "quote": "We handle 300+ orders daily. Checking Steadfast and Pathao manually was a waste of time. ConversionFlow handles everything automatically.",
         "name": "Rahim Ahmed",
         "store": "StyleBD.com · Dhaka"
       },
@@ -144,13 +144,13 @@
   "cta": {
     "bdTag": "🇧🇩 Made for Bangladeshi Sellers",
     "title": "Start Automating Your Store Today",
-    "subtitle": "Join 500+ WooCommerce store owners who save hours every week with WooBooster.",
-    "button": "Get WooBooster Now — $18/yr →",
+    "subtitle": "Join 500+ WooCommerce store owners who save hours every week with ConversionFlow.",
+    "button": "Get ConversionFlow Now — $18/yr →",
     "note": "Per year / one-time payment · 30-day refund · bKash / Nagad · Instant delivery"
   },
   "featuresPage": {
     "eyebrow": "All Features",
-    "title": "Everything WooBooster Does",
+    "title": "Everything ConversionFlow Does",
     "subtitle": "Six powerful modules, one unified plugin. No integrations to wrestle with. No APIs to manage separately.",
     "tabAll": "All Modules",
     "tabCourier": "Courier Sync",
@@ -173,7 +173,7 @@
       "0": {
         "title": "Automated Courier Sync",
         "description": "Automatically polls Steadfast, Pathao, and RedX in the background and updates your WooCommerce order statuses in real-time. Zero manual tracking.",
-        "detailDescription": "WooBooster polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
+        "detailDescription": "ConversionFlow polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
         "tags": ["Steadfast", "Pathao", "RedX", "Auto Poll", "Status Mapping"],
         "checks": [
           "Background polling — no manual action needed",
@@ -204,7 +204,7 @@
       "3": {
         "title": "Meta Pixel + CAPI",
         "description": "Hybrid browser + server-side tracking that survives iOS 14 and ad-blockers. 100% accurate conversions.",
-        "detailDescription": "Browser-side pixels miss 30–40% of conversions. WooBooster’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
+        "detailDescription": "Browser-side pixels miss 30–40% of conversions. ConversionFlow’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
         "tags": ["CAPI", "iOS 14+", "GA4"],
         "checks": [
           "Unified Tracking Hub for all platforms",
@@ -292,7 +292,7 @@
       },
       "2": {
         "question": "Do I need a developer?",
-        "answer": "No. If you can install a WordPress plugin, you can fully set up WooBooster. The wizard guides you step-by-step."
+        "answer": "No. If you can install a WordPress plugin, you can fully set up ConversionFlow. The wizard guides you step-by-step."
       },
       "3": {
         "question": "Can I pay in BDT using bKash or Nagad?",
@@ -313,7 +313,7 @@
   },
   "changelogPage": {
     "eyebrow": "Changelog",
-    "title": "What's New in WooBooster",
+    "title": "What's New in ConversionFlow",
     "subtitle": "Every update documented transparently. Regular releases with new features, improvements, and bug fixes.",
     "tagNew": "🆕 New",
     "tagImp": "⬆ Improved",
@@ -391,7 +391,7 @@
     "websiteLabel": "Your Website URL",
     "websitePlaceholder": "https://yourstore.com",
     "productLabel": "Product of Interest",
-    "productPlaceholder": "e.g. WooBooster Professional",
+    "productPlaceholder": "e.g. ConversionFlow Professional",
     "subjectLabel": "Subject",
     "subjectPlaceholder": "Steadfast sync not working",
     "messageLabel": "Message",
@@ -412,8 +412,8 @@
   },
   "docsPage": {
     "eyebrow": "Documentation",
-    "title": "WooBooster Docs",
-    "subtitle": "Everything you need to set up, configure, and master WooBooster.",
+    "title": "ConversionFlow Docs",
+    "subtitle": "Everything you need to set up, configure, and master ConversionFlow.",
     "readGuide": "Read guide"
   },
   "docsNav": {
@@ -433,7 +433,7 @@
     "back": "Back to Home"
   },
   "Metadata": {
-    "title": "WooBooster — WooCommerce Automation for Bangladesh",
+    "title": "ConversionFlow — WooCommerce Automation for Bangladesh",
     "description": "All-in-one WooCommerce automation plugin for Bangladeshi stores. Courier sync, Meta CAPI, fraud protection, analytics, and more."
   }
 }

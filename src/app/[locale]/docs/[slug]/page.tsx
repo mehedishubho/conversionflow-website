@@ -32,7 +32,7 @@ export async function generateMetadata({
 
   return {
     title: doc.title,
-    description: `WooBooster ${doc.title} documentation and guide.`,
+    description: `ConversionFlow ${doc.title} documentation and guide.`,
   };
 }
 

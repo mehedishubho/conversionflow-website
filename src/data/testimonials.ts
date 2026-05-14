@@ -11,7 +11,7 @@ export const testimonials: Testimonial[] = [
   {
     stars: "★★★★★",
     quote:
-      "আমাদের প্রতিদিন ৩০০+ অর্ডার আসে। Steadfast আর Pathao manually চেক করা অনেক সময় নষ্ট করতো। WooBooster সব auto করে দিচ্ছে।",
+      "আমাদের প্রতিদিন ৩০০+ অর্ডার আসে। Steadfast আর Pathao manually চেক করা অনেক সময় নষ্ট করতো। ConversionFlow সব auto করে দিচ্ছে।",
     initials: "RA",
     name: "Rahim Ahmed",
     store: "StyleBD.com · Dhaka",

@@ -20,7 +20,7 @@ export function BlogPageClient({ posts }: { posts: BlogPostMeta[] }) {
             transition={{ duration: 0.5, delay: 0.08, ease }}
             className="sec-title" style={{ fontSize: "clamp(32px,4vw,52px)", letterSpacing: "-2px" }}
           >
-            Latest from WooBooster
+            Latest from ConversionFlow
           </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}

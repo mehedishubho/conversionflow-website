@@ -116,7 +116,7 @@ export function HeroSection() {
                   <div className="mc" style={{ background: "#FFBD2E" }} />
                   <div className="mc" style={{ background: "#28C840" }} />
                 </div>
-                <div className="mock-title-bar">woobooster-dashboard.php</div>
+                <div className="mock-title-bar">conversionflow-dashboard.php</div>
               </div>
               <div className="mock-body">
                 <div className="mstats">

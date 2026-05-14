@@ -34,28 +34,28 @@ const dmSansMono = JetBrains_Mono({
 });
 
 const plausibleDomain =
-  process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "woobooster.com";
+  process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "conversionflow.com";
 
 const plausibleScriptSrc =
   process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC ??
-  "https://plausible.woobooster.com/js/script.js";
+  "https://plausible.conversionflow.com/js/script.js";
 
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Metadata'});
 
   return {
-    metadataBase: new URL("https://woobooster.com"),
+    metadataBase: new URL("https://conversionflow.com"),
     title: {
       default: t('title'),
-      template: "%s | WooBooster",
+      template: "%s | ConversionFlow",
     },
     description: t('description'),
     openGraph: {
       type: "website",
       locale: locale === 'bn' ? 'bn_BD' : 'en_US',
-      url: "https://woobooster.com",
-      siteName: "WooBooster",
+      url: "https://conversionflow.com",
+      siteName: "ConversionFlow",
     },
     twitter: {
       card: "summary_large_image",

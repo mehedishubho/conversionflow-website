@@ -43,7 +43,7 @@ export const featureModules: FeatureModule[] = [
     ],
     eyebrow: "Module 01",
     detailDescription:
-      "WooBooster polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
+      "ConversionFlow polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
     checks: [
       "Background polling — no manual action needed",
       "Real-time status: Delivered / Returned / Cancelled",
@@ -88,7 +88,7 @@ export const featureModules: FeatureModule[] = [
     tags: [{ label: "CAPI" }, { label: "iOS 14+" }, { label: "GA4" }],
     eyebrow: "Module 02",
     detailDescription:
-      "Browser-side pixels miss 30–40% of conversions. WooBooster’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
+      "Browser-side pixels miss 30–40% of conversions. ConversionFlow’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
     checks: [
       "Unified Tracking Hub for all platforms",
       "GA4, TikTok, Pinterest, GTM supported",

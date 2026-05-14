@@ -17,7 +17,7 @@ export const faqItems: FAQItem[] = [
   {
     question: "Do I need a developer?",
     answer:
-      "No. If you can install a WordPress plugin, you can fully set up WooBooster. The wizard guides you step-by-step.",
+      "No. If you can install a WordPress plugin, you can fully set up ConversionFlow. The wizard guides you step-by-step.",
   },
   {
     question: "Can I pay in BDT using bKash or Nagad?",

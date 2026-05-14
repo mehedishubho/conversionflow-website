@@ -37,8 +37,8 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Starter",
     buttonStyle: "btn-outline",
-    checkoutUrl: "https://checkout.woobooster.com/starter",
-    whatsappMessage: "Hi, I'd like to purchase WooBooster Starter. I want to pay via bKash/Nagad.",
+    checkoutUrl: "https://checkout.conversionflow.com/starter",
+    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Starter. I want to pay via bKash/Nagad.",
   },
   {
     plan: "Professional",
@@ -59,8 +59,8 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Professional",
     buttonStyle: "btn-primary",
-    checkoutUrl: "https://checkout.woobooster.com/professional",
-    whatsappMessage: "Hi, I'd like to purchase WooBooster Professional. I want to pay via bKash/Nagad.",
+    checkoutUrl: "https://checkout.conversionflow.com/professional",
+    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Professional. I want to pay via bKash/Nagad.",
   },
   {
     plan: "Agency",
@@ -81,7 +81,7 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Agency",
     buttonStyle: "btn-outline",
-    checkoutUrl: "https://checkout.woobooster.com/agency",
-    whatsappMessage: "Hi, I'd like to purchase WooBooster Agency. I want to pay via bKash/Nagad.",
+    checkoutUrl: "https://checkout.conversionflow.com/agency",
+    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Agency. I want to pay via bKash/Nagad.",
   },
 ];

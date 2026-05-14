@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "Refund Policy",
-  description: "WooBooster Refund Policy -- 30-day money-back guarantee.",
+  description: "ConversionFlow Refund Policy -- 30-day money-back guarantee.",
 };
 
 export default function RefundPage() {
@@ -13,7 +13,7 @@ export default function RefundPage() {
       <LegalLayout title="Refund Policy" lastUpdated="June 1, 2025">
       <h2>30-Day Money-Back Guarantee</h2>
       <p>
-        WooBooster includes a full 30-Day money-back guarantee. If the plugin is
+        ConversionFlow includes a full 30-Day money-back guarantee. If the plugin is
         not a good fit for your store, you may request a refund within 30 days
         of purchase.
       </p>
@@ -24,7 +24,7 @@ export default function RefundPage() {
 
       <h2>How to Request a Refund</h2>
       <p>
-        Email support@woobooster.com with your license key, order details, and
+        Email support@conversionflow.com with your license key, order details, and
         the email used during purchase.
       </p>
       <p>
@@ -58,7 +58,7 @@ export default function RefundPage() {
       <h2>License Deactivation</h2>
       <p>
         After a refund is issued, the related license key is deactivated and
-        WooBooster updates, support, and licensed functionality may stop working.
+        ConversionFlow updates, support, and licensed functionality may stop working.
       </p>
       <p>
         You should remove the plugin from production sites after a refund unless
@@ -68,8 +68,8 @@ export default function RefundPage() {
 
       <h2>Contact</h2>
       <p>
-        WooBooster is operated by Devsroom in Dhaka, Bangladesh. Refund questions
-        can be sent to support@woobooster.com.
+        ConversionFlow is operated by Devsroom in Dhaka, Bangladesh. Refund questions
+        can be sent to support@conversionflow.com.
       </p>
       <p>
         This refund policy is intended to be customer-friendly while protecting
