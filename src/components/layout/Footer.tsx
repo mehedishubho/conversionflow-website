@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { footerProductLinks, footerResourceLinks, footerLegalLinks } from "@/data/navigation";
+import { footerProductLinks } from "@/data/navigation";
 import { LanguageToggle } from "./LanguageToggle";
 
 const socialLinks = [
@@ -66,38 +66,68 @@ export function Footer() {
   return (
     <footer className="ft">
 
-      {/* ── TOP: Brand + Links grid ── */}
+      {/* ── TOP: 4-column grid ── */}
       <div className="ft-top">
         <div className="max-w-[1280px] mx-auto px-7 py-14">
           <div className="ft-grid">
 
-            {/* Brand column — split into left info + right newsletter */}
-            <div className="ft-brand">
+            {/* About Company */}
+            <div className="ft-col">
+              <Link href="/" className="ft-logo">
+                <div className="ft-logo-icon">🚀</div>
+                <span className="ft-logo-text">Conversion<span>Flow</span></span>
+              </Link>
+              <p className="ft-tagline">{t("tagline")}</p>
+              <span className="ft-made-in">{t("madeIn")}</span>
+            </div>
 
-              {/* Left: identity */}
-              <div className="ft-brand-left">
-                <Link href="/" className="ft-logo">
-                  <div className="ft-logo-icon">🚀</div>
-                  <span className="ft-logo-text">Conversion<span>Flow</span></span>
-                </Link>
+            {/* Product */}
+            <div className="ft-col">
+              <h4 className="ft-col-heading">{t("product")}</h4>
+              {footerProductLinks.map((link) => {
+                const navKey = link.name.toLowerCase().includes("doc") ? "docs" : link.name.toLowerCase();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const label = tn.has(navKey as any) ? tn(navKey as any) : link.name;
+                return (
+                  <Link key={link.href}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    href={link.href as any}
+                    className="ft-link"
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
 
-                <p className="ft-tagline">{t("tagline")}</p>
+            {/* Resources */}
+            <div className="ft-col">
+              <h4 className="ft-col-heading">{t("resources")}</h4>
+              <Link href="/blog" className="ft-link">{t("blog")}</Link>
+              <Link href="/privacy" className="ft-link">{t("privacyPolicy")}</Link>
+              <Link href="/terms" className="ft-link">{t("termsOfService")}</Link>
+              <Link href="/refund" className="ft-link">{t("refundPolicy")}</Link>
+              <Link href="/license" className="ft-link">{t("licenseAgreement")}</Link>
+            </div>
 
-                <div className="ft-contacts">
-                  <a href="mailto:mhs@wpmhs.com" className="ft-contact">
-                    <span className="ft-contact-icon">✉</span>
-                    mhs@wpmhs.com
+            {/* Contact */}
+            <div className="ft-col">
+              <h4 className="ft-col-heading">{t("connectLabel")}</h4>
+              <a href="mailto:mhs@wpmhs.com" className="ft-link">
+                mhs@wpmhs.com
+              </a>
+              <a href="https://wa.me/8801721328992" target="_blank" rel="noopener noreferrer" className="ft-link">
+                WhatsApp BD
+              </a>
+              <div className="ft-socials" style={{ marginTop: "8px" }}>
+                {socialLinks.map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                    className="ft-social-btn" aria-label={s.label}>
+                    {s.icon}
                   </a>
-                  <a href="https://wa.me/8801721328992" target="_blank" rel="noopener noreferrer" className="ft-contact">
-                    <span className="ft-contact-icon">💬</span>
-                    +880 1721-328992
-                  </a>
-                  <span className="ft-made-in">{t("madeIn")}</span>
-                </div>
+                ))}
               </div>
-
-              {/* Right: newsletter + socials */}
-              <div className="ft-brand-right">
+              <div style={{ marginTop: "16px" }}>
                 <p className="ft-newsletter-heading">{t("newsletterLabel")}</p>
                 <div className="ft-subscribe-row">
                   <input
@@ -109,89 +139,7 @@ export function Footer() {
                   />
                   <button className="ft-subscribe-btn">{t("newsletterBtn")}</button>
                 </div>
-                <p className="ft-subscribe-note">{t("newsletterNote")}</p>
-
-                <div className="ft-socials-block">
-                  <p className="ft-socials-label">{t("connectLabel")}</p>
-                  <div className="ft-socials">
-                    {socialLinks.map((s) => (
-                      <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-                        className="ft-social-btn" aria-label={s.label}>
-                        {s.icon}
-                      </a>
-                    ))}
-                  </div>
-                </div>
               </div>
-            </div>
-
-            {/* Product column */}
-            <div className="ft-col">
-              <h4 className="ft-col-heading">{t("product")}</h4>
-              {footerProductLinks.map((link) => {
-                const navKey = link.name.toLowerCase().includes("doc") ? "docs" : link.name.toLowerCase();
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const label = tn.has(navKey as any) ? tn(navKey as any) : link.name;
-                return (
-                  <Link key={link.href} 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    href={link.href as any} 
-                    className="ft-link"
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Resources column */}
-            <div className="ft-col">
-              <h4 className="ft-col-heading">{t("resources")}</h4>
-              {footerResourceLinks.map((link) => {
-                const keyMap: Record<string, string> = {
-                  "Blog": "blog",
-                  "Devsroom": "devsroom",
-                  "WPMHS": "wpmhs",
-                  "WhatsApp BD": "whatsappBd",
-                };
-                const key = keyMap[link.name];
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const label = key ? t(key as any) : link.name;
-                return (
-                  <Link key={link.href} 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    href={link.href as any} 
-                    className="ft-link"
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Legal column */}
-            <div className="ft-col">
-              <h4 className="ft-col-heading">{t("legal")}</h4>
-              {footerLegalLinks.map((link) => {
-                const keyMap: Record<string, string> = {
-                  "Privacy Policy": "privacyPolicy",
-                  "Terms of Service": "termsOfService",
-                  "Refund Policy": "refundPolicy",
-                  "License Agreement": "licenseAgreement",
-                };
-                const key = keyMap[link.name];
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const label = key ? t(key as any) : link.name;
-                return (
-                  <Link key={link.href} 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    href={link.href as any} 
-                    className="ft-link"
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
             </div>
           </div>
         </div>
