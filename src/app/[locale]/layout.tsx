@@ -95,6 +95,7 @@ export default async function LocaleLayout({
       lang={locale}
       className={`${dmSans.variable} ${notoSansBengali.variable} ${dmSansMono.variable} antialiased`}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
     >
       <body className={`min-h-screen flex flex-col bg-background text-foreground ${locale === 'bn' ? 'font-bengali' : ''}`}>
         <Script

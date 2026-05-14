@@ -38,7 +38,10 @@
     "refundPolicy": "Refund Policy",
     "licenseAgreement": "License Agreement",
     "copyright": "© 2025 WooBooster by Devsroom. All rights reserved.",
-    "backToTop": "Back to top ↑"
+    "backToTop": "Back to top ↑",
+    "bdCouriers": "BD Couriers",
+    "trackingPlatforms": "Tracking Platforms",
+    "capiAccuracy": "CAPI Accuracy"
   },
   "hero": {
     "eyebrow": "v0.0.14 — Analytics Suite Live",

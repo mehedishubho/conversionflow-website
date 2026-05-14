@@ -38,7 +38,10 @@
     "refundPolicy": "রিফান্ড পলিসি",
     "licenseAgreement": "লাইসেন্স এগ্রিমেন্ট",
     "copyright": "© ২০২৫ WooBooster by Devsroom. সর্বস্বত্ব সংরক্ষিত।",
-    "backToTop": "উপরে যান ↑"
+    "backToTop": "উপরে যান ↑",
+    "bdCouriers": "বিডি কুরিয়ার",
+    "trackingPlatforms": "ট্র্যাকিং প্ল্যাটফর্ম",
+    "capiAccuracy": "CAPI নির্ভুলতা"
   },
   "hero": {
     "eyebrow": "v0.0.14 — অ্যানালিটিক্স স্যুট লাইভ",
