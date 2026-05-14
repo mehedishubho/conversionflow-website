@@ -7,7 +7,7 @@ export function VideoSection() {
 
   return (
     <div className="video-sec">
-      <div className="max-w-[1160px] mx-auto px-7">
+      <div className="max-w-[1280px] mx-auto px-7">
         <div className="text-center mb-4">
           <div className="vs-label">{t("label")}</div>
           <div className="vs-title">{t("title")}</div>

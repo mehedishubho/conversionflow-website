@@ -40,7 +40,7 @@ export function HeroSection() {
       <div className="hero-mesh absolute inset-0 pointer-events-none" />
       <div className="absolute inset-0 opacity-[.035] bg-[radial-gradient(circle,var(--accent)_1.5px,transparent_1.5px)] bg-[length:40px_40px] pointer-events-none" />
 
-      <div className="max-w-[1160px] mx-auto px-7 relative z-10">
+      <div className="max-w-[1280px] mx-auto px-7 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
             <motion.div

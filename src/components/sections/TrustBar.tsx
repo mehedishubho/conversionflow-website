@@ -45,7 +45,7 @@ export function TrustBar() {
 
   return (
     <div className="trust-bar">
-      <div className="max-w-[1160px] mx-auto px-7">
+      <div className="max-w-[1280px] mx-auto px-7">
         <div className="trust-bar-inner">
           {stats.map((stat, i) => (
             <StatItem key={stat.label} {...stat} delay={i * 0.08} />

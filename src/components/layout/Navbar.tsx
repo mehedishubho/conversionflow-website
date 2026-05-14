@@ -36,7 +36,7 @@ export function Navbar() {
   if (!mounted) {
     return (
       <div className="fixed top-4 left-0 right-0 z-[900] flex justify-center px-5 pointer-events-none">
-        <div className="max-w-[1160px] w-full h-[56px]" />
+        <div className="max-w-[1280px] w-full h-[56px]" />
       </div>
     );
   }
@@ -48,7 +48,7 @@ export function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "max-w-[1160px] w-full flex items-center justify-between glass rounded-[18px] px-3 md:px-4 py-2 pointer-events-auto transition-shadow duration-300",
+          "max-w-[1280px] w-full flex items-center justify-between glass rounded-[18px] px-3 md:px-4 py-2 pointer-events-auto transition-shadow duration-300",
           isScrolled && "shadow-lg border-opacity-50"
         )}
       >

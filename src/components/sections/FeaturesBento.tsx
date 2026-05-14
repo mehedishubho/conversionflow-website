@@ -10,7 +10,7 @@ export function FeaturesBento() {
 
   return (
     <section className="sec">
-      <div className="max-w-[1160px] mx-auto px-7">
+      <div className="max-w-[1280px] mx-auto px-7">
         <div className="sh center">
           <div className="eyebrow">{t("eyebrow")}</div>
           <div className="sec-title">{t("title")}</div>

@@ -47,7 +47,7 @@ export default function FeaturesClient({
     <>
       {/* Page Hero */}
       <div className="page-hero-sm">
-        <div className="max-w-[1160px] mx-auto px-7 page-hero-sm-inner">
+        <div className="max-w-[1280px] mx-auto px-7 page-hero-sm-inner">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}>
             <div className="eyebrow">{t("eyebrow")}</div>
           </motion.div>
@@ -72,7 +72,7 @@ export default function FeaturesClient({
       <VideoSection />
 
       <section className="sec">
-        <div className="max-w-[1160px] mx-auto px-7">
+        <div className="max-w-[1280px] mx-auto px-7">
           {/* Tabs */}
           <motion.div
             className="feat-tabs"

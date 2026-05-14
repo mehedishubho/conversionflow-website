@@ -11,7 +11,7 @@ export function BlogPageClient({ posts }: { posts: BlogPostMeta[] }) {
   return (
     <>
       <div className="page-hero-sm">
-        <div className="max-w-[1160px] mx-auto px-7 page-hero-sm-inner">
+        <div className="max-w-[1280px] mx-auto px-7 page-hero-sm-inner">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}>
             <div className="eyebrow">Blog</div>
           </motion.div>
@@ -33,7 +33,7 @@ export function BlogPageClient({ posts }: { posts: BlogPostMeta[] }) {
       </div>
 
       <section className="sec">
-        <div className="max-w-[1160px] mx-auto px-7">
+        <div className="max-w-[1280px] mx-auto px-7">
           <StaggerReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {posts.map((post, index) => (
               <StaggerItem key={post.slug}>

@@ -7,7 +7,7 @@ export default function NotFound() {
 
   return (
     <div className="page-hero-sm" style={{ minHeight: "70vh", display: "flex", alignItems: "center" }}>
-      <div className="max-w-[1160px] mx-auto px-7 page-hero-sm-inner">
+      <div className="max-w-[1280px] mx-auto px-7 page-hero-sm-inner">
         <div
           className="font-dm-sans font-black text-foreground"
           style={{ fontSize: "clamp(80px, 12vw, 140px)", letterSpacing: "-4px", lineHeight: 1 }}

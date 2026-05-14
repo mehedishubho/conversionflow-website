@@ -68,7 +68,7 @@ export function Footer() {
 
       {/* ── TOP: Brand + Links grid ── */}
       <div className="ft-top">
-        <div className="max-w-[1160px] mx-auto px-7 py-14">
+        <div className="max-w-[1280px] mx-auto px-7 py-14">
           <div className="ft-grid">
 
             {/* Brand column — split into left info + right newsletter */}
@@ -199,7 +199,7 @@ export function Footer() {
 
       {/* ── MIDDLE: Achievement strip ── */}
       <div className="ft-achievements">
-        <div className="max-w-[1160px] mx-auto px-7">
+        <div className="max-w-[1280px] mx-auto px-7">
           <div className="ft-ach-grid">
             {achievements.map((a, i) => (
               <div key={i} className="ft-ach-item">
@@ -216,7 +216,7 @@ export function Footer() {
 
       {/* ── BOTTOM: Copyright + Back to top ── */}
       <div className="ft-bottom">
-        <div className="max-w-[1160px] mx-auto px-7 ft-bottom-inner flex items-center justify-between">
+        <div className="max-w-[1280px] mx-auto px-7 ft-bottom-inner flex items-center justify-between">
           <div className="flex items-center gap-6">
             <p className="ft-copyright">{t("copyright")}</p>
             <LanguageToggle className="h-7 px-1.5 rounded-md border-opacity-30" />

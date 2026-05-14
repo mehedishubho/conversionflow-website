@@ -8,7 +8,7 @@ export function CTASection() {
 
   return (
     <section className="sec">
-      <div className="max-w-[1160px] mx-auto px-7">
+      <div className="max-w-[1280px] mx-auto px-7">
         <div className="cta-wrap">
           <div className="cta-bd-tag">{t("bdTag")}</div>
           <h2>{t("title")}</h2>
