@@ -168,16 +168,14 @@ export function Footer() {
             <p className="ft-copyright">{t("copyright")}</p>
             <LanguageToggle className="h-7 px-1.5 rounded-md border-opacity-30" />
           </div>
-          <div className="flex items-center gap-6">
-            <span className="ft-made-in">{t("madeIn")}</span>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="ft-back-top"
-            >
-              {t("backToTop")}
-            </button>
-          </div>
+          <span className="ft-made-in">{t("madeIn")}</span>
         </div>
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="ft-back-top ft-back-top--fixed"
+        >
+          {t("backToTop")}
+        </button>
       </div>
 
     </footer>
