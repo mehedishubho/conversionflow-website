@@ -463,10 +463,6 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border); }
 .page-hero-sm::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 50%, var(--accent-glow) 0%, transparent 60%); }
 .page-hero-sm-inner { position: relative; z-index: 1; text-align: center; }
 
-/* â”€â”€ SCROLL REVEAL â”€â”€ */
-.sr { opacity: 0; transform: translateY(32px); transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
-.sr.vis { opacity: 1; transform: none; }
-.sr-d1 { transition-delay: 0.08s; } .sr-d2 { transition-delay: 0.16s; } .sr-d3 { transition-delay: 0.24s; } .sr-d4 { transition-delay: 0.32s; }
 
 /* â”€â”€ CHANGELOG PAGE â”€â”€ */
 .clog-list { display: flex; flex-direction: column; gap: 32px; }
