@@ -1,229 +1,416 @@
-# Feature Landscape
+# Feature Research
 
-**Domain:** WooCommerce plugin marketing website targeting Bangladeshi store owners
-**Researched:** 2026-05-11
-**Confidence:** HIGH (based on exhaustive analysis of design reference, project context, WooCommerce.com product pages, Yoast marketing patterns)
-
----
-
-## Table Stakes
-
-Features users expect. Missing any of these means the site feels incomplete or untrustworthy. Every successful WordPress/WooCommerce plugin site has these -- WooCommerce.com product pages, Yoast, Elementor, and even modest CodeCanyon listings all cover this baseline.
-
-### Landing Page / Homepage
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Hero with value prop + CTA above fold | Visitors decide in 3 seconds. Hero must answer "what is this, who is it for, what do I do next?" | Low | Design reference has this: headline, subheadline, two CTAs, trust pills. Must port faithfully. |
-| Dashboard mockup / product screenshot | Plugin buyers need to see the UI before purchasing. WooCommerce.com, Yoast, all major plugin sites show screenshots or video. | Medium | Design has a floating dashboard mockup with stats, chart, order list. Port with count-up animations. |
-| Trust bar with numbers | "500+ stores", "3 couriers", "100% CAPI accuracy" -- quantified social proof is standard for plugin marketing | Low | Design has 5-stat trust bar. Numbers should animate on scroll (count-up). |
-| Bento features grid | Users scan features. A visual grid with icons beats a text list. Standard on all modern SaaS/plugin sites. | Medium | Design has 6-card bento grid (Courier Sync wide card + 5 standard). Include tags on each card. |
-| How-it-works steps | Reduces perceived complexity. "Install, connect, done" pattern is universal for plugin marketing. | Low | Design has 3-step cards. Keep this -- it directly addresses "do I need a developer?" objection. |
-| Testimonials section | Social proof. BD market especially relies on peer validation (word-of-mouth is dominant trust mechanism). | Medium | Design has 3 testimonials with Bengali quotes, star ratings, store names. Critical for BD audience. |
-| Bottom CTA banner | Visitors who scroll past hero need a second conversion opportunity. Standard pattern. | Low | Design has accent-colored CTA with BD tag, price anchor, and payment method list. |
-| BD couriers showcase | This IS the core differentiator. Must show Steadfast/Pathao/RedX integration prominently. Not optional. | Medium | Design has courier cards with live chips, order flow visualization, and bKash/Nagad payment note. |
-| Video section (even placeholder) | Product demos increase conversion 20-80% for plugin sales. Even a "coming soon" placeholder builds credibility. | Low | Design has dark video section with play button lightbox. Currently shows placeholder -- that is fine for launch. |
-| Responsive design | BD traffic is 70%+ mobile. Mobile-first is not optional, it is the primary viewport. | Medium | Design has full responsive breakpoints (960px, 640px). Must faithfully port all responsive states. |
-
-### Pricing Page
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| 3 pricing tiers with clear differentiation | Standard pattern: good/better/best. Users expect to compare tiers visually. WooCommerce.com, CodeCanyon, all do this. | Low | Design has Starter/Professional/Agency. Professional marked "Most Popular" with accent border. |
-| Per-tier feature list with checkmarks | Users scan to see what they get at each level. "What am I missing if I pick the cheaper one?" | Low | Design has checkmark/cross lists. Key differentiators: site count, update period, support level. |
-| BDT + USD pricing | BD audience thinks in Taka. International audience (or agencies with foreign clients) needs USD. Both must be visible. | Medium | Design shows USD primary with BDT equivalent. Project requirement: add toggle. |
-| "Most Popular" tier highlight | Anchoring effect. Draws eye to the tier you want to sell most. Universal pricing page pattern. | Low | Design already has this with pop-tag on Professional tier. |
-| FAQ accordion | Pricing objections must be addressed immediately. "Is this subscription?", "Can I pay bKash?", "Refund?" -- these close sales. | Medium | Design has 5 FAQs covering key objections. Accordion with smooth expand/collapse. |
-| Trust strip below pricing | Reinforces purchase safety: secure checkout, refund policy, payment methods, instant delivery. | Low | Design has 5-item trust strip with icons. Critical for one-time payment products. |
-| Buy Now buttons wired to checkout | Dead buttons destroy trust. Each tier's CTA must link somewhere -- external checkout or WhatsApp. | Medium | Requires server action or external link routing. Professional tier uses primary button; others use outline. |
-
-### Features Page
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Page hero with title + subtitle | Standard page header. Every plugin site has this. | Low | Design has page-hero-sm pattern reused across content pages. |
-| Feature tab/filter navigation | Users want to see specific modules. Tabbed navigation is the standard pattern. | Medium | Design has filter tabs: All Modules, Courier Sync, Tracking, Fraud Shield, Analytics, Lead Recovery. |
-| Feature detail rows (alternating layout) | Each module needs its own section with description, checklist, and visual demo. The alternating left-right layout keeps scrolling interesting. | Medium | Design has 3 detailed rows for Courier Sync, Meta CAPI, Fraud Shield with visual mockups. |
-| Visual demos per feature | Text-only feature descriptions do not sell. Users need to see the UI -- tracking panel, fraud table, courier cards. | Medium | Design has: courier cards + flow diagram, tracking hub panel, fraud table with block buttons. |
-| Video walkthrough section | Deep-dive video for feature page. Different from homepage video -- shows setup/config process. | Low | Design has a second video section with API/CAPI setup context. Keep as placeholder for now. |
-
-### Changelog Page
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Version history entries | Shows the product is actively maintained. Critical trust signal for one-time payment products (users worry about abandonment). | Low | Design has 3 version entries with semantic version badges, dates, release names. |
-| Categorized change tags (New/Improved/Fixed) | Users scan changelogs by type. "What is new?" vs "What was fixed?" | Low | Design has color-coded tags: green (New), blue (Improved), orange (Fixed). |
-| Release dates | Establishes cadence. Monthly releases = healthy product. | Low | Design has "Released -- Month Year" format. |
-| Semantic versioning | Professional appearance. v0.0.14 looks more credible than "Update 14". | Low | Design uses semver with accent badge for latest, muted for older. |
-
-### Support Page
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Multiple support channels (Email, WhatsApp, Docs) | BD users prefer WhatsApp. International users prefer email. Both must be offered. | Low | Design has 3 support cards with icons, descriptions, and action buttons. |
-| Functional contact form | Users expect to reach support directly from the site. A form is table stakes for any support page. | Medium | Design has form with Name, Email, License Key, Subject, Message fields. Must wire to server action. |
-| BD-specific contact info | WhatsApp number with +880 prefix. BD timezone hours. This is the primary support channel for target market. | Low | Design shows WhatsApp +880 number and business hours. |
-| Response time expectations | Sets expectations. "24 hours" or "within business hours" prevents frustration. | Low | Design mentions "within 24 hours" for email and business hours for WhatsApp. |
-
-### Navigation / Layout
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Floating navbar with scroll detection | Standard pattern. Glassmorphism navbar with backdrop blur is modern and expected. | Low | Already implemented in Navbar.tsx. |
-| Mobile hamburger menu | 70%+ BD traffic is mobile. Non-negotiable. | Medium | Already implemented. Must verify all 5 nav links work. |
-| Dark/light theme toggle | 30-40% of users prefer dark mode. Not having it looks dated. | Low | Already implemented via next-themes. |
-| Footer with 4-column grid | Standard for product sites: brand, product links, company links, legal links. | Low | Missing from codebase. Design has it fully specified. |
-| Page transitions | Subtle fade/slide between pages. Polish signal. Not strictly necessary but elevates perceived quality. | Medium | Design has CSS transition with 180ms fade. Port with Framer Motion. |
-| Custom cursor (desktop) | Brand personality element. From design reference. Optional but part of the design identity. | Low | Design has floating dot cursor with blend mode. Port as client component. |
+**Domain:** Dual-portal SaaS platform (Customer Portal + Admin BI Dashboard) for WooCommerce plugin licensing
+**Researched:** 2026-05-15
+**Confidence:** HIGH (based on PROJECT.md requirements, SSL Commerce API docs, Stripe Billing patterns, backenddashboard/ template analysis)
 
 ---
 
-## Differentiators
+## Feature Landscape
 
-Features that set WooBooster apart. Not expected by users, but they create competitive advantage and increase conversion. These are what make this site feel premium rather than generic.
+### Table Stakes (Users Expect These)
+
+Features users assume exist. Missing these = product feels incomplete. Broken into functional areas.
+
+#### Authentication & User Management
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Customer registration + login | Every SaaS requires account creation. Customers must log in to manage licenses, view billing, download products. | MEDIUM | Better Auth handles core flows. Need dual auth: customer login (public) vs admin login (separate route). |
+| Email verification | Standard SaaS pattern. Prevents spam accounts, ensures license emails reach real owners. | LOW | Better Auth supports email verification out of the box. Trigger on registration, resend option. |
+| Password reset | Users forget passwords. Not having this = support burden. | LOW | Better Auth built-in. Email-based reset link with expiry. |
+| Session management | Users expect to stay logged in across tabs, be logged out after timeout. | MEDIUM | Redis-backed sessions. Customer sessions: 30-day expiry with refresh. Admin sessions: 8-hour expiry, no remember-me. |
+| Role-based access (4 roles) | customer, admin, support_staff, super_admin. Admin portal must restrict features by role. | MEDIUM | RBAC middleware in proxy.ts checks role on every admin route. support_staff sees tickets + limited user data. super_admin gets everything + role management. |
+| Admin 2FA | Admin dashboard access is high-value. 2FA is table stakes for any admin panel handling revenue data. | MEDIUM | Better Auth supports TOTP. Enable for admin + super_admin roles only. Store 2FA secret encrypted in DB. |
+| Audit logging | Admin actions (license changes, refunds, user modifications) must be traceable. Required for dispute resolution. | MEDIUM | Log actor, action, target, timestamp, IP to audit_logs table. Admin can view own activity. super_admin sees all activity. |
+
+#### Customer Portal
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Customer dashboard overview | Landing page after login. Must show: active licenses, expiring soon, recent downloads, open tickets, notifications count. | MEDIUM | Summary cards with counts. "Expiring soon" = licenses within 30 days of expiry. Quick-action links to renew/upgrade. |
+| License list + detail | Customers must see all their licenses: key, product, status, activation count, expiry date, associated domain(s). | MEDIUM | List view with filters (active/expired/all). Detail view shows full license info, activation history. |
+| License key copy | One-click copy of license key to clipboard. Users expect this for pasting into plugin settings. | LOW | Client-side clipboard API. Visual feedback (copied confirmation). |
+| License renewal | One-time payment model means licenses have an update/support period. Renewal extends that period. | HIGH | Creates renewal order -> checkout -> payment -> call central API to extend license. Depends on checkout system. |
+| License activation/deactivation | Plugin users activate on a domain. Customer portal should show which domains are active and allow deactivation (free up a slot). | HIGH | Calls central license API. Must handle: max activations reached, cannot deactivate primary domain while active on others. Sync state locally. |
+| Billing history | Customers need to see all past payments, invoices, statuses. Standard for any paid product. | MEDIUM | List of orders with: date, product, amount, payment method, status (paid/pending/failed/refunded). Link to invoice PDF. |
+| Invoice download | Customers need invoices for accounting, tax purposes, reimbursement. PDF invoices are standard. | MEDIUM | Generate PDF server-side (react-pdf or puppeteer). Include: invoice number, date, customer info, line items, tax, total, payment method, status. |
+| Product downloads | Customers must be able to download the plugin ZIP they purchased. Versioned downloads are expected. | LOW | Serve ZIP files from protected storage. Show latest version prominently, with older versions available. Link changelog per version. |
+| Support tickets | Customers need a way to get help beyond email/WhatsApp. Ticket system is standard for SaaS. | HIGH | Create ticket with subject, message, category, priority. Reply thread with rich text. File attachments. Status: open/in-progress/resolved/closed. Admin/support_staff can respond. |
+| Notifications | Customers expect to be notified about: license expiry, payment success/failure, ticket responses, new versions. | MEDIUM | In-app notification center (bell icon with count). Email notifications for critical events (payment failure, license expiring). Preference settings for notification types. |
+| Profile management | Customers need to edit name, email, password, company info. | LOW | Simple profile edit form. Email change requires re-verification. |
+
+#### Admin BI Dashboard
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Executive overview (KPIs) | Admins need at-a-glance business health: total revenue, MRR, ARR, active customers, CLV, CAC. | MEDIUM | KPI cards with trend indicators (up/down arrows, percentage change vs previous period). backenddashboard/ has EcommerceMetrics component pattern to port. |
+| Sales performance metrics | Total sales, conversion rate, refund rate, average order value. Basic revenue tracking. | MEDIUM | Aggregated from orders table. Conversion rate = purchases / unique checkout page visits. Refund rate = refunded / total orders. |
+| User growth tracking | Daily/weekly/monthly signups, activation rate (purchased after signup), growth trends. | MEDIUM | Time-series chart (ApexCharts line chart). Cohort view optional for v1. backenddashboard/ has MonthlySalesChart pattern. |
+| Revenue trend charts | Revenue over time with granularity: daily, weekly, monthly, yearly. With comparison to previous period. | MEDIUM | ApexCharts area/line chart. Date range selector. backenddashboard/ has StatisticsChart component. |
+| Invoice management | Admin must view all invoices, filter by status (paid/pending/failed/overdue), mark as paid, trigger retry. | MEDIUM | Data table with status filters, search, pagination. Actions: view, mark paid, send reminder, retry payment. backenddashboard/ has RecentOrders table pattern. |
+| Activity feed | Real-time chronological log of important events: new purchase, license activated, ticket created, payment failed. | MEDIUM | Paginated event list with icons per type. Optional WebSocket for real-time (defer to v2, use polling for v1). |
+| Date range + filters | Every BI metric must be filterable by date range, product, plan, channel. Without filters, dashboards are useless. | MEDIUM | Date picker component (flatpickr is in backenddashboard/). Product/plan/channel dropdowns. Filters apply to all dashboard widgets simultaneously. |
+| Data export (CSV/Excel/PDF) | Admins need to export reports for accounting, meetings, analysis. Standard BI feature. | MEDIUM | Server-side generation for large datasets. CSV for raw data. Excel for formatted reports. PDF for presentation-ready reports. |
+
+#### Checkout & Payments
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| BD manual payments (bKash/Nagad/Rocket/Bank) | Bangladeshi customers predominantly pay via mobile banking. This IS the primary payment method for the target market. | HIGH | Customer selects method, sees instructions (phone number/account details), sends payment, submits transaction ID. Admin verifies manually and approves order. |
+| SSL Commerce gateway | For card payments and automated mobile banking. Standard payment gateway in Bangladesh. | HIGH | 3-step flow: (1) Create session via API with store_id + store_passwd + order details, (2) Redirect to SSL Commerce hosted payment page, (3) Handle IPN callback + validate via Order Validation API. Supports BDT 10-500,000 range. |
+| SSL Commerce IPN handler | Async payment confirmation. SSL Commerce sends IPN to webhook URL when payment completes. | HIGH | POST endpoint receives tran_id, val_id, amount, status. Must verify with Validation API before marking order paid. Idempotency required (handle duplicate IPNs). |
+| Coupon codes | Promotional discounts are standard. Percentage or flat amount, expiry, usage limits. | MEDIUM | Coupon DB table: code, type (percentage/flat), value, max_uses, used_count, expires_at, active. Apply at checkout before payment. Validate server-side. |
+| Tax/VAT calculation | Bangladeshi businesses may need VAT on invoices. Configurable tax rate per product. | MEDIUM | Tax rate stored in settings. Calculate on checkout: subtotal + tax = total. Display tax breakdown on invoice. Default 0% (plugin licenses in BD typically not VAT-taxed, but must be configurable). |
+| Order creation flow | Purchase -> create/find customer -> create order -> payment -> call central API -> store mapping. The complete purchase pipeline. | HIGH | Multi-step server action: (1) validate cart, (2) create/update user, (3) create order record, (4) process payment, (5) on success: POST to license.devsroom.com/api/orders/import, (6) store central_user_id + central_license_id mapping locally, (7) generate invoice, (8) send confirmation email. |
+
+#### License Intelligence
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Central API sync | Local data must match license.devsroom.com. Sync license statuses on schedule and on webhook events. | HIGH | Webhook handlers: license-created, license-updated, license-expired, payment-refunded. Scheduled fallback sync (hourly) for missed webhooks. Store total/active/expired/revoked counts locally. |
+| License status dashboard (admin) | Admin must see: total licenses, active, expired, revoked, renewal rate. Breakdown by product, plan. | MEDIUM | Aggregated from local cache. Sync from central API on load if stale (>15 min old). Charts: status pie chart, renewal rate trend. |
+| Domain tracking | Admin needs to see which domains each license is activated on, activation timestamps, multisite usage. | MEDIUM | Data comes from central API sync. Display per-license detail. Flag suspicious patterns (many domains in short time, different countries). |
+
+---
+
+### Differentiators (Competitive Advantage)
+
+Features that set ConversionFlow apart from generic WooCommerce plugin stores. Not expected by users, but create significant value.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| BD-specific branding throughout | No other WooCommerce plugin site has bKash/Nagad badges, BD flag attribution, BDT pricing, and Bengali testimonials. This is the single biggest differentiator. | Medium | Design embeds BD identity in hero, couriers section, CTA banner, and footer. Not a separate section -- it is woven throughout. |
-| Courier live status chips | Visual simulation showing Steadfast/Pathao/RedX as "Live" with animated dots. Creates immediate perception of active integration. | Low | Design has green live-chip with pulse animation on each courier card. |
-| Order flow visualization | Pending -> Shipped -> Delivered/Returned status flow diagram. Makes the invisible automation tangible. | Low | Design has colored status pills with arrow connectors. High impact, low effort. |
-| Dashboard mockup with animated stats | Floating mock dashboard showing revenue, orders, blocked fraud. Count-up animation on numbers. Shows the product working, not just described. | Medium | Design has mock with 3 stat boxes, bar chart, order list. Count-up JS already in design. Port with Framer Motion. |
-| Word-by-word hero reveal | Headline animates word by word on load. Premium feel that differentiates from generic WordPress sites. | Medium | Design has CSS word-reveal animation. Port with Framer Motion variants. |
-| Magnetic tilt cards | 3D perspective tilt on hover for bento cards, testimonials, pricing cards. Micro-interaction that signals quality. | Medium | Design has JS-based mousemove tilt calculation. Port with Framer Motion useMotionValue. |
-| USD/BDT currency toggle | Dual-currency switching on pricing page. Unique for this market. Makes both local and international audiences feel catered to. | Medium | Not in design (design shows both statically). Must build toggle component with React state. |
-| Bengali language testimonials | Quotes in Bangla script alongside English descriptions. Authentic. Cannot be faked by competitors. | Low | Design has one Bengali quote (Rahim Ahmed). Consider adding more. |
-| Fraud protection dollar value | "12 Fraud Orders Blocked / 18,400 BDT protected this month" -- quantified risk reduction. Unique selling point that competitors do not show. | Low | Design has this in the fraud demo panel. High conversion impact. |
-| Video lightbox | Click-to-expand video player. Even with placeholder content, the interaction pattern signals that video content is coming. | Medium | Design has full lightbox with close button, overlay, scale transition. |
+| Churn analytics | Proactive churn detection: cancellation trends, downgrade alerts, at-risk customer identification. Most WP plugin stores do not have this. | HIGH | Churn rate = expired licenses / total licenses per period. At-risk = licenses expiring within 14 days with no renewal intent signal. Alert admin dashboard. |
+| Conversion funnel tracking | Full funnel: impressions -> site visits -> pricing page -> checkout started -> payment completed -> license activated. Reveals where customers drop off. | HIGH | Track events at each step. Store in analytics_events table or use existing session tracking. Funnel visualization with drop-off percentages per stage. |
+| Retention analytics (day 1/7/30/90) | Measures product stickiness. How many customers who purchased are still active after 1, 7, 30, 90 days? Critical for one-time payment model where revenue depends on renewals. | MEDIUM | Cohort-based analysis. Group customers by purchase month, track their license status over time. ApexCharts cohort grid visualization. |
+| Geographic analytics (revenue heatmap) | Sales by country/division with revenue heatmap. Understand where customers are concentrated. Unique for BD-targeted plugin. | MEDIUM | jvectormap (already in backenddashboard/) for world map. Revenue by country aggregated from customer billing addresses. Bangladesh division-level breakdown. |
+| Piracy detection | Flag suspicious license activations: same key on many IPs, rapid sequential activations, geographic anomalies. Protect revenue. | HIGH | Heuristic rules: >3 activations in 1 hour, >5 unique IPs in 24 hours, IP geolocation mismatch with customer profile. Admin gets alerts. Does NOT block automatically (manual review). |
+| Product performance comparison | Compare sales performance across products (WP Plugin vs Laravel Module) and plans (Starter/Professional/Agency). | MEDIUM | Side-by-side metrics: units sold, revenue, renewal rate, support tickets per product. Reveals which products/plans are most profitable. |
+| Real-time revenue counter | Live-updating revenue total on admin dashboard. Psychological motivator for operators. Creates "alive" feeling. | LOW | WebSocket or Server-Sent Events pushing revenue updates. Fallback to 30-second polling. Animated counter (count-up pattern already in codebase). |
+| Scheduled reporting | Auto-generate weekly/monthly reports and email to admins. "Your weekly ConversionFlow report" with key metrics. | MEDIUM | Background job (Redis queue or cron) generates report, sends via email. Report includes: revenue, new customers, expiring licenses, support ticket stats. |
+| Smart renewal reminders | Automated email sequence: 30 days before expiry, 7 days, 1 day, day of, 7 days after. With renewal link pre-filled. | MEDIUM | Background job checks expiring licenses daily. Email template with customer name, license details, one-click renewal link. |
+| Customer lifetime value (CLV) tracking | Calculate and display CLV per customer: total spend + predicted renewal value. Helps admin identify VIP customers. | MEDIUM | CLV = sum of all orders + (avg renewal rate * renewal value). Display on customer detail page. Flag high-CLV customers for priority support. |
 
 ---
 
-## Anti-Features
+### Anti-Features (Commonly Requested, Often Problematic)
 
-Features to explicitly NOT build. These are common in plugin marketing but wrong for WooBooster's specific context.
+Features to explicitly NOT build. Documented to prevent scope creep.
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| User accounts / authentication | This is a marketing site, not a SaaS dashboard. Adding auth creates maintenance burden and confuses visitors who expect instant access. | Link to external checkout. License key delivery via email. |
-| On-site payment processing | PCI compliance, security headers, payment gateway integration -- massive complexity for a one-time purchase product. Not the team's core competency. | External checkout (WooCommerce/EasyCart for card). WhatsApp for bKash/Nagad. Dual path already planned. |
-| CMS integration (WordPress, Sanity, etc.) | Overkill for a marketing site with 5 pages + blog. Adds deployment complexity and a dependency on external service. | Content in TypeScript data files. MDX for blog posts. Version-controlled, zero infrastructure. |
-| Live chat widget (Intercom, Crisp, Tawk.to) | Third-party JS that hurts performance. Loads tracking cookies. BD users do not expect live chat -- they expect WhatsApp. | WhatsApp link on support page. Already in design. BD users know and trust WhatsApp. |
-| Auto-playing video with audio | Aggressive, hurts Core Web Vitals, increases bounce rate. BD users on mobile data hate autoplay. | Click-to-play with lightbox. Design already has this pattern. |
-| Blog with headless CMS / database | Premature for launch. Adds complexity (DB, API routes, content management workflow) for content that does not exist yet. | Static MDX blog posts added when content is ready. Infrastructure (routes, layout) can be built now. |
-| A/B testing framework | No traffic volume to justify it yet. Adds client-side JS and tracking complexity. | Manual iteration based on analytics. Add A/B later if traffic warrants. |
-| Newsletter / email marketing integration | Newsletter service (Mailchimp, ConvertKit) adds form JS and privacy concerns. BD audience is not newsletter-culture. | Defer. Can add a simple email capture form later if demand exists. |
-| Multi-language runtime (next-intl, i18next) | Full runtime i18n adds bundle size, routing complexity, and translation management overhead. Overkill for 2 languages on 5 pages. | i18n infrastructure (string extraction, route structure) but not runtime switching for v1. English primary, Bengali strings prepared. |
-| Animated page transitions as route changes | Next.js App Router does client-side navigation. True page transitions with Framer Motion AnimatePresence require wrapping every page in a layout with client component boundary. Adds complexity and can cause layout shift. | Use scroll-triggered animations within pages (already in design). Page transition can be a simple opacity fade via CSS. |
-| Comparison table (WooBooster vs Competitors) | WooBooster has no direct competitors offering the same BD-specific module bundle. A comparison table would either compare against unrelated products (confusing) or fabricated competitors (disingenuous). | Let the feature grid speak for itself. The "6 modules, one plugin" bento grid already communicates integration advantage. |
-| Cookie consent banner | Not legally required for a site that does not serve EU users or use tracking cookies. Adds visual noise and hurts first impression. | Skip for v1. Add if/when targeting EU or adding analytics cookies. |
-| Social media feed integration | Embedding Facebook/Instagram feeds adds third-party JS, hurts performance, and looks unprofessional for a plugin product site. | Static testimonials. Hand-curated, high-quality. Already in design. |
+| Anti-Feature | Why Requested | Why Problematic | Alternative |
+|--------------|---------------|-----------------|-------------|
+| Local license generation | "What if central API is down? Generate locally as fallback." | Violates project constraint: NEVER generate licenses locally. Creates license drift, duplicate keys, activation conflicts. Central API is the single source of truth. | Queue the request in Redis. Retry with exponential backoff. Show "pending" status to customer. Never generate locally. |
+| Built-in email marketing | "Send newsletters, drip campaigns, product announcements from the dashboard." | Email delivery is a specialized domain. SPF/DKIM/DMARC configuration, deliverability monitoring, bounce handling, unsubscribe compliance. Not the team's core competency. | Integrate with Resend for transactional emails. Use a dedicated email service (Mailchimp, Resend Campaigns) for marketing emails. |
+| Live chat / real-time messaging | "Customers should chat with support in real-time." | WebSocket infrastructure, message persistence, presence detection, typing indicators. Massive complexity for a team of 2-3. BD customers already use WhatsApp. | Support ticket system for structured support. WhatsApp link for urgent issues. No live chat widget. |
+| Built-in CMS for marketing pages | "Admin should edit the homepage, pricing, features from the dashboard." | Marketing site (v1.x) is a Next.js app with TypeScript data files and MDX. Adding a CMS would require either a headless CMS integration or building a full content editor. Both are major scope expansion. | Marketing content stays in code. Dashboard is for operational management, not content editing. |
+| Automatic fraud blocking | "Auto-block suspicious license activations." | False positives block legitimate customers (shared hosting, office networks, developers testing). Automatic blocking without human review causes support nightmares and lost customers. | Flag suspicious activity for admin review. Admin decides whether to revoke. Show evidence (IPs, timestamps, patterns) to support the decision. |
+| Multi-tenant / white-label | "Let other agencies run their own ConversionFlow instance." | Multi-tenant architecture requires database isolation, custom domains, per-tenant configuration, billing for the platform itself. Complete architecture redesign. | Single-tenant. Devsroom runs one instance. Other agencies can become resellers with coupon codes. |
+| Social login (Google/Facebook/GitHub) | "Let customers log in with Google." | Better Auth supports it, but adds OAuth app management, token refresh, provider-specific edge cases. BD customers are less familiar with social login than email/password. Also adds a dependency on external services that may be blocked in BD. | Email/password only for v2.0. Social login can be added later via Better Auth if customer demand exists. |
+| Subscription/recurring billing | "Offer monthly subscription plans." | The product is one-time payment. Adding subscriptions requires: recurring billing logic, failed payment retry dunning, proration, upgrade/downgrade mid-cycle, Stripe Billing integration. Completely different business model. | Stay one-time payment. Renewal is a separate purchase that extends the update/support period. Not a subscription. |
+| Built-in analytics tracking (Google Analytics alternative) | "Track page views, user behavior, funnels ourselves." | Building analytics from scratch is a full product. Plausible is already chosen for marketing site. Use existing tools. | Plausible for marketing site analytics. Internal event tracking for conversion funnel (lightweight: just store events in DB). |
+| Mobile app / PWA | "Customers should manage licenses from their phone." | Building and maintaining a mobile app doubles the development burden. The responsive web dashboard is sufficient. PWA adds service worker complexity without clear benefit. | Responsive web design for both portals. Test on mobile browsers. No native app, no PWA. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Foundation (Phase 1 -- must exist before anything else)
-  cn() utility
-  Footer component
-  Button CSS classes
-  Build fixes
+[Database Layer: PostgreSQL + Drizzle ORM + Redis]
+    |
+    +--required by--> [Authentication: Better Auth]
+    |                       |
+    |                       +--required by--> [Customer Portal: all features]
+    |                       +--required by--> [Admin BI Dashboard: all features]
+    |                       +--required by--> [Checkout: user creation]
+    |
+    +--required by--> [Central Licensing: API sync + webhooks]
+    |                       |
+    |                       +--required by--> [License Intelligence: piracy detection]
+    |                       +--required by--> [Customer Portal: license management]
+    |                       +--required by--> [Admin BI: license metrics]
+    |
+    +--required by--> [Checkout: order creation]
+    |                       |
+    |                       +--requires--> [Central Licensing: POST on purchase]
+    |                       +--requires--> [SSL Commerce: payment processing]
+    |                       +--enhances--> [Billing: invoice generation]
+    |
+    +--required by--> [BD Manual Payments: transaction verification]
+    |
+    +--required by--> [Admin BI Dashboard: all analytics queries]
 
-Homepage (Phase 2 -- primary conversion page)
-  Hero Section
-    depends on: Foundation
-  Dashboard Mockup
-    depends on: Hero Section (rendered alongside)
-  Trust Bar
-    depends on: Hero Section (rendered below)
-  Bento Features Grid
-    depends on: Foundation (reusable card components)
-  BD Couriers Section
-    depends on: Bento grid (uses same courier card pattern)
-  How It Works Steps
-    depends on: Foundation
-  Testimonials
-    depends on: Foundation
-  CTA Banner
-    depends on: Pricing data (price anchor)
-  Video Section
-    depends on: Foundation (lightbox component)
+[Authentication: Better Auth]
+    +--required by--> [Customer Portal: dashboard, licenses, billing, downloads, tickets, notifications]
+    +--required by--> [Admin BI Dashboard: KPIs, charts, reports, user management, invoice management]
+    +--required by--> [RBAC: route protection via proxy.ts]
+    +--required by--> [Audit Logging: who did what]
 
-Content Pages (Phase 3 -- all nav links must resolve)
-  Features Page
-    depends on: Homepage (reuses courier cards, tracking panel patterns)
-    reuses: Bento grid component patterns
-  Pricing Page
-    depends on: Pricing data (TypeScript data file)
-    requires: USD/BDT toggle component (client component)
-    requires: FAQ accordion component
-    requires: Buy Now button routing (external checkout + WhatsApp)
-  Changelog Page
-    depends on: Changelog data (TypeScript data file)
-    requires: Version badge, change tag components
-  Support Page
-    depends on: Foundation (form input styles)
-    requires: Contact form server action (email sending)
-    requires: Support card component
+[Central Licensing API: license.devsroom.com]
+    +--required by--> [License Intelligence: sync, webhooks, domain tracking]
+    +--required by--> [Checkout: license creation on purchase]
+    +--required by--> [Customer Portal: license activation/deactivation]
+    +--enhances--> [Admin BI: license status metrics, renewal rates]
 
-Polish (Phase 4 -- quality layer)
-  SEO metadata
-    depends on: All pages built
-  404 page
-    depends on: Foundation
-  Scroll animations
-    depends on: All sections built
-  Performance optimization
-    depends on: All content loaded
-  Custom cursor
-    depends on: Foundation (client-side only)
+[Checkout System: payments + order flow]
+    +--requires--> [Database: order, invoice tables]
+    +--requires--> [Authentication: user identification]
+    +--requires--> [Central Licensing: license creation]
+    +--enhances--> [Admin BI: revenue metrics, conversion funnel]
+    +--enhances--> [Customer Portal: billing history, invoices]
+
+[Dashboard UI: backenddashboard/ port]
+    +--required by--> [Customer Portal: layout, navigation, components]
+    +--required by--> [Admin BI Dashboard: layout, charts, tables, forms]
+
+[SSL Commerce Gateway]
+    +--requires--> [Checkout: order creation before payment]
+    +--provides--> [IPN Handler: async payment confirmation]
+    +--enhances--> [Admin BI: payment method analytics]
+
+[BD Manual Payments]
+    +--requires--> [Checkout: order creation]
+    +--requires--> [Admin: manual verification workflow]
+    +--conflicts with--> [SSL Commerce: same order, different payment paths]
+
+[Coupons + Tax/VAT]
+    +--requires--> [Checkout: order total calculation]
+    +--enhances--> [Admin BI: discount analytics, tax reporting]
 ```
 
----
+### Critical Dependency Chains
 
-## MVP Recommendation
+1. **Database -> Auth -> Portal/Dashboard:** Nothing works without the database layer and authentication. These are the absolute foundation.
 
-**Prioritize (Phase 1-3, must ship):**
+2. **Database -> Central Licensing -> License Management:** The central API sync must be working before customer license management can function. Customer portal cannot show license data until it has been synced from license.devsroom.com.
 
-1. All 5 pages from design reference (Home, Features, Pricing, Changelog, Support) -- the entire HTML design must be ported
-2. Responsive design on all pages -- mobile is the primary viewport for BD
-3. Dark/light mode working on all pages -- already has ThemeProvider
-4. Pricing page with all 3 tiers, FAQ, trust strip, and wired CTAs
-5. Support page with functional contact form (server action for email)
-6. BD-specific branding elements woven throughout (not a separate section)
+3. **Auth -> Checkout -> Central API -> License:** The complete purchase flow is a chain: authenticate user -> create order -> process payment -> call central API to generate license -> store mapping locally -> send confirmation. If any link breaks, the purchase fails.
 
-**Defer to post-launch:**
-- Blog/MDX content: Infrastructure can exist, but do not wait for content
-- Documentation section: Link placeholder for now, build when docs exist
-- Legal pages: Stub pages with placeholder text, write proper legal later
-- USD/BDT currency toggle: Show both statically (as in design), add toggle as enhancement
-- i18n/Bengali full translation: English primary at launch, Bengali later
-- Video content: Placeholder with lightbox, record and embed real video later
+4. **Dashboard UI -> Admin BI:** The admin dashboard visual design comes from backenddashboard/. All BI components (charts, metrics, tables) must be built within that design system. Port the template first, then wire data.
 
-**Never build (Anti-Features):**
-- User auth, on-site payments, CMS, live chat, comparison tables, cookie banners
+5. **SSL Commerce IPN -> Order Confirmation:** SSL Commerce payment is asynchronous. The IPN handler is the only reliable way to confirm payment. Without it, orders stay in "pending" forever.
+
+### Dependency Notes
+
+- **BD Manual Payments vs SSL Commerce:** These are parallel payment paths for the same checkout. Manual payments require admin verification (human in the loop). SSL Commerce is automated via IPN. Both create orders in the same table with different payment_method values.
+- **Central Licensing is read-only for this app:** The app NEVER generates licenses. It only syncs from the central API and caches locally. All write operations (create, activate, deactivate, renew) go through the central API.
+- **Webhook reliability:** If webhooks from license.devsroom.com fail, the scheduled fallback sync (hourly) catches up. The system must be designed to handle stale data gracefully.
+- **RBAC spans all features:** Role-based access control is not a standalone feature. It is a cross-cutting concern applied to every admin and customer route via proxy.ts.
 
 ---
 
-## Confidence Assessment
+## MVP Definition
 
-| Area | Confidence | Reason |
-|------|------------|--------|
-| Landing page sections | HIGH | Design reference is comprehensive. HTML analysis covers every section. WooCommerce.com product pages validate the patterns. |
-| Pricing page patterns | HIGH | Analyzed WooCommerce.com (30-day refund, reviews, feature lists), Yoast ($178/year, ratings, benefit lists). WooBooster's one-time model is well-understood. |
-| Feature presentation | HIGH | Design reference has detailed feature rows with visual demos. Pattern matches WooCommerce.com and Yoast approaches. |
-| BD market trust signals | MEDIUM | Based on design reference + PROJECT.md context. Cannot verify with live BD competitor analysis due to tool limitations. Bengali testimonials, bKash/Nagad badges, and WhatsApp support are strong signals based on known BD eCommerce culture. |
-| Changelog presentation | HIGH | Standard pattern. Design reference has it fully specified. Yoast and WordPress.org plugin directories use the same versioned, tagged format. |
-| Support page features | HIGH | Design reference has complete support page. BD-specific WhatsApp support is the right call for the market. |
+### Launch With (v2.0 Phase 1-3)
+
+Minimum viable platform -- what is needed to serve paying customers and give admins business intelligence.
+
+- [ ] **Database + Auth foundation** -- PostgreSQL schema, Drizzle ORM, Redis, Better Auth with dual login, 4-role RBAC, email verification, password reset
+- [ ] **Central Licensing sync** -- Webhook handlers for license events, scheduled fallback sync, local license cache
+- [ ] **Customer Portal: Dashboard overview** -- Active licenses, expiring soon, quick actions
+- [ ] **Customer Portal: License management** -- View, copy key, deactivate domain, sync status
+- [ ] **Customer Portal: Downloads** -- Download latest/older plugin versions with changelog
+- [ ] **Checkout: BD manual payments** -- bKash, Nagad, Rocket, Bank Transfer with admin verification workflow
+- [ ] **Checkout: SSL Commerce** -- Hosted payment page, IPN handler, order validation
+- [ ] **Admin BI: Executive overview** -- Total revenue, active customers, MRR, ARR, growth indicators
+- [ ] **Admin BI: Sales performance** -- Total sales, conversion rate, refund rate
+- [ ] **Admin BI: Revenue charts** -- Daily/weekly/monthly trends with ApexCharts
+- [ ] **Admin BI: Invoice management** -- View/filter invoices, mark paid, send reminders
+- [ ] **Dashboard UI** -- Port layout, sidebar, charts from backenddashboard/ template
+- [ ] **Audit logging** -- Admin action tracking for dispute resolution
+
+### Add After Validation (v2.1)
+
+Features to add once the core platform is stable and serving customers.
+
+- [ ] **Support ticket system** -- When manual email/WhatsApp support becomes unsustainable. Trigger: >20 support emails/week.
+- [ ] **Coupon codes** -- When marketing needs promotional campaigns. Trigger: first promotional campaign planned.
+- [ ] **Customer Portal: Billing history** -- When customers start asking for payment records. Requires invoice PDF generation.
+- [ ] **Notifications center** -- When customers miss important events (license expiry, payment failures). Trigger: first complaint about not knowing license expired.
+- [ ] **Admin BI: User growth charts** -- When there is enough signup data to visualize trends. Trigger: >100 registered users.
+- [ ] **Admin BI: Activity feed** -- When admins need real-time awareness of platform events. Trigger: support staff missing important events.
+- [ ] **Export functionality (CSV/Excel/PDF)** -- When admins need reports for accounting or meetings. Trigger: first request for exportable data.
+- [ ] **Smart renewal reminders** -- Automated email sequence for expiring licenses. Trigger: manual renewal reminders becoming tedious.
+
+### Future Consideration (v2.2+)
+
+Features to defer until the platform has traction and data to justify them.
+
+- [ ] **Churn analytics** -- Requires historical data (6+ months of license expiry patterns). No data to analyze at launch.
+- [ ] **Conversion funnel tracking** -- Requires significant event tracking infrastructure. Implement after basic analytics are proven.
+- [ ] **Retention analytics (day 1/7/30/90)** -- Requires cohort data that only exists after customers have been active for months.
+- [ ] **Piracy detection** -- Requires activation data from central API. Implement when suspicious patterns start appearing.
+- [ ] **Geographic analytics heatmap** -- Requires customer location data (billing addresses). Nice-to-have visualization.
+- [ ] **Scheduled reporting** -- Automated weekly/monthly email reports. Useful but not critical at low volume.
+- [ ] **CLV tracking** -- Requires purchase history across multiple transactions. One-time payment model means CLV = purchase price until renewals exist.
+- [ ] **Product performance comparison** -- Only 2 products currently (WP Plugin, Laravel Module). Not enough data for meaningful comparison.
+
+---
+
+## Feature Prioritization Matrix
+
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| Database + Drizzle ORM setup | HIGH (enables everything) | MEDIUM | P1 |
+| Better Auth integration + RBAC | HIGH (enables everything) | MEDIUM | P1 |
+| Central licensing webhook handlers | HIGH (data integrity) | HIGH | P1 |
+| Customer dashboard overview | HIGH (first thing customers see) | MEDIUM | P1 |
+| License list + detail + copy key | HIGH (core customer need) | MEDIUM | P1 |
+| License deactivation | HIGH (customer autonomy) | MEDIUM | P1 |
+| Downloads section | HIGH (product delivery) | LOW | P1 |
+| BD manual payments (bKash/Nagad/Rocket/Bank) | HIGH (primary payment method) | HIGH | P1 |
+| SSL Commerce integration | HIGH (automated payments) | HIGH | P1 |
+| Admin executive overview (KPIs) | HIGH (business health visibility) | MEDIUM | P1 |
+| Admin revenue trend charts | MEDIUM (decision making) | MEDIUM | P1 |
+| Admin invoice management | HIGH (operational necessity) | MEDIUM | P1 |
+| Dashboard UI port from backenddashboard/ | HIGH (visual foundation) | MEDIUM | P1 |
+| Audit logging | MEDIUM (dispute resolution) | LOW | P1 |
+| Email verification + password reset | MEDIUM (account security) | LOW | P1 |
+| Admin 2FA | MEDIUM (admin security) | MEDIUM | P1 |
+| Session management (Redis) | HIGH (security + UX) | MEDIUM | P1 |
+| Scheduled fallback license sync | MEDIUM (data reliability) | MEDIUM | P1 |
+| Support tickets | HIGH (customer satisfaction) | HIGH | P2 |
+| Coupon codes | MEDIUM (marketing flexibility) | MEDIUM | P2 |
+| Invoice PDF download | MEDIUM (customer accounting) | MEDIUM | P2 |
+| Billing history | MEDIUM (customer transparency) | LOW | P2 |
+| Notifications center | MEDIUM (customer engagement) | MEDIUM | P2 |
+| User growth charts | MEDIUM (growth tracking) | LOW | P2 |
+| Activity feed | MEDIUM (admin awareness) | MEDIUM | P2 |
+| Data export (CSV/Excel/PDF) | MEDIUM (reporting) | MEDIUM | P2 |
+| License renewal flow | HIGH (revenue continuity) | HIGH | P2 |
+| Smart renewal reminders | MEDIUM (retention tool) | MEDIUM | P2 |
+| Date range + dashboard filters | HIGH (analytics usability) | MEDIUM | P2 |
+| Churn analytics | MEDIUM (business intelligence) | HIGH | P3 |
+| Conversion funnel tracking | MEDIUM (optimization) | HIGH | P3 |
+| Retention analytics | MEDIUM (product insights) | MEDIUM | P3 |
+| Geographic analytics heatmap | LOW (visualization) | MEDIUM | P3 |
+| Piracy detection | MEDIUM (revenue protection) | HIGH | P3 |
+| Product performance comparison | LOW (2 products only) | LOW | P3 |
+| Scheduled reporting | LOW (convenience) | MEDIUM | P3 |
+| CLV tracking | LOW (one-time model limits value) | MEDIUM | P3 |
+| Real-time revenue counter | LOW (cosmetic) | LOW | P3 |
+
+**Priority key:**
+- P1: Must have for launch -- the platform cannot function without these
+- P2: Should have, add when core is stable -- important but not blocking
+- P3: Nice to have, future consideration -- valuable with data/time
+
+---
+
+## Feature Complexity Notes
+
+### HIGH Complexity Features (Plan Extra Time)
+
+1. **SSL Commerce Integration (3-step flow):**
+   - Step 1: POST to `https://securepay.sslcommerz.com/gwprocess/v4/api.php` with store_id, store_passwd, total_amount, tran_id, success/fail/cancel/IPN URLs, product details, customer info
+   - Step 2: Redirect customer to SSL Commerce hosted page (supports bKash, cards, mobile banking, internet banking)
+   - Step 3: Handle IPN at webhook URL. Verify with Validation API: POST to `https://securepay.sslcommerz.com/validator/api/validationserverAPI.php` with val_id + store_id + store_passwd. Only then mark order as paid.
+   - Sandbox: sandbox.sslcommerz.com for testing. Production: securepay.sslcommerz.com.
+   - BDT range: 10 - 500,000. No USD support in BDT gateway.
+
+2. **BD Manual Payments (admin verification workflow):**
+   - Customer selects bKash/Nagad/Rocket/Bank Transfer
+   - System shows payment instructions (phone number for bKash/Nagad/Rocket, bank account details for Bank Transfer)
+   - Customer sends payment externally, enters transaction ID / reference number
+   - Order created with status "pending_verification"
+   - Admin sees pending verifications in dashboard
+   - Admin verifies payment received (checks their bKash/bank statement)
+   - Admin approves or rejects order
+   - On approval: same flow as SSL Commerce success -> call central API -> store mapping
+
+3. **Central Licensing Webhook Handlers:**
+   - Must handle: license-created, license-updated, license-expired, payment-refunded
+   - Each webhook must be: authenticated (shared secret HMAC), idempotent (handle duplicate deliveries), ordered (handle out-of-order delivery)
+   - Fallback: hourly scheduled sync fetches all licenses from central API and reconciles local cache
+   - Must never generate licenses locally -- only sync and cache
+
+4. **Support Ticket System:**
+   - Full CRUD for tickets + threaded replies + file attachments
+   - File upload handling (storage, virus scanning optional, size limits)
+   - Customer can create and view own tickets
+   - Admin/support_staff can view all tickets, assign, respond, close
+   - Email notifications on new reply
+   - Status workflow: open -> in-progress -> resolved -> closed
+
+5. **Piracy Detection:**
+   - Requires activation event data from central API (IP, domain, timestamp per activation)
+   - Heuristic rules engine: rate of activation, unique IP count, geographic spread, domain patterns
+   - Admin review interface with evidence display
+   - Manual action: warn customer, revoke license, or dismiss alert
+   - NOT automatic blocking (too many false positives)
+
+---
+
+## Competitor Feature Analysis
+
+| Feature | WooCommerce.com | Freemius (WP plugin SaaS) | Our Approach |
+|---------|-----------------|---------------------------|--------------|
+| Customer portal | My Account page: purchases, downloads, licenses, support | Freemius dashboard: licenses, upgrades, billing | Standalone customer portal with BD-specific payment support |
+| Admin BI | WooCommerce Admin analytics (revenue, orders, customers) | Freemius vendor dashboard (sales, revenue, growth) | Custom BI dashboard ported from backenddashboard/ template, tailored for license intelligence |
+| License management | WooCommerce Software License (basic) | Freemius licensing (activation, deactivation, site management) | Central API at license.devsroom.com + local sync cache. Never generate locally. |
+| Payment methods | Stripe, PayPal, bank transfer | Stripe, PayPal | BD manual payments (bKash/Nagad/Rocket/Bank) + SSL Commerce gateway. BD-first. |
+| Pricing model | Subscription or one-time | Freemium (free + premium) | One-time payment with renewal for updates/support. 3 tiers: Starter/Professional/Agency. |
+| Analytics depth | Standard ecommerce metrics | Growth analytics, conversion, retention | Full BI: revenue intelligence, churn, conversion funnel, retention, geographic analytics |
+| Anti-piracy | None built-in | Freemius has code obfuscation + license enforcement | Piracy detection via activation pattern analysis. Admin review, not auto-blocking. |
+
+---
+
+## SSL Commerce Integration Reference
+
+Detailed notes from SSL Commerce API v4 documentation research.
+
+### Payment Flow
+```
+Customer -> Selects product + plan
+         -> Clicks "Pay with SSL Commerce"
+         -> Server creates session (POST to init API)
+         -> Receives redirect_url (GatewayPageURL)
+         -> Redirect customer to SSL Commerce hosted page
+         -> Customer pays (bKash/card/mobile banking)
+         -> SSL Commerce sends IPN to our webhook
+         -> Customer redirected to success/fail/cancel URL
+         -> Server validates payment via Validation API
+         -> On validated: create license via central API, store mapping, generate invoice
+```
+
+### Key Parameters (Session Creation)
+- `store_id`: Provided by SSL Commerce on registration
+- `store_passwd`: API password from SSL Commerce
+- `total_amount`: BDT amount (10-500,000 range)
+- `currency`: "BDT" (BDT gateway only)
+- `tran_id`: Unique transaction ID (our order ID)
+- `success_url`: Redirect on payment success
+- `fail_url`: Redirect on payment failure
+- `cancel_url`: Redirect on customer cancel
+- `ipn_url`: Webhook for async notification (MOST IMPORTANT for reliability)
+- `product_name`, `product_category`, `product_profile`: Product metadata
+- `cus_name`, `cus_email`, `cus_phone`: Customer info (required for bKash)
+
+### IPN Handler Requirements
+- Endpoint: POST handler (Next.js API route or server action)
+- Validate: Must call Validation API before trusting IPN data
+- Idempotency: Same tran_id may be delivered multiple times
+- Security: Verify request came from SSL Commerce (check store_id matches)
+- Response: Return "VALID" string to acknowledge receipt
+
+### Validation API
+- URL: `https://securepay.sslcommerz.com/validator/api/validationserverAPI.php`
+- Params: val_id (from IPN), store_id, store_passwd, format (json)
+- Returns: status (VALID/INVALID), amount, currency, bank_txn, card_type, etc.
+- MUST call this before marking order paid -- never trust the redirect URL alone
 
 ---
 
 ## Sources
 
-- `woobooster-v2.html` -- Complete design reference (1247 lines), analyzed in full
-- `.planning/PROJECT.md` -- Project context, requirements, constraints
-- `.planning/ROADMAP.md` -- Phase structure and plan breakdown
-- WooCommerce.com product page patterns (WooCommerce Payments) -- pricing tiers, benefit lists, review ratings, trust signals
-- Yoast WooCommerce SEO marketing page -- product page layout, feature descriptions, pricing display, CTAs
-- Training data on WordPress/WooCommerce plugin marketing best practices (verified against observed patterns)
+- `.planning/PROJECT.md` -- Complete v2.0 requirements, constraints, key decisions
+- SSL Commerce API v4 documentation (https://developer.sslcommerz.com) -- Payment flow, session creation, IPN handling, validation API, refund API. Read in full.
+- SSL Commerce integration guide (https://www.sslcommerz.com) -- Overview, sandbox testing, Easy Checkout vs Hosted Payment. Read in full.
+- Stripe Billing features reference (https://stripe.com/billing) -- SaaS BI dashboard patterns: MRR, ARR, churn, conversion funnel, retention, revenue recovery, geographic analytics. Used as reference for feature patterns.
+- `backenddashboard/` folder analysis -- Admin dashboard template with ApexCharts, ecommerce metrics, charts, sidebar layout, auth pages, calendar, forms, tables, modals. Package.json confirms: apexcharts, react-apexcharts, @react-jvectormap/core, flatpickr, @tailwindcss/forms.
+- SaaS customer portal patterns (training data, verified against WooCommerce.com and Freemius patterns) -- License management, billing history, downloads, support tickets, notifications.
+- BD payment ecosystem (training data, limited verification -- bKash and Nagad developer docs were inaccessible during research) -- bKash/Nagad/Rocket mobile banking, Bank Transfer, manual verification workflows.
 
-**Note:** WebSearch and web reader tools were rate-limited during this research session. Findings marked MEDIUM confidence should be validated with additional BD-specific market research when tools are available. The core feature landscape is well-supported by the comprehensive design reference and project documentation.
+---
+
+*Feature research for: ConversionFlow v2.0 Dual Portal SaaS Platform*
+*Researched: 2026-05-15*

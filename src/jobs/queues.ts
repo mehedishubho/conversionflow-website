@@ -8,7 +8,7 @@ export const QUEUE_NAMES = {
 } as const;
 
 const connectionOptions = process.env.REDIS_URL
-  ? { connection: { host: "localhost", port: 6380 } }
+  ? { connection: { host: "localhost", port: 6381 } }
   : undefined;
 
 // Only create queues if Redis is available

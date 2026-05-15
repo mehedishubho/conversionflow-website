@@ -1,259 +1,512 @@
 # Technology Stack
 
-**Project:** WooBooster Marketing Website
-**Researched:** 2026-05-11
-**Overall confidence:** HIGH
+**Project:** ConversionFlow v2.0 -- Dual Portal SaaS Platform (Customer Portal + Admin BI Dashboard)
+**Researched:** 2026-05-15
+**Scope:** NEW dependencies only (database, auth, caching, payments, jobs, exports, dashboard UI)
+**Existing stack preserved:** Next.js 16.2.6, React 19.2.4, TailwindCSS v4, Framer Motion, next-themes, next-intl, MDX, Lucide, clsx, tailwind-merge, Sharp, Google Fonts (Syne, DM Sans, JetBrains Mono), Plausible Analytics
+
+---
 
 ## Recommended Stack
 
-### Core Framework (Already Installed)
+### Database Layer
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Next.js | 16.2.6 | Full-stack React framework | App Router with Server Components, SSG for marketing pages, built-in SEO metadata API, `output: 'standalone'` for self-hosting. Already chosen and correct. | HIGH |
-| React | 19.2.4 | UI rendering | Server Components reduce client JS bundle. Already installed. | HIGH |
-| TypeScript | 5.x | Type safety | Strict mode enabled. Non-negotiable for maintainability. | HIGH |
-| TailwindCSS | 4.x | Styling | CSS-first config via `@theme` block is the v4 approach. Already set up with design tokens. | HIGH |
-| Framer Motion | 12.38.0 | Animation | Standard for React animation. Page transitions, scroll reveals, stagger effects, shared layout animations. Already installed. | HIGH |
-| next-themes | 0.4.6 | Dark/light theme | Class strategy works with Tailwind. Pin exact version (0.x means semver breaks possible). | MEDIUM |
-| Lucide React | 1.14.0 | Icons | Tree-shakeable, consistent design, lightweight. Already installed. | HIGH |
-| clsx + tailwind-merge | 2.1.1 / 3.6.0 | Class name utilities | `cn()` utility for conditional class merging. Already installed. | HIGH |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `drizzle-orm` | ^0.45.2 | Type-safe ORM for PostgreSQL queries | Zero runtime dependencies. Full TypeScript inference with SQL-like API. Excellent Drizzle Kit migration tooling. First-class Next.js support. Native support for both `pg` and `postgres.js` drivers. Chosen over Prisma because: no Rust engine binary, lighter bundle, faster cold starts on VPS, better SQL control, better self-hosted deployment story. |
+| `drizzle-kit` | ^0.31.10 | Schema migrations and introspection | Official migration tool. Generates SQL migrations from schema changes. `drizzle-kit generate` + `drizzle-kit migrate` workflow. Required peer dep by Better Auth (>=0.31.4). |
+| `postgres` | ^3.4.9 | PostgreSQL driver (postgres.js) | Zero-dependency, async/await-native driver. Chosen over `pg` because: no native bindings (works on any VPS), simpler API surface, faster cold start, better edge/runtime compatibility, Drizzle recommends it as the primary driver. Use `pg` (^8.20.0) as an alternative only if PgBouncer transaction-mode pooling is needed. |
 
-### MDX Blog (NEW -- Must Install)
+**Install:** `pnpm add drizzle-orm postgres` and `pnpm add -D drizzle-kit`
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| @next/mdx | 16.2.6 | MDX compilation in Next.js | Official Next.js MDX plugin. Same version as Next.js. Supports Server Components, dynamic imports via `generateStaticParams`, file-based routing for `.mdx` pages. Verified in official docs. | HIGH |
-| @mdx-js/loader | >=0.15.0 | MDX webpack/turbopack loader | Required peer dependency of `@next/mdx`. | HIGH |
-| @mdx-js/react | >=0.15.0 | MDX React components | Required peer dependency of `@next/mdx`. | HIGH |
-| @types/mdx | latest | TypeScript types for MDX | Type safety for MDX module imports. | HIGH |
-| gray-matter | latest | Frontmatter parsing | `@next/mdx` does not support frontmatter natively. Extract title, date, description, tags from blog post headers. | HIGH |
-| remark-gfm | latest | GitHub Flavored Markdown | Tables, strikethrough, task lists, autolinks in MDX content. Standard plugin. | HIGH |
-| @tailwindcss/typography | 0.5.19 | Prose styles for MDX content | Adds `prose` classes for typographic styling of rendered markdown. Verified: peer dependency supports Tailwind `>=4.0.0-beta.1`. | HIGH |
-
-**Why @next/mdx over alternatives:**
-- **Not next-mdx-remote**: `next-mdx-remote` v6.0.0 is designed for remote/fetched MDX (from CMS, database). Our content is local files in the repo. `@next/mdx` handles local files natively with zero overhead.
-- **Not Contentlayer**: Contentlayer is unmaintained and archived. Dead project.
-- **Not Velite**: Velite is a newer alternative but adds unnecessary abstraction for a small blog. `@next/mdx` with `gray-matter` is simpler and officially supported.
-
-**MDX setup pattern (from official Next.js docs):**
+**Schema structure:**
 ```
-src/
-  app/
-    blog/
-      page.tsx              # Blog listing (reads all .mdx from content/blog)
-      [slug]/page.tsx       # Individual post (dynamic import by slug)
-  content/
-    blog/
-      getting-started.mdx   # Blog posts with frontmatter
-      courier-sync-guide.mdx
-  mdx-components.tsx        # Global MDX component overrides
+src/db/
+  schema/            -- One file per domain table
+    users.ts         -- users, sessions, accounts (Better Auth tables)
+    orders.ts        -- orders, payments, invoices
+    licenses.ts      -- license mappings (central_user_id, central_license_id)
+    tickets.ts       -- support tickets, replies, attachments
+    downloads.ts     -- download logs, version tracking
+    notifications.ts -- notification records
+    audit.ts         -- audit log entries
+    index.ts         -- Barrel export of all schemas
+  index.ts           -- Drizzle instance + connection singleton
+  migrate.ts         -- Migration runner script
+drizzle.config.ts    -- Drizzle Kit config (project root)
 ```
 
-### i18n / Internationalization (NEW -- Must Install)
+**Confidence:** HIGH
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| next-intl | latest | App Router i18n | First-class App Router support with request-scoped configuration. Verified: official docs show `createNextIntlPlugin()` setup. Supports locale-based routing (`/en/...`, `/bn/...`) and cookie-based locale detection. Active maintenance. | HIGH |
+### Authentication
 
-**Why next-intl over alternatives:**
-- **Not next-i18next**: Built for Pages Router. Has App Router compatibility via wrappers but is fundamentally a Pages Router library. Adds unnecessary complexity.
-- **Not next-i18n-router**: Minimal library, less community support, fewer features.
-- **Not paraglide-next**: Newer but smaller ecosystem. next-intl is the established standard.
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `better-auth` | ^1.6.11 | Full authentication framework | Self-hosted, framework-agnostic, built for Next.js. Ships with a dedicated `better-auth/next-js` export, `better-auth/adapters/drizzle` for direct Drizzle ORM integration, `better-auth/plugins/admin` for admin panel user management, `better-auth/plugins/two-factor` for TOTP 2FA, `better-auth/plugins/access` for RBAC role-based access, and `better-auth/plugins/email-otp` for email-based OTP login. The Drizzle adapter is bundled inside the core package at `@better-auth/drizzle-adapter@1.6.11` -- no separate install needed. |
 
-**next-intl setup pattern (from official docs):**
+**Install:** `pnpm add better-auth` (zod@^4.4.3 comes as a dependency -- no separate install)
+
+**Key exports (verified from package.json):**
 ```
-src/
-  i18n/
-    request.ts             # createRequestConfiguration
-    routing.ts             # locale routing config
-  messages/
-    en.json                # English translations
-    bn.json                # Bengali translations
-  app/
-    [locale]/
-      layout.tsx           # Locale-aware layout
-      page.tsx             # Locale-aware pages
+better-auth                        -- Server-side auth configuration
+better-auth/client                 -- Client-side hooks (useSession, signIn, signOut)
+better-auth/next-js                -- Next.js route handler integration (toNextJsHandler)
+better-auth/adapters/drizzle       -- Drizzle ORM adapter (built-in, maps Drizzle tables)
+better-auth/plugins/admin          -- Admin user management panel
+better-auth/plugins/access         -- RBAC / role-based access control
+better-auth/plugins/two-factor     -- TOTP 2FA (admin requirement)
+better-auth/plugins/email-otp      -- Email OTP for passwordless login
+better-auth/plugins/username       -- Username-based auth
+better-auth/plugins/bearer         -- API token / bearer auth
+better-auth/plugins/custom-session -- Session customization for Redis
+better-auth/plugins/organization   -- Multi-tenant organization support
 ```
 
-**Architecture decision:** Use path-based locale routing (`/en/pricing`, `/bn/pricing`). English is primary/default. Bengali is secondary. This matches how both audiences naturally discover the site. Cookie-based fallback for returning visitors.
+**Better Auth peer deps (verified):** `react: ^18.0.0 \|\| ^19.0.0`, `next: ^14.0.0 \|\| ^15.0.0 \|\| ^16.0.0`, `drizzle-orm: ^0.45.2`, `drizzle-kit: >=0.31.4` -- all compatible with our stack.
 
-### Form Handling / Email (NEW -- Must Install)
+**Dual auth pattern:** Better Auth supports multiple auth configurations on the same server. Customer portal (`/portal/...`) and admin portal (`/admin/...`) share one Better Auth instance. The `access` plugin provides role-based routing (customer, admin, support_staff, super_admin). The `admin` plugin provides admin-specific user management capabilities.
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Resend | 6.12.3 | Transactional email API | Modern email API. Clean Node.js SDK (verified: v6.12.3, requires Node >=20). Use for contact form submission emails. Server action calls Resend directly. No webhook setup needed. | HIGH |
-| react-email | latest | Email templates | Build transactional email templates as React components. Pairs with Resend. | MEDIUM |
+**Integration files:**
+```
+src/lib/auth.ts              -- Better Auth server config (plugins, Drizzle adapter, database)
+src/lib/auth-client.ts       -- Better Auth client config (for client components)
+src/app/api/auth/[...all]/route.ts  -- Catch-all auth API route handler
+src/proxy.ts                 -- Auth middleware for route protection (NOT middleware.ts)
+```
 
-**Why Resend over alternatives:**
-- **Not Nodemailer + SMTP**: Requires SMTP server configuration, harder to self-host reliably.
-- **Not SendGrid**: Legacy API, heavier SDK, overkill for a contact form.
-- **Not third-party form services (Formspree, Getform)**: Adds external dependency, monthly limits, less control.
+**Confidence:** HIGH
 
-**Pattern:** Server action receives form data, validates, sends via Resend API. No API routes needed.
+### Caching, Sessions, and Queues (Redis)
 
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `ioredis` | ^5.10.1 | Redis client for caching, sessions, rate limiting | Full-featured Redis client with cluster support, pipeline/multi, Lua scripting, and robust reconnection. Used for: Better Auth custom session store, API response caching (license lookups, product data), rate limiting counters, and as the shared infrastructure for BullMQ queues. Standard Node.js Redis client -- nothing else comes close in maturity. |
+| `bullmq` | ^5.76.8 | Redis-backed job queue for background tasks | Ships ioredis@5.10.1 as a bundled dependency. Supports delayed jobs, recurring/cron jobs, job prioritization, rate limiting per queue, retries with exponential backoff, dead-letter queues, and job progress tracking. Perfect for: license sync from central API, webhook retry processing, scheduled analytics reports, email sending, large data export jobs. |
+
+**Install:** `pnpm add ioredis bullmq`
+
+**Note on Redis duplication:** BullMQ bundles its own ioredis for queue operations. Installing `ioredis` separately gives us a dedicated client for caching and session operations independent of the queue system. Standard practice -- BullMQ manages its own connections for queue operations, the app uses a separate connection for general caching.
+
+**Redis connection pattern:**
+```
+src/lib/redis.ts     -- Redis client singleton (ioredis, used for caching + sessions)
+src/jobs/queues.ts   -- BullMQ queue definitions (BullMQ uses its own internal ioredis)
+src/jobs/workers/    -- BullMQ worker processes (separate from Next.js in production)
+```
+
+**Redis usage areas:**
+1. Better Auth session store (via custom session adapter writing to Redis)
+2. API response caching (license lookups from central API, product catalog)
+3. Rate limiting counters (rate-limiter-flexible Redis backend)
+4. Feature flags / configuration cache
+5. BullMQ job queues (internal ioredis)
+
+**Worker deployment:** In production, BullMQ workers run as a separate Node.js process (`npx tsx src/jobs/workers/index.ts`). During development, workers can run alongside the Next.js dev server. The workers connect to the same Redis instance.
+
+**BullMQ verified dependencies:** `ioredis@5.10.1`, `cron-parser@4.9.0`, `msgpackr@2.0.1`
+
+**Confidence:** HIGH
+
+### Charts and Data Visualization
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `apexcharts` | ^5.11.0 | Chart rendering engine | Already used in `backenddashboard/` template. Full chart library: line, bar, area, pie, donut, radar, heatmap, treemap, gauge, range bar. Cannot SSR -- must use `dynamic()` import with `ssr: false`. |
+| `react-apexcharts` | ^2.1.0 | React wrapper for ApexCharts | Peer deps: `apexcharts>=5.10.1`, `react>=16.8.0`. Compatible with React 19. Dashboard template already uses the proven pattern. |
+| `@react-jvectormap/core` | ^1.0.4 | Interactive world map for geographic analytics | Already in dashboard template. Used for sales-by-country heatmap in admin dashboard. React 19 compatible (template has override in package.json). |
+| `@react-jvectormap/world` | ^1.1.2 | World map data for jVectormap | Companion to core. Dashboard template uses this for the CountryMap component. |
+
+**Install:** `pnpm add apexcharts react-apexcharts @react-jvectormap/core @react-jvectormap/world`
+
+**Proven pattern from dashboard template (MonthlySalesChart.tsx):**
 ```typescript
-// src/app/actions/contact.ts
-"use server"
-import { Resend } from 'resend';
-// Server action sends email directly
+"use client";
+import dynamic from "next/dynamic";
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+```
+This pattern is already battle-tested in the dashboard template. All chart components must use `"use client"` and dynamic import.
+
+**Charts needed for Admin BI Dashboard:**
+- Revenue trend line chart (daily/weekly/monthly/yearly)
+- Sales performance bar chart
+- User growth area chart
+- Churn rate donut chart
+- Conversion funnel horizontal bar chart
+- Product performance radar chart
+- Geographic heatmap (jVectormap)
+- Retention analytics multi-line chart
+- MRR/ARR gauge chart
+
+**Confidence:** HIGH
+
+### Data Tables
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `@tanstack/react-table` | ^8.21.3 | Headless table component for data grids | Peer deps: `react>=16.8`, `react-dom>=16.8` -- compatible with React 19. Headless design gives full styling control with TailwindCSS, matching the existing dashboard template aesthetic. Supports sorting, filtering, pagination, row selection, column resizing, and row virtualization for large datasets. Also listed as a peer dep by Better Auth for its admin UI. |
+
+**Install:** `pnpm add @tanstack/react-table`
+
+**Use cases:**
+- Admin: Orders table, users table, licenses table, invoices table, tickets table
+- Customer: Licenses table, orders table, invoices table, downloads table
+- All tables: Server-side pagination, column sorting, text search, date range filters
+
+**Confidence:** HIGH
+
+### Payment Gateways (Bangladesh)
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `bkash-payment` | ^3.0.5 | bKash tokenized checkout API | Most maintained bKash npm package (updated Sep 2024). Handles the full tokenized checkout flow: create agreement, execute payment, query payment status. Dependencies: axios, uuid, node-global-storage. |
+| `sslcommerz` | ^1.7.0 | SSL Commerz payment gateway | Covers credit/debit cards, internet banking, and mobile banking across Bangladesh. Handles full checkout flow: session init, payment validation, IPN (instant payment notification), refund. Dependencies: form-data, isomorphic-fetch, node-fetch. Well-maintained community package. |
+| Manual flow (custom) | N/A | Nagad, Rocket, Bank Transfer | No reliable npm packages exist for Nagad or Rocket merchant APIs. These will be implemented as manual payment verification: customer sends payment, uploads proof screenshot, admin reviews and approves. Bank transfer follows the same pattern. This is standard practice for BD SaaS platforms. |
+
+**Install:** `pnpm add bkash-payment sslcommerz`
+
+**Payment architecture:**
+```
+PaymentMethod enum:
+  bkash            -> bkash-payment package (tokenized API flow)
+  nagad            -> manual flow (no public merchant API SDK)
+  rocket           -> manual flow (no public merchant API SDK)
+  ssl_commerz      -> sslcommerz package (card/bank/mobile)
+  bank_transfer    -> manual flow (upload payment proof)
+
+PaymentStatus enum:
+  pending -> processing -> completed -> failed -> refunded
+
+PaymentFlow:
+  1. Customer selects plan + payment method
+  2a. [API methods] Redirect to payment gateway, callback verifies
+  2b. [Manual methods] Customer uploads proof, admin verifies
+  3. On success: create/find customer -> POST to license.devsroom.com/api/orders/import
+  4. Store central_user_id + central_license_id mapping locally
 ```
 
-### SEO (Built into Next.js -- No Install Needed)
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Next.js Metadata API | built-in | Per-page metadata | `generateMetadata` export in each page. Open Graph, Twitter cards, title, description. Native to App Router. | HIGH |
-| sitemap.ts | built-in | Dynamic sitemap generation | `src/app/sitemap.ts` using `generateSitemaps` function. Creates `sitemap.xml` at build time. | HIGH |
-| robots.ts | built-in | Robots.txt generation | `src/app/robots.ts` export. Creates `robots.txt` allowing/disallowing crawlers. | HIGH |
-| opengraph-image | built-in | OG image generation | `opengraph-image.tsx` in route directories. Generates social preview images using JSX. | HIGH |
-| next-sitemap | NOT RECOMMENDED | -- | Unnecessary. Next.js 16 has built-in sitemap/robots support. Do not add this. | HIGH |
-
-### Analytics (NEW -- Must Install)
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Plausible Analytics | self-hosted | Privacy-first analytics | No cookies, no GDPR consent needed, lightweight script (<1KB). Self-hosted option available via Docker. Matches self-hosting requirement. | HIGH |
-
-**Why Plausible over alternatives:**
-- **Not Google Analytics**: Heavy script, privacy concerns, GDPR complications. Unnecessary for a marketing site.
-- **Not Vercel Analytics**: Tied to Vercel platform. Project deploys self-hosted.
-- **Not Umami**: Good alternative but Plausible has larger community and more documentation.
-- **Not PostHog**: Overkill. Product analytics for a marketing site is wrong scope.
-
-**Implementation:** Self-host Plausible on same VPS as the site. Add tracking script to root layout. Use `<Script>` component from Next.js for optimal loading.
-
-### Self-Hosted Deployment (Infrastructure)
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Docker | latest | Containerization | `output: 'standalone'` in `next.config.ts` produces minimal deployment. Wrap in Docker container. | HIGH |
-| Node.js | >=20 | Runtime | Standalone output runs with Node.js. Resend requires Node >=20. | HIGH |
-| Caddy or Nginx | latest | Reverse proxy | SSL termination, static asset serving, gzip compression. Caddy has automatic HTTPS. | HIGH |
-
-**next.config.ts change required:**
-```typescript
-const nextConfig: NextConfig = {
-  output: 'standalone',  // Required for self-hosted Docker deployment
-};
+**API routes:**
+```
+src/app/api/payments/
+  bkash/
+    create/route.ts       -- Initialize bKash payment
+    execute/route.ts      -- Execute bKash payment
+    callback/route.ts     -- bKash callback handler
+  sslcommerz/
+    init/route.ts         -- Initialize SSL Commerz session
+    success/route.ts      -- SSL Commerz success callback
+    fail/route.ts         -- SSL Commerz failure callback
+    ipn/route.ts          -- SSL Commerz IPN handler
+  manual/
+    submit/route.ts       -- Customer uploads payment proof
+    verify/route.ts       -- Admin verifies manual payment
 ```
 
-**Deployment pattern (verified from Next.js official docs):**
-1. `pnpm build` produces `.next/standalone/` with minimal `server.js`
-2. Copy `public/` and `.next/static/` into standalone output
-3. Docker container runs `node server.js`
-4. Reverse proxy handles SSL and serves static assets via CDN
+**SSL Commerz coverage:** Visa, Mastercard, DBBL Nexus, City Bank, internet banking, mobile banking (including bKash via SSL Commerz as a payment option), all major BD bank transfers. This makes it the single most comprehensive payment option.
 
-### Supporting Libraries
+**Confidence:** MEDIUM -- bKash and SSL Commerz packages are community-maintained (not officially published by the companies). Standard practice in BD developer ecosystem. Manual flows for Nagad/Rocket are the accepted norm.
 
-| Library | Version | Purpose | When to Use | Confidence |
-|---------|---------|---------|-------------|------------|
-| sharp | latest | Image optimization | `next/image` uses it for optimized image processing on self-hosted (not needed on Vercel). Required for self-hosted deployment. | HIGH |
+### Export Libraries
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `xlsx` | ^0.18.5 | Excel (XLSX) file generation and reading | SheetJS community edition. Read and write Excel files server-side. No peer deps. For large exports (>10K rows), generate in a BullMQ worker and notify the user when ready. |
+| `papaparse` | ^5.5.3 | CSV parsing and generation | Zero-dependency CSV library. Handles edge cases correctly (quoted fields, special characters, Unicode Bengali text). Use for CSV export and any CSV import needs. |
+| `@types/papaparse` | ^5.5.2 | TypeScript types for PapaParse | Type definitions. |
+| `@react-pdf/renderer` | ^4.5.1 | PDF generation from React components | Write PDF documents as JSX templates. Peer dep: `react: ^16.0.0 \|\| ^17.0.0 \|\| ^18.0.0 \|\| ^19.0.0` -- confirmed React 19 compatible. Best for invoice PDFs, analytics report PDFs. JSX-based template approach is far more maintainable than programmatic PDF libraries. |
+
+**Install:** `pnpm add xlsx papaparse @react-pdf/renderer` and `pnpm add -D @types/papaparse`
+
+**Export strategy by data size:**
+```
+Small (< 1K rows):   Generate synchronously in API route, return as file download
+Medium (1K-10K):     Generate in API route with streaming response
+Large (> 10K):       Queue in BullMQ worker, email/notify user when ready
+```
+
+**Export use cases:**
+- Admin: Revenue reports (CSV/Excel), user lists (CSV), invoice batches (PDF), license reports (Excel)
+- Admin: Analytics snapshots (PDF), geographic data (CSV), transaction history (Excel)
+- Customer: Invoice PDF downloads, order history (CSV), license details (PDF)
+
+**Confidence:** HIGH
+
+### Email
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `nodemailer` | ^8.0.7 | Transactional email sending | Standard Node.js email library. Supports SMTP, Amazon SES, and any transactional email provider. Use with a provider like Resend, Amazon SES, or Mailgun. Self-hosted compatible. `@types/nodemailer`@^8.0.0 for TypeScript. |
+
+**Install:** `pnpm add nodemailer` and `pnpm add -D @types/nodemailer`
+
+**Email use cases:**
+- Welcome email (new customer signup)
+- Email verification
+- Password reset
+- Invoice/receipt PDF delivery
+- License expiration warnings
+- Support ticket notifications
+- Admin alerts (failed payment, fraud detection, churn alerts)
+
+**Note:** v1.x used Resend SDK directly. For v2.0, nodemailer is more flexible because it works with any SMTP provider and is better suited for self-hosted deployment. If the team already has Resend configured, the Resend SDK from v1.x can be kept for contact forms while nodemailer handles all new transactional emails.
+
+**Confidence:** HIGH
+
+### Rate Limiting and Security
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `rate-limiter-flexible` | ^11.1.0 | Rate limiting for API routes and auth endpoints | Supports Redis as a backend (uses our ioredis connection). Prevents brute force on auth endpoints, API abuse, payment endpoint flooding, and webhook endpoint overload. Works with Next.js API route handlers directly. |
+
+**Install:** `pnpm add rate-limiter-flexible`
+
+**Rate limiting strategy:**
+```
+Auth endpoints:           5 requests/minute per IP (login, register, password reset)
+Payment endpoints:        10 requests/minute per user
+API routes:               60 requests/minute per user
+Webhook endpoints:        100 requests/minute per IP
+Public API (if any):      30 requests/minute per IP
+Export endpoints:         5 requests/minute per user
+```
+
+**Confidence:** HIGH
+
+### Dashboard UI Components (from backenddashboard/ template)
+
+These are defined in `backenddashboard/package.json`. Port selectively -- only what the ConversionFlow dashboard needs.
+
+| Technology | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| `react-dnd` | ^16.0.1 | Drag and drop | Kanban boards, reorderable lists. Peer dep: `react>=16.11`, React 19 compatible. |
+| `react-dnd-html5-backend` | ^16.0.1 | HTML5 DnD backend | Companion to react-dnd. |
+| `react-dropzone` | ^15.0.0 | File upload component | Support ticket attachments, manual payment proof uploads. |
+| `flatpickr` | ^4.6.13 | Date/time picker | Admin date range filters, report scheduling. |
+| `@svgr/webpack` | ^8.1.0 | SVG-to-React webpack loader | Dashboard template uses custom SVG icons. Dev dependency. |
+| `@tailwindcss/forms` | ^0.5.11 | Form element styling | Reset/base styles for form elements with TailwindCSS. Dev dependency. |
+
+**Install:** `pnpm add react-dnd react-dnd-html5-backend react-dropzone flatpickr` and `pnpm add -D @svgr/webpack @tailwindcss/forms`
+
+**Do NOT install from dashboard template:** `swiper` (no carousels needed in dashboard), `@fullcalendar/*` (calendar view optional -- skip unless specifically requested), `autoprefixer` (already handled by TailwindCSS v4 PostCSS plugin), `prettier` (project uses ESLint for formatting).
+
+### Utility Libraries
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `date-fns` | ^4.1.0 | Date manipulation and formatting | Tree-shakeable, modern. Used for: date range filtering in analytics, relative time display ("3 days ago"), subscription expiry calculations, chart date axis formatting. |
+| `nanoid` | ^5.1.11 | Unique ID generation | Fast, URL-safe, compact IDs. Use for: order reference IDs, ticket numbers, download tokens, export job IDs. Shorter and faster than uuid for non-UUID-format identifiers. |
+| `zod` | ^4.4.3 | Schema validation | Comes as a dependency of better-auth -- no separate install needed. Use project-wide for: form validation, API input validation, environment variable validation, payment payload validation. |
+
+**Install:** `pnpm add date-fns nanoid` (zod is already included with better-auth)
+
+---
 
 ## Alternatives Considered
 
 | Category | Recommended | Alternative | Why Not |
 |----------|-------------|-------------|---------|
-| MDX | @next/mdx | next-mdx-remote | For remote/fetched content. Our content is local files. |
-| MDX | @next/mdx | Contentlayer | Unmaintained, archived project. Dead. |
-| MDX | @next/mdx | Velite | Adds abstraction layer we don't need. @next/mdx is simpler for a small blog. |
-| i18n | next-intl | next-i18next | Pages Router library. Clunky App Router adapter. |
-| i18n | next-intl | paraglide-next | Smaller ecosystem, less mature. |
-| Email | Resend | Nodemailer + SMTP | Requires SMTP server, harder to maintain. |
-| Email | Resend | SendGrid | Heavier SDK, overkill for contact forms. |
-| Analytics | Plausible | Google Analytics | Privacy issues, heavy script, GDPR complications. |
-| Analytics | Plausible | Vercel Analytics | Tied to Vercel platform. We self-host. |
-| SEO | Built-in Metadata API | next-sitemap | Next.js 16 has native sitemap/robots support. Redundant. |
-| Deployment | Docker + standalone | Vercel | Project constraint: self-hosted. |
-| State | None (useState) | Redux/Zustand | Overkill for a static marketing site. |
-| CMS | Data files + MDX | Sanity/Contentful | Out of scope. Developer-managed content. |
+| ORM | Drizzle ORM | Prisma | Prisma requires a Rust engine binary, larger bundle size, slower cold starts on VPS, less control over generated SQL. Drizzle is lighter, faster, zero-dep, and better for self-hosted deployment. |
+| PostgreSQL Driver | postgres.js | pg (node-postgres) | pg has callback-based origins and requires native bindings for some features. postgres.js is async-native, zero-dependency, recommended by Drizzle docs. Use pg only if PgBouncer transaction-mode is needed. |
+| Auth | Better Auth | NextAuth/Auth.js v5 | NextAuth v5 had a prolonged beta period, limited self-hosting customization, harder to configure for dual-portal (customer vs admin with different auth flows). Better Auth has built-in admin plugin, RBAC access plugin, Drizzle adapter, and first-class self-hosting. |
+| Auth | Better Auth | Clerk | Clerk is a managed SaaS auth service with per-MAU pricing. Not suitable for self-hosted VPS deployment. Limits customization of the auth flow. |
+| Job Queue | BullMQ | Inngest | Inngest has nice developer experience but requires their SDK and event-driven model. BullMQ is proven, Redis-backed (we already need Redis), no external service dependency, fully self-hosted. |
+| Job Queue | BullMQ | Agenda / MongoDB-based | Agenda uses MongoDB. We are using PostgreSQL. BullMQ uses Redis (already planned). |
+| Charts | ApexCharts | Recharts | Dashboard template already built with ApexCharts and proven patterns. Switching means rewriting all chart components. ApexCharts also has more chart types (heatmap, treemap) needed for BI analytics. |
+| Charts | ApexCharts | Chart.js + react-chartjs-2 | Same reason -- template already uses ApexCharts. |
+| CSV | PapaParse | Manual string concatenation | PapaParse handles edge cases (escaping, quoting, special characters, Unicode/Bengali text). Worth the small dependency for correctness. |
+| Excel | SheetJS (xlsx) | ExcelJS | xlsx is more established, handles more file formats, smaller API surface for export-only use. ExcelJS has streaming support for very large files but adds complexity. Start with xlsx, switch only if streaming is needed. |
+| PDF | @react-pdf/renderer | pdfkit | @react-pdf/renderer uses JSX templates for PDF layout -- much easier for invoice and report design. pdfkit is lower-level and requires manual layout calculations. @react-pdf/renderer confirmed React 19 compatible. |
+| Tables | @tanstack/react-table | AG Grid | TanStack Table is headless (no styling opinions), works perfectly with TailwindCSS. AG Grid Community has limited features; Enterprise has licensing costs. |
+| Tables | @tanstack/react-table | Material Table | Brings Material Design which conflicts with our custom design system. |
+| Email | nodemailer | Resend SDK | Resend is a SaaS product with per-email pricing. nodemailer works with any SMTP provider including self-hosted. More flexible for VPS deployment. |
+| Rate Limiting | rate-limiter-flexible | express-rate-limit | express-rate-limit is Express-specific. rate-limiter-flexible works with any Node.js handler including Next.js API routes, and supports Redis for distributed limiting. |
+| Redis Client | ioredis | node-redis (@redis/client) | ioredis has better TypeScript types, pipeline support, and is what BullMQ uses internally. More mature ecosystem and wider community adoption. |
 
-## Installation
+---
+
+## What NOT to Install
+
+### Conflicts with Existing Stack
+| Package | Why Not |
+|---------|---------|
+| `@prisma/client` / `prisma` | Conflicts with Drizzle ORM. Using Drizzle. |
+| `mongoose` | MongoDB driver. We use PostgreSQL. |
+| `next-auth` / `@auth/core` | Conflicts with Better Auth. |
+| `@upstash/redis` | Serverless-focused Redis wrapper. We have real Redis via ioredis. |
+| `express` | Not needed. Next.js API routes handle server logic. |
+| `body-parser` | Built into Next.js API route handling. |
+| `multer` | File uploads handled by Next.js `request.formData()`. |
+| `cors` | Next.js API routes handle CORS via headers config. |
+| `jsonwebtoken` | Better Auth handles JWT/session via its `jose` dependency. |
+| `bcrypt` / `bcryptjs` | Better Auth handles password hashing internally. |
+| `@vercel/postgres` | Vercel-specific. We are self-hosted. |
+| `moment` | Use date-fns instead (tree-shakeable, modern). |
+
+### Redundant with Existing Stack
+| Package | Why Not |
+|---------|---------|
+| `tailwindcss` | Already at v4.3.0. Dashboard template has its own -- keep ours. |
+| `next` | Already at 16.2.6. |
+| `react` / `react-dom` | Already at 19.2.4. |
+| `tailwind-merge` | Already at 3.6.0. Dashboard template has 2.6.0 -- keep ours. |
+| `autoprefixer` | Already handled by TailwindCSS v4 PostCSS plugin. |
+| `@tailwindcss/postcss` | Already installed. |
+| `swiper` | Dashboard template includes it. ConversionFlow dashboard does not need carousels. |
+
+### Unnecessary for This Project
+| Package | Why Not |
+|---------|---------|
+| `@fullcalendar/list` / `timegrid` / `interaction` | Calendar view is optional. Skip unless explicitly requested. |
+| `gsap` | Framer Motion covers animation needs. GSAP adds weight and licensing complexity. |
+| `styled-components` / `emotion` | CSS-in-JS declining. Tailwind is our styling approach. |
+| `shadcn/ui` | Adds component dependency. Dashboard template has its own UI components to port. |
+| `zustand` / `jotai` / `redux` | Server components + React state handles UI state. Use React Context for shared dashboard state if needed. |
+| `middleware.ts` | Project rule: use `proxy.ts` instead. |
+
+---
+
+## Installation Summary
 
 ```bash
-# MDX Blog
-pnpm add @next/mdx @mdx-js/loader @mdx-js/react @types/mdx gray-matter remark-gfm @tailwindcss/typography
+# === Database Layer ===
+pnpm add drizzle-orm postgres
+pnpm add -D drizzle-kit
 
-# i18n
-pnpm add next-intl
+# === Authentication ===
+pnpm add better-auth
+# zod comes with better-auth -- no separate install
 
-# Email (contact forms)
-pnpm add resend
+# === Caching, Sessions, and Queues ===
+pnpm add ioredis bullmq
 
-# Image optimization (self-hosted)
-pnpm add sharp
+# === Charts and Data Visualization ===
+pnpm add apexcharts react-apexcharts @react-jvectormap/core @react-jvectormap/world
 
-# Analytics (Plausible is self-hosted, just add script tag)
-# No npm install needed -- add <script> tag to layout
+# === Data Tables ===
+pnpm add @tanstack/react-table
+
+# === Payment Gateways (Bangladesh) ===
+pnpm add bkash-payment sslcommerz
+
+# === Export Libraries ===
+pnpm add xlsx papaparse @react-pdf/renderer
+pnpm add -D @types/papaparse
+
+# === Email ===
+pnpm add nodemailer
+pnpm add -D @types/nodemailer
+
+# === Rate Limiting ===
+pnpm add rate-limiter-flexible
+
+# === Dashboard UI Components (selective) ===
+pnpm add react-dnd react-dnd-html5-backend react-dropzone flatpickr
+pnpm add -D @svgr/webpack @tailwindcss/forms
+
+# === Utilities ===
+pnpm add date-fns nanoid
 ```
 
-## What NOT to Use
+**New production dependencies: ~20**
+**New dev dependencies: ~5**
+**Total stack size: ~47 packages (27 existing + 20 new production + 5 new dev)**
 
-| Technology | Why Avoid |
-|------------|-----------|
-| next-sitemap | Next.js 16 has built-in sitemap support via `src/app/sitemap.ts` |
-| next-i18next | Pages Router library, clunky with App Router |
-| next-mdx-remote | Designed for remote/fetched MDX; our content is local |
-| Contentlayer | Unmaintained, archived |
-| Google Analytics | Privacy issues, heavy, GDPR complications for BD+global audience |
-| Vercel Analytics | Tied to Vercel; we self-host |
-| Redux/Zustand/Jotai | No client-side state complexity warrants this |
-| Styled-components/Emotion | CSS-in-JS is declining; Tailwind is the standard |
-| GSAP | Framer Motion covers our animation needs; GSAP adds weight and licensing complexity |
-| Shadcn/ui | Adds component dependency for a site with custom design tokens. Build custom. |
-| Radix UI | Overkill for a marketing site. Use native HTML + Tailwind. |
-| middleware.ts | Project rule: use proxy.ts instead |
+---
 
-## Configuration Changes Required
+## Version Compatibility Matrix
 
-### next.config.ts
-```typescript
-import createMDX from '@next/mdx';
-import type { NextConfig } from "next";
+| Package | Version | React 19 | Next.js 16 | Node.js | TypeScript 5 |
+|---------|---------|----------|------------|---------|-------------|
+| drizzle-orm | ^0.45.2 | N/A | Yes | >=18 | Yes |
+| drizzle-kit | ^0.31.10 | N/A | Yes | >=18 | Yes |
+| postgres | ^3.4.9 | N/A | Yes | >=18 | Yes |
+| better-auth | ^1.6.11 | Yes | Yes (^14\|\|^15\|\|^16) | >=18 | Yes |
+| ioredis | ^5.10.1 | N/A | N/A | >=12 | Yes |
+| bullmq | ^5.76.8 | N/A | N/A | >=18 | Yes |
+| apexcharts | ^5.11.0 | N/A | N/A | N/A | N/A |
+| react-apexcharts | ^2.1.0 | Yes (>=16.8) | Yes | N/A | Yes |
+| @tanstack/react-table | ^8.21.3 | Yes (>=16.8) | N/A | N/A | Yes |
+| @react-pdf/renderer | ^4.5.1 | Yes (^16\|\|^17\|\|^18\|\|^19) | N/A | N/A | Yes |
+| xlsx | ^0.18.5 | N/A | N/A | N/A | Yes |
+| papaparse | ^5.5.3 | N/A | N/A | N/A | Yes (via @types) |
+| nodemailer | ^8.0.7 | N/A | N/A | N/A | Yes (via @types) |
+| rate-limiter-flexible | ^11.1.0 | N/A | N/A | >=12 | Yes |
+| react-dnd | ^16.0.1 | Yes (>=16.11) | Yes | N/A | Yes |
+| react-dropzone | ^15.0.0 | Yes (>=16.8) | Yes | N/A | Yes |
+| date-fns | ^4.1.0 | N/A | N/A | N/A | Yes |
+| nanoid | ^5.1.11 | N/A | N/A | N/A | Yes |
 
-const nextConfig: NextConfig = {
-  output: 'standalone',
-  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
-};
+---
 
-const withMDX = createMDX({
-  options: {
-    remarkPlugins: [],
-    rehypePlugins: [],
-  },
-});
+## Integration Points with Next.js 16 App Router
 
-export default withMDX(nextConfig);
+### 1. Database Connection
+```
+src/db/index.ts            -- Exports Drizzle instance (singleton, module-cached)
+src/app/api/**/route.ts    -- Route handlers import db directly
+src/app/(portal)/**/page.tsx  -- Server components can use db for reads
+```
+postgres.js handles connection pooling internally. For VPS, configure `max: 10` connections. Server components can query directly; mutations go through API routes with proper auth checks.
+
+### 2. Better Auth Integration
+```
+src/lib/auth.ts                       -- Better Auth server config
+src/lib/auth-client.ts                -- Better Auth client config
+src/app/api/auth/[...all]/route.ts    -- Catch-all route handler
+src/proxy.ts                          -- Auth middleware (NOT middleware.ts)
+```
+Better Auth's `better-auth/next-js` export provides `toNextJsHandler()`. The `proxy.ts` file handles session checking and route protection for `/portal/*` and `/admin/*` routes.
+
+### 3. BullMQ Workers
+```
+src/jobs/queues.ts          -- Queue definitions (licenseSync, email, export, webhook)
+src/jobs/workers/index.ts   -- Worker entry point (runs as separate process)
+src/jobs/schedulers/        -- Cron/recurring job definitions
+```
+Workers run as `npx tsx src/jobs/workers/index.ts` in production. Can be managed by PM2 or systemd alongside the Next.js server.
+
+### 4. Redis Connection
+```
+src/lib/redis.ts    -- Redis client singleton (ioredis)
+```
+Single file, single connection, used everywhere. BullMQ manages its own internal connections.
+
+### 5. Payment Callback Routes
+```
+src/app/api/payments/bkash/callback/route.ts
+src/app/api/payments/sslcommerz/success/route.ts
+src/app/api/payments/sslcommerz/ipn/route.ts
+```
+Payment callbacks must be public routes (no auth middleware on these) but must verify request signatures to prevent spoofing.
+
+### 6. API Route Structure
+```
+src/app/api/
+  auth/[...all]/route.ts          -- Better Auth handler
+  payments/                       -- Payment endpoints
+  licenses/                       -- License management endpoints
+  exports/                        -- Export generation endpoints
+  admin/                          -- Admin-specific API routes
+  webhooks/                       -- Webhook receivers (central API, payment gateways)
 ```
 
-### New Files Required
-- `mdx-components.tsx` (root level) -- Required by @next/mdx for App Router
-- `src/app/sitemap.ts` -- Dynamic sitemap generation
-- `src/app/robots.ts` -- Robots.txt
-- `src/i18n/request.ts` -- next-intl request configuration
-- `src/messages/en.json` -- English translations
-- `src/messages/bn.json` -- Bengali translations
-
-## Confidence Assessment
-
-| Area | Confidence | Source | Notes |
-|------|------------|--------|-------|
-| Core Framework | HIGH | Already installed and verified | Next.js 16, React 19, TypeScript, TailwindCSS 4 |
-| MDX Blog | HIGH | Next.js official docs + npm registry | @next/mdx@16.2.6 verified, official docs read in full |
-| i18n (next-intl) | HIGH | next-intl official docs + npm registry | App Router setup verified in official docs |
-| Email (Resend) | HIGH | npm registry | v6.12.3 verified, clean Node.js SDK |
-| SEO (built-in) | HIGH | Next.js official docs | Metadata API, sitemap.ts, robots.ts all native |
-| Analytics (Plausible) | MEDIUM | Training data | Well-established but version not verified via registry |
-| Self-hosting | HIGH | Next.js official docs | `output: 'standalone'` documented and verified |
-| @tailwindcss/typography | HIGH | npm registry | v0.5.19, peer dep supports Tailwind >=4.0.0-beta.1 |
+---
 
 ## Sources
 
-- Next.js MDX docs: https://nextjs.org/docs/app/building-your-application/configuring/mdx (read in full)
-- next-intl App Router docs: https://next-intl.dev/docs/getting-started/app-router (read in full)
-- Next.js output/standalone docs: https://nextjs.org/docs/app/api-reference/config/next-config-js/output (read in full)
-- npm registry: @next/mdx@16.2.6, next-mdx-remote@6.0.0, resend@6.12.3, @tailwindcss/typography@0.5.19
-- Project source: package.json, globals.css, next.config.ts, PROJECT.md
+- pnpm registry version queries (all packages, executed 2026-05-15) -- HIGH confidence
+- `backenddashboard/package.json` -- verified existing chart/dashboard dependencies -- HIGH confidence
+- `backenddashboard/src/components/ecommerce/MonthlySalesChart.tsx` -- verified ApexCharts integration pattern -- HIGH confidence
+- `backenddashboard/src/components/ecommerce/EcommerceMetrics.tsx` -- verified component structure -- HIGH confidence
+- better-auth package.json exports -- verified drizzle adapter, next-js integration, admin/access/two-factor plugins -- HIGH confidence
+- better-auth peerDependencies -- verified React 19 + Next.js 16 + drizzle-orm compatibility -- HIGH confidence
+- drizzle-orm peerDependencies -- verified postgres.js and pg driver support -- HIGH confidence
+- bullmq dependencies -- verified ioredis@5.10.1 bundling -- HIGH confidence
+- react-apexcharts peerDependencies -- verified React 19 compatibility (>=16.8.0) -- HIGH confidence
+- @react-pdf/renderer peerDependencies -- verified React 19 compatibility (^16||^17||^18||^19) -- HIGH confidence
+- @tanstack/react-table peerDependencies -- verified React 19 compatibility (>=16.8) -- HIGH confidence
+- bkash-payment package -- community-maintained, verified via pnpm view -- MEDIUM confidence
+- sslcommerz package -- community-maintained, verified via pnpm view -- MEDIUM confidence
+- Nagad/Rocket payment APIs -- no public npm packages, manual flow is standard practice -- MEDIUM confidence
 
 ---
-*Research completed: 2026-05-11. Versions verified against npm registry and official documentation.*
+*Research completed: 2026-05-15. All versions verified via pnpm registry queries.*

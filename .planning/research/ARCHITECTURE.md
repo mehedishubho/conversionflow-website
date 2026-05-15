@@ -1,535 +1,1133 @@
-# Architecture Patterns
+# Architecture Research
 
-**Domain:** Next.js 16 marketing website (WooBooster)
-**Researched:** 2026-05-11
-**Confidence:** HIGH (based on codebase analysis + official Next.js docs)
+**Domain:** Dual-Portal SaaS Platform (Customer Portal + Admin BI Dashboard)
+**Researched:** 2026-05-15
+**Confidence:** HIGH (based on codebase analysis, Better Auth official docs, Drizzle docs, backenddashboard template analysis, Next.js 16 App Router patterns)
 
-## Recommended Architecture
+## Standard Architecture
 
-The site uses a **layered App Router architecture** with Server Components by default, Client Components only for interactivity, and static content driven by TypeScript data files. The architecture must accommodate planned growth: i18n (English + Bengali), MDX blog, server actions for forms, and self-hosted standalone deployment.
+### System Overview
 
-### Target Directory Structure
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Next.js 16 App Router                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────────┐  ┌─────────────────────┐  ┌────────────────────┐  │
+│  │  Marketing Site      │  │  Customer Portal    │  │  Admin BI          │  │
+│  │  [locale] routes     │  │  (portal) group     │  │  (admin) group     │  │
+│  │  (PRESERVED AS-IS)   │  │                     │  │                    │  │
+│  │  - Navbar/Footer     │  │  - Sidebar layout   │  │  - Sidebar layout  │  │
+│  │  - i18n/bilingual    │  │  - License mgmt     │  │  - Revenue charts  │  │
+│  │  - 13 pages          │  │  - Billing/Invoices │  │  - Sales analytics │  │
+│  │  - MDX blog/docs     │  │  - Downloads        │  │  - User mgmt       │  │
+│  │  - Public only       │  │  - Support tickets  │  │  - License intel   │  │
+│  └──────────┬───────────┘  └──────────┬──────────┘  └──────────┬─────────┘  │
+│             │                         │                        │             │
+├─────────────┴─────────────────────────┴────────────────────────┴─────────────┤
+│                          API Routes Layer                                     │
+│  ┌────────────────┐  ┌──────────────────┐  ┌────────────────────────────────┐│
+│  │ /api/auth/*    │  │ /api/webhooks/*  │  │ /api/(portal|admin)/*          ││
+│  │ Better Auth    │  │ License events   │  │ RESTful API routes             ││
+│  │ catch-all      │  │ Payment events   │  │ Server actions + route handlers││
+│  └───────┬────────┘  └───────┬──────────┘  └───────────────┬────────────────┘│
+│          │                   │                              │                 │
+├──────────┴───────────────────┴──────────────────────────────┴─────────────────┤
+│                          Service Layer                                        │
+│  ┌──────────────┐  ┌───────────────┐  ┌──────────────┐  ┌────────────────┐  │
+│  │ Auth Service │  │ License Sync  │  │ Payment      │  │ BI Aggregation │  │
+│  │ Better Auth  │  │ Service       │  │ Service      │  │ Service        │  │
+│  │ + Drizzle    │  │ Central API   │  │ bKash/SSL    │  │ Query builders │  │
+│  └──────┬───────┘  └──────┬────────┘  └──────┬───────┘  └───────┬────────┘  │
+│         │                 │                  │                   │            │
+├─────────┴─────────────────┴──────────────────┴───────────────────┴────────────┤
+│                          Data Layer                                           │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────────┐│
+│  │ PostgreSQL       │  │ Redis            │  │ External APIs                ││
+│  │ Drizzle ORM      │  │ Sessions/Cache   │  │ license.devsroom.com        ││
+│  │ users, orders,   │  │ Rate limiting    │  │ SSL Commerz gateway         ││
+│  │ licenses, etc.   │  │ Job queues       │  │ bKash/Nagad/Rocket (manual) ││
+│  └──────────────────┘  └──────────────────┘  └──────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Component Responsibilities
+
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| `src/app/[locale]/` | Public marketing site with i18n, Navbar, Footer, all v1.x pages | PRESERVED AS-IS from v1.x |
+| `src/app/(portal)/` | Authenticated customer portal with sidebar layout | NEW route group |
+| `src/app/(admin)/` | Authenticated admin BI dashboard with sidebar layout | NEW route group |
+| `src/app/api/auth/[...all]/` | Better Auth catch-all route handler | NEW |
+| `src/app/api/webhooks/` | Webhook handlers for central licensing + payment events | NEW |
+| `src/app/api/portal/` | Customer-facing API routes (license copy, download generate) | NEW |
+| `src/app/api/admin/` | Admin-facing API routes (exports, user management, BI queries) | NEW |
+| `src/lib/auth.ts` | Better Auth configuration with Drizzle adapter, RBAC plugins | NEW |
+| `src/lib/db/` | Drizzle ORM schema, migration config, database client | NEW |
+| `src/lib/redis.ts` | Redis client singleton for caching, sessions, queues | NEW |
+| `src/lib/services/` | Business logic: license sync, payments, BI aggregation | NEW |
+| `src/proxy.ts` | Route protection: redirect unauthenticated users, skip `/api` routes | MODIFIED |
+| `src/app/layout.tsx` | Root layout: passes children through | PRESERVED (no changes needed) |
+
+## Recommended Project Structure
 
 ```
 src/
-├── app/                              # Next.js App Router (routing + layouts)
-│   ├── [lang]/                       # i18n route segment (future)
-│   │   ├── layout.tsx                # Locale-aware layout
-│   │   ├── page.tsx                  # Homepage
+├── app/
+│   ├── layout.tsx                          # Root layout (PRESERVED - just returns children)
+│   ├── globals.css                         # Design tokens (MODIFIED - add dashboard tokens)
+│   ├── not-found.tsx                       # 404 page (PRESERVED)
+│   │
+│   ├── [locale]/                           # Marketing site (PRESERVED AS-IS)
+│   │   ├── layout.tsx                      # Locale layout with fonts, Navbar, Footer
+│   │   ├── page.tsx                        # Homepage
 │   │   ├── features/page.tsx
 │   │   ├── pricing/page.tsx
 │   │   ├── changelog/page.tsx
 │   │   ├── support/page.tsx
-│   │   ├── blog/
-│   │   │   ├── page.tsx              # Blog listing
-│   │   │   └── [slug]/page.tsx       # Individual MDX posts
-│   │   ├── docs/
-│   │   │   ├── page.tsx              # Docs landing
-│   │   │   └── [...slug]/page.tsx    # Doc pages
-│   │   ├── privacy/page.tsx
-│   │   ├── terms/page.tsx
+│   │   ├── blog/page.tsx
+│   │   ├── blog/[slug]/page.tsx
+│   │   ├── docs/page.tsx
+│   │   ├── docs/[slug]/page.tsx
+│   │   ├── license/page.tsx
 │   │   ├── refund/page.tsx
-│   │   └── license/page.tsx
-│   ├── layout.tsx                    # Root layout (fonts, html, body)
-│   ├── globals.css                   # Design tokens + Tailwind
-│   └── not-found.tsx                 # Global 404
-├── components/
-│   ├── layout/                       # Shell components (rendered by root layout)
-│   │   ├── Navbar.tsx                # Client component (scroll, mobile, theme)
-│   │   ├── Footer.tsx                # Server component
-│   │   ├── ThemeProvider.tsx         # Client component (next-themes wrapper)
-│   │   └── PageTransition.tsx        # Client component (Framer Motion wrapper)
-│   ├── sections/                     # Homepage + reusable page sections
-│   │   ├── HeroSection.tsx           # Client component (animations)
-│   │   ├── TrustBar.tsx              # Client component (count-up animation)
-│   │   ├── FeaturesBento.tsx         # Server component
-│   │   ├── VideoSection.tsx          # Server component (placeholder)
-│   │   ├── BDSection.tsx             # Server component
-│   │   ├── HowItWorks.tsx            # Server component
-│   │   ├── Testimonials.tsx          # Server component
-│   │   ├── CTASection.tsx            # Server component
-│   │   ├── FAQAccordion.tsx          # Client component (toggle state)
-│   │   ├── ScrollReveal.tsx          # Client component (IntersectionObserver)
-│   │   └── PageHero.tsx              # Server component (reusable page header)
-│   ├── ui/                           # Generic reusable primitives
-│   │   ├── Button.tsx                # Server/client (based on usage)
-│   │   ├── Badge.tsx                 # Server component
-│   │   ├── Card.tsx                  # Server component
-│   │   ├── Accordion.tsx             # Client component
-│   │   └── VideoPlayer.tsx           # Client component (lightbox)
-│   └── blog/                         # Blog-specific components
-│       ├── BlogCard.tsx              # Server component
-│       ├── MDXComponents.tsx         # Custom MDX rendering components
-│       └── TableOfContents.tsx       # Client component
-├── content/                          # MDX blog posts and docs
-│   ├── blog/
-│   │   ├── getting-started.mdx
-│   │   └── courier-sync-guide.mdx
-│   └── docs/
-│       ├── installation.mdx
-│       └── meta-capi-setup.mdx
-├── data/                             # Static content as TypeScript data files
-│   ├── navigation.ts                 # Nav links, footer links
-│   ├── pricing.ts                    # Pricing tiers, features, BDT/USD values
-│   ├── features.ts                   # Feature modules with details
-│   ├── changelog.ts                  # Version history entries
-│   ├── testimonials.ts               # Customer testimonials
-│   ├── faq.ts                        # FAQ items
-│   ├── couriers.ts                   # BD courier data
-│   └── support.ts                    # Support channels, contact info
-├── i18n/                             # Internationalization
-│   ├── dictionaries/
-│   │   ├── en.json                   # English translations
-│   │   └── bn.json                   # Bengali translations
-│   ├── config.ts                     # Locale list, default locale, routing config
-│   └── get-dictionary.ts             # Translation loader (server-only)
+│   │   ├── terms/page.tsx
+│   │   └── privacy/page.tsx
+│   │
+│   ├── (auth)/                             # Auth pages (no sidebar, no marketing Navbar)
+│   │   ├── layout.tsx                      # Auth layout: split-panel design
+│   │   ├── login/page.tsx                  # Customer/Admin login (email + social)
+│   │   ├── register/page.tsx               # Customer registration
+│   │   ├── verify-email/page.tsx           # Email verification
+│   │   ├── forgot-password/page.tsx        # Password reset request
+│   │   └── reset-password/page.tsx         # Password reset form
+│   │
+│   ├── (portal)/                           # Customer portal (sidebar layout)
+│   │   ├── layout.tsx                      # Portal layout: sidebar + header + main
+│   │   ├── dashboard/page.tsx              # Overview (active licenses, recent activity)
+│   │   ├── licenses/
+│   │   │   ├── page.tsx                    # License list with status filters
+│   │   │   └── [id]/page.tsx               # License detail (copy key, domains, renew)
+│   │   ├── billing/
+│   │   │   ├── page.tsx                    # Invoice list + payment history
+│   │   │   └── [id]/page.tsx               # Invoice detail + PDF download
+│   │   ├── downloads/page.tsx              # Plugin downloads + changelogs
+│   │   ├── tickets/
+│   │   │   ├── page.tsx                    # Support ticket list
+│   │   │   ├── new/page.tsx                # Create ticket
+│   │   │   └── [id]/page.tsx               # Ticket conversation
+│   │   ├── notifications/page.tsx          # Notification center
+│   │   ├── settings/
+│   │   │   ├── page.tsx                    # Account settings
+│   │   │   └── security/page.tsx           # Password change, sessions
+│   │   └── checkout/
+│   │       ├── page.tsx                    # Checkout form (plan, payment method)
+│   │       └── success/page.tsx            # Post-purchase confirmation
+│   │
+│   ├── (admin)/                            # Admin BI Dashboard (sidebar layout)
+│   │   ├── layout.tsx                      # Admin layout: sidebar + header + main
+│   │   ├── dashboard/page.tsx              # Executive overview (MRR, ARR, CLV)
+│   │   ├── sales/
+│   │   │   ├── page.tsx                    # Sales performance + charts
+│   │   │   └── funnel/page.tsx             # Conversion funnel visualization
+│   │   ├── revenue/
+│   │   │   ├── page.tsx                    # Revenue trends + forecasting
+│   │   │   └── invoices/page.tsx           # Invoice management
+│   │   ├── customers/
+│   │   │   ├── page.tsx                    # Customer list + growth chart
+│   │   │   └── [id]/page.tsx               # Customer detail
+│   │   ├── licenses/
+│   │   │   ├── page.tsx                    # License intelligence overview
+│   │   │   ├── sync/page.tsx               # Central API sync status
+│   │   │   └── piracy/page.tsx             # Piracy detection dashboard
+│   │   ├── analytics/
+│   │   │   ├── page.tsx                    # Geographic analytics
+│   │   │   ├── retention/page.tsx          # Retention cohort analysis
+│   │   │   └── churn/page.tsx              # Churn analytics
+│   │   ├── products/page.tsx               # Product performance
+│   │   ├── activity/page.tsx               # Real-time activity feed
+│   │   ├── users/
+│   │   │   ├── page.tsx                    # User management (RBAC)
+│   │   │   └── [id]/page.tsx               # User detail + role assignment
+│   │   ├── notifications/page.tsx          # Admin notification rules
+│   │   ├── settings/page.tsx               # System settings
+│   │   └── exports/page.tsx                # CSV/Excel/PDF export center
+│   │
+│   └── api/
+│       ├── auth/[...all]/route.ts          # Better Auth catch-all handler
+│       ├── webhooks/
+│       │   ├── license/route.ts            # Central licensing webhook
+│       │   └── payment/route.ts            # Payment gateway webhook (SSL Commerz)
+│       ├── portal/
+│       │   ├── licenses/[id]/copy/route.ts # Copy license key endpoint
+│       │   ├── downloads/[id]/route.ts     # Generate download token
+│       │   └── tickets/[id]/reply/route.ts # Reply to ticket
+│       └── admin/
+│           ├── export/route.ts             # Export data (CSV/Excel/PDF)
+│           ├── bi/route.ts                 # BI aggregation queries
+│           └── sync/route.ts               # Manual central API sync trigger
+│
 ├── lib/
-│   ├── utils.ts                      # cn() className merger
-│   ├── mdx.ts                        # MDX utilities (getPost, getAllPosts)
-│   └── constants.ts                  # Shared constants
-└── actions/                          # Server actions
-    └── contact.ts                    # Contact form submission handler
-
-public/
-├── images/                           # Optimized images
-│   ├── og/                           # Open Graph images per page
-│   └── brand/                        # Logo, favicon variants
-├── favicon.svg
-└── robots.txt
+│   ├── utils.ts                            # cn() utility (PRESERVED)
+│   ├── auth.ts                             # Better Auth config + Drizzle adapter
+│   ├── redis.ts                            # Redis client singleton (ioredis)
+│   ├── db/
+│   │   ├── index.ts                        # Drizzle client initialization
+│   │   ├── schema.ts                       # All table definitions
+│   │   ├── migrations/                     # Generated migration files
+│   │   └── seed.ts                         # Seed data (admin user, plans)
+│   ├── services/
+│   │   ├── license-sync.ts                 # Central API sync logic
+│   │   ├── payment.ts                      # Payment processing (SSL Commerz + manual)
+│   │   ├── invoice.ts                      # Invoice generation + PDF
+│   │   ├── bi-queries.ts                   # BI aggregation query builders
+│   │   ├── notifications.ts                # Notification dispatch
+│   │   └── export.ts                       # CSV/Excel/PDF export service
+│   ├── types/
+│   │   ├── auth.ts                         # Auth-related types (roles, permissions)
+│   │   ├── license.ts                      # License + central API types
+│   │   ├── payment.ts                      # Payment, invoice, coupon types
+│   │   └── bi.ts                           # BI metric types
+│   └── constants.ts                        # Shared constants (PRESERVED)
+│
+├── components/
+│   ├── layout/                             # Marketing site layout (PRESERVED)
+│   │   ├── Navbar.tsx
+│   │   ├── Footer.tsx
+│   │   ├── ThemeProvider.tsx
+│   │   ├── CustomCursor.tsx
+│   │   └── PageTransition.tsx
+│   ├── sections/                           # Marketing site sections (PRESERVED)
+│   ├── ui/                                 # Marketing site UI (PRESERVED)
+│   ├── blog/                               # Blog components (PRESERVED)
+│   │
+│   ├── dashboard/                          # Shared dashboard components (NEW)
+│   │   ├── layout/
+│   │   │   ├── AppSidebar.tsx              # Sidebar (adapted from backenddashboard)
+│   │   │   ├── AppHeader.tsx               # Header with search, notifications, user menu
+│   │   │   ├── Backdrop.tsx                # Mobile backdrop overlay
+│   │   │   └── SidebarContext.tsx           # Sidebar state management
+│   │   ├── charts/
+│   │   │   ├── AreaChart.tsx               # ApexCharts area chart wrapper
+│   │   │   ├── BarChart.tsx                # ApexCharts bar chart wrapper
+│   │   │   ├── DonutChart.tsx              # ApexCharts donut chart wrapper
+│   │   │   ├── HeatMap.tsx                 # Geographic heatmap
+│   │   │   └── MetricCard.tsx              # KPI card with trend indicator
+│   │   ├── data/
+│   │   │   ├── DataTable.tsx               # Server-side paginated/sortable table
+│   │   │   └── DataExport.tsx              # Export button (CSV/Excel/PDF)
+│   │   └── shared/
+│   │       ├── Badge.tsx                   # Status badge component
+│   │       ├── Modal.tsx                   # Confirmation/detail modal
+│   │       ├── Dropdown.tsx                # Dropdown menu
+│   │       ├── Avatar.tsx                  # User avatar
+│   │       ├── Alert.tsx                   # Alert/notification banner
+│   │       └── Tabs.tsx                    # Tab navigation
+│   │
+│   ├── portal/                             # Customer portal-specific (NEW)
+│   │   ├── LicenseCard.tsx                 # License display card
+│   │   ├── InvoiceRow.tsx                  # Invoice list item
+│   │   ├── DownloadItem.tsx                # Plugin download row
+│   │   ├── TicketThread.tsx                # Support ticket conversation
+│   │   ├── NotificationBell.tsx            # Notification dropdown
+│   │   └── CheckoutForm.tsx                # Payment form (bKash/Nagad/SSL)
+│   │
+│   └── admin/                              # Admin-specific (NEW)
+│       ├── RevenueChart.tsx                # Revenue trend chart
+│       ├── SalesFunnel.tsx                 # Conversion funnel visualization
+│       ├── ChurnIndicator.tsx              # Churn rate display
+│       ├── ActivityFeed.tsx                # Real-time event feed
+│       ├── LicenseSyncStatus.tsx           # Central API sync status
+│       └── GeographicMap.tsx               # Sales by country
+│
+├── i18n/                                   # i18n config (PRESERVED)
+├── content/                                # MDX content (PRESERVED)
+├── data/                                   # Static data files (PRESERVED)
+└── actions/                                # Server actions
+    ├── contact.ts                          # Contact form (PRESERVED)
+    ├── portal.ts                           # Customer portal actions (NEW)
+    └── admin.ts                            # Admin actions (NEW)
 ```
 
-### Component Boundaries
+### Structure Rationale
 
-| Component | Type | Responsibility | Communicates With |
-|-----------|------|---------------|-------------------|
-| `app/layout.tsx` | Server | HTML shell, font loading, global metadata | ThemeProvider, Navbar, Footer |
-| `ThemeProvider` | Client | Wraps next-themes provider | Root layout (renders it), Navbar (reads theme) |
-| `Navbar` | Client | Navigation, scroll detection, mobile menu, theme toggle | Router (usePathname), ThemeProvider (useTheme) |
-| `Footer` | Server | Footer links, brand info, legal links | None (pure presentational) |
-| `PageTransition` | Client | Framer Motion page enter/exit animations | Layout (wraps children) |
-| `ScrollReveal` | Client | IntersectionObserver-based scroll animation | Section components (wraps them) |
-| `FAQAccordion` | Client | Toggle open/close state for FAQ items | None (self-contained state) |
-| `TrustBar` | Client | Count-up animation on scroll | None (self-contained state) |
-| Pages (page.tsx) | Server | Compose sections, export metadata | Section components, data files |
-| Data files | Module | Static content (pricing, features, changelog) | Pages import them |
-| Server actions | Server | Form handling (contact form) | Support page (form submission) |
-| i18n dictionaries | JSON | Translated strings | Pages via getDictionary() |
+- **`[locale]/` preserved as-is:** The 13 existing marketing pages have their own layout with Navbar, Footer, i18n, and page transitions. They remain untouched. The `[locale]` segment handles i18n for public-facing pages only.
+- **`(auth)/` route group (no locale):** Auth pages (login, register, reset password) are locale-independent. Using a route group without `[locale]` avoids the i18n middleware overhead on auth routes. The auth layout uses the split-panel design from `backenddashboard/(full-width-pages)/(auth)/layout.tsx`.
+- **`(portal)/` route group (no locale):** Customer portal pages are locale-independent (portal UI does not need bilingual support initially). Sidebar layout is adapted from `backenddashboard/(admin)/layout.tsx`.
+- **`(admin)/` route group (no locale):** Admin dashboard is operator-only, English-only. Sidebar layout is adapted from `backenddashboard/(admin)/layout.tsx` with admin-specific nav items.
+- **`api/` routes (no locale):** `proxy.ts` already skips `/api` routes (line 11: `pathname.startsWith('/api')`). All API routes are outside the `[locale]` segment.
 
-### Data Flow
+## Architectural Patterns
 
-```
-[TypeScript Data Files] ──import──> [Server Component Pages]
-                                            │
-                                            ├── renders ──> [Server Section Components]
-                                            │                      │
-                                            │                      └── wrapped by ──> [ScrollReveal]
-                                            │
-                                            └── renders ──> [Client Section Components]
-                                                                   │
-                                                                   ├── reads ──> [next-themes context]
-                                                                   ├── reads ──> [Router state]
-                                                                   └── manages ──> [Local UI state]
+### Pattern 1: Route Group Isolation (Three Parallel Layouts)
 
-[MDX Files in /content] ──dynamic import──> [Blog/Doc Pages via generateStaticParams]
+**What:** The app has three independent layout trees that never share visual chrome: marketing (`[locale]`), auth (`(auth)`), and portal/admin (`(portal)`, `(admin)`). The root `layout.tsx` simply returns `children` (no shared HTML shell), so each route group can define its own `<html>` and `<body>` tags.
 
-[i18n JSON dictionaries] ──getDictionary()──> [Pages access via lang param]
+**When to use:** When an app serves fundamentally different UI contexts (public marketing, authenticated portal, admin dashboard).
 
-[Contact Form] ──form action──> [Server Action] ──> [Email send (Resend/Nodemailer)]
-```
+**Trade-offs:**
+- Pro: Complete visual isolation. Marketing Navbar/Footer never appear in the dashboard. Dashboard sidebar never appears on marketing pages.
+- Pro: Each layout can load different fonts, scripts, and styles.
+- Con: Route groups do NOT create URL segments. `(portal)/dashboard/page.tsx` resolves to `/dashboard`, not `/(portal)/dashboard`. This means routes must be unique across all groups.
+- Con: Cannot easily share client-side state between groups (different layout trees).
 
-**Theme Data Flow:**
-```
-Root Layout (suppressHydrationWarning)
-  └── ThemeProvider (wraps app with next-themes context)
-        ├── Navbar reads theme via useTheme(), toggles light/dark
-        └── CSS variables in globals.css switch between :root and .dark
-```
-
-**Navigation Data Flow:**
-```
-Navbar reads usePathname() → determines active link
-  └── Framer Motion layoutId="active-nav" animates underline to active link
-  └── AnimatePresence handles mobile menu enter/exit
-```
-
-## Patterns to Follow
-
-### Pattern 1: Data-First Content Architecture
-**What:** Extract all hardcoded content into TypeScript data files under `src/data/`.
-**When:** For any content that appears in JSX as inline text arrays (pricing tiers, changelog entries, testimonials, FAQs, nav links).
-**Why:** Separates content from presentation, enables i18n translation later, allows content reuse across pages.
 **Example:**
 
 ```typescript
-// src/data/pricing.ts
-export const pricingTiers = [
-  {
-    plan: "Starter",
-    price: { usd: 29, bdt: 3499 },
-    period: "one-time",
-    features: [/* ... */],
-    popular: false,
+// src/app/(portal)/layout.tsx
+"use client";
+import { SidebarProvider } from "@/components/dashboard/layout/SidebarContext";
+import AppSidebar from "@/components/dashboard/layout/AppSidebar";
+import AppHeader from "@/components/dashboard/layout/AppHeader";
+
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className="antialiased" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <SidebarProvider>
+            <div className="min-h-screen xl:flex">
+              <AppSidebar items={portalNavItems} />
+              <div className="flex-1 transition-all duration-300">
+                <AppHeader />
+                <main className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+                  {children}
+                </main>
+              </div>
+            </div>
+          </SidebarProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+**Critical note on root layout:** `src/app/layout.tsx` currently returns `{children}`. In Next.js 16, if a route group has its own `<html>` and `<body>` tags, those take precedence. The root layout MUST remain minimal. Do NOT add shared UI to the root layout.
+
+### Pattern 2: Better Auth with Drizzle Adapter
+
+**What:** Better Auth is configured in a single `auth.ts` file using the Drizzle adapter for PostgreSQL. The catch-all route handler at `api/auth/[...all]/route.ts` delegates all auth requests to Better Auth.
+
+**When to use:** For any Next.js App Router project needing authentication with database persistence.
+
+**Trade-offs:**
+- Pro: Single configuration file for all auth concerns (email/password, social, 2FA, RBAC, sessions).
+- Pro: Drizzle adapter generates the schema automatically via CLI.
+- Pro: Built-in admin plugin provides admin-specific user management.
+- Con: Better Auth is newer than NextAuth/Auth.js -- smaller community, fewer StackOverflow answers.
+- Con: Must manage database migrations when Better Auth schema updates.
+
+**Example:**
+
+```typescript
+// src/lib/auth.ts
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin, accessControl } from "better-auth/plugins";
+import { db } from "@/lib/db";
+import * as schema from "@/lib/db/schema";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema,
+  }),
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
   },
-  // ...
-] as const;
-
-// src/app/pricing/page.tsx imports from data
-import { pricingTiers } from "@/data/pricing";
-```
-
-**Current state:** Pricing page already has data inline. Changelog page has data inline. FAQAccordion has data inline. All need extraction to `src/data/`.
-
-### Pattern 2: Server Component by Default
-**What:** All components are Server Components unless they need `useState`, `useEffect`, browser APIs, or event handlers.
-**When:** Every component creation decision.
-**Example:**
-
-```typescript
-// Server Component (default) - no "use client"
-export function FeaturesBento() {
-  return <section>...</section>;
-}
-
-// Client Component - ONLY when interactivity is needed
-"use client";
-export function FAQAccordion() {
-  const [openIndex, setOpenIndex] = useState(0);
-  // ...
-}
-```
-
-**Current state:** Correctly applied in existing codebase. FeaturesBento, BDSection, HowItWorks, Testimonials, CTASection, VideoSection, Footer are all Server Components. HeroSection, ScrollReveal, TrustBar, Navbar, FAQAccordion are Client Components (correctly, since they use hooks/animations).
-
-### Pattern 3: Reusable PageHero Component
-**What:** Extract the repeated page-hero-sm pattern from Features, Pricing, Changelog, and Support pages into a shared component.
-**When:** Multiple pages share identical hero structure with eyebrow, title, subtitle.
-**Example:**
-
-```typescript
-// src/components/sections/PageHero.tsx
-interface PageHeroProps {
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-}
-
-export function PageHero({ eyebrow, title, subtitle }: PageHeroProps) {
-  return (
-    <div className="page-hero-sm">
-      <div className="max-w-[1160px] mx-auto px-7 page-hero-sm-inner">
-        <div className="eyebrow">{eyebrow}</div>
-        <div className="sec-title" style={{ fontSize: "clamp(30px,4vw,52px)", letterSpacing: "-2px" }}>
-          {title}
-        </div>
-        <p className="sec-sub" style={{ maxWidth: "540px", margin: "0 auto" }}>
-          {subtitle}
-        </p>
-      </div>
-    </div>
-  );
-}
-```
-
-### Pattern 4: Framer Motion Page Transitions via Layout
-**What:** Wrap `{children}` in the layout with a Framer Motion AnimatePresence component that animates page transitions.
-**When:** Route changes should feel smooth rather than instant hard swaps.
-**Example:**
-
-```typescript
-// src/components/layout/PageTransition.tsx
-"use client";
-import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
-
-export function PageTransition({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -12 }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-```
-
-### Pattern 5: i18n via Dynamic Route Segment with Dictionary Files
-**What:** Use App Router `[lang]` dynamic segment with JSON dictionary files and `generateStaticParams` for static generation of both locales.
-**When:** Supporting English (primary) and Bengali (secondary).
-**Why:** This is the officially recommended Next.js i18n pattern. It keeps translations as simple JSON, works with Server Components (no client-side bundle cost), and supports static generation.
-**Example:**
-
-```typescript
-// src/i18n/config.ts
-export const locales = ["en", "bn"] as const;
-export type Locale = (typeof locales)[number];
-export const defaultLocale: Locale = "en";
-
-// src/i18n/get-dictionary.ts
-import "server-only";
-import { type Locale } from "./config";
-
-const dictionaries = {
-  en: () => import("./dictionaries/en.json").then((m) => m.default),
-  bn: () => import("./dictionaries/bn.json").then((m) => m.default),
-};
-
-export const getDictionary = async (locale: Locale) => dictionaries[locale]();
-
-// src/app/[lang]/page.tsx
-import { getDictionary } from "@/i18n/get-dictionary";
-
-export default async function Home({ params }: { params: Promise<{ lang: Locale }> }) {
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
-  return <h1>{dict.hero.title}</h1>;
-}
-
-export async function generateStaticParams() {
-  return [{ lang: "en" }, { lang: "bn" }];
-}
-```
-
-**Important:** This requires restructuring the entire `app/` directory to nest under `[lang]/`. This is a significant migration that should be planned as its own phase.
-
-### Pattern 6: MDX Blog via Dynamic Imports
-**What:** Store MDX files in `src/content/blog/`, load them dynamically in `[slug]` pages using `generateStaticParams`.
-**When:** Blog section with developer-authored posts.
-**Why:** Official `@next/mdx` pattern. Supports React components inside posts. Statically generated at build time. No CMS dependency.
-**Configuration required:**
-
-```typescript
-// next.config.ts - add MDX support
-import createMDX from "@next/mdx";
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: "standalone",
-  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-};
-
-const withMDX = createMDX({
-  options: {
-    remarkPlugins: [],
-    rehypePlugins: [],
+  plugins: [
+    admin(),
+    accessControl({
+      roles: {
+        customer: { permissions: ["portal:read", "portal:write", "license:read"] },
+        admin: { permissions: ["admin:read", "admin:write", "portal:read"] },
+        support_staff: { permissions: ["admin:read", "tickets:manage"] },
+        super_admin: { permissions: ["*"] },
+      },
+    }),
+  ],
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24,      // Update session every 24 hours
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5,              // Cache session in cookie for 5 minutes
+    },
   },
 });
 
-export default withMDX(nextConfig);
+export type Auth = typeof auth;
 ```
 
-**Required files:**
-- `@next/mdx`, `@mdx-js/loader`, `@mdx-js/react`, `@types/mdx` packages
-- `mdx-components.tsx` at project root (required by @next/mdx)
-- `src/content/blog/*.mdx` for posts
-- `src/lib/mdx.ts` for utilities like `getAllPosts()`, `getPost(slug)`
+```typescript
+// src/app/api/auth/[...all]/route.ts
+import { auth } from "@/lib/auth";
+import { toNextJsHandler } from "better-auth/next-js";
 
-### Pattern 7: Server Actions for Contact Form
-**What:** Use Next.js Server Actions (async functions with `"use server"`) for the support page contact form.
-**When:** Form submission needs to send email without exposing API logic to the client.
+export const { GET, POST } = toNextJsHandler(auth);
+```
+
+### Pattern 3: Proxy-Based Route Protection
+
+**What:** Use `proxy.ts` (project convention instead of `middleware.ts`) to check authentication and redirect unauthenticated users attempting to access portal/admin routes.
+
+**When to use:** For route-level access control that runs before page rendering.
+
+**Trade-offs:**
+- Pro: Runs on the Edge, no database query needed for basic auth checks (session cookie check).
+- Pro: Catches all route patterns with matchers.
+- Con: Cannot perform complex RBAC checks in Edge runtime (no Drizzle access). Use for auth yes/no only; do detailed RBAC in page components.
+
 **Example:**
 
 ```typescript
-// src/actions/contact.ts
-"use server";
-import { redirect } from "next/navigation";
+// src/proxy.ts (MODIFIED from current version)
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function submitContactForm(formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const message = formData.get("message") as string;
+const handleI18nRouting = createMiddleware(routing);
 
-  // Validate inputs
-  if (!name || !email || !message) {
-    return { error: "All fields are required" };
+// Routes that require authentication
+const protectedRoutes = [
+  '/dashboard', '/licenses', '/billing', '/downloads',
+  '/tickets', '/notifications', '/settings', '/checkout',
+  '/admin',
+];
+
+// Routes that require admin role
+const adminRoutes = [
+  '/admin',
+];
+
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Skip static files, API routes, and _next
+  if (pathname.includes('.') || pathname.startsWith('/api') || pathname.startsWith('/_next')) {
+    return;
   }
 
-  // Send email (Resend, Nodemailer, etc.)
-  // await sendEmail({ to: "mhs@wpmhs.com", subject: `Support: ${subject}`, ... });
+  // Check if route is a protected portal/admin route
+  const isProtected = protectedRoutes.some(route => pathname.startsWith(route));
+  const isAdmin = adminRoutes.some(route => pathname.startsWith(route));
 
-  redirect("/support?success=true");
+  if (isProtected) {
+    // Check for session cookie (Better Auth sets this)
+    const sessionCookie = request.cookies.get('better-auth.session_token');
+    if (!sessionCookie) {
+      const loginUrl = new URL(isAdmin ? '/login?mode=admin' : '/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+    // Detailed RBAC checks happen in the page component, not in proxy
+  }
+
+  // i18n routing for marketing pages only
+  // Portal/admin/auth pages are NOT under [locale]
+  const isPortalOrAdminOrAuth = isProtected ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/verify-email') ||
+    pathname.startsWith('/forgot-password') ||
+    pathname.startsWith('/reset-password');
+
+  if (isPortalOrAdminOrAuth) {
+    return NextResponse.next();
+  }
+
+  return handleI18nRouting(request);
 }
-```
 
-**Support page form** would use `action={submitContactForm}` on a native `<form>` element, enabling progressive enhancement (works without JavaScript).
-
-### Pattern 8: Self-Hosted Standalone Deployment
-**What:** Configure `output: "standalone"` in `next.config.ts` for minimal Docker/VPS deployment.
-**When:** Self-hosted deployment (not Vercel).
-**Why:** Produces a minimal `.next/standalone/` folder with only necessary files, no full `node_modules`. Includes a `server.js` that replaces `next start`.
-**Configuration:**
-
-```typescript
-// next.config.ts
-const nextConfig: NextConfig = {
-  output: "standalone",
-  // If images need optimization, configure allowed domains
-  images: {
-    remotePatterns: [
-      // Add any external image sources here
-    ],
-  },
+export const config = {
+  matcher: [
+    '/',
+    '/(bn|en)/:path*',
+    '/((?!api|_next|_vercel|.*\\..*).*)'
+  ]
 };
 ```
 
-**Deployment steps:**
-1. `pnpm build` produces `.next/standalone/`
-2. Copy `public/` and `.next/static/` into the standalone output
-3. Run `node .next/standalone/server.js` (or Dockerize)
+### Pattern 4: Central Licensing API Integration (Never Local)
 
-**Important:** The project rules require `proxy.ts` instead of `middleware.ts`. In Next.js 16, proxy files handle server-side routing logic. For i18n locale detection, the proxy file would handle redirect logic that was previously middleware-based.
+**What:** All license generation, activation, and validation happens at `license.devsroom.com`. This app only syncs and caches license data via REST API calls and webhooks.
 
-## Anti-Patterns to Avoid
+**When to use:** For any system with a central authority that owns a data domain.
 
-### Anti-Pattern 1: Client Components for Static Content
-**What:** Marking sections as "use client" when they contain no interactivity.
-**Why bad:** Ships unnecessary JavaScript to the browser, increases bundle size, hurts performance.
-**Instead:** Default to Server Components. Only add "use client" when the component uses `useState`, `useEffect`, event handlers, or browser APIs.
+**Trade-offs:**
+- Pro: Single source of truth. No license drift between systems.
+- Pro: The central API handles all the complex licensing logic (activation limits, domain validation, expiration).
+- Con: Requires reliable webhook delivery. Must handle webhook failures gracefully.
+- Con: Adds network latency for real-time license lookups.
 
-**Current codebase status:** Correctly applied. `FeaturesBento`, `BDSection`, `HowItWorks`, `Testimonials`, `CTASection`, `VideoSection`, `Footer` are all Server Components. No violations found.
-
-### Anti-Pattern 2: Inline Data in Page Components
-**What:** Defining arrays of pricing tiers, changelog entries, or FAQ items directly inside page components.
-**Why bad:** Cannot be reused across pages. Cannot be translated. Cannot be tested independently. Makes components harder to read.
-**Instead:** Extract to `src/data/*.ts` files and import.
-**Current violations:** `pricing/page.tsx` has `pricingTiers` inline. `changelog/page.tsx` has `changelogEntries` and `tagLabels` inline. `FAQAccordion.tsx` has `faqItems` inline. All should be extracted.
-
-### Anti-Pattern 3: Duplicated Page Hero Markup
-**What:** Copy-pasting the `page-hero-sm` block across Features, Pricing, Changelog, Support pages.
-**Why bad:** Any hero design change requires updating 4+ files. Inconsistent styling drifts over time.
-**Instead:** Create a reusable `PageHero` component.
-**Current violations:** All four content pages have identical hero structure duplicated.
-
-### Anti-Pattern 4: CSS-in-JS for a Tailwind Project
-**What:** Using styled-components, Emotion, or other CSS-in-JS libraries.
-**Why bad:** Conflicts with TailwindCSS v4's CSS-first approach. Adds bundle weight. Requires client component boundary.
-**Instead:** Use Tailwind utility classes and CSS custom properties (the existing pattern).
-
-### Anti-Pattern 5: Barrel Files (index.ts Re-exports)
-**What:** Creating `src/components/index.ts` that re-exports everything.
-**Why bad:** Defeats tree-shaking. Next.js bundler cannot optimize imports through barrel files. Slows builds as the project grows.
-**Instead:** Import directly from component files: `import { Navbar } from "@/components/layout/Navbar"`.
-
-### Anti-Pattern 6: Global State Management for a Static Marketing Site
-**What:** Adding Redux, Zustand, or other state management libraries.
-**Why bad:** A marketing site has minimal state (theme toggle, mobile menu, form inputs). Local component state is sufficient.
-**Instead:** Use `useState` in client components, `next-themes` for theme, and server-side data resolution for content.
-
-## Scalability Considerations
-
-| Concern | At 5 pages (current) | At 15 pages (with blog/docs/legal) | At 50+ pages |
-|---------|---------------------|------------------------------------|--------------|
-| Build time | < 10s | 15-30s (MDX compilation) | 30-60s (may need ISR) |
-| Data loading | Direct imports from data files | Same pattern, more files | Consider caching layer |
-| i18n overhead | None | 2x routes (en/bn), 2x static pages | Manageable with generateStaticParams |
-| Bundle size | Small (mostly server components) | Grows with blog MDX components | Lazy load heavy components |
-| Image assets | Minimal | Blog post images need optimization | Consider CDN for images |
-
-## Build Order Implications (Dependencies Between Components)
-
-The architecture imposes a strict dependency order for implementation:
+**Purchase Flow:**
 
 ```
-Phase 1: Foundation (no dependencies)
-├── src/lib/utils.ts
-├── src/components/layout/Footer.tsx
-├── globals.css (button utilities)
-└── src/data/navigation.ts (extract nav links)
-
-Phase 2: Homepage (depends on Phase 1)
-├── src/components/sections/HeroSection.tsx
-├── src/components/sections/TrustBar.tsx
-├── src/components/sections/FeaturesBento.tsx
-├── src/components/sections/VideoSection.tsx
-├── src/components/sections/BDSection.tsx
-├── src/components/sections/HowItWorks.tsx
-├── src/components/sections/Testimonials.tsx
-├── src/components/sections/CTASection.tsx
-├── src/components/sections/ScrollReveal.tsx
-└── src/app/page.tsx (composes sections)
-
-Phase 3: Content Pages (depends on Phase 2)
-├── src/components/sections/PageHero.tsx (reusable)
-├── src/components/sections/FAQAccordion.tsx
-├── src/data/pricing.ts
-├── src/data/changelog.ts
-├── src/data/faq.ts
-├── src/data/testimonials.ts
-├── src/app/features/page.tsx
-├── src/app/pricing/page.tsx
-├── src/app/changelog/page.tsx
-└── src/app/support/page.tsx
-
-Phase 4: Polish (depends on Phase 3)
-├── src/app/not-found.tsx
-├── SEO metadata per page
-├── public/favicon.svg
-└── Performance optimization
-
-Phase 5: i18n Infrastructure (BREAKING CHANGE - restructures app/)
-├── src/i18n/config.ts
-├── src/i18n/get-dictionary.ts
-├── src/i18n/dictionaries/en.json
-├── src/i18n/dictionaries/bn.json
-├── Migrate all pages under src/app/[lang]/
-└── src/proxy.ts (locale detection and redirect)
-
-Phase 6: Blog (depends on Phase 5 for i18n, or Phase 4 if i18n deferred)
-├── @next/mdx setup (next.config.ts modification)
-├── mdx-components.tsx (project root)
-├── src/lib/mdx.ts
-├── src/content/blog/*.mdx
-├── src/components/blog/BlogCard.tsx
-├── src/app/[lang]/blog/page.tsx
-└── src/app/[lang]/blog/[slug]/page.tsx
-
-Phase 7: Server Actions + Deployment (depends on Phase 6)
-├── src/actions/contact.ts
-├── Support page form wired to server action
-├── output: "standalone" in next.config.ts
-├── Dockerfile or deployment config
-└── proxy.ts for server-side routing
+Customer selects plan on /checkout
+    |
+    v
+POST /api/portal/checkout (server action)
+    |-- Validate coupon, calculate tax
+    |-- Process payment (SSL Commerz / manual)
+    |
+    v
+Payment confirmed
+    |-- POST to license.devsroom.com/api/orders/import
+    |   Body: { customer_email, product_id, plan, payment_ref }
+    |
+    v
+Central API responds with:
+    { central_user_id, central_license_id, license_key }
+    |
+    v
+Store locally:
+    |-- orders table: central_order_id, payment details
+    |-- users table: central_user_id mapping
+    |-- licenses table: central_license_id, license_key, cached status
+    |
+    v
+Redirect to /checkout/success with license key
 ```
 
-**Key dependency:** i18n is a structural breaking change that moves all pages under `[lang]/`. It should either be done early (before blog/docs/legal pages exist) or late (as a focused migration phase). Mid-project i18n introduction is the worst option.
+**Webhook Handler:**
+
+```typescript
+// src/app/api/webhooks/license/route.ts
+import { headers } from "next/headers";
+import { db } from "@/lib/db";
+import { licenses } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+export async function POST(request: Request) {
+  // 1. Verify webhook signature
+  const signature = headers().get("x-webhook-signature");
+  const body = await request.text();
+  // verify HMAC signature with shared secret
+
+  const event = JSON.parse(body);
+
+  switch (event.type) {
+    case "license.created":
+    case "license.updated":
+      await db.insert(licenses).values({
+        centralLicenseId: event.data.license_id,
+        centralUserId: event.data.user_id,
+        key: event.data.license_key,
+        status: event.data.status,
+        plan: event.data.plan,
+        expiresAt: new Date(event.data.expires_at),
+        activationLimit: event.data.activation_limit,
+        activationsCount: event.data.activations_count,
+        lastSyncedAt: new Date(),
+      }).onConflictDoUpdate({
+        target: licenses.centralLicenseId,
+        set: { status: event.data.status, lastSyncedAt: new Date() },
+      });
+      break;
+
+    case "license.expired":
+      await db.update(licenses)
+        .set({ status: "expired", lastSyncedAt: new Date() })
+        .where(eq(licenses.centralLicenseId, event.data.license_id));
+      break;
+
+    case "payment.refunded":
+      await db.update(licenses)
+        .set({ status: "revoked", lastSyncedAt: new Date() })
+        .where(eq(licenses.centralLicenseId, event.data.license_id));
+      break;
+  }
+
+  return Response.json({ received: true });
+}
+```
+
+### Pattern 5: Database Schema Design with Drizzle ORM
+
+**What:** PostgreSQL schema using Drizzle ORM with explicit relationships. The schema extends Better Auth's generated tables with application-specific tables.
+
+**When to use:** For any application with persistent data that needs type-safe queries.
+
+**Trade-offs:**
+- Pro: Full TypeScript type safety. Schema changes are compile-time checked.
+- Pro: Drizzle Kit generates migration SQL files. Version-controlled schema evolution.
+- Pro: Better Auth's Drizzle adapter CLI generates the auth tables automatically.
+- Con: Drizzle has a learning curve for complex queries (joins, aggregations for BI).
+- Con: Must keep Drizzle Kit version in sync with Better Auth's expected schema.
+
+**Schema Design:**
+
+```typescript
+// src/lib/db/schema.ts
+import { pgTable, text, timestamp, integer, boolean, jsonb, uuid, pgEnum } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
+// === Enums ===
+export const licenseStatusEnum = pgEnum("license_status", ["active", "expired", "revoked", "suspended"]);
+export const orderStatusEnum = pgEnum("order_status", ["pending", "completed", "failed", "refunded"]);
+export const paymentMethodEnum = pgEnum("payment_method", ["bkash", "nagad", "rocket", "bank_transfer", "ssl_commerz"]);
+export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "resolved", "closed"]);
+export const userRoleEnum = pgEnum("user_role", ["customer", "admin", "support_staff", "super_admin"]);
+
+// === Better Auth generates these tables automatically via CLI ===
+// Run: pnpm exec @better-auth/cli generate
+// Then manually add our custom columns (role, central_user_id, etc.)
+
+// === Users (extends Better Auth's user table) ===
+export const users = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  image: text("image"),
+  role: userRoleEnum("role").notNull().default("customer"),
+  centralUserId: text("central_user_id"),           // Maps to license.devsroom.com user
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// === Sessions (Better Auth managed) ===
+export const sessions = pgTable("session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// === Orders ===
+export const orders = pgTable("orders", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  centralOrderId: text("central_order_id"),           // Reference to central API order
+  productId: text("product_id").notNull(),             // "conversionflow-wp" or "conversionflow-laravel"
+  plan: text("plan").notNull(),                        // "starter", "professional", "agency"
+  amount: integer("amount").notNull(),                 // Amount in BDT (smallest currency)
+  currency: text("currency").notNull().default("BDT"),
+  paymentMethod: paymentMethodEnum("payment_method"),
+  paymentRef: text("payment_ref"),                     // Transaction ID from payment provider
+  status: orderStatusEnum("status").notNull().default("pending"),
+  couponCode: text("coupon_code"),
+  taxAmount: integer("tax_amount").default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// === Licenses (synced from central API) ===
+export const licenses = pgTable("licenses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  orderId: uuid("order_id").references(() => orders.id),
+  centralLicenseId: text("central_license_id").notNull().unique(),
+  key: text("key").notNull(),                          // Encrypted or hashed display key
+  productId: text("product_id").notNull(),
+  plan: text("plan").notNull(),
+  status: licenseStatusEnum("status").notNull().default("active"),
+  activationLimit: integer("activation_limit").notNull().default(1),
+  activationsCount: integer("activations_count").notNull().default(0),
+  domains: jsonb("domains").$type<string[]>().default([]),
+  expiresAt: timestamp("expires_at"),
+  lastSyncedAt: timestamp("last_synced_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// === Downloads ===
+export const downloads = pgTable("downloads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  productId: text("product_id").notNull(),
+  version: text("version").notNull(),                  // e.g., "2.1.0"
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),             // Bytes
+  changelog: text("changelog"),                        // Markdown changelog
+  downloadUrl: text("download_url").notNull(),          // Signed URL or local path
+  requiresLicense: boolean("requires_license").notNull().default(true),
+  releasedAt: timestamp("released_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// === Support Tickets ===
+export const tickets = pgTable("tickets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  subject: text("subject").notNull(),
+  status: ticketStatusEnum("status").notNull().default("open"),
+  priority: text("priority").notNull().default("medium"),  // low, medium, high, urgent
+  assignedTo: text("assigned_to").references(() => users.id),
+  licenseId: uuid("license_id").references(() => licenses.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const ticketMessages = pgTable("ticket_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  ticketId: uuid("ticket_id").notNull().references(() => tickets.id),
+  userId: text("user_id").notNull().references(() => users.id),
+  message: text("message").notNull(),
+  attachments: jsonb("attachments").$type<string[]>().default([]),
+  isAdminReply: boolean("is_admin_reply").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// === Notifications ===
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  type: text("type").notNull(),                       // "license_expiring", "payment_failed", etc.
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  actionUrl: text("action_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// === Audit Log ===
+export const auditLogs = pgTable("audit_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").references(() => users.id),
+  action: text("action").notNull(),                   // "user.login", "license.create", etc.
+  entity: text("entity").notNull(),                   // "user", "license", "order"
+  entityId: text("entity_id"),
+  details: jsonb("details"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// === Coupons ===
+export const coupons = pgTable("coupons", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  code: text("code").notNull().unique(),
+  type: text("type").notNull(),                       // "percentage", "fixed"
+  value: integer("value").notNull(),                  // Percentage or fixed amount in BDT
+  maxUses: integer("max_uses"),
+  usedCount: integer("used_count").notNull().default(0),
+  validFrom: timestamp("valid_from"),
+  validUntil: timestamp("valid_until"),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// === Relations ===
+export const usersRelations = relations(users, ({ many }) => ({
+  orders: many(orders),
+  licenses: many(licenses),
+  tickets: many(tickets),
+  notifications: many(notifications),
+  sessions: many(sessions),
+}));
+
+export const ordersRelations = relations(orders, ({ one }) => ({
+  user: one(users, { fields: [orders.userId], references: [users.id] }),
+}));
+
+export const licensesRelations = relations(licenses, ({ one }) => ({
+  user: one(users, { fields: [licenses.userId], references: [users.id] }),
+  order: one(orders, { fields: [licenses.orderId], references: [orders.id] }),
+}));
+
+export const ticketsRelations = relations(tickets, ({ one, many }) => ({
+  user: one(users, { fields: [tickets.userId], references: [users.id] }),
+  assignedTo: one(users, { fields: [tickets.assignedTo], references: [users.id] }),
+  messages: many(ticketMessages),
+}));
+
+export const ticketMessagesRelations = relations(ticketMessages, ({ one }) => ({
+  ticket: one(tickets, { fields: [ticketMessages.ticketId], references: [tickets.id] }),
+  user: one(users, { fields: [ticketMessages.userId], references: [users.id] }),
+}));
+```
+
+### Pattern 6: Redis for Sessions, Caching, and Job Queues
+
+**What:** A single Redis instance serves three purposes: session caching (complementing Better Auth's DB sessions), API response caching (BI aggregation queries), and background job queues (license sync, notification dispatch).
+
+**When to use:** For any app with database-heavy queries that benefit from caching, or where background processing is needed.
+
+**Trade-offs:**
+- Pro: Fast in-memory store for frequently accessed data.
+- Pro: Redis lists/sets make simple job queues trivial.
+- Con: Another infrastructure dependency (Redis server must be managed).
+- Con: Cache invalidation complexity.
+
+**Example:**
+
+```typescript
+// src/lib/redis.ts
+import Redis from "ioredis";
+
+const globalForRedis = globalThis as unknown as { redis: Redis | undefined };
+
+export const redis = globalForRedis.redis ?? new Redis(process.env.REDIS_URL!, {
+  maxRetriesPerRequest: 3,
+  retryStrategy(times) {
+    return Math.min(times * 200, 5000);
+  },
+});
+
+if (process.env.NODE_ENV !== "production") {
+  globalForRedis.redis = redis;
+}
+
+// Cache helpers
+export async function cacheGet<T>(key: string): Promise<T | null> {
+  const cached = await redis.get(key);
+  return cached ? JSON.parse(cached) : null;
+}
+
+export async function cacheSet(key: string, value: unknown, ttlSeconds = 300): Promise<void> {
+  await redis.set(key, JSON.stringify(value), "EX", ttlSeconds);
+}
+
+// Usage: BI dashboard queries
+// cacheSet("bi:daily-revenue:2026-05-15", revenueData, 3600); // 1 hour TTL
+// cacheSet("bi:mrr", mrrData, 1800); // 30 min TTL
+```
+
+### Pattern 7: Theme Reconciliation (next-themes across all layouts)
+
+**What:** The dashboard template (`backenddashboard/`) uses a custom `ThemeContext.tsx` with localStorage, while the marketing site uses `next-themes`. These must be reconciled into a single system.
+
+**When to use:** When merging two codebases with different theme approaches.
+
+**Trade-offs:**
+- Pro: `next-themes` handles SSR correctly, has cookie-based theme detection, and works with Tailwind's `class` strategy.
+- Con: Requires removing the dashboard template's custom ThemeContext entirely.
+
+**Decision:** Use `next-themes` everywhere. Remove the `ThemeContext.tsx` from the dashboard port. Each layout tree (`(portal)`, `(admin)`, `(auth)`) wraps its content with `next-themes` ThemeProvider independently, sharing the same cookie/localStorage key so the theme persists across layouts.
+
+## Data Flow
+
+### Request Flow
+
+```
+[User Action: Visit /dashboard]
+    |
+    v
+[proxy.ts] -- Checks session cookie
+    |-- No cookie? --> Redirect to /login
+    |-- Has cookie? --> NextResponse.next()
+    |
+    v
+[(portal)/layout.tsx] -- Client component
+    |-- SidebarProvider wraps children
+    |-- AppSidebar renders navigation
+    |-- AppHeader renders header
+    |
+    v
+[(portal)/dashboard/page.tsx] -- Server component
+    |-- import { auth } from "@/lib/auth"
+    |-- const session = await auth.api.getSession({ headers })
+    |-- Query DB for user's licenses, recent activity
+    |-- Render dashboard with data
+```
+
+### Purchase Flow
+
+```
+[Customer clicks "Buy Now" on marketing Pricing page]
+    |
+    v
+[POST /api/portal/checkout] (or server action)
+    |-- 1. Validate input (plan, coupon code)
+    |-- 2. Calculate total (price + tax - coupon discount)
+    |-- 3. Route to payment method:
+    |       |-- SSL Commerz --> Redirect to gateway
+    |       |-- bKash/Nagad/Rocket/Bank --> Show payment instructions
+    |
+    v
+[Payment confirmation (async)]
+    |-- SSL Commerz: POST /api/webhooks/payment (callback)
+    |-- Manual: Admin marks as paid in /admin/invoices
+    |
+    v
+[POST license.devsroom.com/api/orders/import]
+    |-- Body: { email, product, plan, payment_ref }
+    |-- Response: { central_user_id, central_license_id, key }
+    |
+    v
+[Store locally]
+    |-- upsert users table with central_user_id
+    |-- insert orders table with central_order_id
+    |-- insert licenses table with central_license_id
+    |
+    v
+[Notify customer]
+    |-- Create notification record
+    |-- (Future: send email)
+```
+
+### License Sync Flow
+
+```
+[Webhook from license.devsroom.com]
+    |
+    v
+[POST /api/webhooks/license]
+    |-- Verify HMAC signature
+    |-- Parse event type
+    |-- Update local licenses table cache
+    |-- Update user's notifications if needed
+    |
+    v
+[Fallback: Scheduled sync (cron/interval)]
+    |-- Every 15 minutes: GET license.devsroom.com/api/licenses/changed?since=<last_sync>
+    |-- Batch update local cache
+    |-- Log sync results to audit_logs
+```
+
+### BI Query Flow
+
+```
+[Admin visits /admin/revenue]
+    |
+    v
+[Server component: (admin)/revenue/page.tsx]
+    |-- Check Redis cache: "bi:revenue:2026-05-15"
+    |-- Cache HIT --> Return cached data
+    |-- Cache MISS --> Query PostgreSQL via Drizzle
+    |       |-- Complex aggregation: SUM, GROUP BY, date_trunc
+    |       |-- Store result in Redis with TTL
+    |
+    v
+[Render with ApexCharts]
+    |-- AreaChart component receives data as props
+    |-- Client-side chart rendering
+```
+
+### State Management
+
+```
+[Marketing Site]
+    Local useState in client components
+    next-themes for theme
+    next-intl for locale
+    (No global state needed -- PRESERVED pattern)
+
+[Customer Portal]
+    Local useState for UI interactions
+    next-themes for theme
+    SidebarContext for sidebar state
+    Server-side data fetching per page (no client cache needed)
+
+[Admin Dashboard]
+    Local useState for UI interactions
+    next-themes for theme
+    SidebarContext for sidebar state
+    Server-side BI queries with Redis caching
+    (No React Query/SWR needed initially -- server components fetch directly)
+```
+
+### Key Data Flows
+
+1. **Authentication:** Login form -> Better Auth handler -> Session cookie + DB session -> Proxy checks cookie on every protected route -> Page components validate session server-side.
+
+2. **License Display:** Customer portal -> Server component queries local `licenses` table (cached from central API) -> Render license cards -> Customer copies key or deactivates domain via server action -> Server action calls central API for activation/deactivation -> Webhook updates local cache.
+
+3. **BI Metrics:** Admin page -> Server component checks Redis cache -> If miss, Drizzle aggregates from `orders`, `licenses`, `users` tables -> Store in Redis with TTL -> Render charts. Manual refresh bypasses cache.
+
+4. **Support Tickets:** Customer creates ticket -> Server action inserts into `tickets` + `ticket_messages` -> Notification created for admin staff -> Admin replies via server action -> Notification created for customer.
+
+## Scaling Considerations
+
+| Concern | At 500 users | At 10K users | At 100K users |
+|---------|-------------|--------------|---------------|
+| Database queries | Direct Drizzle queries fine | Add indexes on foreign keys, status columns | Read replicas for BI queries, connection pooling (PgBouncer) |
+| BI aggregation | Real-time queries acceptable | Redis caching with 5-15 min TTL | Materialized views + scheduled refresh, dedicated BI replica |
+| Session storage | PostgreSQL sessions (Better Auth default) | PostgreSQL still fine | Consider Redis-backed sessions for faster lookup |
+| License sync | 15-min cron job sufficient | 5-min cron, batch API calls | Webhook-only, real-time sync queue |
+| File downloads | Direct file serving | Signed URLs with expiry | CDN for download files, offload from app server |
+| Search (Cmd+K) | Simple DB LIKE queries | PostgreSQL full-text search | Dedicated search (Meilisearch) |
+| Export (CSV/Excel) | Synchronous generation | Background job + email download link | Pre-computed exports + S3 storage |
+
+### Scaling Priorities
+
+1. **First bottleneck:** BI aggregation queries on `orders` table. Mitigate with Redis caching from day one. Add database indexes in migration.
+2. **Second bottleneck:** License sync lag when webhook delivery fails. Mitigate with scheduled fallback sync every 15 minutes.
+3. **Third bottleneck:** Session table growth. Better Auth handles session cleanup. Monitor table size.
+
+## Anti-Patterns
+
+### Anti-Pattern 1: Generating Licenses Locally
+
+**What people do:** Create license keys in the local database and push them to the central API.
+**Why it is wrong:** Violates the project's single source of truth rule. Creates race conditions where local and central state diverge. The central API owns license generation -- period.
+**Do this instead:** POST to `license.devsroom.com/api/orders/import` with purchase details. The central API creates the license and returns the key. Store only the `central_license_id` mapping locally.
+
+### Anti-Pattern 2: Client-Side Data Fetching for Dashboard
+
+**What people do:** Use React Query or SWR to fetch dashboard data from client components.
+**Why it is wrong:** Dashboard data is user-specific and should be fetched server-side. Client-side fetching leaks API structure, adds loading states, and increases bundle size.
+**Do this instead:** Use Server Components for all dashboard pages. Fetch data in the server component, pass as props to chart components. Charts are client components that receive data, not fetchers.
+
+### Anti-Pattern 3: Sharing Layout HTML Between Marketing and Dashboard
+
+**What people do:** Put Navbar/Footer in the root layout so they appear everywhere.
+**Why it is wrong:** The marketing Navbar and Footer must never appear in the portal or admin layouts. Dashboard has its own sidebar navigation. Root layout must remain minimal (return children only).
+**Do this instead:** Each route group (`[locale]`, `(portal)`, `(admin)`, `(auth)`) has its own complete layout with its own `<html>` and `<body>` tags. The root `layout.tsx` only returns `{children}`.
+
+### Anti-Pattern 4: Mixing i18n Locale Routes with Dashboard Routes
+
+**What people do:** Put portal and admin pages under `[locale]/portal/` and `[locale]/admin/`.
+**Why it is wrong:** The `next-intl` middleware intercepts all `[locale]` routes and adds locale prefix logic. Dashboard pages do not need i18n. Mixing creates URL complexity (`/bn/dashboard` makes no sense for a Bangladeshi product where the dashboard is English-only).
+**Do this instead:** Portal and admin route groups are outside `[locale]`. They live at `/dashboard`, `/admin`, `/licenses`, etc. Only marketing pages are under `[locale]`.
+
+### Anti-Pattern 5: Using Dashboard Template's ThemeContext
+
+**What people do:** Port the `backenddashboard/src/context/ThemeContext.tsx` as-is.
+**Why it is wrong:** It uses a custom localStorage-based theme system that conflicts with `next-themes` used in the marketing site. Two theme systems means two sets of CSS classes, two localStorage keys, and potential class conflicts.
+**Do this instead:** Delete the dashboard's `ThemeContext.tsx`. Use `next-themes` in all layout trees. The dashboard's dark/light toggle buttons call `useTheme()` from `next-themes`, just like the marketing Navbar already does.
+
+### Anti-Pattern 6: RBAC Checks Only in Proxy
+
+**What people do:** Check user role in `proxy.ts` and assume pages are safe.
+**Why it is wrong:** The proxy only checks for session cookie existence, not role. Edge runtime cannot query the database. A customer with a valid session could access `/admin` URLs if role checks are only in proxy.
+**Do this instead:** Proxy checks auth (session cookie exists). Page components check role (server-side session validation with role lookup). Admin pages verify `role === "admin" | "super_admin"` in every page's server-side data fetch.
+
+## Integration Points
+
+### External Services
+
+| Service | Integration Pattern | Notes |
+|---------|---------------------|-------|
+| license.devsroom.com | REST API (POST /api/orders/import, GET /api/licenses) + Webhooks | Central authority for all licensing. This app only syncs and caches. Never generate licenses locally. |
+| SSL Commerz | Redirect to gateway + POST callback webhook | BD payment gateway for card payments. Requires merchant ID and store password. Test in sandbox mode first. |
+| bKash/Nagad/Rocket | Manual payment flow (show instructions, admin confirms) | No API integration for v2.0. Customer sends payment, submits transaction ID, admin manually verifies and marks order as paid. |
+| Bank Transfer | Manual payment flow (show bank details, admin confirms) | Same manual flow as mobile banking. |
+| Redis | ioredis client for caching and job queues | Self-hosted on same VPS. Used for: BI query caching, rate limiting, background job queues. |
+| PostgreSQL | Drizzle ORM with pg driver | Self-hosted on same VPS or managed. All persistent data stored here. |
+| Plausible Analytics | Script tag in marketing layout (already configured) | PRESERVED as-is. Dashboard pages can optionally add Plausible tracking. |
+
+### Internal Boundaries
+
+| Boundary | Communication | Notes |
+|----------|---------------|-------|
+| Marketing <-> Auth | Redirect: pricing "Buy Now" -> /login?redirect=/checkout?plan=professional | Marketing pages link to auth pages. No shared state. |
+| Auth <-> Portal | Session cookie set by Better Auth, portal pages validate server-side | After login, redirect to portal dashboard or intended page. |
+| Portal <-> Central API | REST API calls from server actions/functions | Server-side only. Never call central API from client. |
+| Portal <-> Admin | Shared database tables, separate route groups | Customers and admins read/write same tables. Admin has elevated permissions. |
+| Admin <-> Central API | REST API for sync + Webhooks for real-time updates | Admin can trigger manual sync. Scheduled sync runs every 15 minutes. |
+| Marketing <-> Portal | No direct communication | Marketing site is completely static. Portal is authenticated. They share a database but have no runtime dependency. |
+
+## Build Order (Dependency Chain)
+
+The architecture imposes a strict build order. Each phase depends on the previous.
+
+```
+Phase 1: Database & Auth Foundation
+├── PostgreSQL setup (Docker or managed)
+├── Drizzle ORM config (drizzle.config.ts)
+├── Database schema (src/lib/db/schema.ts)
+├── Better Auth config (src/lib/auth.ts)
+├── Better Auth API route (api/auth/[...all]/route.ts)
+├── Redis setup + client (src/lib/redis.ts)
+├── Auth pages layout ((auth)/layout.tsx)
+├── Login, Register, Forgot/Reset Password pages
+├── Proxy route protection (src/proxy.ts modification)
+├── Seed script (admin user, plans)
+└── Migration system (drizzle-kit)
+
+Phase 2: Dashboard Shell
+├── SidebarContext (adapted from backenddashboard)
+├── AppSidebar component (portal nav items)
+├── AppHeader component (search, notifications, user menu)
+├── Backdrop component (mobile overlay)
+├── Portal layout ((portal)/layout.tsx)
+├── Admin layout ((admin)/layout.tsx)
+├── Theme reconciliation (next-themes in all layouts)
+├── globals.css additions (dashboard design tokens from backenddashboard)
+└── Shared dashboard UI components (Badge, Modal, Tabs, etc.)
+
+Phase 3: Customer Portal
+├── Dashboard overview page (active licenses, recent activity)
+├── License management (list, detail, copy key, deactivate domain)
+├── Billing section (invoices, payment history)
+├── Downloads section (plugin versions, changelogs)
+├── Support tickets (create, list, reply)
+├── Notifications (list, mark read)
+├── Account settings (profile, password, sessions)
+└── Server actions for portal operations
+
+Phase 4: Checkout & Payments
+├── Checkout page (plan selection, payment method)
+├── SSL Commerz integration (redirect + callback)
+├── Manual payment flow (bKash/Nagad/Rocket/Bank instructions)
+├── Coupon code validation
+├── Tax/VAT calculation
+├── Invoice generation (HTML + PDF)
+├── Central API order import (license.devsroom.com POST)
+└── Post-purchase confirmation page
+
+Phase 5: Admin BI Dashboard
+├── Executive overview (MRR, ARR, active customers, CLV, CAC)
+├── Revenue charts (daily/weekly/monthly/yearly via ApexCharts)
+├── Sales performance + conversion funnel
+├── Customer growth + retention analytics
+├── Churn analytics + alerts
+├── Geographic analytics (sales by country)
+├── License intelligence (sync status, activation domains, piracy)
+├── Product performance (plugin sales, renewals, plans)
+├── Invoice management (paid/pending/failed/overdue)
+├── User management (RBAC, role assignment)
+├── Activity feed (real-time events)
+├── Notification rules (failed payment, expiring license, fraud)
+├── Export system (CSV, Excel, PDF)
+└── BI query service with Redis caching
+
+Phase 6: Webhooks & Background Jobs
+├── License webhook handler (api/webhooks/license/route.ts)
+├── Payment webhook handler (api/webhooks/payment/route.ts)
+├── Webhook signature verification (HMAC)
+├── Scheduled license sync (fallback when webhooks fail)
+├── Background job system (Redis queue)
+├── Audit logging for all mutations
+└── Notification dispatch service
+```
+
+**Key dependency:** Phase 1 must be complete before anything else. Database + Auth is the foundation. Phase 2 provides the layout shell used by Phases 3, 4, and 5. Phase 6 (webhooks) can run in parallel with Phase 5, but requires Phase 4's payment integration to be complete for payment webhooks.
 
 ## Architecture Decision Records
 
-### ADR-1: Data Files over CMS
-**Decision:** Use TypeScript data files (`src/data/*.ts`) for all content.
-**Context:** Small team, developer-managed content, no non-technical editors.
-**Consequence:** Content changes require code commits. No admin UI. Version-controlled content. Zero infrastructure cost.
+### ADR-1: Route Groups Instead of Subdomain or Path Prefix
+**Decision:** Use Next.js route groups `(portal)` and `(admin)` instead of subdomains (`portal.conversionflow.com`, `admin.conversionflow.com`) or path prefixes (`/portal/dashboard`, `/admin/dashboard`).
+**Context:** Marketing site lives at `/` with i18n. Portal and admin need separate layouts.
+**Consequence:** Routes are `/dashboard`, `/admin/dashboard`, `/licenses` (no prefix). Proxy.ts must carefully distinguish marketing routes from portal/admin routes. No subdomain DNS configuration needed. Simpler deployment.
 
-### ADR-2: @next/mdx over next-mdx-remote
-**Decision:** Use `@next/mdx` (official plugin) for blog posts, not `next-mdx-remote`.
-**Context:** Blog posts are local files in the repository, not fetched from a CMS.
-**Consequence:** Posts must be `.mdx` files in the project. Cannot fetch remote MDX at runtime. Simpler setup. Better build performance.
+### ADR-2: Server Components for Dashboard Data Fetching
+**Decision:** All dashboard pages are Server Components that fetch data directly from PostgreSQL via Drizzle. Charts are Client Components that receive data as props.
+**Context:** Next.js App Router encourages Server Components. Dashboard data is user-specific and benefits from server-side access control.
+**Consequence:** No React Query or SWR needed. Data is fresh on every page load (or cached in Redis). Chart components are thin wrappers around ApexCharts that accept data arrays. No API routes needed for data fetching (only for webhooks and specific actions).
 
-### ADR-3: App Router i18n over next-intl
-**Decision:** Use the native App Router `[lang]` pattern with JSON dictionaries, not a third-party i18n library.
-**Context:** Only 2 locales (en, bn). Simple translation needs (no pluralization, no complex date formatting). Project rules prefer minimal dependencies.
-**Consequence:** No library overhead. Manual locale routing logic. Must implement own dictionary loading (trivial with dynamic imports). If needs grow complex, `next-intl` can be adopted later.
+### ADR-3: Better Auth over NextAuth/Auth.js
+**Decision:** Use Better Auth with Drizzle adapter, not NextAuth/Auth.js.
+**Context:** Better Auth has first-class Drizzle support, built-in admin plugin, RBAC via access control plugin, and simpler configuration. NextAuth requires custom Drizzle adapter wiring and has more complex session management.
+**Consequence:** Better Auth is newer with a smaller ecosystem. However, it handles all v2.0 auth requirements (dual auth, 4-role RBAC, 2FA-ready, session management) out of the box. Trade-off is acceptable for the functionality gained.
 
-### ADR-4: standalone output over static export
-**Decision:** Use `output: "standalone"` in next.config.ts, NOT `output: "export"`.
-**Context:** Server actions (contact form) require a Node.js server. MDX dynamic imports work better with SSR. ISR may be needed for blog.
-**Consequence:** Requires Node.js runtime on the server. Cannot deploy to pure static hosting. Enables all Next.js features including server actions.
+### ADR-4: ApexCharts over Recharts or Chart.js
+**Decision:** Use ApexCharts (via react-apexcharts) for all dashboard charts, matching the `backenddashboard/` template.
+**Context:** The dashboard template already uses ApexCharts. Recharts would require rewriting all chart components. Chart.js is lower-level and requires more configuration.
+**Consequence:** ApexCharts is a client-side library (~150KB). Charts must be Client Components. Data is passed from Server Components as props. The dashboard template's chart wrappers (MonthlySalesChart, StatisticsChart, etc.) can be adapted with minimal changes.
 
-### ADR-5: proxy.ts over middleware.ts
-**Decision:** Use `proxy.ts` per project rules, not `middleware.ts`.
-**Context:** Next.js 16 recommends proxy over legacy middleware. Project AGENTS.md mandates this.
-**Consequence:** Uses the proxy file convention for locale detection, redirects, and rewrites. Same capabilities as middleware but following the newer API.
+### ADR-5: Manual BD Payments for v2.0
+**Decision:** bKash, Nagad, Rocket, and Bank Transfer are manual payment flows (customer sends payment, submits transaction ID, admin confirms). Only SSL Commerz has automated gateway integration.
+**Context:** bKash and Nagad have merchant APIs but they require separate merchant accounts, API keys, and compliance processes. For v2.0 launch, manual verification is faster and sufficient for the expected volume.
+**Consequence:** Admin must manually verify and approve manual payments. Customer sees payment instructions and submits proof. Not ideal UX but acceptable for launch. Can add automated bKash/Nagad API integration in v2.1.
 
 ## Sources
 
-- Next.js official docs: Routing Internationalization (https://nextjs.org/docs/app/building-your-application/routing/internationalization) -- HIGH confidence
-- Next.js official docs: Configuring MDX (https://nextjs.org/docs/app/building-your-application/configuring/mdx) -- HIGH confidence
-- Next.js official docs: Deploying / Self-Hosting (https://nextjs.org/docs/app/building-your-application/deploying) -- HIGH confidence
-- Next.js official docs: output configuration (https://nextjs.org/docs/app/api-reference/config/next-config-js/output) -- HIGH confidence
-- Existing codebase analysis: all 20+ source files reviewed for current patterns -- HIGH confidence
+- Better Auth official docs: Introduction, Installation, Drizzle adapter, Next.js integration, Admin plugin, Access Control plugin (via Context7) -- HIGH confidence
+- Drizzle ORM official docs: PostgreSQL setup, Schema definition, Relations, Migrations (via training data) -- HIGH confidence
+- Next.js 16 App Router: Route Groups, Layouts, Server Components, Middleware/Proxy patterns (via official docs + codebase analysis) -- HIGH confidence
+- backenddashboard/ template analysis: AppSidebar, AppHeader, SidebarContext, ThemeContext, Auth layout, globals.css, package.json (direct codebase analysis) -- HIGH confidence
+- Existing codebase: src/app/layout.tsx, src/app/[locale]/layout.tsx, src/proxy.ts, src/i18n/routing.ts, package.json, next.config.ts, globals.css (direct analysis) -- HIGH confidence
+- Central licensing API patterns: Based on PROJECT.md specification (POST /api/orders/import, webhook handlers) -- HIGH confidence
+- SSL Commerz integration: Based on training data for Bangladeshi payment gateway patterns -- MEDIUM confidence
+
+---
+*Architecture research for: ConversionFlow v2.0 Dual Portal SaaS Platform*
+*Researched: 2026-05-15*

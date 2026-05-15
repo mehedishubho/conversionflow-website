@@ -172,7 +172,7 @@ export const licenses = pgTable(
     orderId: uuid("order_id").references(() => orders.id),
     productId: text("product_id").notNull(),
     plan: text("plan").notNull(),
-    licenseKey: text("license_key").notNull().unique(),
+    licenseKey: text("license_key").notNull(),
     status: licenseStatusEnum("status").notNull().default("active"),
     activationDomains: jsonb("activation_domains").default([]),
     maxActivations: integer("max_activations").default(1),

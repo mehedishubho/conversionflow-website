@@ -37,6 +37,10 @@ function isAdminRoute(pathname: string): boolean {
   return pathname.startsWith('/admin');
 }
 
+function isSetupPage(pathname: string): boolean {
+  return pathname === '/admin/setup';
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -52,15 +56,19 @@ export function proxy(request: NextRequest) {
   const authPage = isAuthPage(pathname);
   const portalRoute = isPortalRoute(pathname);
   const adminRoute = isAdminRoute(pathname);
-  const nonMarketingRoute = authPage || portalRoute || adminRoute;
+  const setupPage = isSetupPage(pathname);
+  const nonMarketingRoute = authPage || portalRoute || adminRoute || setupPage;
 
   const sessionCookie = request.cookies.get('better-auth.session_token');
 
-  // Protected routes (portal + admin): redirect to login if no session
-  if ((portalRoute || adminRoute) && !sessionCookie) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
-    return NextResponse.redirect(loginUrl);
+  // Protected routes (portal + admin, excluding setup): redirect if no session
+  // Route through /api/auth/check-setup which checks if admin exists
+  // → no admin: redirect to /admin/setup
+  // → admin exists: redirect to /login
+  if ((portalRoute || adminRoute) && !setupPage && !sessionCookie) {
+    const checkUrl = new URL('/api/auth/check-setup', request.url);
+    checkUrl.searchParams.set('next', pathname);
+    return NextResponse.redirect(checkUrl);
   }
 
   // Auth pages: redirect logged-in users to their appropriate dashboard

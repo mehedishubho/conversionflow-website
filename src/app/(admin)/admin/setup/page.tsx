@@ -4,32 +4,33 @@ import { user } from "@/lib/db/schema";
 import { redirect } from "next/navigation";
 import SetupForm from "./SetupForm";
 
-// This page queries the database at request time -- must be dynamically rendered
 export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
-  // Check if any super_admin already exists
   const adminCount = await db
     .select({ count: sql<number>`count(*)` })
     .from(user)
     .where(eq(user.role, "super_admin"));
 
   if (adminCount[0].count > 0) {
-    // Setup already completed -- redirect to login
     redirect("/login");
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-md px-6">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2">Initial Admin Setup</h1>
-          <p className="text-[--text2]">
-            Create the first super admin account for ConversionFlow
+    <div className="flex min-h-screen">
+      {/* Left: Brand panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-accent items-center justify-center">
+        <div className="text-white text-center px-12">
+          <h1 className="text-4xl font-bold mb-4">
+            ConversionFlow
+          </h1>
+          <p className="text-lg opacity-90">
+            Create the first admin account to get started
           </p>
         </div>
-        <SetupForm />
       </div>
+      {/* Right: Setup form */}
+      <SetupForm />
     </div>
   );
 }

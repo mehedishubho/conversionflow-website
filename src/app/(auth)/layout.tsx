@@ -1,6 +1,6 @@
 import { DM_Sans, Syne, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import "../dashboard.css";
+import "@/styles/dashboard.css";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],

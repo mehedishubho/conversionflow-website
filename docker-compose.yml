@@ -4,7 +4,7 @@ services:
     container_name: devsroom_conversionflow
     restart: always
     ports:
-      - "5433:5432"
+      - "5434:5432"
 
     environment:
       POSTGRES_USER: wpmhs
@@ -34,7 +34,7 @@ services:
     container_name: devsroom_conversionflow_redis
     restart: always
     ports:
-      - "6380:6379"
+      - "6381:6379"
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data

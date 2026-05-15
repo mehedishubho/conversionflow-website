@@ -1,5 +1,11 @@
+/**
+ * Emergency seed script — NOT the primary admin creation method.
+ * The primary method is the /admin/setup page.
+ *
+ * Usage: pnpm db:seed
+ * Requires: ADMIN_EMAIL, ADMIN_PASSWORD, DATABASE_URL in .env.local
+ */
 import postgres from "postgres";
-import { hash } from "bcryptjs";
 
 async function seed() {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -7,7 +13,8 @@ async function seed() {
 
   if (!adminEmail || !adminPassword) {
     console.error(
-      "Missing ADMIN_EMAIL or ADMIN_PASSWORD environment variables. Set them in .env or pass them as environment variables."
+      "This is an emergency seed script. The primary method is /admin/setup.\n" +
+        "Set ADMIN_EMAIL and ADMIN_PASSWORD in .env.local to use this script."
     );
     process.exit(1);
   }
@@ -19,10 +26,8 @@ async function seed() {
   }
 
   const client = postgres(connectionString);
-
   console.log("Seeding database...");
 
-  // Check if super_admin already exists
   const existingAdmins = await client`
     SELECT id FROM "user" WHERE role = 'super_admin' LIMIT 1
   `;
@@ -33,26 +38,32 @@ async function seed() {
     return;
   }
 
-  // Insert super_admin user
-  // Better Auth uses its own user table, so we insert directly
-  // The user table is created by Better Auth CLI in Plan 02
-  // This seed is a fallback and will be run after auth tables exist
-  const hashedPassword = await hash(adminPassword, 12);
+  await client.end();
 
-  await client`
-    INSERT INTO "user" (id, name, email, password, role, "emailVerified")
-    VALUES (
-      gen_random_uuid(),
-      'Super Admin',
-      ${adminEmail},
-      ${hashedPassword},
-      'super_admin',
-      true
-    )
-  `;
+  // Use Better Auth API so password hashing is correct
+  const { auth } = await import("../auth");
+  const { db } = await import("./index");
+  const { user } = await import("./schema");
+  const { eq } = await import("drizzle-orm");
+
+  const result = await auth.api.signUpEmail({
+    body: {
+      name: "Super Admin",
+      email: adminEmail,
+      password: adminPassword,
+      phone: "+880000000000",
+    },
+  });
+
+  if (!result?.user?.id) {
+    console.error("Failed to create admin user:", result);
+    process.exit(1);
+  }
+
+  await db.update(user).set({ role: "super_admin" }).where(eq(user.id, result.user.id));
 
   console.log(`Super admin created: ${adminEmail}`);
-  await client.end();
+  console.log("Note: Use /admin/setup for the primary admin creation flow.");
 }
 
 seed().catch((err) => {
