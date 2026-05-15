@@ -73,6 +73,18 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8, // D-07: minimum 8 characters
     resetPasswordTokenExpiresIn: 3600, // D-09: 1 hour in seconds
+    sendResetPassword: async ({ user, url }) => {
+      const { sendResetPasswordEmail } = await import("@/lib/emails/reset-password");
+      await sendResetPasswordEmail(user.email, url);
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true, // D-06: send verification email on registration
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      const { sendVerificationEmail } = await import("@/lib/emails/verification");
+      await sendVerificationEmail(user.email, url);
+    },
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30, // D-10: 30 days in seconds
