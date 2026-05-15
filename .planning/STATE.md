@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: Phase 10 context gathered
-last_updated: "2026-05-14T12:27:55.743Z"
-last_activity: 2026-05-14
+milestone: v2.0
+milestone_name: Dual Portal SaaS Platform
+status: defining_requirements
+stopped_at: Requirements definition
+last_updated: "2026-05-15T12:00:00.000Z"
+last_activity: 2026-05-15
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 20
-  completed_plans: 17
-  percent: 85
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,23 +20,23 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-11)
 
-**Core value:** A premium, high-performance marketing website that converts Bangladeshi WooCommerce store owners into WooBooster customers
-**Current focus:** Phase 10 — polish-and-enhancements
+**Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
+**Current focus:** v2.0 — Dual Portal SaaS Platform (Customer Portal + Admin BI Dashboard)
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Executing Phase 10
-Last activity: 2026-05-14
+Phase: Not started (defining requirements)
+Plan: -
+Status: Defining requirements
+Last activity: 2026-05-15 — Milestone v2.0 started
 
-Progress: [███████░░░] 70%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 28 (v1.0 milestone)
+- Total plans completed: 28 (v1.0/v1.1 milestones)
 - Average duration: -
 - Total execution time: -
 
@@ -57,8 +57,8 @@ Progress: [███████░░░] 70%
 
 **Recent Trend:**
 
-- Last 13 plans: All completed successfully (v1.0)
-- Trend: Smooth execution, consistent patterns across phases
+- Last 28 plans: All completed successfully across v1.0 and v1.1
+- Trend: Smooth execution, consistent patterns
 
 *Updated after each plan completion*
 
@@ -69,14 +69,12 @@ Progress: [███████░░░] 70%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Phase 1]: Footer is static server component, button CSS uses @apply in @layer utilities
-- [Phase 2]: Dashboard mockup is full React component, not an image
-- [Phase 2]: Video section is decorative (no lightbox), magnetic tilt + custom cursor skipped
-- [Phase 3]: All 4 content pages are server components (FAQAccordion is the only client component)
-- [Phase 3]: Feature tabs are decorative (no filtering JS), just CSS active state
-- [Phase 3]: Pricing tiers data-driven via array map, FAQ accordion client component
-- [Phase 4]: Syne font weights reduced to 600, 700, 800 (removed unused 400)
-- [Phase 4]: ScrollReveal client component wraps below-fold homepage sections
+- [v1.x]: All marketing site decisions preserved in shipped codebase
+- [v2.0]: Better Auth chosen for dual auth (customer + admin)
+- [v2.0]: PostgreSQL + Drizzle ORM for database
+- [v2.0]: Redis for caching, sessions, queues
+- [v2.0]: Dashboard design from backenddashboard/ folder, no redesign
+- [v2.0]: Central licensing only — never generate locally
 
 ### Pending Todos
 
@@ -84,14 +82,14 @@ None.
 
 ### Blockers/Concerns
 
-- i18n via [lang] route segment is a structural breaking change -- requires route migration for all pages. Best done as a focused Phase 9 after all content pages are stable.
-- Resend API key needed for contact form email sending (Phase 6) -- developer must provide or set up Resend account.
-- External checkout URLs for "Buy Now" buttons (Phase 6) -- developer must provide actual URLs.
-- Legal page content will be drafted professionally in Phase 7 (D-16) -- review by lawyer recommended before production launch.
-- Custom cursor was explicitly skipped in Phase 2 due to performance concerns -- revisit in Phase 10 with performance testing.
+- Resend API key needed for contact form email sending (from v1.1 — still needed)
+- External checkout URLs for "Buy Now" buttons (from v1.1 — will be superseded by v2.0 checkout system)
+- Central licensing API at license.devsroom.com must be available for integration testing
+- SSL Commerce gateway credentials needed for payment integration
+- bKash/Nagad/Rocket API credentials needed for BD payment integration
 
 ## Session Continuity
 
-Last session: 2026-05-14T11:58:33.216Z
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-polish-and-enhancements/10-CONTEXT.md
+Last session: 2026-05-15
+Stopped at: Requirements definition
+Resume file: .planning/PROJECT.md

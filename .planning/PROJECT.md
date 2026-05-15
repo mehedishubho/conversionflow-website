@@ -1,128 +1,172 @@
-# WooBooster Website
+# ConversionFlow Platform
 
 ## What This Is
 
-WooBooster is a marketing/landing page website for a live WooCommerce automation plugin built specifically for Bangladeshi eCommerce store owners. The site presents the plugin's six core modules — Courier Sync, Meta CAPI, Fraud Shield, Analytics, Lead Recovery, and Premium UI — through a polished, high-converting multi-page experience with dark/light themes, BD-specific branding, and functional lead capture forms. It ports a complete static HTML design reference (`woobooster-v2.html`, 1247 lines) into a production-ready Next.js 16 application with enhanced animations, bilingual support (English primary, Bengali secondary), and self-hosted deployment.
+ConversionFlow is a dual-portal SaaS platform for Devsroom. The public marketing site (already built in v1.x) presents the ConversionFlow plugin to Bangladeshi WooCommerce store owners. The v2.0 platform adds a **Customer Portal** for license management, billing, downloads, and support — plus an **Admin BI Dashboard** for revenue intelligence, sales analytics, license intelligence, and operational management. All licensing is handled by the central authority at `license.devsroom.com`.
 
 ## Core Value
 
-A premium, high-performance marketing website that converts Bangladeshi WooCommerce store owners into WooBooster customers through clear presentation of features, local payment trust signals (bKash/Nagad), and a design that blends SaaS polish with Bangladeshi identity.
+A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase ConversionFlow licenses, manage billing and downloads, get support — while Devsroom operators gain real-time business intelligence, revenue analytics, and license intelligence across all products.
+
+## Current Milestone: v2.0 Dual Portal SaaS Platform
+
+**Goal:** Transform the marketing site into a full SaaS platform with Customer Portal and Admin BI Dashboard, integrating with the central Devsroom licensing engine at license.devsroom.com.
+
+**Target features:**
+- Authentication System (Better Auth, dual auth, 4 roles, 2FA-ready, audit logging)
+- Database Layer (PostgreSQL + Drizzle ORM + Redis)
+- Customer Portal (overview, licenses, billing, downloads, support tickets, notifications)
+- Admin BI Dashboard (revenue intelligence, sales analytics, churn, conversion funnel, geographic analytics, exports)
+- Checkout System (bKash, Nagad, Rocket, Bank Transfer, SSL Commerce, coupons, tax/VAT, invoices)
+- License Intelligence (central API sync, webhooks, piracy detection)
+- Admin Operations (invoice management, user management, activity feed, CSV/Excel/PDF export)
+- Security (RBAC, signed webhooks, encrypted secrets, CSRF, rate limiting)
+- Dashboard Design ported from `backenddashboard/` folder
 
 ## Requirements
 
 ### Validated
 
-<!-- Inferred from existing codebase (brownfield). -->
+<!-- v1.0 + v1.1 shipped work. -->
 
-- ✓ Root layout with 3 Google Fonts (Syne, DM Sans, JetBrains Mono) loaded via next/font — existing
-- ✓ ThemeProvider wrapping app with next-themes (class strategy, light default) — existing
-- ✓ Responsive Navbar with scroll detection, mobile drawer, theme toggle, and active route tracking — existing
-- ✓ TailwindCSS v4 CSS-first config with custom design tokens (light/dark CSS variables) — existing
-- ✓ Project initialized with Next.js 16, TypeScript strict mode, ESLint, pnpm — existing
-- ✓ Framer Motion and Lucide React installed and integrated — existing
-- ✓ Path alias `@/*` → `./src/*` configured — existing
+- Root layout with 3 Google Fonts (Syne, DM Sans, JetBrains Mono) — shipped v1.0
+- ThemeProvider with next-themes (class strategy, light default) — shipped v1.0
+- Responsive Navbar with scroll detection, mobile drawer, theme toggle — shipped v1.0
+- TailwindCSS v4 CSS-first config with custom design tokens — shipped v1.0
+- All 5 core pages (Home, Features, Pricing, Changelog, Support) — shipped v1.0
+- Framer Motion animations, custom cursor, ScrollReveal — shipped v1.0/v1.1
+- Footer with 4-column grid — shipped v1.0
+- Data layer: all content in TS data files — shipped v1.1
+- Blog with MDX, Documentation section, 4 Legal pages — shipped v1.1
+- SEO: metadata, sitemap, robots, Plausible analytics — shipped v1.1
+- i18n: Bengali via next-intl, language switcher — shipped v1.1
+- Interactive: currency toggle, contact form, count-up animations — shipped v1.1
+- Responsive design verified at all breakpoints — shipped v1.1
 
 ### Active
 
-<!-- Current scope. Building toward these. -->
+<!-- v2.0 scope. Building toward these. -->
 
-**Core Pages (from HTML design)**
-- [ ] Convert Home page: hero with dashboard mockup, trust bar, bento features grid, video section, BD couriers section, how-it-works steps, testimonials, CTA banner
-- [ ] Convert Features page: page hero, video walkthrough, feature tabs, feature rows (Courier Sync, Meta CAPI, Fraud Shield)
-- [ ] Convert Pricing page: 3 pricing tiers with USD/BDT currency toggle, FAQ accordion, trust strip
-- [ ] Convert Changelog page: version history entries with tags (New/Improved/Fixed)
-- [ ] Convert Support page: support cards (Email, WhatsApp, Docs), functional contact form
+**Authentication**
+- [ ] Better Auth integration with dual auth (customer/admin login)
+- [ ] 4-role RBAC system (customer, admin, support_staff, super_admin)
+- [ ] Email verification, password reset, session management
+- [ ] Admin 2FA-ready, IP logging, audit logging
 
-**Additional Pages**
-- [x] Build Blog section with MDX-based posts and listing page - Validated in Phase 7: Blog, Docs, and Legal
-- [x] Build Documentation section with structured guides - Validated in Phase 7: Blog, Docs, and Legal
-- [x] Build Legal pages: Privacy Policy, Terms of Service, Refund Policy, License Agreement - Validated in Phase 7: Blog, Docs, and Legal
+**Database & Infrastructure**
+- [ ] PostgreSQL + Drizzle ORM setup with migration system
+- [ ] Redis for sessions, caching, queues
+- [ ] Background job system for sync tasks
+- [ ] Database schema: users, orders, licenses, downloads, tickets, notifications
 
-**Functional Features**
-- [ ] Implement functional contact form with email sending (server action)
-- [ ] Wire pricing "Buy Now" buttons to external checkout + WhatsApp for BD payment methods
-- [ ] Implement USD/BDT currency toggle on pricing page
+**Central Licensing Integration**
+- [ ] POST to license.devsroom.com/api/orders/import on purchase
+- [ ] Store central_user_id + central_license_id mappings locally
+- [ ] Webhook handlers for license-created/updated/expired/payment-refunded
+- [ ] Scheduled fallback sync when webhooks fail
 
-**Design & Animation**
-- [ ] Implement enhanced Framer Motion animations: page transitions, scroll reveals, stagger effects, word-by-word hero reveal, magnetic tilt cards, count-up animations
-- [ ] Implement custom cursor effect (floating dot following mouse with blend mode)
-- [ ] Build BD-specific branding elements: bKash/Nagad payment badges, BD flag, courier live status chips, BDT pricing
-- [ ] Create reusable component library: Bento cards, feature rows, pricing cards, testimonials, FAQ accordion, video player with lightbox, trust bar, step cards, support cards
-- [ ] Implement shared Footer component with 4-column grid and BD developer attribution
-- [ ] Ensure fully responsive design (equal priority desktop/mobile)
+**Customer Portal**
+- [ ] Customer dashboard overview (active licenses, expiring, downloads, tickets)
+- [ ] License management (view, copy, renew, upgrade, deactivate domain, sync)
+- [ ] Billing section (invoices, payment history, refunds)
+- [ ] Downloads section (latest + old versions, changelogs)
+- [ ] Support tickets (create, reply, attachments)
+- [ ] Notification center
 
-**Infrastructure**
-- [x] Extract all content (changelog, testimonials, pricing tiers, features, FAQs, support info) into TypeScript data files — Validated in Phase 5: Data Layer
-- [ ] Set up i18n infrastructure for English primary + Bengali translation support
-- [ ] Implement SEO: metadata API per page, Open Graph tags, Twitter cards, sitemap.xml, robots.txt
-- [ ] Add site analytics tracking
-- [ ] Create proxy.ts for server-side routing needs
-- [ ] Fix existing build-breaking issues: missing Footer component, missing cn() utility, undefined CSS button classes
-- [ ] Optimize for Lighthouse 90+ (Next Image, font optimization, code splitting, lazy loading)
+**Checkout & Payments**
+- [ ] Manual BD payments (bKash, Nagad, Rocket, Bank Transfer)
+- [ ] SSL Commerce payment gateway
+- [ ] Coupon codes, tax/VAT calculation
+- [ ] Invoice generation
+- [ ] Purchase flow: payment -> create/find customer -> call central API -> store mapping
+
+**Admin BI Dashboard**
+- [ ] Executive overview (total revenue, MRR, ARR, active customers, CLV, CAC)
+- [ ] Sales performance (total sales, conversion rate, refund rate)
+- [ ] User growth (daily signups, weekly growth, activation rate)
+- [ ] Churn analytics (cancellations, churn rate, downgrade alerts)
+- [ ] Conversion funnel (impressions -> visits -> checkout -> purchase -> activation)
+- [ ] Product performance (plugin sales, renewals, plans)
+- [ ] Revenue trend charts (daily/weekly/monthly/yearly)
+- [ ] Retention analytics (day 1/7/30/90)
+- [ ] Geographic analytics (sales by country, revenue heatmap)
+- [ ] Invoice management (paid/pending/failed/overdue)
+- [ ] Activity feed (real-time events)
+- [ ] Filtering (date range, product, plan, channel)
+- [ ] Export (CSV, Excel, PDF)
+- [ ] Notifications (failed payment, expiring license, churn, fraud alerts)
+
+**License & Plugin Intelligence**
+- [ ] License sync from central API (total/active/expired/revoked/renewal rate)
+- [ ] Plugin intelligence (activation domains, multisite usage, suspicious activations)
+- [ ] Piracy detection
+
+**Dashboard UI**
+- [ ] Port dashboard design from `backenddashboard/` folder
+- [ ] Customer portal layout with sidebar navigation
+- [ ] Admin portal layout with sidebar navigation
+- [ ] Charts via ApexCharts (from dashboard template)
+- [ ] Data tables, forms, modals from dashboard UI components
 
 ### Out of Scope
 
 <!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
 
-- WordPress plugin development — this is the marketing website, not the plugin itself
-- User authentication or accounts on the marketing site — not needed for a landing page
-- CMS integration — content managed via data files and MDX in the repository (simpler for small team)
-- Payment processing on-site — checkout handled externally (WooCommerce/EasyCart + WhatsApp)
-- Real-time courier data on the marketing site — dashboard mockups are illustrative only
-- Mobile app — web-only marketing site
-- A/B testing infrastructure — can be added later if needed
-- Newsletter/email marketing integration — deferred to future milestone
+- WordPress plugin development — this is the SaaS platform, not the plugin itself
+- Central licensing engine — owned by license.devsroom.com, only integrated here
+- CMS integration — content managed via data files and MDX in the repository
+- Mobile app — web-only platform
+- Redesigning existing marketing pages — all v1.x pages preserved as-is
+- Redesigning dashboard UI — use backenddashboard/ folder design as-is
 
 ## Context
 
-- **Product state**: WooBooster plugin is live and serving 500+ active WooCommerce stores in Bangladesh
-- **Design reference**: Complete static HTML design in `woobooster-v2.html` (1247 lines) — includes all 5 pages, CSS tokens, animations, and JavaScript interactions. This is the visual source of truth
+- **Product state**: ConversionFlow plugin is live and serving 500+ active WooCommerce stores in Bangladesh
+- **Design reference**: Marketing site design from `woobooster-v2.html`. Dashboard design from `backenddashboard/` folder (Next.js admin template with ecommerce metrics, charts, sidebar layout, auth pages)
 - **Company**: Built by Devsroom/WPMHS team based in Dhaka, Bangladesh (contact: mhs@wpmhs.com, WhatsApp: +880 1721-328992)
-- **Target audience**: Bangladeshi WooCommerce store owners who manually manage courier tracking, lack fraud protection, or have poor Meta ad tracking due to iOS 14+ issues
-- **Competitive landscape**: No other WooCommerce plugin offers integrated BD courier sync + Meta CAPI + fraud protection in one package
-- **Pricing**: Starter $29/৳3,499, Professional $69/৳8,299 (most popular), Agency $129/৳15,499 — all one-time payments
-- **Existing codebase**: Early-stage Next.js 16 project with 4 source files. Has build-breaking issues (missing Footer, missing cn() utility). TailwindCSS v4 CSS-first configuration already established with design tokens
-- **Design approach**: Faithful to HTML but polished — improve rough edges, enhance animations beyond the prototype, maintain visual identity
-- **Design feel**: Premium SaaS quality with Bangladeshi local personality — not generic, not purely Western
+- **Target audience**: Bangladeshi WooCommerce store owners (customers) + Devsroom operators (admins)
+- **Central licensing**: license.devsroom.com — all license generation, activation, validation happens there. This app only syncs and caches.
+- **Products**: ConversionFlow WP Plugin, ConversionFlow Laravel Module
+- **Existing codebase**: v1.x marketing site with 10 phases complete — Next.js 16, TypeScript, TailwindCSS v4, Framer Motion, next-intl, MDX blog/docs
+- **Pricing**: Starter $29/3,499BDT, Professional $69/8,299BDT (most popular), Agency $129/15,499BDT — all one-time payments
+- **Design feel**: Premium SaaS quality with Bangladeshi local personality
 
 ## Constraints
 
 - **Package Manager**: pnpm only — never npm, yarn, or bun
 - **Framework**: Next.js 16 with App Router, TypeScript strict mode, TailwindCSS v4, ESLint
 - **Proxy**: Use `proxy.ts` instead of `middleware.ts` per project rules
-- **Components**: Server components by default; client components only when needed (useState, useEffect, browser APIs)
-- **Styling**: TailwindCSS v4 CSS-first config — no tailwind.config.js file, tokens via `@theme { }` block in globals.css
-- **Design Fidelity**: Faithful to the HTML design but polished — improve rough edges, don't pixel-perfect copy
-- **Animation**: Enhanced beyond the HTML — page transitions, stagger effects, 3D elements where appropriate, but avoid over-animation
+- **Components**: Server components by default; client components only when needed
+- **Styling**: TailwindCSS v4 CSS-first config — no tailwind.config.js file
+- **Design Fidelity**: Dashboard UI ported from `backenddashboard/` folder — no redesign
+- **Preservation**: All existing marketing pages preserved as-is
 - **Deployment**: Self-hosted (not Vercel) — must work on custom server/VPS
-- **Design feel**: Premium SaaS quality with Bangladeshi local personality
+- **Licensing Rule**: NEVER generate licenses locally — always use central API
 
 ## Key Decisions
 
-<!-- Decisions that constrain future work. Add throughout project lifecycle. -->
-
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Faithful but polished design approach | HTML is a prototype, not production — polish rough edges while maintaining visual identity | — Pending |
-| Enhanced animations beyond HTML | Premium feel differentiates from competitors; page transitions and stagger effects add perceived quality | — Pending |
-| Data files for content (not CMS) | Small team, developer-managed content, version-controlled — simpler than headless CMS for a marketing site | — Pending |
-| MDX for blog posts and docs | Developer-friendly authoring, supports React components in posts, version-controlled | Implemented in Phase 7 with local `src/content` files |
-| i18n infrastructure from start | English primary but Bengali market is core audience — easier to build in now than retrofit later | — Pending |
-| Self-hosted deployment | Team manages own infrastructure — no Vercel dependency | — Pending |
-| USD/BDT currency toggle | BD customers prefer Taka pricing; international visitors need USD — both audiences served | — Pending |
-| Dual checkout paths | External payment for card users, WhatsApp for bKash/Nagad — matches how BD customers actually pay | — Pending |
-| Server actions for forms | Next.js 16 native approach for form handling, no API routes needed | — Pending |
+| Faithful but polished marketing design | HTML is a prototype, not production | Shipped v1.0 |
+| Data files for content (not CMS) | Small team, developer-managed | Shipped v1.1 |
+| MDX for blog/docs | Developer-friendly, supports React components | Shipped v1.1 |
+| Better Auth for dual auth | Supports multi-role, session management, social login, 2FA | Pending |
+| PostgreSQL + Drizzle ORM | Type-safe ORM, migrations, good Next.js ecosystem | Pending |
+| Central licensing only (never local) | Single source of truth, prevents license drift | Pending |
+| Redis for caching/queues | Fast in-memory store for sessions, rate limiting, background jobs | Pending |
+| Dashboard design from backenddashboard/ | Saves design time, proven admin template | Pending |
+| BD payment methods (bKash/Nagad/Rocket/SSL) | Matches how BD customers actually pay | Pending |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
+1. Requirements invalidated? -> Move to Out of Scope with reason
+2. Requirements validated? -> Move to Validated with phase reference
+3. New requirements emerged? -> Add to Active
+4. Decisions to log? -> Add to Key Decisions
+5. "What This Is" still accurate? -> Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -131,4 +175,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-12 after Phase 7 completion*
+*Last updated: 2026-05-15 — Milestone v2.0 started*
