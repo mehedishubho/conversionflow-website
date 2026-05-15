@@ -36,7 +36,7 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 Plans:
 - [x] 01-01-PLAN.md — Database infrastructure: Drizzle ORM, Redis, BullMQ, 8-table schema, seed script
 - [x] 01-02-PLAN.md — Better Auth configuration: Drizzle adapter, RBAC plugins, API route, audit logging
-- [ ] 01-03-PLAN.md — Auth pages: login, register, verify-email, forgot/reset password, email sending, dashboard CSS
+- [x] 01-03-PLAN.md — Auth pages: login, register, verify-email, forgot/reset password, email sending, dashboard CSS
 - [ ] 01-04-PLAN.md — Route architecture: proxy.ts protection, portal/admin layouts, setup wizard, human verification
 
 ### Phase 2: Dashboard Shell

@@ -114,8 +114,8 @@
 
 - [x] **AUTH-01**: Better Auth integration with dual auth (customer login + admin login)
 - [x] **AUTH-02**: 4-role RBAC system (customer, admin, support_staff, super_admin) with server-side checks
-- [ ] **AUTH-03**: Email verification on registration
-- [ ] **AUTH-04**: Password reset flow via email link
+- [x] **AUTH-03**: Email verification on registration
+- [x] **AUTH-04**: Password reset flow via email link
 - [x] **AUTH-05**: Session management with Redis-backed storage (optional in dev)
 - [x] **AUTH-06**: Admin 2FA-ready (TOTP support via Better Auth plugin)
 - [x] **AUTH-07**: Audit logging for all admin mutations (actor, action, target, IP, timestamp)
@@ -175,7 +175,7 @@
 ### Dashboard UI
 
 - [ ] **DASH-01**: Port dashboard layout from backenddashboard/ (AppSidebar, AppHeader, Backdrop, SidebarContext)
-- [ ] **DASH-02**: Separate CSS for dashboard routes (prevent CSS token conflict with marketing site)
+- [x] **DASH-02**: Separate CSS for dashboard routes (prevent CSS token conflict with marketing site)
 - [ ] **DASH-03**: Unified next-themes across marketing + dashboard (delete dashboard's ThemeContext)
 - [ ] **DASH-04**: Route group architecture: (auth)/, (portal)/, (admin)/ separate from [locale]/
 
@@ -270,8 +270,8 @@
 |-------------|-------|--------|
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 1 | Complete |
@@ -279,7 +279,7 @@
 | DB-02 | Phase 1 | Complete |
 | DB-03 | Phase 1 | Complete |
 | DB-04 | Phase 1 | Complete |
-| DASH-02 | Phase 1 | Pending |
+| DASH-02 | Phase 1 | Complete |
 | DASH-03 | Phase 1 | Pending |
 | DASH-04 | Phase 1 | Pending |
 | DASH-01 | Phase 2 | Pending |
