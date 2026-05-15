@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Dual Portal SaaS Platform
-status: defining_requirements
-stopped_at: Requirements definition
-last_updated: "2026-05-15T12:00:00.000Z"
+status: roadmap_created
+stopped_at: Roadmap created, awaiting approval
+last_updated: "2026-05-15T14:00:00.000Z"
 last_activity: 2026-05-15
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-11)
+See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-**Current focus:** v2.0 — Dual Portal SaaS Platform (Customer Portal + Admin BI Dashboard)
+**Current focus:** v2.0 -- Dual Portal SaaS Platform (Customer Portal + Admin BI Dashboard)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 1 (Database, Auth, and Route Foundation)
 Plan: -
-Status: Defining requirements
-Last activity: 2026-05-15 — Milestone v2.0 started
+Status: Roadmap created, awaiting approval to begin planning
+Last activity: 2026-05-15 -- Roadmap created for v2.0 milestone
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -37,6 +37,7 @@ Progress: [░░░░░░░░░░] 0%
 **Velocity:**
 
 - Total plans completed: 28 (v1.0/v1.1 milestones)
+- v2.0 plans completed: 0
 - Average duration: -
 - Total execution time: -
 
@@ -44,16 +45,14 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Status | Notes |
 |-------|-------|--------|-------|
-| 1. Foundation | 3/3 | Complete | Build + lint pass |
-| 2. Homepage | 3/3 | Complete | 8 sections, responsive, dark/light |
-| 3. Content Pages | 4/4 | Complete | Features, Pricing, Changelog, Support |
-| 4. Polish | 3/3 | Complete | SEO, 404, animations, favicon |
-| 5. Data Layer | 4/4 | Complete | All content in TS data files |
-| 6. Interactive Features | 3/3 | Complete | Contact form, currency toggle, animations |
-| 7. Blog, Docs, Legal | 4/4 | Complete | MDX-based content sections |
-| 8. SEO Completion | 2/2 | Complete | Sitemap, robots, analytics |
-| 9. Internationalization | 0/? | Not started | - |
-| 10. Polish & Enhancements | 0/? | Not started | - |
+| v1.0 Phases 1-4 | 13/13 | Complete | Shipped 2026-05-11 |
+| v1.1 Phases 5-10 | 15/15 | Complete | Shipped 2026-05-14 |
+| v2.0 Phase 1 | 0/? | Not started | Database, Auth, Route Foundation |
+| v2.0 Phase 2 | 0/? | Not started | Dashboard Shell |
+| v2.0 Phase 3 | 0/? | Not started | Customer Portal |
+| v2.0 Phase 4 | 0/? | Not started | Checkout and Payments |
+| v2.0 Phase 5 | 0/? | Not started | Admin BI Dashboard |
+| v2.0 Phase 6 | 0/? | Not started | Webhooks, Jobs, License Intelligence |
 
 **Recent Trend:**
 
@@ -74,7 +73,10 @@ Recent decisions affecting current work:
 - [v2.0]: PostgreSQL + Drizzle ORM for database
 - [v2.0]: Redis for caching, sessions, queues
 - [v2.0]: Dashboard design from backenddashboard/ folder, no redesign
-- [v2.0]: Central licensing only — never generate locally
+- [v2.0]: Central licensing only -- never generate locally
+- [v2.0]: Route group isolation: [locale]/ marketing, (auth)/ login, (portal)/ customer, (admin)/ admin
+- [v2.0]: Unified next-themes across all layouts, delete dashboard ThemeContext
+- [v2.0]: Separate CSS files for dashboard routes to prevent marketing site token conflicts
 
 ### Pending Todos
 
@@ -82,14 +84,14 @@ None.
 
 ### Blockers/Concerns
 
-- Resend API key needed for contact form email sending (from v1.1 — still needed)
-- External checkout URLs for "Buy Now" buttons (from v1.1 — will be superseded by v2.0 checkout system)
-- Central licensing API at license.devsroom.com must be available for integration testing
-- SSL Commerce gateway credentials needed for payment integration
-- bKash/Nagad/Rocket API credentials needed for BD payment integration
+- Central licensing API at license.devsroom.com must be available for integration testing (Phase 4+)
+- SSL Commerce gateway credentials needed for payment integration (Phase 4)
+- bKash/Nagad/Rocket API credentials needed for BD payment integration (Phase 4)
+- Better Auth + Drizzle dual migration workflow needs hands-on validation (Phase 1 research flag)
+- Backenddashboard/ component inventory -- 65+ components, not all needed (Phase 2 planning)
 
 ## Session Continuity
 
 Last session: 2026-05-15
-Stopped at: Requirements definition
-Resume file: .planning/PROJECT.md
+Stopped at: Roadmap created for v2.0 milestone
+Resume file: .planning/ROADMAP.md

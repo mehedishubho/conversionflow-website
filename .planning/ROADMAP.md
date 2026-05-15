@@ -1,208 +1,116 @@
-# Roadmap: WooBooster Website
+# Roadmap: ConversionFlow v2.0
 
 ## Overview
 
-Transform the WooBooster website from a working visual prototype (Phases 1-4 complete) into a fully functional, production-ready marketing site with data-driven content, interactive features, blog/documentation sections, legal pages, SEO completion, and bilingual support. Phases 1-4 established the visual design and page structure. Phases 5-10 add functionality, new content sections, and production readiness.
+Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS platform with Customer Portal and Admin BI Dashboard. The existing marketing site is preserved as-is. This milestone adds authentication, database infrastructure, customer-facing license management, checkout with Bangladesh payment methods, admin business intelligence, and central licensing integration. All licensing handled by license.devsroom.com -- never generated locally.
 
 ## Milestones
 
 - **v1.0 Core Site** - Phases 1-4 (shipped 2026-05-11)
-- **v1.1 Functional Site** - Phases 5-10 (current milestone)
+- **v1.1 Functional Site** - Phases 5-10 (shipped 2026-05-14)
+- **v2.0 Dual Portal SaaS Platform** - Phases 1-6 (current milestone)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1-4): Completed milestone work
-- Integer phases (5-10): Current milestone work
-
-<details>
-<summary>v1.0 Core Site (Phases 1-4) - SHIPPED 2026-05-11</summary>
-
-- [x] **Phase 1: Foundation** - Fix build errors, create missing utilities and components
-- [x] **Phase 2: Homepage** - Port hero and content sections from HTML design reference
-- [x] **Phase 3: Content Pages** - Build Features, Pricing, Changelog, and Support pages
-- [x] **Phase 4: Polish** - SEO, 404 page, animations, performance, brand assets
-
-</details>
-
-- [x] **Phase 5: Data Layer** - Extract all content into TypeScript data files and configure deployment
-- [x] **Phase 6: Interactive Features** - Wire up currency toggle, contact form, buy buttons, and count-up animations
-- [x] **Phase 7: Blog, Docs, and Legal** - MDX blog/documentation sections and legal content pages
-- [x] **Phase 8: SEO Completion** - Sitemap, robots.txt, and analytics tracking
-- [x] **Phase 9: Internationalization** - Bengali language support via next-intl
-- [x] **Phase 10: Polish and Enhancements** - Custom cursor, Syne 900, responsive audit, enhanced animations
+- [ ] **Phase 1: Database, Auth, and Route Foundation** - PostgreSQL + Drizzle schema, Better Auth with 4-role RBAC, route group architecture, CSS isolation
+- [ ] **Phase 2: Dashboard Shell** - Port layout from backenddashboard/, sidebar/header/backdrop, unified theming, shared dashboard components
+- [ ] **Phase 3: Customer Portal** - Dashboard overview, license management, billing, downloads, support tickets, notifications
+- [ ] **Phase 4: Checkout and Payments** - SSL Commerz gateway, manual BD payments, coupons, tax/VAT, invoices, central API purchase flow
+- [ ] **Phase 5: Admin BI Dashboard** - Executive KPIs, revenue charts, sales analytics, invoice/user management, activity feed, exports, notifications
+- [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** - Central API webhooks, BullMQ workers, fallback sync, piracy detection, security hardening
 
 ## Phase Details
 
-<details>
-<summary>v1.0 Core Site Details (Phases 1-4)</summary>
-
-### Phase 1: Foundation
-**Goal**: Get the project building and running without errors. Establish the component and utility foundation that all subsequent phases depend on.
-**Depends on**: Nothing (first phase)
-**Requirements**: FOUND-01, FOUND-02, FOUND-04, FOUND-10
+### Phase 1: Database, Auth, and Route Foundation
+**Goal**: The application has a working database, authentication system, and route architecture that isolates the dashboard from the marketing site. Users can register, verify email, log in, reset passwords, and access role-appropriate routes.
+**Depends on**: Nothing (first phase of v2.0 milestone)
+**Requirements**: DB-01, DB-02, DB-03, DB-04, AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, AUTH-07, DASH-02, DASH-03, DASH-04
 **Success Criteria** (what must be TRUE):
-  1. `pnpm build` completes without errors
-  2. `pnpm dev` starts and all existing pages render correctly
-  3. Footer component renders with design token styling matching the design reference
-  4. Buttons in Navbar are styled correctly (not unstyled text links)
-  5. Navbar renders without layout shift on page load
-**Plans**: 3 plans (complete)
+  1. User can register a new account and verify their email address via a confirmation link
+  2. User can log in with email/password and stay logged in across browser sessions (Redis-backed in production, in-memory fallback in dev)
+  3. User can reset their password via an email link and log in with the new password
+  4. Admin users see the admin dashboard route; customer users see the customer portal route; unauthorized users are redirected to login
+  5. Marketing site pages ([locale]/*) render identically to v1.x with no CSS or layout changes
+**Plans**: TBD
 
-### Phase 2: Homepage
-**Goal**: Port the homepage content from the HTML design reference into Next.js components. The homepage should display all 8 sections with dark/light mode and responsive layout.
+### Phase 2: Dashboard Shell
+**Goal**: Both the customer portal and admin dashboard have a complete layout shell with sidebar navigation, header, responsive backdrop, and unified theming. The shell is ready for feature pages to be dropped in.
 **Depends on**: Phase 1
-**Requirements**: HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, HOME-06, HOME-07, HOME-08, HOME-09
+**Requirements**: DASH-01
 **Success Criteria** (what must be TRUE):
-  1. Homepage displays hero section with dashboard mockup, headline, and CTAs
-  2. Trust bar shows key stats with design-matched styling
-  3. Bento features grid displays 6 modules with icons and descriptions
-  4. BD couriers section displays courier cards with live status chips
-  5. How It Works, Testimonials, and CTA sections render correctly
-  6. Visual design matches woobooster-v2.html reference
-**Plans**: 3 plans (complete)
-
-### Phase 3: Content Pages
-**Goal**: Build all four content pages (Features, Pricing, Changelog, Support) with proper navigation and visual components matching the design reference.
-**Depends on**: Phase 2
-**Requirements**: FEAT-01, FEAT-02, FEAT-03, FEAT-04, FEAT-05, FEAT-06, FEAT-07, PRIC-01, PRIC-03, PRIC-04, PRIC-05, CHLOG-01, CHLOG-02, SUPP-01, SUPP-02
-**Success Criteria** (what must be TRUE):
-  1. All five navigation links resolve to real pages
-  2. Features page displays module details with tracking panel and fraud box
-  3. Pricing page shows 3 tiers with feature checklists and FAQ accordion
-  4. Changelog page lists version history with tagged changes
-  5. Support page displays support cards and contact form layout
-  6. All pages render correctly in both light and dark mode
-**Plans**: 4 plans (complete)
-
-### Phase 4: Polish
-**Goal**: Add SEO metadata, custom 404 page, scroll animations, and favicon. Optimize performance baseline.
-**Depends on**: Phase 3
-**Requirements**: SEO-01, SEO-02
-**Success Criteria** (what must be TRUE):
-  1. Each page has unique title and meta description via Metadata API
-  2. Open Graph tags render correctly for social sharing
-  3. Custom 404 page displays with navigation back to home
-  4. Custom favicon replaces default Next.js icon
-  5. ScrollReveal animations trigger on homepage below-fold sections
-**Plans**: 3 plans (complete)
-
-</details>
-
-### Phase 5: Data Layer
-**Goal**: All page content lives in structured TypeScript data files (not inline JSX), and the project is configured for self-hosted deployment. This unblocks i18n (translating data files) and makes content maintainable.
-**Depends on**: Phase 4
-**Requirements**: DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, DATA-07, CHLOG-03, FOUND-07
-**Success Criteria** (what must be TRUE):
-  1. Pricing page renders identical content but reads from src/data/pricing.ts instead of inline arrays
-  2. Changelog page renders identical content but reads from src/data/changelog.ts instead of inline arrays
-  3. Testimonials, features, FAQ, support info, and navigation links each have dedicated data files in src/data/
-  4. `pnpm build` produces standalone output (output: 'standalone' in next.config.ts)
-  5. No visual or content changes from user perspective -- pure refactor
-**Plans**: 4 plans
-
-Plans:
-- [x] 05-01-PLAN.md -- Extract navigation links to data file, update Navbar + Footer
-- [x] 05-02-PLAN.md -- Extract pricing, changelog, FAQ data to data files, update consumers
-- [x] 05-03-PLAN.md -- Extract features, testimonials, support data to data files, update consumers
-- [x] 05-04-PLAN.md -- Configure standalone output, install sharp, create Dockerfile
-
-### Phase 6: Interactive Features
-**Goal**: Existing pages gain real interactive functionality -- users can toggle currencies, submit contact forms that send email, follow buy links, and see count-up animations on stats. Pages stop being static mockups and become functional.
-**Depends on**: Phase 5
-**Requirements**: PRIC-02, PRIC-06, SUPP-03, SUPP-04, SUPP-05, HOME-10
-**Success Criteria** (what must be TRUE):
-  1. User can toggle between USD and BDT on the pricing page and see all prices update
-  2. User can fill out and submit the contact form, and receive confirmation feedback
-  3. Contact form validates required fields and shows inline error messages before submission
-  4. "Buy Now" buttons link to external checkout; WhatsApp option visible for BD payments
-  5. Trust bar stats and dashboard numbers animate with count-up effect on scroll
-**Plans**: 3 plans
-
-Plans:
-- [x] 06-01-PLAN.md -- Extract useCountUp hook, animate TrustBar stats and HeroSection dashboard
-- [x] 06-02-PLAN.md -- Currency toggle, checkout links, and WhatsApp BD payment on pricing page
-- [x] 06-03-PLAN.md -- Validated contact form with success feedback on support page
-
-### Phase 7: Blog, Docs, and Legal
-**Goal**: The site has three new content sections -- a blog with MDX posts, documentation with structured guides, and legal pages (Privacy, Terms, Refund, License). These are essential for trust, SEO, and compliance.
-**Depends on**: Phase 5
-**Requirements**: BLOG-01, BLOG-02, BLOG-03, BLOG-04, DOCS-01, DOCS-02, LEGL-01, LEGL-02, LEGL-03, LEGL-04
-**Success Criteria** (what must be TRUE):
-  1. Blog listing page at /blog displays posts with title, date, excerpt, and reading time
-  2. Individual blog posts render MDX content with code blocks, tables, and frontmatter metadata
-  3. Documentation section at /docs displays guides organized by topic with table of contents
-  4. Privacy Policy, Terms of Service, Refund Policy, and License Agreement pages each display full legal content
-  5. Navigation includes links to blog and legal pages (footer or appropriate location)
-**Plans**: 4 plans
-
-Plans:
-- [x] 07-01-PLAN.md -- Install MDX dependencies, configure Next.js, set up Typography, create content files
-- [x] 07-02-PLAN.md -- Blog listing page with card grid and individual post pages with MDX rendering
-- [x] 07-03-PLAN.md -- Documentation section with sidebar navigation, TOC, and individual doc pages
-- [x] 07-04-PLAN.md -- Legal pages (Privacy, Terms, Refund, License) and footer navigation link updates
-
-### Phase 8: SEO Completion
-**Goal**: The site is fully discoverable by search engines and has analytics tracking visitor behavior. Technical SEO is complete.
-**Depends on**: Phase 7
-**Requirements**: SEO-03, SEO-04, SEO-05
-**Success Criteria** (what must be TRUE):
-  1. sitemap.xml is accessible at /sitemap.xml and lists all public pages
-  2. robots.txt is accessible at /robots.txt and allows search engine crawling
-  3. Analytics script loads on all pages and tracks page views without cookies
-  4. Google Search Console can verify the site via sitemap submission
-**Plans**: 2 plans
-
-Plans:
-- [x] 08-01-PLAN.md -- Native Next.js sitemap and robots metadata routes
-- [ ] 08-02-PLAN.md -- Global self-hosted Plausible analytics script
-
-### Phase 9: Internationalization
-**Goal**: The site structure supports English and Bengali, with a language switcher in the navbar and translatable strings extracted to message files. Bengali-capable font is loaded.
-**Depends on**: Phase 5
-**Requirements**: I18N-01, I18N-02, I18N-03, I18N-04
-**Success Criteria** (what must be TRUE):
-  1. User can switch between English and Bengali via a language switcher in the navbar
-  2. Bengali text renders correctly with a Bengali-capable fallback font (not tofu squares)
-  3. All translatable strings (headings, descriptions, button labels, navigation) are extracted to en.json and bn.json message files
-  4. URL structure reflects language (e.g., /en/features, /bn/features) via next-intl route segment
+  1. Customer portal displays a sidebar layout with navigation links to Dashboard, Licenses, Billing, Downloads, Support, and Account
+  2. Admin dashboard displays a sidebar layout with navigation links to Overview, Sales, Users, Invoices, Licenses, and Settings
+  3. Sidebar collapses to a mobile-friendly hamburger menu on narrow viewports with a backdrop overlay
+  4. Dark/light theme toggle works consistently across marketing site and both dashboard layouts (single next-themes instance, no separate ThemeContext)
+  5. Dashboard CSS does not affect marketing site responsive breakpoints or design tokens
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 10: Polish and Enhancements
-**Goal**: The site has premium visual polish -- DM_Sans standardized for all text, ScrollReveal consolidation, consistent scroll animations across all pages, container widened to 1280px, and verified responsive design. Custom cursor already implemented.
-**Depends on**: Phase 6
-**Requirements**: FOUND-03, FOUND-05, FOUND-08, FOUND-09
+### Phase 3: Customer Portal
+**Goal**: Customers can log in and manage their ConversionFlow licenses, view billing history, download plugin files, submit support tickets, and manage notifications -- all within the portal sidebar layout.
+**Depends on**: Phase 2
+**Requirements**: PORT-01, PORT-02, PORT-03, PORT-04, PORT-05, PORT-06
 **Success Criteria** (what must be TRUE):
-  1. Headings render with DM_Sans at correct weights without synthetic bold (Syne removed)
-  2. Custom cursor effect (floating dot with blend mode) renders on desktop and is disabled on touch devices (already implemented)
-  3. All pages are verified responsive at tablet (960px) and mobile (640px) breakpoints
-  4. All pages have consistent ScrollReveal fade-up animations on below-the-fold sections
-  5. Container max-width is 1280px across the entire site
-  6. Only one ScrollReveal component exists (layout/ version), no legacy CSS classes
-**Plans**: 3 plans
+  1. Customer sees a dashboard overview with counts of active licenses, licenses expiring soon, recent downloads, and open tickets
+  2. Customer can view their license list, click into a license detail, copy the license key, and see activation domain status
+  3. Customer can view invoices, payment history, and refund status in the billing section
+  4. Customer can download the latest plugin version and access previous versions with changelogs
+  5. Customer can create a support ticket, reply to existing tickets with attachments, and view ticket status
+  6. Customer can view their notification list, mark notifications as read, and manage notification preferences
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 10-01-PLAN.md -- Delete duplicate ScrollReveal, remove legacy CSS classes
-- [x] 10-02-PLAN.md -- Add ScrollReveal to all content pages
-- [x] 10-03-PLAN.md -- Widen container to 1280px, responsive audit
+### Phase 4: Checkout and Payments
+**Goal**: Customers can complete a purchase using Bangladesh payment methods (bKash, Nagad, Rocket, Bank Transfer) or SSL Commerce gateway, with coupon codes, tax/VAT calculation, and invoice generation. The purchase flow syncs with the central licensing API.
+**Depends on**: Phase 3
+**Requirements**: PAY-01, PAY-02, PAY-03, PAY-04, PAY-05, PAY-06, LIC-01, LIC-02
+**Success Criteria** (what must be TRUE):
+  1. Customer can select a plan, choose a payment method (bKash/Nagad/Rocket/Bank Transfer/SSL Commerce), and initiate checkout
+  2. SSL Commerce gateway redirects customer to payment page and back to the site with order confirmation on success
+  3. Manual BD payments (bKash, Nagad, Rocket, Bank Transfer) create a pending order that admin can verify and confirm
+  4. Customer can apply a coupon code and see the discounted price before payment
+  5. Customer receives an invoice (HTML view + PDF download) after successful payment
+  6. Successful payment triggers a POST to license.devsroom.com/api/orders/import and stores the central_user_id + central_license_id mapping locally
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: Admin BI Dashboard
+**Goal**: Admin operators can view real-time business intelligence -- revenue KPIs, sales performance, user growth trends, revenue charts, invoice management, user management, and activity feeds -- with filtering and export capabilities.
+**Depends on**: Phase 4
+**Requirements**: ADMN-01, ADMN-02, ADMN-03, ADMN-04, ADMN-05, ADMN-06, ADMN-07, ADMN-08, ADMN-09, ADMN-10
+**Success Criteria** (what must be TRUE):
+  1. Admin sees an executive overview with total revenue, MRR, ARR, active customers, CLV, and CAC with trend indicators (up/down/flat)
+  2. Admin can view revenue trend charts (daily/weekly/monthly/yearly) with a date range selector via ApexCharts
+  3. Admin can list and filter invoices by status (paid/pending/failed/overdue), mark invoices as paid, and send payment reminders
+  4. Admin can list users, view user details, assign roles, and ban/activate accounts
+  5. Admin can export any report (revenue, sales, users, invoices) as CSV, Excel, or PDF
+  6. Admin sees a real-time activity feed of events (purchases, license activations, refunds, tickets) and receives alerts for failed payments, expiring licenses, and fraud signals
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 6: Webhooks, Background Jobs, and License Intelligence
+**Goal**: The platform reliably syncs with the central licensing API via webhooks and scheduled fallback jobs. Admins can monitor license health, detect piracy patterns, and background jobs handle async tasks without blocking user-facing responses.
+**Depends on**: Phase 4
+**Requirements**: LIC-03, LIC-04, LIC-05, LINT-01, LINT-02, LINT-03
+**Success Criteria** (what must be TRUE):
+  1. Webhook handlers receive and process license events (created, updated, expired, payment-refunded) from license.devsroom.com with HMAC signature verification
+  2. A scheduled job syncs license data from the central API every 15 minutes as a fallback when webhooks fail or are missed
+  3. Admin can view a license intelligence dashboard showing total/active/expired/revoked counts and renewal rates by product and plan
+  4. Admin can see domain tracking details for each license (activation domains, timestamps, multisite usage flags)
+  5. Suspicious activation patterns are flagged for admin review as potential piracy indicators
+**Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9 -> 10
-(Phase 7 and 9 both depend on Phase 5 and can proceed in parallel if desired, but sequential is recommended)
-(Phase 10 depends on Phase 6 and can run alongside Phase 8 or 9)
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+(Phase 5 and Phase 6 both depend on Phase 4 and could partially overlap, but sequential is recommended)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/3 | Complete | 2026-05-11 |
-| 2. Homepage | 3/3 | Complete | 2026-05-11 |
-| 3. Content Pages | 4/4 | Complete | 2026-05-11 |
-| 4. Polish | 3/3 | Complete | 2026-05-11 |
-| 5. Data Layer | 4/4 | Complete | 2026-05-11 |
-| 6. Interactive Features | 3/3 | Complete | 2026-05-12 |
-| 7. Blog, Docs, and Legal | 4/4 | Complete | 2026-05-12 |
-| 8. SEO Completion | 2/2 | Complete | 2026-05-14 |
-| 9. Internationalization | 2/2 | Complete | 2026-05-14 |
-| 10. Polish and Enhancements | 4/4 | Complete    | 2026-05-14 |
+| 1. Database, Auth, and Route Foundation | 0/? | Not started | - |
+| 2. Dashboard Shell | 0/? | Not started | - |
+| 3. Customer Portal | 0/? | Not started | - |
+| 4. Checkout and Payments | 0/? | Not started | - |
+| 5. Admin BI Dashboard | 0/? | Not started | - |
+| 6. Webhooks, Background Jobs, and License Intelligence | 0/? | Not started | - |
