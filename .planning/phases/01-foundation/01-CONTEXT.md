@@ -1,38 +1,61 @@
-# Phase 1: Foundation - Context
+# Phase 1: Database, Auth, and Route Foundation - Context
 
-**Gathered:** 2026-05-11
+**Gathered:** 2026-05-15
 **Status:** Ready for planning
 
 <domain>
 ## Phase Boundary
 
-Fix all build-breaking issues so `pnpm build` succeeds and `pnpm dev` runs cleanly. Create the missing `cn()` utility, Footer component, and button CSS classes that all subsequent phases depend on. Fix the Navbar hydration flash and CSS typo. This phase delivers a building, running project — no new features or pages.
+The application has a working database, authentication system, and route architecture that isolates the dashboard from the marketing site. Users can register, verify email, log in, reset passwords, and access role-appropriate routes. PostgreSQL + Drizzle schema with all 8 tables, Better Auth with 4-role RBAC, Redis-backed sessions, route group architecture, and CSS isolation — all functional and building cleanly.
 
 </domain>
 
 <decisions>
 ## Implementation Decisions
 
-### Footer Component
-- **D-01:** Footer renders statically (no Framer Motion entrance animation). It's always visible at page bottom — animation adds no value here.
-- **D-02:** Footer is a **server component** (no `"use client"` directive). It has no interactivity, state, or browser APIs.
-- **D-03:** Internal nav links (Features, Pricing, Changelog, Support) use Next.js `<Link>` components. External company links (Devsroom, WPMHS) use real URLs from the design reference. Legal/policy links (Privacy Policy, Terms of Service, Refund Policy, License Agreement) use `#` as placeholders — these pages are out of scope for v1.
-- **D-04:** Footer layout matches the HTML reference: 4-column grid (2fr brand + 1fr Product + 1fr Company + 1fr Legal) with responsive breakpoints (2-col on tablet, 1-col on mobile).
+### Auth Page Design
+- **D-01:** Port backenddashboard auth forms (SignInForm.tsx, SignUpForm.tsx) as-is — swap Outfit font for ConversionFlow design system fonts (DM Sans, Syne), rewire ThemeContext to next-themes
+- **D-02:** Auth pages are English only — no Bengali i18n (they live outside [locale] route group)
 
-### Navbar Skeleton
-- **D-05:** Navbar returns an **invisible spacer** (empty `div` matching navbar dimensions) before mount instead of `null`. This prevents layout shift without showing any unstyled content flash.
-- **D-06:** The CSS typo `height-[34px]` on the logo div is fixed to `h-[34px]` (standard Tailwind height class).
+### Login Flow
+- **D-03:** Single shared login page at `(auth)/login` — server-side role check after auth redirects customers to /portal/dashboard, admins/support_staff to /admin/dashboard
+- **D-04:** Fixed redirect per role — no dynamic routing or permission-based nav in Phase 1
 
-### Button CSS Classes
-- **D-07:** All button variants from the HTML reference are added to `globals.css` in one pass: `.btn`, `.btn-primary`, `.btn-outline`, `.btn-lg`, `.btn-xl`, `.btn-white`. This avoids returning to `globals.css` in later phases when hero/pricing sections need the larger variants.
-- **D-08:** Button styles use CSS custom properties (design tokens) for colors, matching the existing token system in `globals.css`.
+### Registration
+- **D-05:** Registration collects: full name + email + password + phone number (phone needed for BD payment verification in Phase 4)
+- **D-06:** Auto-login with full access after registration — email verification sent but not blocking. Users can use the platform immediately.
 
-### Utility Function
-- **D-09:** `cn()` utility at `src/lib/utils.ts` uses `clsx` + `tailwind-merge` (both already in `package.json`). Standard implementation — no customization needed.
+### Password & Security
+- **D-07:** Minimum 8 characters, no complexity rules (suitable for BD audience)
+- **D-08:** 5 failed login attempts triggers 15-minute account lockout
+- **D-09:** Password reset link expires in 1 hour, auto-login after successful reset
+- **D-10:** 30-day session duration
 
-### Agent's Discretion
-- Exact padding/sizing values for the Navbar skeleton spacer — agent should match the rendered navbar height.
-- Whether to add hover transition details for button CSS — follow the HTML reference closely.
+### First Admin Setup
+- **D-11:** Setup wizard page as primary method — a /admin/setup route that only works when no admin account exists (protected from abuse by checking user count)
+- **D-12:** Seed script (pnpm db:seed) from env vars (ADMIN_EMAIL, ADMIN_PASSWORD) as backup/emergency fallback for creating super_admin
+
+### Database Schema
+- **D-13:** Full 8-table schema created upfront in Phase 1: users, orders, licenses, downloads, tickets, notifications, audit_logs, coupons. Later phases add data flows, not new tables.
+
+### Dev Environment
+- **D-14:** Add Redis to docker-compose.yml alongside PostgreSQL. In-memory fallback when Redis is unavailable — dev works with or without Docker.
+- **D-15:** Resend for auth emails (verification, password reset) — same provider already used for contact form emails
+
+### Account Management
+- **D-16:** Customer account settings at /portal/account (within sidebar layout). Admin settings at /admin/settings. Both accessible from their respective sidebar navigation.
+
+### Claude's Discretion
+- Drizzle migration strategy (push vs generate + migrate)
+- Drizzle schema file organization (single file vs split by domain)
+- Better Auth configuration and plugin setup
+- Redis client choice (ioredis vs redis)
+- BullMQ worker configuration
+- CSRF protection implementation
+- Environment variable structure and .env.example
+- proxy.ts auth middleware implementation for route protection
+- Setup wizard abuse protection mechanism
+- Audit log storage format and query patterns
 
 </decisions>
 
@@ -41,19 +64,28 @@ Fix all build-breaking issues so `pnpm build` succeeds and `pnpm dev` runs clean
 
 **Downstream agents MUST read these before planning or implementing.**
 
-### Design Reference
-- `woobooster-v2.html` — Complete HTML prototype (1247 lines). Footer section at lines 990-1025. Button CSS at lines 74-82. Footer grid CSS at lines 327-334.
+### Requirements & Planning
+- `.planning/ROADMAP.md` — Phase 1 goal, requirements (DB-01 through DB-04, AUTH-01 through AUTH-07, DASH-02 through DASH-04), success criteria
+- `.planning/REQUIREMENTS.md` — Full v2 requirements with traceability, acceptance criteria for each requirement
+- `.planning/PROJECT.md` — Constraints (pnpm only, Next.js 16, proxy.ts, TailwindCSS v4 CSS-first), key decisions, out of scope items
+- `.planning/STATE.md` — Current progress, accumulated decisions, blockers/concerns
+
+### Dashboard Template (Port Source)
+- `backenddashboard/src/components/auth/SignInForm.tsx` — Sign-in form to port (layout, fields, styling)
+- `backenddashboard/src/components/auth/SignUpForm.tsx` — Sign-up form to port (layout, fields, styling)
+- `backenddashboard/src/context/ThemeContext.tsx` — Custom theme context to DELETE, replace with next-themes
+- `backenddashboard/src/context/SidebarContext.tsx` — Sidebar state management pattern reference
+- `backenddashboard/src/layout/AppSidebar.tsx` — Sidebar component pattern reference
+- `backenddashboard/src/layout/AppHeader.tsx` — Header component pattern reference
+- `backenddashboard/src/layout/Backdrop.tsx` — Mobile backdrop pattern reference
+- `backenddashboard/src/app/layout.tsx` — Dashboard root layout structure reference
 
 ### Existing Source Files
-- `src/components/layout/Navbar.tsx` — Current Navbar with `cn()` import (line 9), CSS typo at line 47 (`height-[34px]`), hydration flash at line 33 (`return null`).
-- `src/app/layout.tsx` — Root layout importing Footer (line 6), Navbar, ThemeProvider. Footer is already wired in.
-- `src/app/globals.css` — Current CSS with design tokens, `.glass` and `.hero-mesh` utilities. Button classes need to be added.
-- `src/components/layout/ThemeProvider.tsx` — Client component wrapping next-themes.
-
-### Project Configuration
-- `.planning/PROJECT.md` — Project constraints, design fidelity requirement.
-- `.planning/REQUIREMENTS.md` — FOUND-01 through FOUND-06, NAV-02 acceptance criteria.
-- `.planning/ROADMAP.md` — Phase 1 plans (01-01, 01-02, 01-03).
+- `src/app/layout.tsx` — Root layout (passes children through)
+- `src/app/[locale]/layout.tsx` — Marketing site layout with fonts, ThemeProvider, Navbar, Footer, CustomCursor
+- `src/app/globals.css` — Design tokens, theme variables, utility classes
+- `src/components/layout/ThemeProvider.tsx` — next-themes wrapper (shared across all layouts)
+- `docker-compose.yml` — PostgreSQL 17 Alpine on port 5433, Adminer on 8081
 
 </canonical_refs>
 
@@ -61,41 +93,46 @@ Fix all build-breaking issues so `pnpm build` succeeds and `pnpm dev` runs clean
 ## Existing Code Insights
 
 ### Reusable Assets
-- `cn()` from `clsx` + `tailwind-merge`: Both packages already installed in `package.json`. Just need to create `src/lib/utils.ts`.
-- Design token system: Full light/dark theme CSS variables already defined in `globals.css` (`:root` and `.dark` selectors).
-- `.glass` utility: Glassmorphism effect already available for potential Footer styling.
-- `motion` from `framer-motion`: Already imported in Navbar — available if Footer needs animation (decided: not needed).
+- **Resend email**: Already installed and sending contact form emails — reuse for auth emails
+- **cn() utility** (`src/lib/utils.ts`): clsx + tailwind-merge, available everywhere
+- **Design token system** (`globals.css`): Full light/dark theme with CSS variables, `.glass` utility
+- **ThemeProvider** (`src/components/layout/ThemeProvider.tsx`): next-themes wrapper, already working across marketing site
+- **Dashboard template** (`backenddashboard/`): 65+ components, auth forms, sidebar, header, charts, tables — port, don't rebuild
 
 ### Established Patterns
-- Server components by default: `page.tsx` and `layout.tsx` have no `"use client"` directive.
-- Client components marked explicitly: `Navbar.tsx` and `ThemeProvider.tsx` use `"use client"` at top.
-- TailwindCSS v4 CSS-first config: All customization via `@theme` block and CSS variables in `globals.css`.
-- Font system: Syne for headings, DM Sans for body, JetBrains Mono for code — loaded in `layout.tsx`.
+- Server components by default, `"use client"` only when needed (useState, useEffect, browser APIs)
+- TailwindCSS v4 CSS-first config — no tailwind.config.js, tokens via `@theme { }` block
+- Route groups for layout isolation — `[locale]/` for marketing, new groups for auth/portal/admin
+- Framer Motion for animations, Lucide React for icons
+- Data files in `src/data/` for content, MDX for blog/docs
 
 ### Integration Points
-- `src/app/layout.tsx:6` — Footer import already exists (`import { Footer } from "@/components/layout/Footer"`). Just need to create the file.
-- `src/components/layout/Navbar.tsx:9` — `cn()` import already exists (`import { cn } from "@/lib/utils"`). Just need to create the file.
-- `src/app/globals.css` — Button classes referenced by Navbar (lines 90, 97, 140) but not yet defined.
+- `src/app/layout.tsx` — Root layout needs to wrap new route groups alongside `[locale]`
+- `src/app/[locale]/layout.tsx` — Must remain untouched (marketing site preserved as-is)
+- `docker-compose.yml` — Add Redis service alongside existing PostgreSQL
+- `src/components/layout/ThemeProvider.tsx` — Shared across marketing + dashboard layouts
 
 </code_context>
 
 <specifics>
 ## Specific Ideas
 
-- Footer must match the HTML reference design exactly: brand section with logo + tagline + Bangladesh flag, Product column, Company column, Legal column, and bottom bar with copyright + credits.
-- Button CSS must include the shimmer hover effect (`.btn::before` pseudo-element with gradient sweep) from the HTML reference.
-- The Navbar skeleton should be invisible (not a visual skeleton with shapes) — just a transparent spacer div that occupies the same space.
+- Setup wizard page should only activate when zero admin users exist — after first admin is created, the route returns 404 or redirects
+- Auto-login after registration means the verification email is informational only — users can ignore it
+- Phone number at registration is forward-looking for Phase 4 BD payment verification (bKash, Nagad)
+- In-memory Redis fallback should log a warning so developers know they're not using persistent sessions
 
 </specifics>
 
 <deferred>
 ## Deferred Ideas
 
-None — discussion stayed within phase scope.
+- Social login (Google) — considered but deferred. Better Auth supports it, can add in a future phase if needed.
+- Support staff limited admin access (different nav, restricted routes) — deferred to Phase 2 when dashboard shell is built. Phase 1 gives support_staff same admin dashboard access.
 
 </deferred>
 
 ---
 
 *Phase: 01-foundation*
-*Context gathered: 2026-05-11*
+*Context gathered: 2026-05-15*
