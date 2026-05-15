@@ -1,13 +1,46 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const handleI18nRouting = createMiddleware(routing);
+
+// Route category definitions
+const AUTH_PAGES = [
+  '/login',
+  '/register',
+  '/verify-email',
+  '/forgot-password',
+  '/reset-password',
+];
+
+const PORTAL_PREFIXES = [
+  '/dashboard',
+  '/licenses',
+  '/billing',
+  '/downloads',
+  '/tickets',
+  '/notifications',
+  '/checkout',
+  '/account',
+];
+
+function isAuthPage(pathname: string): boolean {
+  return AUTH_PAGES.some((p) => pathname === p);
+}
+
+function isPortalRoute(pathname: string): boolean {
+  return PORTAL_PREFIXES.some((p) => pathname.startsWith(p));
+}
+
+function isAdminRoute(pathname: string): boolean {
+  return pathname.startsWith('/admin');
+}
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip static files, sitemap, robots, and API routes
+  // Skip static files, API routes, and _next
   if (
     pathname.includes('.') || // matches .ico, .svg, .xml, .txt, etc.
     pathname.startsWith('/api') ||
@@ -16,6 +49,31 @@ export function proxy(request: NextRequest) {
     return;
   }
 
+  const authPage = isAuthPage(pathname);
+  const portalRoute = isPortalRoute(pathname);
+  const adminRoute = isAdminRoute(pathname);
+  const nonMarketingRoute = authPage || portalRoute || adminRoute;
+
+  const sessionCookie = request.cookies.get('better-auth.session_token');
+
+  // Protected routes (portal + admin): redirect to login if no session
+  if ((portalRoute || adminRoute) && !sessionCookie) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Auth pages: redirect logged-in users to their appropriate dashboard
+  if (authPage && sessionCookie) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // Non-marketing routes: pass through without i18n
+  if (nonMarketingRoute) {
+    return NextResponse.next();
+  }
+
+  // Marketing routes: apply i18n routing
   return handleI18nRouting(request);
 }
 

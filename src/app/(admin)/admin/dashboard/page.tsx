@@ -1,0 +1,38 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+export default async function AdminDashboard() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  // Only admin, super_admin, and support_staff can access admin routes
+  const userRole = (session.user as Record<string, unknown>).role as string;
+  if (
+    userRole !== "admin" &&
+    userRole !== "super_admin" &&
+    userRole !== "support_staff"
+  ) {
+    redirect("/dashboard");
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-2">Admin Dashboard</h1>
+        <p className="text-[--text2]">
+          Welcome, {session.user.name || session.user.email}
+        </p>
+        <p className="text-sm text-[--text2] mt-2">Role: {userRole}</p>
+        <p className="text-sm text-[--text2] mt-1">
+          Admin features coming in Phase 5
+        </p>
+      </div>
+    </div>
+  );
+}
