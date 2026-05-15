@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-05-15T12:16:19.902Z"
-last_activity: 2026-05-15 -- Phase 01 Plan 01 complete
+status: executing
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-05-15T12:35:58.265Z"
+last_activity: 2026-05-15
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 21
-  completed_plans: 18
-  percent: 86
+  completed_plans: 19
+  percent: 90
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 ## Current Position
 
 Phase: 01-foundation — EXECUTING
-Plan: 2 of 4
-Status: Completed Plan 01-01 (Database + Redis Infrastructure)
-Last activity: 2026-05-15 -- Phase 01 Plan 01 complete
+Plan: 3 of 4
+Status: Ready to execute
+Last activity: 2026-05-15
 
 Progress: [█████████░] 86%
 
@@ -61,6 +61,7 @@ Progress: [█████████░] 86%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5min | 2 tasks | 10 files |
+| Phase 01 P02 | 12min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Application tables only in schema.ts - no user table, Better Auth owns auth tables
 - [Phase 01]: Redis port 6380 externally to avoid conflicts; in-memory Map fallback when REDIS_URL unset
 - [Phase 01]: Seed script uses raw SQL via postgres.js for direct table access before Better Auth setup
+- [Phase 01]: Account lockout implemented as custom Better Auth plugin (top-level hooks only accept single AuthMiddleware, not matcher/handler arrays)
+- [Phase 01]: Auth client uses actual Better Auth operationIds: requestPasswordReset, sendVerificationEmail (not forgotPassword, emailVerification)
+- [Phase 01]: pnpm override for better-call@^1.3.5 to resolve version conflict between @better-auth/core@1.4.21 (CLI) and @better-auth/core@1.6.11 (better-auth)
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-15T12:14:02Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md
+Last session: 2026-05-15T12:35:58.263Z
+Stopped at: Completed 01-02-PLAN.md
+Resume file: None

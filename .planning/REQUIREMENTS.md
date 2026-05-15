@@ -112,13 +112,13 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: Better Auth integration with dual auth (customer login + admin login)
-- [ ] **AUTH-02**: 4-role RBAC system (customer, admin, support_staff, super_admin) with server-side checks
+- [x] **AUTH-01**: Better Auth integration with dual auth (customer login + admin login)
+- [x] **AUTH-02**: 4-role RBAC system (customer, admin, support_staff, super_admin) with server-side checks
 - [ ] **AUTH-03**: Email verification on registration
 - [ ] **AUTH-04**: Password reset flow via email link
 - [x] **AUTH-05**: Session management with Redis-backed storage (optional in dev)
-- [ ] **AUTH-06**: Admin 2FA-ready (TOTP support via Better Auth plugin)
-- [ ] **AUTH-07**: Audit logging for all admin mutations (actor, action, target, IP, timestamp)
+- [x] **AUTH-06**: Admin 2FA-ready (TOTP support via Better Auth plugin)
+- [x] **AUTH-07**: Audit logging for all admin mutations (actor, action, target, IP, timestamp)
 
 ### Database & Infrastructure
 
@@ -268,13 +268,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Complete |
-| AUTH-06 | Phase 1 | Pending |
-| AUTH-07 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Complete |
+| AUTH-07 | Phase 1 | Complete |
 | DB-01 | Phase 1 | Complete |
 | DB-02 | Phase 1 | Complete |
 | DB-03 | Phase 1 | Complete |
