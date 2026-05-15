@@ -37,7 +37,7 @@ Plans:
 - [x] 01-01-PLAN.md — Database infrastructure: Drizzle ORM, Redis, BullMQ, 8-table schema, seed script
 - [x] 01-02-PLAN.md — Better Auth configuration: Drizzle adapter, RBAC plugins, API route, audit logging
 - [x] 01-03-PLAN.md — Auth pages: login, register, verify-email, forgot/reset password, email sending, dashboard CSS
-- [ ] 01-04-PLAN.md — Route architecture: proxy.ts protection, portal/admin layouts, setup wizard, human verification
+- [x] 01-04-PLAN.md — Route architecture: proxy.ts protection, portal/admin layouts, setup wizard, human verification
 
 ### Phase 2: Dashboard Shell
 **Goal**: Both the customer portal and admin dashboard have a complete layout shell with sidebar navigation, header, responsive backdrop, and unified theming. The shell is ready for feature pages to be dropped in.

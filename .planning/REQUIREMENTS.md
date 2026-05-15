@@ -176,8 +176,8 @@
 
 - [ ] **DASH-01**: Port dashboard layout from backenddashboard/ (AppSidebar, AppHeader, Backdrop, SidebarContext)
 - [x] **DASH-02**: Separate CSS for dashboard routes (prevent CSS token conflict with marketing site)
-- [ ] **DASH-03**: Unified next-themes across marketing + dashboard (delete dashboard's ThemeContext)
-- [ ] **DASH-04**: Route group architecture: (auth)/, (portal)/, (admin)/ separate from [locale]/
+- [x] **DASH-03**: Unified next-themes across marketing + dashboard (delete dashboard's ThemeContext)
+- [x] **DASH-04**: Route group architecture: (auth)/, (portal)/, (admin)/ separate from [locale]/
 
 ## Out of Scope
 
@@ -280,8 +280,8 @@
 | DB-03 | Phase 1 | Complete |
 | DB-04 | Phase 1 | Complete |
 | DASH-02 | Phase 1 | Complete |
-| DASH-03 | Phase 1 | Pending |
-| DASH-04 | Phase 1 | Pending |
+| DASH-03 | Phase 1 | Complete |
+| DASH-04 | Phase 1 | Complete |
 | DASH-01 | Phase 2 | Pending |
 | PORT-01 | Phase 3 | Pending |
 | PORT-02 | Phase 3 | Pending |
