@@ -31,7 +31,13 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
   3. User can reset their password via an email link and log in with the new password
   4. Admin users see the admin dashboard route; customer users see the customer portal route; unauthorized users are redirected to login
   5. Marketing site pages ([locale]/*) render identically to v1.x with no CSS or layout changes
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Database infrastructure: Drizzle ORM, Redis, BullMQ, 8-table schema, seed script
+- [ ] 01-02-PLAN.md — Better Auth configuration: Drizzle adapter, RBAC plugins, API route, audit logging
+- [ ] 01-03-PLAN.md — Auth pages: login, register, verify-email, forgot/reset password, email sending, dashboard CSS
+- [ ] 01-04-PLAN.md — Route architecture: proxy.ts protection, portal/admin layouts, setup wizard, human verification
 
 ### Phase 2: Dashboard Shell
 **Goal**: Both the customer portal and admin dashboard have a complete layout shell with sidebar navigation, header, responsive backdrop, and unified theming. The shell is ready for feature pages to be dropped in.
@@ -108,7 +114,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database, Auth, and Route Foundation | 0/? | Not started | - |
+| 1. Database, Auth, and Route Foundation | 0/4 | Planned | - |
 | 2. Dashboard Shell | 0/? | Not started | - |
 | 3. Customer Portal | 0/? | Not started | - |
 | 4. Checkout and Payments | 0/? | Not started | - |
