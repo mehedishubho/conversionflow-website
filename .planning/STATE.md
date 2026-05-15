@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 1 context gathered
-last_updated: "2026-05-15T12:04:05.851Z"
-last_activity: 2026-05-15 -- Phase 01 planning complete
+status: completed
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-05-15T12:16:19.902Z"
+last_activity: 2026-05-15 -- Phase 01 Plan 01 complete
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 21
-  completed_plans: 17
-  percent: 81
+  completed_plans: 18
+  percent: 86
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-**Current focus:** v2.0 -- Dual Portal SaaS Platform (Customer Portal + Admin BI Dashboard)
+**Current focus:** Phase 01-foundation
 
 ## Current Position
 
-Phase: 1 (Database, Auth, and Route Foundation)
-Plan: -
-Status: Ready to execute
-Last activity: 2026-05-15 -- Phase 01 planning complete
+Phase: 01-foundation — EXECUTING
+Plan: 2 of 4
+Status: Completed Plan 01-01 (Database + Redis Infrastructure)
+Last activity: 2026-05-15 -- Phase 01 Plan 01 complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
 **Velocity:**
 
 - Total plans completed: 28 (v1.0/v1.1 milestones)
-- v2.0 plans completed: 0
+- v2.0 plans completed: 1
 - Average duration: -
 - Total execution time: -
 
@@ -47,7 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 |-------|-------|--------|-------|
 | v1.0 Phases 1-4 | 13/13 | Complete | Shipped 2026-05-11 |
 | v1.1 Phases 5-10 | 15/15 | Complete | Shipped 2026-05-14 |
-| v2.0 Phase 1 | 0/? | Not started | Database, Auth, Route Foundation |
+| v2.0 Phase 1 | 1/4 | In progress | Database + Redis infrastructure done (01-01) |
 | v2.0 Phase 2 | 0/? | Not started | Dashboard Shell |
 | v2.0 Phase 3 | 0/? | Not started | Customer Portal |
 | v2.0 Phase 4 | 0/? | Not started | Checkout and Payments |
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: Smooth execution, consistent patterns
 
 *Updated after each plan completion*
+| Phase 01 P01 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,9 @@ Recent decisions affecting current work:
 - [v2.0]: Route group isolation: [locale]/ marketing, (auth)/ login, (portal)/ customer, (admin)/ admin
 - [v2.0]: Unified next-themes across all layouts, delete dashboard ThemeContext
 - [v2.0]: Separate CSS files for dashboard routes to prevent marketing site token conflicts
+- [Phase 01]: Application tables only in schema.ts - no user table, Better Auth owns auth tables
+- [Phase 01]: Redis port 6380 externally to avoid conflicts; in-memory Map fallback when REDIS_URL unset
+- [Phase 01]: Seed script uses raw SQL via postgres.js for direct table access before Better Auth setup
 
 ### Pending Todos
 
@@ -92,6 +96,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-15T11:15:14.878Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-foundation/01-CONTEXT.md
+Last session: 2026-05-15T12:14:02Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md

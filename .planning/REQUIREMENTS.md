@@ -116,16 +116,16 @@
 - [ ] **AUTH-02**: 4-role RBAC system (customer, admin, support_staff, super_admin) with server-side checks
 - [ ] **AUTH-03**: Email verification on registration
 - [ ] **AUTH-04**: Password reset flow via email link
-- [ ] **AUTH-05**: Session management with Redis-backed storage (optional in dev)
+- [x] **AUTH-05**: Session management with Redis-backed storage (optional in dev)
 - [ ] **AUTH-06**: Admin 2FA-ready (TOTP support via Better Auth plugin)
 - [ ] **AUTH-07**: Audit logging for all admin mutations (actor, action, target, IP, timestamp)
 
 ### Database & Infrastructure
 
-- [ ] **DB-01**: PostgreSQL + Drizzle ORM setup with migration system
-- [ ] **DB-02**: Redis client for caching, sessions, and job queues
-- [ ] **DB-03**: Background job system (BullMQ) for async tasks
-- [ ] **DB-04**: Database schema: users, orders, licenses, downloads, tickets, notifications, audit_logs, coupons
+- [x] **DB-01**: PostgreSQL + Drizzle ORM setup with migration system
+- [x] **DB-02**: Redis client for caching, sessions, and job queues
+- [x] **DB-03**: Background job system (BullMQ) for async tasks
+- [x] **DB-04**: Database schema: users, orders, licenses, downloads, tickets, notifications, audit_logs, coupons
 
 ### Central Licensing
 
@@ -272,13 +272,13 @@
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Pending |
 | AUTH-07 | Phase 1 | Pending |
-| DB-01 | Phase 1 | Pending |
-| DB-02 | Phase 1 | Pending |
-| DB-03 | Phase 1 | Pending |
-| DB-04 | Phase 1 | Pending |
+| DB-01 | Phase 1 | Complete |
+| DB-02 | Phase 1 | Complete |
+| DB-03 | Phase 1 | Complete |
+| DB-04 | Phase 1 | Complete |
 | DASH-02 | Phase 1 | Pending |
 | DASH-03 | Phase 1 | Pending |
 | DASH-04 | Phase 1 | Pending |
