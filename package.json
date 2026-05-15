@@ -60,6 +60,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "better-call": "^1.3.5"
+    }
   }
 }
