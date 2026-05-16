@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { LogoutButton } from "@/components/auth/LogoutButton";
 
 export default async function PortalDashboard() {
   const session = await auth.api.getSession({
@@ -23,18 +22,10 @@ export default async function PortalDashboard() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-2">Customer Dashboard</h1>
-        <p className="text-[--text2]">
-          Welcome, {session.user.name || session.user.email}
-        </p>
-        <p className="text-sm text-[--text2] mt-2">Role: {userRole}</p>
-        <p className="text-sm text-[--text2] mt-1">
-          Portal features coming in Phase 3
-        </p>
-        <LogoutButton />
-      </div>
+    <div>
+      <h1 className="text-2xl font-bold font-syne mb-2">Dashboard</h1>
+      <p className="text-text2">Welcome, {session.user.name || session.user.email}</p>
+      <p className="text-sm text-muted mt-4">Portal features coming in Phase 3</p>
     </div>
   );
 }

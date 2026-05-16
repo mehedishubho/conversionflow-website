@@ -1,5 +1,6 @@
 import { DM_Sans, Syne, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { PortalShell } from "@/components/dashboard/PortalShell";
 import "@/styles/dashboard.css";
 
 const dmSans = DM_Sans({
@@ -45,7 +46,9 @@ export default function PortalLayout({
           defaultTheme="light"
           enableSystem={false}
         >
-          <main>{children}</main>
+          <PortalShell>
+            {children}
+          </PortalShell>
         </ThemeProvider>
       </body>
     </html>

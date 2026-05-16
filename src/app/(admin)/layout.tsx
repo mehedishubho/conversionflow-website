@@ -1,5 +1,6 @@
 import { DM_Sans, Syne, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { AdminShell } from "@/components/dashboard/AdminShell";
 import "@/styles/dashboard.css";
 
 const dmSans = DM_Sans({
@@ -45,7 +46,9 @@ export default function AdminLayout({
           defaultTheme="light"
           enableSystem={false}
         >
-          <main>{children}</main>
+          <AdminShell>
+            {children}
+          </AdminShell>
         </ThemeProvider>
       </body>
     </html>
