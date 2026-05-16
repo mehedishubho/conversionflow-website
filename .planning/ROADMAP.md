@@ -115,7 +115,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database, Auth, and Route Foundation | 0/4 | Planned | - |
-| 2. Dashboard Shell | 0/? | Not started | - |
+| 2. Dashboard Shell | 1/? | In progress | 02-01 complete |
 | 3. Customer Portal | 0/? | Not started | - |
 | 4. Checkout and Payments | 0/? | Not started | - |
 | 5. Admin BI Dashboard | 0/? | Not started | - |
