@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { licenses, downloads, tickets } from "@/lib/db/schema";
-import { eq, and, sql, gt } from "drizzle-orm";
+import { eq, and, sql, gt, lt } from "drizzle-orm";
 import { DashboardMetrics } from "@/components/portal/DashboardMetrics";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
@@ -24,7 +24,7 @@ async function getDashboardMetrics(userId: string) {
         eq(licenses.userId, userId),
         eq(licenses.status, "active"),
         gt(licenses.expiresAt, new Date()),
-        sql`${licenses.expiresAt} < ${thirtyDaysFromNow}`
+        lt(licenses.expiresAt, thirtyDaysFromNow)
       )
     );
 

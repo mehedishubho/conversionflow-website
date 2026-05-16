@@ -99,7 +99,7 @@ export function TicketTable({
               >
                 <TableCell className="px-5 py-4">
                   <Link
-                    href={`/support/${ticket.id}`}
+                    href={`/dashboard/support/${ticket.id}`}
                     className="font-mono text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     {ticket.id.slice(0, 8)}
