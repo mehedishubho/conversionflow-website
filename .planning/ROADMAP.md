@@ -17,7 +17,7 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 
 - [x] **Phase 1: Database, Auth, and Route Foundation** — `01-foundation` — COMPLETE (4/4 plans)
 - [x] **Phase 2: Dashboard Shell** — `02-homepage` — VERIFIED (3/3 plans, UAT 9/9 pass)
-- [ ] **Phase 3: Customer Portal** — `03-customer-portal` — Not started
+- [ ] **Phase 3: Customer Portal** — `03-customer-portal` — Planned (5 plans)
 - [ ] **Phase 4: Checkout and Payments** — `04-checkout-payments` — Not started
 - [ ] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — Not started
 - [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — Not started
@@ -69,7 +69,15 @@ Plans:
   4. Customer can download the latest plugin version and access previous versions with changelogs
   5. Customer can create a support ticket, reply to existing tickets with attachments, and view ticket status
   6. Customer can view their notification list, mark notifications as read, and manage notification preferences
-**Plans**: 0/? (not started)
+**Plans**: 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Dashboard overview: metric cards, real DB queries, breadcrumb basePath update
+- [ ] 03-02-PLAN.md — License management: list table, copy key, detail panel, activation domains
+- [ ] 03-03-PLAN.md — Billing and downloads: invoice table, featured download card, changelog expandable
+- [ ] 03-04-PLAN.md — Support tickets: list, create modal, chat thread, file upload, server actions
+- [ ] 03-05-PLAN.md — Notifications and account: notification dropdown rewrite, profile, password, preferences
+
 **UI hint**: yes
 
 ### Phase 4: Checkout and Payments
@@ -125,7 +133,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|-----------|----------------|--------|-----------|
 | 1. Database, Auth, Route Foundation | 01-foundation | 4/4 | Complete | 2026-05-16 |
 | 2. Dashboard Shell | 02-homepage | 3/3 | Verified | 2026-05-16 |
-| 3. Customer Portal | 03-customer-portal | 0/? | Not started | - |
+| 3. Customer Portal | 03-customer-portal | 0/5 | Planned | - |
 | 4. Checkout and Payments | 04-checkout-payments | 0/? | Not started | - |
 | 5. Admin BI Dashboard | 05-admin-dashboard | 0/? | Not started | - |
 | 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/? | Not started | - |
