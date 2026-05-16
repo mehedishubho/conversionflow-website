@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-05-16T18:52:31.203Z"
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-05-16T19:17:16.711Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 ## Current Position
 
 Phase: 3 (customer-portal) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-05-16
 
@@ -69,6 +69,7 @@ Progress: [██████████] 100%
 | Phase 03 P01 | 3min | 2 tasks | 4 files |
 | Phase 03 P02 | 10min | 2 tasks | 6 files |
 | Phase 03 P03 | 6min | 2 tasks | 5 files |
+| Phase 03 P04 | 11min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Recent decisions affecting current work:
 - [Phase 03]: License detail standalone page uses ComponentCard layout instead of slide-in panel overlay for cleaner URL-based UX
 - [Phase 03]: TableCell UI primitive extended with colSpan prop for table empty state spanning
 - [Phase 03]: Wrapped Badge in span for spacing since Badge component does not accept className prop; download buttons disabled (no file serving route yet)
+- [Phase ?]: Validated priority form input against enum values before Drizzle insert to avoid string-to-enum type mismatch
+- [Phase ?]: Cast JSONB attachments from unknown to typed Attachment[] via map() in ticket detail page (Drizzle jsonb does not enforce inner type)
 
 ### Pending Todos
 
@@ -123,6 +126,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-16T18:52:31.201Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-05-16T19:17:16.709Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None

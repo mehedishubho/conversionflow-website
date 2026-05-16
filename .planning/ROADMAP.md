@@ -75,7 +75,7 @@ Plans:
 - [x] 03-01-PLAN.md — Dashboard overview: metric cards, real DB queries, breadcrumb basePath update
 - [x] 03-02-PLAN.md — License management: list table, copy key, detail panel, activation domains
 - [x] 03-03-PLAN.md — Billing and downloads: invoice table, featured download card, changelog expandable
-- [ ] 03-04-PLAN.md — Support tickets: list, create modal, chat thread, file upload, server actions
+- [x] 03-04-PLAN.md — Support tickets: list, create modal, chat thread, file upload, server actions
 - [ ] 03-05-PLAN.md — Notifications and account: notification dropdown rewrite, profile, password, preferences
 
 **UI hint**: yes

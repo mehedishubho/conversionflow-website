@@ -141,7 +141,7 @@
 - [x] **PORT-02**: License management (list, detail, copy key, deactivate domain, sync status)
 - [x] **PORT-03**: Billing section (invoices, payment history, refund status)
 - [x] **PORT-04**: Downloads section (latest + old plugin versions with changelogs)
-- [ ] **PORT-05**: Support tickets (create, list, reply with attachments)
+- [x] **PORT-05**: Support tickets (create, list, reply with attachments)
 - [ ] **PORT-06**: Notification center (list, mark read, preferences)
 
 ### Checkout & Payments
@@ -287,7 +287,7 @@
 | PORT-02 | Phase 3 | Complete |
 | PORT-03 | Phase 3 | Complete |
 | PORT-04 | Phase 3 | Complete |
-| PORT-05 | Phase 3 | Pending |
+| PORT-05 | Phase 3 | Complete |
 | PORT-06 | Phase 3 | Pending |
 | LIC-01 | Phase 4 | Pending |
 | LIC-02 | Phase 4 | Pending |
