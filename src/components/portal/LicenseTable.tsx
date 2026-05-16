@@ -15,8 +15,8 @@ type LicenseRow = {
   licenseKey: string;
   plan: string;
   status: "active" | "expired" | "revoked" | "suspended";
-  currentActivations: number;
-  maxActivations: number;
+  currentActivations: number | null;
+  maxActivations: number | null;
   expiresAt: Date | null;
 };
 
@@ -110,7 +110,7 @@ export function LicenseTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                  {license.currentActivations} / {license.maxActivations}
+                  {license.currentActivations ?? 0} / {license.maxActivations ?? 1}
                 </TableCell>
                 <TableCell className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                   {license.expiresAt
