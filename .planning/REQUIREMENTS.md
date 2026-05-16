@@ -139,8 +139,8 @@
 
 - [x] **PORT-01**: Dashboard overview (active licenses, expiring soon, recent downloads, open tickets)
 - [x] **PORT-02**: License management (list, detail, copy key, deactivate domain, sync status)
-- [ ] **PORT-03**: Billing section (invoices, payment history, refund status)
-- [ ] **PORT-04**: Downloads section (latest + old plugin versions with changelogs)
+- [x] **PORT-03**: Billing section (invoices, payment history, refund status)
+- [x] **PORT-04**: Downloads section (latest + old plugin versions with changelogs)
 - [ ] **PORT-05**: Support tickets (create, list, reply with attachments)
 - [ ] **PORT-06**: Notification center (list, mark read, preferences)
 
@@ -285,8 +285,8 @@
 | DASH-01 | Phase 2 | Complete |
 | PORT-01 | Phase 3 | Complete |
 | PORT-02 | Phase 3 | Complete |
-| PORT-03 | Phase 3 | Pending |
-| PORT-04 | Phase 3 | Pending |
+| PORT-03 | Phase 3 | Complete |
+| PORT-04 | Phase 3 | Complete |
 | PORT-05 | Phase 3 | Pending |
 | PORT-06 | Phase 3 | Pending |
 | LIC-01 | Phase 4 | Pending |
