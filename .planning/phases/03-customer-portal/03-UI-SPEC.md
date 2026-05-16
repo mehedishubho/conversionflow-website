@@ -42,7 +42,7 @@ Declared values (multiples of 4):
 
 Exceptions:
 - Metric card icon container: 48px x 48px (12 in Tailwind) — matches EcommerceMetrics pattern
-- Badge pill padding: `px-2.5 py-0.5` (10px/2px) — fixed by Badge component
+- Badge pill padding: `px-3 py-1` (12px/4px)
 - Notification bell button: 44px x 44px (h-11 w-11) — touch target minimum
 - Mobile sidebar toggle: 40px x 40px minimum touch target
 
@@ -53,14 +53,13 @@ Exceptions:
 | Role | Size | Weight | Line Height | Tailwind Token | Usage |
 |------|------|--------|-------------|----------------|-------|
 | Body | 14px | 400 (regular) | 1.5 (20px) | `text-sm` / `text-theme-sm` | Page text, table cells, descriptions |
-| Label | 12px | 500 (medium) | 1.5 (18px) | `text-theme-xs` | Badges, timestamps, secondary metadata |
-| Heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` | Page titles (PageBreadCrumb) |
+| Label | 12px | 400 (regular) | 1.5 (18px) | `text-theme-xs` | Badges, timestamps, secondary metadata |
+| Heading | 20px | 700 (bold) | 1.2 | `text-xl font-bold` | Page titles (PageBreadCrumb), card titles, table headers, notification titles |
 | Display | 24px | 700 (bold) | 1.2 | `text-title-sm font-bold` | Metric card values |
 
 Font weights declared:
-- **Regular (400):** Body text, descriptions, secondary text
-- **Semibold (600):** Page headings, card titles, table headers, notification titles
-- **Bold (700):** Metric values, primary CTAs, emphasis text
+- **Regular (400):** Body text, descriptions, secondary text, labels, badges, timestamps
+- **Bold (700):** Page headings, card titles, table headers, notification titles, metric values, primary CTAs, emphasis text
 
 ---
 
@@ -131,9 +130,9 @@ Accent reserved for:
 |---------|------|
 | **Primary CTA (Licenses)** | "View Details" (per row), "Copy Key" (per row) |
 | **Primary CTA (Billing)** | "View Invoice" (per row, links to invoice detail) |
-| **Primary CTA (Downloads)** | "Download Latest" (featured card), "Download" (per version row) |
+| **Primary CTA (Downloads)** | "Download Latest" (featured card), "Download Version" (per version row) |
 | **Primary CTA (Support)** | "New Ticket" (page header button), "Send Reply" (ticket detail) |
-| **Primary CTA (Account)** | "Save Changes" (per section), "Update Password" |
+| **Primary CTA (Account)** | "Update Profile" (profile section), "Update Password" |
 | **Empty state heading** | "Welcome to ConversionFlow" |
 | **Empty state body** | "Your dashboard is ready. Once you purchase a license or open a support ticket, your activity will appear here." |
 | **Empty state (licenses)** | "No licenses yet. Your licenses will appear here after your first purchase." |
@@ -171,7 +170,7 @@ Each card follows EcommerceMetrics pattern:
 - Value: `text-title-sm font-bold text-gray-800 dark:text-white/90`
 
 **Empty state (D-04):** All four cards show `0`. Below cards, show a welcome message:
-- Heading: `text-xl font-semibold` "Welcome to ConversionFlow"
+- Heading: `text-xl font-bold` "Welcome to ConversionFlow"
 - Body: `text-sm text-gray-500` "Your dashboard is ready. Once you purchase a license or open a support ticket, your activity will appear here."
 
 **Recent Activity Table:** Not required in Phase 3 per CONTEXT.md (only metric cards + welcome). If added later, use Table component with columns: Activity, Date, Status.
@@ -252,7 +251,7 @@ Each card follows EcommerceMetrics pattern:
 | Release Date | 20% | Formatted date |
 | File | 25% | File name (mono font) |
 | Changelog | 25% | Expandable row — click to expand/collapse |
-| Download | 10% | Download icon button |
+| Download | 10% | Download icon button with `aria-label="Download Version {version}"` |
 
 **Changelog expand (D-17):**
 - Click handler: toggles a row below the version row
@@ -274,14 +273,14 @@ Each card follows EcommerceMetrics pattern:
 | Priority | 15% | Priority badge | Badge (color per map above) |
 | Status | 15% | Status badge | Badge (color per map above) |
 | Updated | 15% | Relative time (e.g., "2 hours ago") | Plain text (date-fns formatDistanceToNow) |
-| Actions | 15% | "View" link | Text link styled as accent color |
+| Actions | 15% | "View Ticket" link | Text link styled as accent color |
 
 ### 7. Support Tickets — Detail (`(portal)/support/[id]/page.tsx`)
 
 **Layout:** PageBreadCrumb + Ticket header + Conversation thread + Reply area
 
 **Ticket header:**
-- Subject: `text-xl font-semibold`
+- Subject: `text-xl font-bold`
 - Status badge + Priority badge (inline, gap-2)
 - Created date: `text-sm text-gray-500`
 
@@ -296,7 +295,7 @@ Each card follows EcommerceMetrics pattern:
 
 **Reply area:**
 - Textarea: `w-full rounded-xl border border-gray-300 p-4 min-h-[100px]` with placeholder "Type your reply..."
-- Attachment button: Paperclip icon button to trigger file picker
+- Attachment button: Paperclip icon button with `aria-label="Attach file"` to trigger file picker
 - Send button: `btn btn-primary` "Send Reply"
 - File upload: button-style file picker (not drag-and-drop), restricted to images (PNG/JPG/WebP) and PDF, max 10MB
 
@@ -305,13 +304,13 @@ Each card follows EcommerceMetrics pattern:
 **Trigger:** "New Ticket" button opens Modal component
 
 **Modal content:**
-- Title: "Create Support Ticket" (`text-xl font-semibold`)
+- Title: "Create Support Ticket" (`text-xl font-bold`)
 - Form fields:
   - Subject: text input, required, placeholder "Brief description of your issue"
   - Priority: select dropdown with options Low / Medium / High / Urgent, default Medium
   - Description: textarea, required, placeholder "Describe your issue in detail", min-height 120px
   - Attachments: file picker button "Attach Files" with accepted file types label, max 3 files shown as chips
-- Actions: "Cancel" (`btn btn-outline`) + "Create Ticket" (`btn btn-primary`)
+- Actions: "Create Ticket" (`btn btn-primary`) — dismiss via Modal's built-in X close button (top-right), Escape key, or backdrop click only
 - Modal size: `max-w-xl` (centered, not fullscreen)
 
 ### 9. Notifications — Dropdown (rewrite NotificationDropdown.tsx)
@@ -319,7 +318,7 @@ Each card follows EcommerceMetrics pattern:
 **Container:** Existing Dropdown component, positioned `absolute -right-[240px] mt-[17px]`, width 361px, height 480px
 
 **Header row:**
-- Left: "Notifications" (`text-lg font-semibold`)
+- Left: "Notifications" (`text-lg font-bold`)
 - Right: "Mark all as read" text button (`text-sm text-accent hover:underline`)
 
 **Notification items (replaces placeholder user-avatar items):**
@@ -329,7 +328,7 @@ Each card follows EcommerceMetrics pattern:
   - support: `bg-orange-lt` with MessageSquare icon in `text-orange`
   - system: `bg-red-lt` with Info icon in `text-red`
 - Right content:
-  - Title: `text-theme-sm font-medium text-gray-800 dark:text-white/90`
+  - Title: `text-theme-sm font-bold text-gray-800 dark:text-white/90`
   - Message preview: `text-theme-sm text-gray-500 dark:text-gray-400` (truncated to 2 lines)
   - Meta row: type label + dot separator + relative time (`text-theme-xs text-gray-500`)
 - Unread indicator: left border `border-l-2 border-accent` on the item container
@@ -352,7 +351,7 @@ Each card follows EcommerceMetrics pattern:
   - Display Name: text input, editable, pre-filled with current name
   - Email: text input, **read-only** (disabled, with lock icon and tooltip "Email cannot be changed")
   - Phone: text input, editable, pre-filled
-- Save button: `btn btn-primary` "Save Changes" (right-aligned)
+- Save button: `btn btn-primary` "Update Profile" (right-aligned)
 
 **Section 2 — Password:**
 - ComponentCard with title "Change Password"
