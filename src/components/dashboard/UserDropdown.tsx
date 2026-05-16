@@ -8,12 +8,20 @@ import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type SessionUser = {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  role?: string;
+};
+
 export function UserDropdown() {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  const user = session?.user;
+  const user = session?.user as SessionUser | undefined;
   const initials = user?.name
     ? user.name
         .split(" ")
