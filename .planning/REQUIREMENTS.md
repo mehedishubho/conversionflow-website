@@ -138,7 +138,7 @@
 ### Customer Portal
 
 - [x] **PORT-01**: Dashboard overview (active licenses, expiring soon, recent downloads, open tickets)
-- [ ] **PORT-02**: License management (list, detail, copy key, deactivate domain, sync status)
+- [x] **PORT-02**: License management (list, detail, copy key, deactivate domain, sync status)
 - [ ] **PORT-03**: Billing section (invoices, payment history, refund status)
 - [ ] **PORT-04**: Downloads section (latest + old plugin versions with changelogs)
 - [ ] **PORT-05**: Support tickets (create, list, reply with attachments)
@@ -284,7 +284,7 @@
 | DASH-04 | Phase 1 | Complete |
 | DASH-01 | Phase 2 | Complete |
 | PORT-01 | Phase 3 | Complete |
-| PORT-02 | Phase 3 | Pending |
+| PORT-02 | Phase 3 | Complete |
 | PORT-03 | Phase 3 | Pending |
 | PORT-04 | Phase 3 | Pending |
 | PORT-05 | Phase 3 | Pending |
