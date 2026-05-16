@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 
 export default async function AdminDashboard() {
   const session = await auth.api.getSession({
@@ -32,6 +33,7 @@ export default async function AdminDashboard() {
         <p className="text-sm text-[--text2] mt-1">
           Admin features coming in Phase 5
         </p>
+        <LogoutButton />
       </div>
     </div>
   );

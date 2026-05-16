@@ -1,6 +1,21 @@
 import SignInForm from "@/components/auth/SignInForm";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage() {
+  const adminCount = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(user)
+    .where(eq(user.role, "super_admin"));
+
+  if (Number(adminCount[0].count) === 0) {
+    redirect("/admin/setup");
+  }
+
   return (
     <div className="flex min-h-screen">
       {/* Left: Brand panel */}

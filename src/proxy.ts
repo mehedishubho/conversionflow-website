@@ -61,14 +61,11 @@ export function proxy(request: NextRequest) {
 
   const sessionCookie = request.cookies.get('better-auth.session_token');
 
-  // Protected routes (portal + admin, excluding setup): redirect if no session
-  // Route through /api/auth/check-setup which checks if admin exists
-  // → no admin: redirect to /admin/setup
-  // → admin exists: redirect to /login
+  // Protected routes (portal + admin, excluding setup): redirect to login if no session
   if ((portalRoute || adminRoute) && !setupPage && !sessionCookie) {
-    const checkUrl = new URL('/api/auth/check-setup', request.url);
-    checkUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(checkUrl);
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   // Auth pages: redirect logged-in users to their appropriate dashboard
