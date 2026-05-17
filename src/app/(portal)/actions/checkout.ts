@@ -287,3 +287,19 @@ export async function getPaymentAccounts() {
 
   return grouped;
 }
+
+/**
+ * Get order details by ID for the success page.
+ * Only returns orders belonging to the authenticated user.
+ */
+export async function getOrderDetails(orderId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/login");
+
+  const [order] = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.id, orderId), eq(orders.userId, session.user.id)));
+
+  return order ?? null;
+}
