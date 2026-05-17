@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Badge from "@/components/ui/badge/Badge";
 import {
   Table,
@@ -111,9 +112,12 @@ export function InvoiceTable({
                 className="border-b border-gray-100 dark:border-gray-800 last:border-0"
               >
                 <TableCell className="px-5 py-4">
-                  <span className="font-mono text-sm text-gray-800 dark:text-white/90">
+                  <Link
+                    href={`/dashboard/billing/${order.id}`}
+                    className="font-mono text-sm text-[#465fff] hover:underline dark:text-[#465fff]"
+                  >
                     {order.id.slice(0, 8)}...
-                  </span>
+                  </Link>
                 </TableCell>
                 <TableCell className="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                   {order.plan}
