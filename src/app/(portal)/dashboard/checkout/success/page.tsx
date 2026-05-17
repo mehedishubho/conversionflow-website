@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { getOrderDetails } from "@/app/(portal)/actions/checkout";
@@ -38,7 +38,7 @@ const statusLabelMap: Record<string, string> = {
   refunded: "Refunded",
 };
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order") || "";
   const statusParam = searchParams.get("status") || "";
@@ -68,10 +68,8 @@ export default function CheckoutSuccessPage() {
       .finally(() => setLoading(false));
   }, [orderId]);
 
-  // Determine status: use server order status if available, fallback to URL param
   const effectiveStatus = order?.status || statusParam;
   const isCompleted = effectiveStatus === "completed";
-  const isPending = effectiveStatus === "pending";
 
   if (loading) {
     return (
@@ -112,25 +110,21 @@ export default function CheckoutSuccessPage() {
 
       <div className="max-w-lg mx-auto">
         <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] px-6 py-10 text-center">
-          {/* Status icon */}
           <CheckCircle2
             className="mx-auto h-16 w-16 text-success-500 mb-4"
             strokeWidth={1.5}
           />
 
-          {/* Heading */}
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-2">
             {isCompleted ? "Payment Successful" : "Payment Submitted"}
           </h2>
 
-          {/* Body text */}
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             {isCompleted
               ? "Your payment was successful! Your license key has been generated."
               : "Your payment is being verified. We will email your license key within 24 hours once confirmed."}
           </p>
 
-          {/* Order details */}
           <div className="rounded-lg bg-gray-50 dark:bg-gray-900 px-6 py-4 text-left space-y-3 mb-6">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -169,7 +163,6 @@ export default function CheckoutSuccessPage() {
             </div>
           </div>
 
-          {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/dashboard/billing"
@@ -188,5 +181,25 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div>
+          <PageBreadcrumb pageTitle="Success" basePath="/dashboard" />
+          <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] px-6 py-16 text-center">
+            <div className="animate-spin h-8 w-8 mx-auto mb-4 border-2 border-brand-500 border-t-transparent rounded-full" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Loading...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }
