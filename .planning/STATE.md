@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-05-16T19:44:09.574Z"
-last_activity: 2026-05-16
+status: ready
+stopped_at: Phase 3 verified — UAT 6/6 pass
+last_updated: "2026-05-17T03:30:00.000Z"
+last_activity: 2026-05-17
 progress:
   total_phases: 6
   completed_phases: 3
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-**Current focus:** Phase 3 — customer-portal
+**Current focus:** Phase 4 — checkout-payments
 
 ## Current Position
 
-Phase: 3 (customer-portal) — EXECUTING
+Phase: 3 (customer-portal) — VERIFIED
 Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-05-16
+Status: Phase verified — UAT 6/6 pass, route collision fixed
+Last activity: 2026-05-17
 
 Progress: [██████████] 100%
 
@@ -37,7 +37,7 @@ Progress: [██████████] 100%
 **Velocity:**
 
 - Total plans completed: 28 (v1.0/v1.1 milestones)
-- v2.0 plans completed: 3
+- v2.0 plans completed: 12
 - Average duration: -
 - Total execution time: -
 
@@ -49,7 +49,7 @@ Progress: [██████████] 100%
 | v1.1 Phases 5-10 | 15/15 | Complete | Shipped 2026-05-14 |
 | v2.0 Phase 1 | 4/4 | Complete | Foundation: DB, auth, routes, admin setup |
 | v2.0 Phase 2 | 3/3 | Verified | Dashboard shell, TailAdmin port, UAT 9/9 |
-| v2.0 Phase 3 | 0/? | Not started | Customer Portal |
+| v2.0 Phase 3 | 5/5 | Verified | Customer Portal, UAT 6/6, route fix |
 | v2.0 Phase 4 | 0/? | Not started | Checkout and Payments |
 | v2.0 Phase 5 | 0/? | Not started | Admin BI Dashboard |
 | v2.0 Phase 6 | 0/? | Not started | Webhooks, Jobs, License Intelligence |
@@ -108,6 +108,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Cast JSONB attachments from unknown to typed Attachment[] via map() in ticket detail page (Drizzle jsonb does not enforce inner type)
 - [Phase 03]: Password change uses authClient.changePassword directly from client component since Better Auth handles current password verification server-side
 - [Phase 03]: Notification preferences Save button is present but no-op since user table lacks notificationPreferences column (deferred to Phase 6)
+- [Phase 03]: Portal pages nested under (portal)/dashboard/ not (portal)/ — /[locale]/support route group collision with marketing site; nav paths in dashboard-nav.ts already used /dashboard/* prefix
 
 ### Pending Todos
 
@@ -129,6 +130,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-16T19:44:09.572Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-05-17T03:30:00.000Z
+Stopped at: Phase 3 verified — ready for Phase 4
 Resume file: None
