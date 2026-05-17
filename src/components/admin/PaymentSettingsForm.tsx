@@ -212,7 +212,7 @@ export default function PaymentSettingsForm({
               onChange={(e) => setVatRate(e.target.value)}
               min="0"
               max="100"
-              step="0.5"
+              step={0.5}
             />
           </div>
           <div className="w-40">
