@@ -64,6 +64,45 @@ async function seed() {
 
   console.log(`Super admin created: ${adminEmail}`);
   console.log("Note: Use /admin/setup for the primary admin creation flow.");
+
+  // ── Seed: Settings (VAT) ──
+  const { settings, paymentAccounts, coupons } = await import("./schema");
+
+  await db.insert(settings).values([
+    { key: "vat_rate", value: "15" },
+    { key: "vat_mode", value: "exclusive" },
+  ]).onConflictDoNothing();
+
+  console.log("Settings seeded: vat_rate, vat_mode");
+
+  // ── Seed: Payment accounts (placeholders, inactive by default) ──
+  const paymentMethodSeeds = [
+    { method: "bkash" as const, accountName: "Configure in Admin Settings", accountNumber: "0000000000" },
+    { method: "nagad" as const, accountName: "Configure in Admin Settings", accountNumber: "0000000000" },
+    { method: "rocket" as const, accountName: "Configure in Admin Settings", accountNumber: "0000000000" },
+    { method: "bank_transfer" as const, accountName: "Configure in Admin Settings", accountNumber: "0000000000" },
+    { method: "ssl_commerz" as const, accountName: "Configure in Admin Settings", accountNumber: "0000000000" },
+  ];
+
+  for (const pa of paymentMethodSeeds) {
+    await db.insert(paymentAccounts).values({
+      ...pa,
+      active: false,
+    }).onConflictDoNothing();
+  }
+
+  console.log("Payment accounts seeded: 5 placeholder entries (inactive)");
+
+  // ── Seed: Sample coupon ──
+  await db.insert(coupons).values({
+    code: "LAUNCH20",
+    type: "percentage",
+    value: 20,
+    maxUses: 100,
+    active: true,
+  }).onConflictDoNothing();
+
+  console.log("Sample coupon seeded: LAUNCH20 (20% off, 100 uses)");
 }
 
 seed().catch((err) => {

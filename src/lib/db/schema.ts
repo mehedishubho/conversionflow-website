@@ -266,6 +266,32 @@ export const coupons = pgTable("coupons", {
     .$onUpdate(() => new Date()),
 });
 
+export const paymentAccounts = pgTable("payment_accounts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  method: paymentMethodEnum("method").notNull(),
+  accountName: text("account_name").notNull(),
+  accountNumber: text("account_number").notNull(),
+  bankName: text("bank_name"),
+  branch: text("branch"),
+  routingNumber: text("routing_number"),
+  instructions: text("instructions"),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const settings = pgTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 // ──────────────────────────────────────────────
 // Relations
 // ──────────────────────────────────────────────
