@@ -18,8 +18,8 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 - [x] **Phase 1: Database, Auth, and Route Foundation** — `01-foundation` — COMPLETE (4/4 plans)
 - [x] **Phase 2: Dashboard Shell** — `02-homepage` — VERIFIED (3/3 plans, UAT 9/9 pass)
 - [x] **Phase 3: Customer Portal** — `03-customer-portal` — VERIFIED (5/5 plans, UAT 6/6 pass)
-- [ ] **Phase 4: Checkout and Payments** — `04-checkout-payments` — Not started
-- [ ] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — Not started
+- [x] **Phase 4: Checkout and Payments** — `04-checkout-payments` — EXECUTED (6/6 plans, human UAT pending)
+- [ ] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — Planned (5 plans)
 - [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — Not started
 
 ## Phase Details
@@ -95,28 +95,36 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Schema + server actions: payment_accounts/settings tables, createManualOrder, validateCoupon, calculateVAT
-- [ ] 04-02-PLAN.md — SSL Commerce + Central API: ssl-commerz client, central-api client, 5 API route handlers
-- [ ] 04-03-PLAN.md — Checkout page: 2-column layout, payment method grid, coupon input, manual payment form, success page
-- [ ] 04-04-PLAN.md — Admin orders + settings: order management with verify/reject/refund, payment account + VAT config
-- [ ] 04-05-PLAN.md — Invoice + email: HTML/PDF invoice generation, invoice detail page, order confirmation email
-- [ ] 04-06-PLAN.md — Integration + schema push: pricing URL update, email wiring, seed data, DB push, full build verification
+- [x] 04-01-PLAN.md — Schema + server actions: payment_accounts/settings tables, createManualOrder, validateCoupon, calculateVAT
+- [x] 04-02-PLAN.md — SSL Commerce + Central API: ssl-commerz client, central-api client, 5 API route handlers
+- [x] 04-03-PLAN.md — Checkout page: 2-column layout, payment method grid, coupon input, manual payment form, success page
+- [x] 04-04-PLAN.md — Admin orders + settings: order management with verify/reject/refund, payment account + VAT config
+- [x] 04-05-PLAN.md — Invoice + email: HTML/PDF invoice generation, invoice detail page, order confirmation email
+- [x] 04-06-PLAN.md — Integration + schema push: pricing URL update, email wiring, seed data, DB push, full build verification
 
 **UI hint**: yes
 
 ### Phase 5: Admin BI Dashboard
 **Directory**: `05-admin-dashboard`
-**Goal**: Admin operators can view real-time business intelligence -- revenue KPIs, sales performance, user growth trends, revenue charts, invoice management, user management, and activity feeds -- with filtering and export capabilities.
+**Goal**: Admin operators can view real-time business intelligence -- revenue KPIs with trend indicators, adaptive revenue charts, invoice management with filters and payment reminders, user management with detail pages and role/ban controls, activity feeds, CSV data export, and admin-scoped notifications.
 **Depends on**: Phase 4
 **Requirements**: ADMN-01, ADMN-02, ADMN-03, ADMN-04, ADMN-05, ADMN-06, ADMN-07, ADMN-08, ADMN-09, ADMN-10
 **Success Criteria** (what must be TRUE):
-  1. Admin sees an executive overview with total revenue, MRR, ARR, active customers, CLV, and CAC with trend indicators (up/down/flat)
-  2. Admin can view revenue trend charts (daily/weekly/monthly/yearly) with a date range selector via ApexCharts
-  3. Admin can list and filter invoices by status (paid/pending/failed/overdue), mark invoices as paid, and send payment reminders
+  1. Admin sees an executive overview with total revenue, MRR, active customers, and total orders with trend indicators (up/down/flat)
+  2. Admin can view an adaptive revenue chart (bar for 7d/90d, area for 30d/year) with a preset date range selector
+  3. Admin can list and filter invoices by status (paid/pending/failed), mark invoices as paid, and send payment reminders
   4. Admin can list users, view user details, assign roles, and ban/activate accounts
-  5. Admin can export any report (revenue, sales, users, invoices) as CSV, Excel, or PDF
-  6. Admin sees a real-time activity feed of events (purchases, license activations, refunds, tickets) and receives alerts for failed payments, expiring licenses, and fraud signals
-**Plans**: 0/? (not started)
+  5. Admin can export any data table as CSV with client-side Blob download
+  6. Admin sees an activity feed of events and receives admin-scoped notifications in the dropdown
+**Plans**: 5 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Dashboard overview: KPI cards with trends, adaptive revenue chart, date range selector, mini activity feed, recent orders table, sales redirect, nav update
+- [ ] 05-02-PLAN.md — Invoice enhancement: status filter tabs, mark as paid, send reminder email; Users list: View link column
+- [ ] 05-03-PLAN.md — User detail page: profile, order history, license status, activity; role change dropdown, ban/activate toggle
+- [ ] 05-04-PLAN.md — Activity feed page with pagination/filters, CSV export utility, minimal licenses listing page
+- [ ] 05-05-PLAN.md — Admin notifications: extend NotificationDropdown with admin context, admin notification server actions
+
 **UI hint**: yes
 
 ### Phase 6: Webhooks, Background Jobs, and License Intelligence
@@ -143,6 +151,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Database, Auth, Route Foundation | 01-foundation | 4/4 | Complete | 2026-05-16 |
 | 2. Dashboard Shell | 02-homepage | 3/3 | Verified | 2026-05-16 |
 | 3. Customer Portal | 03-customer-portal | 5/5 | Verified | 2026-05-17 |
-| 4. Checkout and Payments | 04-checkout-payments | 0/6 | Not started | - |
-| 5. Admin BI Dashboard | 05-admin-dashboard | 0/? | Not started | - |
+| 4. Checkout and Payments | 04-checkout-payments | 6/6 | Executed (UAT pending) | 2026-05-17 |
+| 5. Admin BI Dashboard | 05-admin-dashboard | 0/5 | Planned | - |
 | 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/? | Not started | - |
