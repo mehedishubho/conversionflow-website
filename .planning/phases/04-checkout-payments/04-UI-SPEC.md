@@ -58,8 +58,13 @@ Declared values (multiples of 4):
 | 2xl | 48px | Major section breaks |
 | 3xl | 64px | Page-level spacing |
 
-Exceptions:
-- Payment method card grid gap: 12px (3 in Tailwind) -- tighter than standard to fit 5 cards
+### Extended Values (exceptions)
+
+| Token | Value | Justification |
+|-------|-------|---------------|
+| grid-sm | 12px (gap-3) | Payment method card grid gap -- tighter than standard spacing required to fit 5 method cards comfortably within the right column without overflow. At 16px gap the cards would wrap or compress awkwardly on tablet widths. |
+
+Other layout-specific exceptions:
 - Checkout column gap: 32px on desktop, 24px on tablet
 
 ---
@@ -70,14 +75,14 @@ Using TailAdmin dashboard typography tokens. All sizes refer to the dashboard CS
 
 | Role | Size | Weight | Line Height | CSS Token |
 |------|------|--------|-------------|-----------|
-| Body | 14px | 400 (regular) | 1.5 | text-sm, text-theme-sm |
+| Body | 14px | 500 (medium) | 1.5 | text-sm, text-theme-sm |
 | Label | 12px | 500 (medium) | 1.5 | text-theme-xs |
 | Heading | 20px | 600 (semibold) | 1.3 | text-theme-xl |
 | Page Title | 20px | 600 (semibold) | 1.3 | text-xl font-semibold |
 
 Font family: Outfit (headings/labels), system default (body) via TailAdmin config.
 
-Note: The existing PageBreadcrumb sets page titles at `text-xl font-semibold`. Checkout and admin pages follow this pattern.
+Note: The existing PageBreadcrumb sets page titles at `text-xl font-semibold`. Checkout and admin pages follow this pattern. Body text uses weight 500 (medium) instead of 400 to maintain visual weight consistency with the TailAdmin design system where form labels, table cells, and body copy share the same weight. Headings at 600 (semibold) provide clear hierarchy distinction at weight level.
 
 ---
 
@@ -138,9 +143,10 @@ When a method is selected: card border becomes brand-500 + method color as 3px l
 | | ──────────────     | | | [bank]       |  |
 | | Total: 3,150 BDT   | | +--------------+  |
 | |                    | | | Coupon Code  |  |
-| | Coupon: SAVE10     | | | [input][Apply]|  |
-| | [Remove]           | | +--------------+  |
-| +-------------------+ | | Instructions  |  |
+| | Coupon: SAVE10     | | | [input][Apply|
+| | [Remove Coupon]    | | |  Coupon]     |  |
+| +-------------------+ | +--------------+  |
+|                       | | Instructions  |  |
 |                       | | (method-specific)|
 |                       | | Transaction ID  |  |
 |                       | | [input]         |  |
@@ -154,7 +160,7 @@ When a method is selected: card border becomes brand-500 + method color as 3px l
 **States:**
 - Initial: Plan loaded from URL param, no method selected, no coupon applied
 - Method selected: Shows method-specific instructions + transaction ID input (manual) or redirect button (SSL)
-- Coupon applied: Discount line appears in summary, "Remove" link replaces Apply button
+- Coupon applied: Discount line appears in summary, "Remove Coupon" link replaces "Apply Coupon" button
 - Submitting: Button shows spinner, disabled state
 - Error: Inline error below the relevant input (red text, error-500)
 
@@ -290,7 +296,7 @@ When a method is selected: card border becomes brand-500 + method color as 3px l
 |-----------|------|----------|-------------|
 | OrderSummary | Server | `src/components/checkout/OrderSummary.tsx` | Left column: plan name, price breakdown, VAT, discount, total |
 | PaymentMethodGrid | Client | `src/components/checkout/PaymentMethodGrid.tsx` | Right column: 5 payment method cards in grid layout |
-| CouponInput | Client | `src/components/checkout/CouponInput.tsx` | Coupon code input + Apply/Remove button |
+| CouponInput | Client | `src/components/checkout/CouponInput.tsx` | Coupon code input + Apply Coupon / Remove Coupon button |
 | ManualPaymentForm | Client | `src/components/checkout/ManualPaymentForm.tsx` | Transaction ID input for manual BD methods |
 | PaymentInstructions | Server | `src/components/checkout/PaymentInstructions.tsx` | Method-specific instructions from payment_accounts table |
 | InvoicePDF | Server | `src/components/invoice/InvoicePDF.tsx` | @react-pdf/renderer document for PDF download |
@@ -325,8 +331,8 @@ When a method is selected: card border becomes brand-500 + method color as 3px l
 | Order summary heading | "Order Summary" |
 | Payment method heading | "Select Payment Method" |
 | Coupon input placeholder | "Enter coupon code" |
-| Coupon apply button | "Apply" |
-| Coupon remove link | "Remove" |
+| Coupon apply button | "Apply Coupon" |
+| Coupon remove link | "Remove Coupon" |
 | Manual payment instructions heading | "Payment Instructions" |
 | Transaction ID label | "Transaction ID" |
 | Transaction ID placeholder | "Enter your transaction ID" |
