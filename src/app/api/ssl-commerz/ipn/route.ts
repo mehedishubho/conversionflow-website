@@ -8,6 +8,7 @@ import {
   mockImportOrderToCentral,
 } from "@/lib/central-api";
 import { createAuditLog } from "@/lib/audit";
+import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
 
 /**
  * SSL Commerz IPN (Instant Payment Notification) handler.
@@ -173,6 +174,29 @@ export async function POST(request: NextRequest) {
       );
       // Order is completed, centralOrderId remains null
       // Admin can retry sync later via admin dashboard
+    }
+
+    // 11. Send confirmation email (T-04-23: wrapped in try/catch, email failure does not block)
+    try {
+      if (orderUser?.email) {
+        const licenseResult = await db
+          .select({ licenseKey: licenses.licenseKey })
+          .from(licenses)
+          .where(eq(licenses.orderId, order.id))
+          .limit(1);
+        await sendOrderConfirmationEmail({
+          to: orderUser.email,
+          orderNumber: order.id.slice(0, 8),
+          planName: order.plan,
+          amount: order.amount,
+          currency: order.currency,
+          paymentMethod: order.paymentMethod ?? "ssl_commerz",
+          licenseKey: licenseResult[0]?.licenseKey,
+          status: "completed",
+        });
+      }
+    } catch (emailError) {
+      console.error(`[IPN] Failed to send confirmation email for order ${order.id}:`, emailError);
     }
 
     return NextResponse.json({ ok: true });

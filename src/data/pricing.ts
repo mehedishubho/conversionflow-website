@@ -37,7 +37,7 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Starter",
     buttonStyle: "btn-outline",
-    checkoutUrl: "https://checkout.conversionflow.com/starter",
+    checkoutUrl: "/dashboard/checkout?plan=starter",
     whatsappMessage: "Hi, I'd like to purchase ConversionFlow Starter. I want to pay via bKash/Nagad.",
   },
   {
@@ -59,7 +59,7 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Professional",
     buttonStyle: "btn-primary",
-    checkoutUrl: "https://checkout.conversionflow.com/professional",
+    checkoutUrl: "/dashboard/checkout?plan=professional",
     whatsappMessage: "Hi, I'd like to purchase ConversionFlow Professional. I want to pay via bKash/Nagad.",
   },
   {
@@ -81,7 +81,7 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Agency",
     buttonStyle: "btn-outline",
-    checkoutUrl: "https://checkout.conversionflow.com/agency",
+    checkoutUrl: "/dashboard/checkout?plan=agency",
     whatsappMessage: "Hi, I'd like to purchase ConversionFlow Agency. I want to pay via bKash/Nagad.",
   },
 ];

@@ -13,6 +13,7 @@ import {
   type ImportOrderPayload,
 } from "@/lib/central-api";
 import { nanoid } from "nanoid";
+import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -153,6 +154,29 @@ export async function verifyOrder(orderId: string) {
     });
   }
   // If central API fails, order stays completed but no central mapping (pending_sync per D-14)
+
+  // Send confirmation email (T-04-23: wrapped in try/catch)
+  try {
+    if (orderUser?.email) {
+      const licenseResult = await db
+        .select({ licenseKey: licenses.licenseKey })
+        .from(licenses)
+        .where(eq(licenses.orderId, orderId))
+        .limit(1);
+      await sendOrderConfirmationEmail({
+        to: orderUser.email,
+        orderNumber: orderId.slice(0, 8),
+        planName: order.plan,
+        amount: order.amount,
+        currency: order.currency,
+        paymentMethod: order.paymentMethod ?? "manual",
+        licenseKey: licenseResult[0]?.licenseKey,
+        status: "completed",
+      });
+    }
+  } catch (emailError) {
+    console.error(`[Admin] Failed to send confirmation email for order ${orderId}:`, emailError);
+  }
 
   return { success: true };
 }
