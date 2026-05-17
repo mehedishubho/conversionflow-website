@@ -92,7 +92,16 @@ Plans:
   4. Customer can apply a coupon code and see the discounted price before payment
   5. Customer receives an invoice (HTML view + PDF download) after successful payment
   6. Successful payment triggers a POST to license.devsroom.com/api/orders/import and stores the central_user_id + central_license_id mapping locally
-**Plans**: 0/? (not started)
+**Plans**: 6 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Schema + server actions: payment_accounts/settings tables, createManualOrder, validateCoupon, calculateVAT
+- [ ] 04-02-PLAN.md — SSL Commerce + Central API: ssl-commerz client, central-api client, 5 API route handlers
+- [ ] 04-03-PLAN.md — Checkout page: 2-column layout, payment method grid, coupon input, manual payment form, success page
+- [ ] 04-04-PLAN.md — Admin orders + settings: order management with verify/reject/refund, payment account + VAT config
+- [ ] 04-05-PLAN.md — Invoice + email: HTML/PDF invoice generation, invoice detail page, order confirmation email
+- [ ] 04-06-PLAN.md — Integration + schema push: pricing URL update, email wiring, seed data, DB push, full build verification
+
 **UI hint**: yes
 
 ### Phase 5: Admin BI Dashboard
@@ -134,6 +143,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Database, Auth, Route Foundation | 01-foundation | 4/4 | Complete | 2026-05-16 |
 | 2. Dashboard Shell | 02-homepage | 3/3 | Verified | 2026-05-16 |
 | 3. Customer Portal | 03-customer-portal | 5/5 | Verified | 2026-05-17 |
-| 4. Checkout and Payments | 04-checkout-payments | 0/? | Not started | - |
+| 4. Checkout and Payments | 04-checkout-payments | 0/6 | Not started | - |
 | 5. Admin BI Dashboard | 05-admin-dashboard | 0/? | Not started | - |
 | 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/? | Not started | - |
