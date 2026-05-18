@@ -20,7 +20,7 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 - [x] **Phase 3: Customer Portal** — `03-customer-portal` — VERIFIED (5/5 plans, UAT 6/6 pass)
 - [x] **Phase 4: Checkout and Payments** — `04-checkout-payments` — EXECUTED (6/6 plans, human UAT pending)
 - [x] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — UAT 12/14 pass, gap closure in progress
-- [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — Not started
+- [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — Planned (4 plans)
 
 ## Phase Details
 
@@ -139,7 +139,15 @@ Plans:
   3. Admin can view a license intelligence dashboard showing total/active/expired/revoked counts and renewal rates by product and plan
   4. Admin can see domain tracking details for each license (activation domains, timestamps, multisite usage flags)
   5. Suspicious activation patterns are flagged for admin review as potential piracy indicators
-**Plans**: 0/? (not started)
+**Plans**: 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Webhook handler: HMAC verification, TypeScript payload types, four event-specific handlers, POST route
+- [ ] 06-02-PLAN.md — Background jobs: BullMQ license-sync worker, 15-min repeatable scheduler, instrumentation hook
+- [ ] 06-03-PLAN.md — License Intelligence dashboard: KPI cards, plan distribution donut chart, enhanced licenses page with tab navigation (All/Flagged/Sync Failures)
+- [ ] 06-04-PLAN.md — Domain tracking + piracy detection: license detail page, piracy trigger evaluation, PiracyFlagBadge, domain table, flagged tab, review actions
+
+**UI hint**: yes
 
 ## Progress
 
@@ -154,4 +162,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Customer Portal | 03-customer-portal | 5/5 | Verified | 2026-05-17 |
 | 4. Checkout and Payments | 04-checkout-payments | 6/6 | Executed (UAT pending) | 2026-05-17 |
 | 5. Admin BI Dashboard | 05-admin-dashboard | 5/6 | UAT gap closure | 2026-05-18 |
-| 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/? | Not started | - |
+| 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/4 | Planned | - |
