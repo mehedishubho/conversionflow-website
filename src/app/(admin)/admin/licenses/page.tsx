@@ -10,6 +10,7 @@ import {
   getLicenseKPIs,
   getPlanDistribution,
   getLicenses,
+  getFlaggedLicenses,
 } from "@/app/(admin)/actions/admin-licenses";
 
 export const dynamic = "force-dynamic";
@@ -29,11 +30,12 @@ export default async function AdminLicensesPage() {
   }
 
   // Fetch all data in parallel
-  const [kpis, planDistribution, allLicenses, syncFailures] = await Promise.all([
+  const [kpis, planDistribution, allLicenses, syncFailures, flaggedLicenses] = await Promise.all([
     getLicenseKPIs(),
     getPlanDistribution(),
     getLicenses("all"),
     getLicenses("sync_failures"),
+    getFlaggedLicenses(),
   ]);
 
   return (
@@ -57,6 +59,7 @@ export default async function AdminLicensesPage() {
         <LicenseIntelligenceClient
           allLicenses={allLicenses}
           syncFailures={syncFailures}
+          flaggedLicenses={flaggedLicenses}
         />
       </ComponentCard>
     </div>
