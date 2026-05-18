@@ -1,4 +1,5 @@
 import SignUpForm from "@/components/auth/SignUpForm";
+import { Suspense } from "react";
 
 export default function RegisterPage() {
   return (
@@ -15,7 +16,9 @@ export default function RegisterPage() {
         </div>
       </div>
       {/* Right: Sign-up form */}
-      <SignUpForm />
+      <Suspense>
+        <SignUpForm />
+      </Suspense>
     </div>
   );
 }

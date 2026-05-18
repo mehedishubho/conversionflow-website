@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,9 @@ export default async function LoginPage() {
         </div>
       </div>
       {/* Right: Sign-in form */}
-      <SignInForm />
+      <Suspense>
+        <SignInForm />
+      </Suspense>
     </div>
   );
 }

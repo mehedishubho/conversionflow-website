@@ -59,14 +59,18 @@ function CheckoutContent() {
   const [paymentAccounts, setPaymentAccounts] = useState<
     Record<string, PaymentAccount[]>
   >({});
+  const [sslEnabled, setSslEnabled] = useState(true);
   const [sslLoading, setSslLoading] = useState(false);
   const [sslError, setSslError] = useState<string | null>(null);
 
-  // Disabled methods = those without active payment accounts (for manual methods)
+  // Disabled methods = those without active payment accounts (for manual methods) + SSL if disabled
   const manualMethods = ["bkash", "nagad", "rocket", "bank_transfer"];
-  const disabledMethods = manualMethods.filter(
-    (m) => !paymentAccounts[m] || paymentAccounts[m].length === 0
-  );
+  const disabledMethods = [
+    ...manualMethods.filter(
+      (m) => !paymentAccounts[m] || paymentAccounts[m].length === 0
+    ),
+    ...(!sslEnabled ? ["ssl_commerz" as const] : []),
+  ];
 
   // Load VAT and payment accounts on mount
   useEffect(() => {
@@ -74,12 +78,13 @@ function CheckoutContent() {
 
     async function load() {
       try {
-        const [vat, accounts] = await Promise.all([
+        const [vat, paymentData] = await Promise.all([
           calculateVAT(basePrice),
           getPaymentAccounts(),
         ]);
         setVatInfo(vat);
-        setPaymentAccounts(accounts as Record<string, PaymentAccount[]>);
+        setPaymentAccounts((paymentData as Record<string, unknown>).accounts as Record<string, PaymentAccount[]>);
+        setSslEnabled((paymentData as Record<string, unknown>).sslEnabled as boolean);
       } catch {
         // Silently handle -- components will show fallback
       }

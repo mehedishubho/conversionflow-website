@@ -22,20 +22,16 @@ export default async function InvoiceDetailPage({
     redirect("/login");
   }
 
-  // Redirect admin roles to admin dashboard
-  const userRole = (session.user as Record<string, unknown>).role as string;
-  if (
-    userRole === "admin" ||
-    userRole === "super_admin" ||
-    userRole === "support_staff"
-  ) {
-    redirect("/admin/dashboard");
-  }
-
   const { id: orderId } = await params;
+  const userRole = (session.user as Record<string, unknown>).role as string;
+  const isAdmin = userRole === "admin" || userRole === "super_admin" || userRole === "support_staff";
   const userId = session.user.id;
 
-  // Query order with user join, filtered by current user
+  // Admin can view any order; customers only their own
+  const whereCondition = isAdmin
+    ? eq(orders.id, orderId)
+    : and(eq(orders.id, orderId), eq(orders.userId, userId));
+
   const [orderRow] = await db
     .select({
       id: orders.id,
@@ -59,7 +55,7 @@ export default async function InvoiceDetailPage({
     })
     .from(orders)
     .leftJoin(user, eq(orders.userId, user.id))
-    .where(and(eq(orders.id, orderId), eq(orders.userId, userId)));
+    .where(whereCondition);
 
   if (!orderRow) {
     return (
@@ -120,7 +116,7 @@ export default async function InvoiceDetailPage({
     <div>
       <PageBreadcrumb
         pageTitle={`Invoice ${orderId.slice(0, 8).toUpperCase()}`}
-        basePath="/dashboard"
+        basePath={isAdmin ? "/admin/invoices" : "/dashboard"}
       />
       <ComponentCard title={`Invoice ${orderId.slice(0, 8).toUpperCase()}`}>
         <InvoiceHTML order={order} vatRate={isNaN(vatRate) ? 15 : vatRate} />

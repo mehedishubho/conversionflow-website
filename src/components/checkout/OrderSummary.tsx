@@ -49,15 +49,17 @@ export default function OrderSummary({
           </span>
         </div>
 
-        {/* VAT line */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-            {vatLabel}
-          </span>
-          <span className="text-sm font-semibold text-gray-800 dark:text-white/90">
-            {vatMode === "inclusive" ? "Included" : formatBDT(vatAmount)}
-          </span>
-        </div>
+        {/* VAT line (only when VAT is active) */}
+        {vatRate > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {vatLabel}
+            </span>
+            <span className="text-sm font-semibold text-gray-800 dark:text-white/90">
+              {vatMode === "inclusive" ? "Included" : formatBDT(vatAmount)}
+            </span>
+          </div>
+        )}
 
         {/* Discount line (only when present) */}
         {discountAmount > 0 && (

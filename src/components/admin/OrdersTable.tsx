@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableHeader,
@@ -86,6 +87,7 @@ export default function OrdersTable({
   onReject,
   onRefund,
 }: OrdersTableProps) {
+  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState("");
   const [methodFilter, setMethodFilter] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -144,6 +146,8 @@ export default function OrdersTable({
       const result = await onVerify(orderId);
       if (result.error) {
         setActionError(result.error);
+      } else {
+        router.refresh();
       }
     });
   };
@@ -158,6 +162,7 @@ export default function OrdersTable({
       } else {
         setRejectModal({ open: false, orderId: "" });
         setRejectionReason("");
+        router.refresh();
       }
     });
   };
@@ -170,6 +175,7 @@ export default function OrdersTable({
         setActionError(result.error);
       } else {
         setRefundModal({ open: false, orderId: "" });
+        router.refresh();
       }
     });
   };

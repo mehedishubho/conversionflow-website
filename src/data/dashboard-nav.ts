@@ -10,6 +10,8 @@ import {
   Users,
   FileText,
   Settings,
+  ShoppingCart,
+  Activity,
 } from "lucide-react";
 
 export type NavItem = {
@@ -30,9 +32,10 @@ export const customerNavItems: NavItem[] = [
 
 export const adminNavItems: NavItem[] = [
   { name: "Overview", icon: BarChart3, path: "/admin/dashboard" },
-  { name: "Sales", icon: CreditCard, path: "/admin/sales" },
+  { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Invoices", icon: FileText, path: "/admin/invoices" },
   { name: "Licenses", icon: Key, path: "/admin/licenses" },
+  { name: "Activity", icon: Activity, path: "/admin/activity" },
   { name: "Settings", icon: Settings, path: "/admin/settings" },
 ];

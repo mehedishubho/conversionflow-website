@@ -2,11 +2,13 @@
 
 import { signUp } from "@/lib/auth-client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 export default function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +62,7 @@ export default function SignUpForm() {
       }
 
       // D-06: Auto-login after registration, redirect to dashboard
-      router.push("/dashboard");
+      router.push(callbackUrl);
     } catch (err) {
       if (
         err &&
@@ -240,7 +242,7 @@ export default function SignUpForm() {
               <p className="text-sm font-normal text-center text-muted">
                 Already have an account?{" "}
                 <Link
-                  href="/login"
+                  href={callbackUrl !== "/dashboard" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
                   className="text-accent hover:text-accent-2 transition-colors"
                 >
                   Sign In

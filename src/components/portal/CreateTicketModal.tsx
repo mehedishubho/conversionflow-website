@@ -72,12 +72,11 @@ export function CreateTicketModal() {
               </label>
               <select
                 name="priority"
+                defaultValue="medium"
                 className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-800 dark:text-white/90 focus:outline-none focus:ring-2 focus:ring-brand-500"
               >
                 <option value="low">Low</option>
-                <option value="medium" selected>
-                  Medium
-                </option>
+                <option value="medium">Medium</option>
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
               </select>

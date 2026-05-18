@@ -8,6 +8,7 @@ import Button from "@/components/ui/button/Button";
 import {
   savePaymentAccount,
   saveVATSettings,
+  saveSSLSettings,
   type PaymentAccountInput,
 } from "@/app/(admin)/actions/admin-settings";
 
@@ -32,6 +33,20 @@ interface PaymentSettingsFormProps {
     paymentAccounts: PaymentAccountRow[];
     vatRate: number;
     vatMode: string;
+    vatEnabled: boolean;
+    sslCommerzEnabled: boolean;
+    sslCommerz: {
+      storeIdConfigured: boolean;
+      storePasswordConfigured: boolean;
+      sandbox: boolean;
+      storeId: string;
+      storePassword: string;
+      dbSandbox: string;
+    };
+    centralApi: {
+      urlConfigured: boolean;
+      keyConfigured: boolean;
+    };
   };
 }
 
@@ -80,6 +95,15 @@ export default function PaymentSettingsForm({
   // VAT state
   const [vatRate, setVatRate] = useState(String(initialData.vatRate));
   const [vatMode, setVatMode] = useState(initialData.vatMode);
+  const [vatEnabled, setVatEnabled] = useState(initialData.vatEnabled);
+
+  // SSL Commerce state
+  const [sslStoreId, setSslStoreId] = useState(initialData.sslCommerz?.storeId ?? "");
+  const [sslStorePassword, setSslStorePassword] = useState(initialData.sslCommerz?.storePassword ?? "");
+  const [sslSandbox, setSslSandbox] = useState(
+    initialData.sslCommerz?.dbSandbox ? initialData.sslCommerz.dbSandbox !== "false" : (initialData.sslCommerz?.sandbox ?? true)
+  );
+  const [sslEnabled, setSslEnabled] = useState(initialData.sslCommerzEnabled);
 
   // Payment accounts state -- keyed by method
   const [accounts, setAccounts] = useState<Record<string, PaymentAccountInput>>(
@@ -146,6 +170,7 @@ export default function PaymentSettingsForm({
         const vatResult = await saveVATSettings({
           rate: rateNum,
           mode: vatMode as "inclusive" | "exclusive",
+          enabled: vatEnabled,
         });
 
         if (vatResult.error) {
@@ -153,7 +178,7 @@ export default function PaymentSettingsForm({
           return;
         }
 
-        // Save payment accounts (skip SSL Commerce - info only)
+        // Save payment accounts (skip SSL Commerce - saved separately)
         for (const method of METHODS) {
           if (method.type === "ssl") continue;
           const account = accounts[method.key];
@@ -167,6 +192,14 @@ export default function PaymentSettingsForm({
             return;
           }
         }
+
+        // Save SSL Commerce settings
+        await saveSSLSettings({
+          storeId: sslStoreId,
+          storePassword: sslStorePassword,
+          sandbox: sslSandbox,
+          enabled: sslEnabled,
+        });
 
         setSaveMessage({ type: "success", text: "All settings saved successfully." });
       } catch {
@@ -226,6 +259,23 @@ export default function PaymentSettingsForm({
               defaultValue={vatMode}
             />
           </div>
+          <div className="flex items-center gap-3">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={vatEnabled}
+                onChange={(e) => setVatEnabled(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500 dark:bg-gray-700 dark:peer-checked:bg-brand-500" />
+            </label>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {vatEnabled ? "VAT Enabled" : "VAT Disabled"}
+            </span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${vatEnabled ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
+              {vatEnabled ? "Active" : "Off"}
+            </span>
+          </div>
         </div>
       </ComponentCard>
 
@@ -235,25 +285,70 @@ export default function PaymentSettingsForm({
 
         if (method.type === "ssl") {
           return (
-            <div
-              key={method.key}
-              className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
-            >
+            <ComponentCard key={method.key} title={`${method.label} Configuration`} desc="SSL Commerce payment gateway credentials. These take priority over environment variables.">
               <div
-                className="px-6 py-5 flex items-center gap-3"
-                style={{ borderLeft: `3px solid ${method.color}` }}
+                className="space-y-4"
+                style={{ borderLeft: `3px solid ${method.color}`, paddingLeft: "16px" }}
               >
-                <div>
-                  <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-                    {method.label}
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    SSL Commerce credentials are configured via environment variables.
-                    No editable fields here.
-                  </p>
+                <div className="flex items-center gap-3 mb-4">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sslEnabled}
+                      onChange={(e) => setSslEnabled(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500 dark:bg-gray-700 dark:peer-checked:bg-brand-500" />
+                  </label>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {sslEnabled ? "SSL Commerce Enabled" : "SSL Commerce Disabled"}
+                  </span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sslEnabled ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
+                    {sslEnabled ? "Active" : "Off"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                      Store ID
+                    </label>
+                    <InputField
+                      placeholder="Enter SSL Commerz Store ID"
+                      defaultValue={sslStoreId}
+                      onChange={(e) => setSslStoreId(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                      Store Password
+                    </label>
+                    <InputField
+                      type="password"
+                      placeholder="Enter SSL Commerz Store Password"
+                      defaultValue={sslStorePassword}
+                      onChange={(e) => setSslStorePassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sslSandbox}
+                      onChange={(e) => setSslSandbox(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500 dark:bg-gray-700 dark:peer-checked:bg-brand-500" />
+                  </label>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {sslSandbox ? "Sandbox Mode" : "Production Mode"}
+                  </span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sslSandbox ? "bg-warning-50 text-warning-600 dark:bg-warning-500/10 dark:text-warning-400" : "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400"}`}>
+                    {sslSandbox ? "Sandbox" : "Production"}
+                  </span>
                 </div>
               </div>
-            </div>
+            </ComponentCard>
           );
         }
 
@@ -367,6 +462,31 @@ export default function PaymentSettingsForm({
           </ComponentCard>
         );
       })}
+
+      {/* Central Licensing API Status */}
+      <ComponentCard title="Central Licensing API" desc="Connection status for the central license management service.">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className={`inline-block h-2 w-2 rounded-full ${initialData.centralApi.urlConfigured ? "bg-success-500" : "bg-error-500"}`} />
+            <span className="text-sm text-gray-600 dark:text-gray-400">API URL</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${initialData.centralApi.urlConfigured ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-error-50 text-error-600 dark:bg-error-500/10 dark:text-error-400"}`}>
+              {initialData.centralApi.urlConfigured ? "Configured" : "Not Set"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`inline-block h-2 w-2 rounded-full ${initialData.centralApi.keyConfigured ? "bg-success-500" : "bg-error-500"}`} />
+            <span className="text-sm text-gray-600 dark:text-gray-400">API Key</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${initialData.centralApi.keyConfigured ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-error-50 text-error-600 dark:bg-error-500/10 dark:text-error-400"}`}>
+              {initialData.centralApi.keyConfigured ? "Configured" : "Not Set"}
+            </span>
+          </div>
+          {(!initialData.centralApi.urlConfigured || !initialData.centralApi.keyConfigured) && (
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              Set <code className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">CENTRAL_API_URL</code> and <code className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">CENTRAL_API_KEY</code> in your <code className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">.env.local</code> file.
+            </p>
+          )}
+        </div>
+      </ComponentCard>
 
       {/* Save button */}
       <div className="flex justify-end">

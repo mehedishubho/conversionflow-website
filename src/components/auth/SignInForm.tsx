@@ -2,11 +2,13 @@
 
 import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +41,7 @@ export default function SignInForm() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push(callbackUrl);
     } catch (err) {
       if (
         err &&
@@ -200,7 +202,7 @@ export default function SignInForm() {
               <p className="text-sm font-normal text-center text-muted">
                 Don&apos;t have an account?{" "}
                 <Link
-                  href="/register"
+                  href={callbackUrl !== "/dashboard" ? `/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/register"}
                   className="text-accent hover:text-accent-2 transition-colors"
                 >
                   Sign Up

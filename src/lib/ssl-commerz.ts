@@ -2,20 +2,31 @@
  * SSL Commerz Payment Gateway Client
  *
  * Direct fetch implementation (no npm package) for SSL Commerz v4 API.
- * Supports sandbox and production environments via SSL_COMMERZ_SANDBOX env var.
+ * Reads credentials from DB settings table (admin-configured) with env var fallback.
  */
 
+import { db } from "@/lib/db";
+import { settings } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
 // ──────────────────────────────────────────────
-// Configuration
+// Dynamic Configuration
 // ──────────────────────────────────────────────
 
-const IS_SANDBOX = process.env.SSL_COMMERZ_SANDBOX === "true";
-const BASE_URL = IS_SANDBOX
-  ? "https://sandbox.sslcommerz.com"
-  : "https://securepay.sslcommerz.com";
+async function getSSLConfig() {
+  const rows = await db.select().from(settings);
+  const get = (key: string) => rows.find(r => r.key === key)?.value;
 
-const STORE_ID = process.env.SSL_COMMERZ_STORE_ID || "";
-const STORE_PASSWORD = process.env.SSL_COMMERZ_STORE_PASSWORD || "";
+  const storeId = get("ssl_commerz_store_id") || process.env.SSL_COMMERZ_STORE_ID || "";
+  const storePassword = get("ssl_commerz_store_password") || process.env.SSL_COMMERZ_STORE_PASSWORD || "";
+  const sandboxVal = get("ssl_commerz_sandbox");
+  const isSandbox = sandboxVal ? sandboxVal !== "false" : process.env.SSL_COMMERZ_SANDBOX !== "false";
+  const baseUrl = isSandbox
+    ? "https://sandbox.sslcommerz.com"
+    : "https://securepay.sslcommerz.com";
+
+  return { storeId, storePassword, baseUrl };
+}
 
 // ──────────────────────────────────────────────
 // Types
@@ -84,9 +95,10 @@ export interface SSLValidationResponse {
 export async function createSSLSession(
   params: SSLSessionParams
 ): Promise<SSLSessionResponse> {
+  const config = await getSSLConfig();
   const body = new URLSearchParams({
-    store_id: STORE_ID,
-    store_passwd: STORE_PASSWORD,
+    store_id: config.storeId,
+    store_passwd: config.storePassword,
     total_amount: params.totalAmount.toString(),
     currency: params.currency,
     tran_id: params.tranId,
@@ -108,7 +120,7 @@ export async function createSSLSession(
     value_d: params.valueD,
   });
 
-  const response = await fetch(`${BASE_URL}/gwprocess/v4/api.php`, {
+  const response = await fetch(`${config.baseUrl}/gwprocess/v4/api.php`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -139,7 +151,8 @@ export async function createSSLSession(
 export async function validateSSLPayment(
   valId: string
 ): Promise<SSLValidationResponse> {
-  const url = `${BASE_URL}/validator/api/validationserverAPI.php?val_id=${encodeURIComponent(valId)}&store_id=${encodeURIComponent(STORE_ID)}&store_passwd=${encodeURIComponent(STORE_PASSWORD)}&v=1&format=json`;
+  const config = await getSSLConfig();
+  const url = `${config.baseUrl}/validator/api/validationserverAPI.php?val_id=${encodeURIComponent(valId)}&store_id=${encodeURIComponent(config.storeId)}&store_passwd=${encodeURIComponent(config.storePassword)}&v=1&format=json`;
 
   const response = await fetch(url, {
     method: "GET",

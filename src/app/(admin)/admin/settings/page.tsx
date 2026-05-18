@@ -44,6 +44,10 @@ export default async function AdminSettingsPage() {
           })),
           vatRate: settings.vatRate,
           vatMode: settings.vatMode,
+          vatEnabled: settings.vatEnabled,
+          sslCommerzEnabled: settings.sslCommerzEnabled,
+          sslCommerz: settings.sslCommerz,
+          centralApi: settings.centralApi,
         }}
       />
     </div>

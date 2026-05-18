@@ -112,7 +112,7 @@ export async function savePaymentAccount(data: PaymentAccountInput) {
 // 2. Save VAT Settings (D-15)
 // ──────────────────────────────────────────────
 
-export async function saveVATSettings(data: { rate: number; mode: "inclusive" | "exclusive" }) {
+export async function saveVATSettings(data: { rate: number; mode: "inclusive" | "exclusive"; enabled: boolean }) {
   const { userId, role } = await requireAdmin();
 
   // Validate rate
@@ -163,6 +163,25 @@ export async function saveVATSettings(data: { rate: number; mode: "inclusive" | 
     });
   }
 
+  // Upsert vat_enabled
+  const existingEnabled = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "vat_enabled"))
+    .limit(1);
+
+  if (existingEnabled.length > 0) {
+    await db
+      .update(settings)
+      .set({ value: data.enabled ? "true" : "false", updatedAt: new Date() })
+      .where(eq(settings.key, "vat_enabled"));
+  } else {
+    await db.insert(settings).values({
+      key: "vat_enabled",
+      value: data.enabled ? "true" : "false",
+    });
+  }
+
   // Audit log
   await createAuditLog({
     actorId: userId,
@@ -199,9 +218,116 @@ export async function getPaymentSettings() {
     .where(eq(settings.key, "vat_mode"))
     .limit(1);
 
+  const vatEnabledRow = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "vat_enabled"))
+    .limit(1);
+
+  // Query SSL Commerce settings
+  const sslStoreIdRow = await db.select().from(settings).where(eq(settings.key, "ssl_commerz_store_id")).limit(1);
+  const sslPasswordRow = await db.select().from(settings).where(eq(settings.key, "ssl_commerz_store_password")).limit(1);
+  const sslSandboxRow = await db.select().from(settings).where(eq(settings.key, "ssl_commerz_sandbox")).limit(1);
+  const sslEnabledRow = await db.select().from(settings).where(eq(settings.key, "ssl_commerz_enabled")).limit(1);
+
+  const sslDbStoreId = sslStoreIdRow[0]?.value ?? "";
+  const sslDbPassword = sslPasswordRow[0]?.value ?? "";
+  const sslDbSandbox = sslSandboxRow[0]?.value ?? "";
+
   return {
     paymentAccounts: accounts,
     vatRate: vatRateRow.length > 0 ? parseFloat(vatRateRow[0].value) : 0,
     vatMode: vatModeRow.length > 0 ? vatModeRow[0].value : "exclusive",
+    vatEnabled: vatEnabledRow.length > 0 ? vatEnabledRow[0].value !== "false" : true,
+    sslCommerzEnabled: sslEnabledRow.length > 0 ? sslEnabledRow[0].value !== "false" : true,
+    sslCommerz: {
+      storeIdConfigured: !!process.env.SSL_COMMERZ_STORE_ID && process.env.SSL_COMMERZ_STORE_ID !== "your_store_id",
+      storePasswordConfigured: !!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password",
+      sandbox: process.env.SSL_COMMERZ_SANDBOX !== "false",
+      storeId: sslDbStoreId,
+      storePassword: sslDbPassword,
+      dbSandbox: sslDbSandbox,
+    },
+    centralApi: {
+      urlConfigured: !!process.env.CENTRAL_API_URL,
+      keyConfigured: !!process.env.CENTRAL_API_KEY && process.env.CENTRAL_API_KEY !== "your_central_api_key",
+    },
+  };
+}
+
+// ──────────────────────────────────────────────
+// 4. Save SSL Commerce Settings (to DB settings table)
+// ──────────────────────────────────────────────
+
+export async function saveSSLSettings(data: {
+  storeId: string;
+  storePassword: string;
+  sandbox: boolean;
+  enabled: boolean;
+}) {
+  const { userId, role } = await requireAdmin();
+
+  const entries = [
+    { key: "ssl_commerz_store_id", value: data.storeId },
+    { key: "ssl_commerz_store_password", value: data.storePassword },
+    { key: "ssl_commerz_sandbox", value: data.sandbox ? "true" : "false" },
+    { key: "ssl_commerz_enabled", value: data.enabled ? "true" : "false" },
+  ];
+
+  for (const entry of entries) {
+    const existing = await db
+      .select()
+      .from(settings)
+      .where(eq(settings.key, entry.key))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db
+        .update(settings)
+        .set({ value: entry.value, updatedAt: new Date() })
+        .where(eq(settings.key, entry.key));
+    } else {
+      await db.insert(settings).values({ key: entry.key, value: entry.value });
+    }
+  }
+
+  await createAuditLog({
+    actorId: userId,
+    actorRole: role,
+    action: "admin.settings_updated",
+    targetType: "settings",
+    targetId: "ssl_commerz",
+    details: { action: "ssl_commerz_settings_updated", sandbox: data.sandbox },
+  });
+
+  return { success: true };
+}
+
+// ──────────────────────────────────────────────
+// 5. Get SSL Commerce Settings (for gateway runtime)
+// ──────────────────────────────────────────────
+
+export async function getSSLSettings() {
+  const rows = await db
+    .select()
+    .from(settings)
+    .where(
+      eq(settings.key, "ssl_commerz_store_id")
+    );
+
+  const passwordRows = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "ssl_commerz_store_password"));
+
+  const sandboxRows = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "ssl_commerz_sandbox"));
+
+  return {
+    storeId: rows[0]?.value || process.env.SSL_COMMERZ_STORE_ID || "",
+    storePassword: passwordRows[0]?.value || process.env.SSL_COMMERZ_STORE_PASSWORD || "",
+    sandbox: sandboxRows[0]?.value !== "false" && (sandboxRows.length === 0 ? process.env.SSL_COMMERZ_SANDBOX !== "false" : true),
   };
 }

@@ -219,8 +219,15 @@ export async function calculateVAT(amount: number): Promise<VatResult> {
     return { taxAmount: 0, total: 0, rate: 0, mode: "exclusive" };
   }
 
-  // Read rate and mode from settings table
+  // Read rate, mode, and enabled flag from settings table
   const settingsRows = await db.select().from(settings);
+
+  const enabledRow = settingsRows.find((s) => s.key === "vat_enabled");
+  const isEnabled = enabledRow ? enabledRow.value !== "false" : true;
+
+  if (!isEnabled) {
+    return { taxAmount: 0, total: amount, rate: 0, mode: "exclusive" };
+  }
 
   const rateRow = settingsRows.find((s) => s.key === "vat_rate");
   const modeRow = settingsRows.find((s) => s.key === "vat_mode");
@@ -257,6 +264,14 @@ export async function getPaymentAccounts() {
     .from(paymentAccounts)
     .where(eq(paymentAccounts.active, true));
 
+  // Check if SSL Commerce is enabled
+  const [sslEnabledRow] = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "ssl_commerz_enabled"))
+    .limit(1);
+  const sslEnabled = sslEnabledRow ? sslEnabledRow.value !== "false" : true;
+
   // Group by method
   const grouped: Record<
     string,
@@ -285,7 +300,7 @@ export async function getPaymentAccounts() {
     });
   }
 
-  return grouped;
+  return { accounts: grouped, sslEnabled };
 }
 
 /**

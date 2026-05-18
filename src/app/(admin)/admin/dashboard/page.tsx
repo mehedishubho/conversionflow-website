@@ -1,6 +1,15 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import {
+  getDashboardKPIs,
+  getRevenueChartData,
+  getRecentActivity,
+  getRecentOrders,
+} from "@/app/(admin)/actions/admin-dashboard";
+import DashboardPageClient from "@/components/admin/DashboardPageClient";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const session = await auth.api.getSession({
@@ -11,7 +20,6 @@ export default async function AdminDashboard() {
     redirect("/login");
   }
 
-  // Only admin, super_admin, and support_staff can access admin routes
   const userRole = (session.user as Record<string, unknown>).role as string;
   if (
     userRole !== "admin" &&
@@ -21,11 +29,20 @@ export default async function AdminDashboard() {
     redirect("/dashboard");
   }
 
+  const [kpis, chartData, activity, recentOrders] = await Promise.all([
+    getDashboardKPIs("30d"),
+    getRevenueChartData("30d"),
+    getRecentActivity(15),
+    getRecentOrders(5),
+  ]);
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold font-syne mb-2">Admin Overview</h1>
-      <p className="text-text2">Welcome, {session.user.name || session.user.email}</p>
-      <p className="text-sm text-muted mt-4">Admin features coming in Phase 5</p>
-    </div>
+    <DashboardPageClient
+      initialKpis={kpis}
+      initialChartData={chartData}
+      initialActivity={activity}
+      initialRecentOrders={recentOrders}
+      initialRange="30d"
+    />
   );
 }

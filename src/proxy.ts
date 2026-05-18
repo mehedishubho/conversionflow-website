@@ -64,7 +64,10 @@ export function proxy(request: NextRequest) {
   // Protected routes (portal + admin, excluding setup): redirect to login if no session
   if ((portalRoute || adminRoute) && !setupPage && !sessionCookie) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
+    const fullUrl = request.nextUrl.search
+      ? pathname + request.nextUrl.search
+      : pathname;
+    loginUrl.searchParams.set('callbackUrl', fullUrl);
     return NextResponse.redirect(loginUrl);
   }
 
