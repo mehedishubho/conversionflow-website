@@ -57,12 +57,14 @@ expected: On the activity page, click the CSV export button. A CSV file download
 result: issue
 reported: "Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with 'use server'. {header: ..., accessor: function accessor}"
 severity: blocker
+resolved_by: "05-06 (LicensesCSVExportButton client wrapper)"
 
 ### 12. Licenses Page
 expected: Navigate to /admin/licenses. Page shows a read-only table with columns: License Key, Customer, Plan, Status, Activations, Created. Status badges show correct colors (active=green, expired=yellow, revoked=red, suspended=gray).
 result: issue
 reported: "Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with 'use server'. {header: ..., accessor: function accessor}"
 severity: blocker
+resolved_by: "05-06 (LicensesCSVExportButton client wrapper)"
 
 ### 13. Admin Notification Dropdown
 expected: While on any /admin/* page, click the notification bell in the header. Dropdown opens showing notifications. If admin notifications exist, they show with appropriate icons (AlertTriangle for payment_failed, Clock for license_expiring, UserPlus for new_signup, MessageSquare for new_ticket, ShieldAlert for fraud_alert). "Mark all as read" and "View All Notifications" link works. Link goes to /admin/activity.
@@ -84,17 +86,25 @@ blocked: 0
 ## Gaps
 
 - truth: "CSV export button on activity and licenses pages downloads a dated CSV file"
-  status: failed
+  status: resolved
   reason: "User reported: Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with 'use server'. {header: ..., accessor: function accessor}"
   severity: blocker
   test: 11
-  artifacts: []
-  missing: []
+  root_cause: "Licenses page (server component) defines csvColumns with accessor arrow functions and passes them to CSVExportButton (client component). Functions cannot cross server/client boundary."
+  artifacts:
+    - path: "src/app/(admin)/admin/licenses/page.tsx"
+      issue: "Lines 21-28: csvColumns with accessor functions defined in server component, passed to client CSVExportButton on lines 65-69"
+  missing:
+    - "Create client wrapper component LicensesCSVExportButton.tsx that defines csvColumns internally, so accessor functions never cross the boundary"
 
 - truth: "Licenses page shows read-only table with columns and color-coded status badges"
-  status: failed
+  status: resolved
   reason: "User reported: Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with 'use server'. {header: ..., accessor: function accessor}"
   severity: blocker
   test: 12
-  artifacts: []
-  missing: []
+  root_cause: "Same as test 11 — licenses page csvColumns accessor functions crossing server/client boundary prevents the entire page from rendering"
+  artifacts:
+    - path: "src/app/(admin)/admin/licenses/page.tsx"
+      issue: "Same root cause as test 11"
+  missing:
+    - "Same fix as test 11 — moving csvColumns into client-side scope resolves both"
