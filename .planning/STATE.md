@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-05-18T16:24:00.000Z"
-last_activity: 2026-05-18 -- Plan 06-03 complete (License Intelligence Dashboard)
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-05-18T16:37:23.831Z"
+last_activity: 2026-05-18 -- Plan 06-04 complete (Domain Tracking + Piracy Detection)
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 28
-  completed_plans: 27
-  percent: 96
+  completed_plans: 28
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-**Current focus:** Phase 06 — Webhooks, Jobs, License Intelligence
+**Current focus:** Phase 06 complete — all v2.0 phases executed
 
 ## Current Position
 
 Phase: 06
-Plan: 03 complete, 04 next
-Status: Executing
-Last activity: 2026-05-18 -- Plan 06-03 complete (License Intelligence Dashboard)
+Plan: 04 complete (all plans done)
+Status: Phase 06 Complete
+Last activity: 2026-05-18 -- Plan 06-04 complete (Domain Tracking + Piracy Detection)
 
 Progress: [██████████] 100%
 
@@ -37,7 +37,7 @@ Progress: [██████████] 100%
 **Velocity:**
 
 - Total plans completed: 34 (v1.0/v1.1 milestones)
-- v2.0 plans completed: 18
+- v2.0 plans completed: 19
 - Average duration: -
 - Total execution time: -
 
@@ -52,7 +52,7 @@ Progress: [██████████] 100%
 | v2.0 Phase 3 | 5/5 | Verified | Customer Portal, UAT 6/6, route fix |
 | v2.0 Phase 4 | 6/6 | Executed (UAT pending) | Checkout and Payments |
 | v2.0 Phase 5 | 5/5 | Executed (UAT pending) | Admin BI Dashboard |
-| v2.0 Phase 6 | 3/4 | Executing | Webhooks, Jobs, License Intelligence |
+| v2.0 Phase 6 | 4/4 | Executed (UAT pending) | Webhooks, Jobs, License Intelligence |
 
 **Recent Trend:**
 
@@ -74,6 +74,7 @@ Progress: [██████████] 100%
 | Phase 06 P01 | 6min | 2 tasks | 4 files |
 | Phase 06 P02 | 6min | 2 tasks | 3 files |
 | Phase 06 P03 | 5min | 2 tasks | 6 files |
+| Phase 06 P04 | 8min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Added productId to WebhookEventData interface since licenses table requires it as NOT NULL field for insert
 - [Phase 06]: Duplicate license check before insert in syncOrderToCentral to prevent unique constraint violations on re-runs
 - [Phase 06]: Audit log truncates license key to 8 chars per T-06-09 threat model
+- [Phase 06]: Piracy flags computed live from activation data, not stored in DB -- flags re-evaluated on each page load
+- [Phase 06]: Flag dismissal is audit-only (no DB change) -- flags reappear unless underlying activation data changes
 
 ### Pending Todos
 
@@ -136,6 +139,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-18T16:24:00.000Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-05-18T16:37:23.828Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
