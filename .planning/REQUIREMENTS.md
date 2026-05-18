@@ -132,7 +132,7 @@
 - [ ] **LIC-01**: POST to license.devsroom.com/api/orders/import on purchase completion
 - [ ] **LIC-02**: Store central_user_id + central_license_id mappings locally
 - [x] **LIC-03**: Webhook handlers for license-created/updated/expired/payment-refunded events
-- [ ] **LIC-04**: Scheduled fallback sync (every 15 minutes) when webhooks fail
+- [x] **LIC-04**: Scheduled fallback sync (every 15 minutes) when webhooks fail
 - [x] **LIC-05**: HMAC signature verification on all incoming webhooks
 
 ### Customer Portal
@@ -308,7 +308,7 @@
 | ADMN-09 | Phase 5 | Pending |
 | ADMN-10 | Phase 5 | Pending |
 | LIC-03 | Phase 6 | Complete |
-| LIC-04 | Phase 6 | Pending |
+| LIC-04 | Phase 6 | Complete |
 | LIC-05 | Phase 6 | Complete |
 | LINT-01 | Phase 6 | Pending |
 | LINT-02 | Phase 6 | Pending |
