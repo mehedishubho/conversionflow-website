@@ -59,10 +59,8 @@ retested: 2026-05-18 — fixed by 05-06 (LicensesCSVExportButton client wrapper)
 
 ### 12. Licenses Page
 expected: Navigate to /admin/licenses. Page shows a read-only table with columns: License Key, Customer, Plan, Status, Activations, Created. Status badges show correct colors (active=green, expired=yellow, revoked=red, suspended=gray).
-result: issue
-reported: "no color show"
-severity: cosmetic
-retested: 2026-05-18
+result: pass
+retested: 2026-05-18 — fixed by adding @theme block for Badge color utilities in dashboard.css
 
 ### 13. Admin Notification Dropdown
 expected: While on any /admin/* page, click the notification bell in the header. Dropdown opens showing notifications. If admin notifications exist, they show with appropriate icons (AlertTriangle for payment_failed, Clock for license_expiring, UserPlus for new_signup, MessageSquare for new_ticket, ShieldAlert for fraud_alert). "Mark all as read" and "View All Notifications" link works. Link goes to /admin/activity.
@@ -75,8 +73,8 @@ result: pass
 ## Summary
 
 total: 14
-passed: 13
-issues: 1
+passed: 14
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -108,9 +106,13 @@ blocked: 0
     - "Same fix as test 11 — moving csvColumns into client-side scope resolves both"
 
 - truth: "Status badges on licenses table show correct colors (active=green, expired=yellow, revoked=red, suspended=gray)"
-  status: failed
+  status: resolved
   reason: "User reported: no color show"
   severity: cosmetic
   test: 12
-  artifacts: []
+  root_cause: "dashboard.css used @theme inline which registers CSS variables but doesn't generate Tailwind utility classes. Badge component used bg-success-50 etc. which had no matching utilities."
+  fix: "Added second @theme block (without inline) for success/error/warning/blue-light color tokens"
+  artifacts:
+    - path: "src/styles/dashboard.css"
+      issue: "@theme inline doesn't generate utility classes for Badge color names"
   missing: []
