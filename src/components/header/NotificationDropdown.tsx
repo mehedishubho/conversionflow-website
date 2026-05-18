@@ -1,15 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Key, CreditCard, MessageSquare, Info } from "lucide-react";
+import { Key, CreditCard, MessageSquare, Info, AlertTriangle, Clock, UserPlus, ShieldAlert } from "lucide-react";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   getNotifications,
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/app/(portal)/actions/notifications";
+import {
+  getAdminNotifications,
+  markAdminNotificationRead,
+  markAllAdminNotificationsRead,
+} from "@/app/(admin)/actions/admin-notifications";
 import { formatDistanceToNow } from "date-fns";
 
 type NotificationItem = {
@@ -42,6 +48,36 @@ function getNotificationIcon(type: string) {
         bg: "bg-warning-50 dark:bg-warning-500/15",
         color: "text-warning-600 dark:text-warning-500",
       };
+    case "payment_failed":
+      return {
+        icon: <AlertTriangle className="w-5 h-5" />,
+        bg: "bg-error-50 dark:bg-error-500/15",
+        color: "text-error-600 dark:text-error-500",
+      };
+    case "license_expiring":
+      return {
+        icon: <Clock className="w-5 h-5" />,
+        bg: "bg-warning-50 dark:bg-warning-500/15",
+        color: "text-warning-600 dark:text-warning-500",
+      };
+    case "new_signup":
+      return {
+        icon: <UserPlus className="w-5 h-5" />,
+        bg: "bg-success-50 dark:bg-success-500/15",
+        color: "text-success-600 dark:text-success-500",
+      };
+    case "new_ticket":
+      return {
+        icon: <MessageSquare className="w-5 h-5" />,
+        bg: "bg-warning-50 dark:bg-warning-500/15",
+        color: "text-warning-600 dark:text-warning-500",
+      };
+    case "fraud_alert":
+      return {
+        icon: <ShieldAlert className="w-5 h-5" />,
+        bg: "bg-error-50 dark:bg-error-500/15",
+        color: "text-error-600 dark:text-error-500",
+      };
     default:
       return {
         icon: <Info className="w-5 h-5" />,
@@ -52,6 +88,8 @@ function getNotificationIcon(type: string) {
 }
 
 export function NotificationDropdown() {
+  const pathname = usePathname();
+  const isAdminContext = pathname.startsWith("/admin");
   const [isOpen, setIsOpen] = useState(false);
   const [notificationList, setNotificationList] = useState<NotificationItem[]>(
     []
@@ -61,7 +99,12 @@ export function NotificationDropdown() {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const result = await getNotifications();
+      let result;
+      if (isAdminContext) {
+        result = await getAdminNotifications();
+      } else {
+        result = await getNotifications();
+      }
       setNotificationList(
         result.notifications as unknown as NotificationItem[]
       );
@@ -71,7 +114,7 @@ export function NotificationDropdown() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAdminContext]);
 
   useEffect(() => {
     fetchNotifications();
@@ -89,7 +132,11 @@ export function NotificationDropdown() {
     notificationId: string,
     entityUrl?: string
   ) {
-    await markNotificationRead(notificationId);
+    if (isAdminContext) {
+      await markAdminNotificationRead(notificationId);
+    } else {
+      await markNotificationRead(notificationId);
+    }
 
     setUnreadCount((prev) => Math.max(0, prev - 1));
     setNotificationList((prev) =>
@@ -104,7 +151,11 @@ export function NotificationDropdown() {
   }
 
   async function handleMarkAllRead() {
-    await markAllNotificationsRead();
+    if (isAdminContext) {
+      await markAllAdminNotificationsRead();
+    } else {
+      await markAllNotificationsRead();
+    }
     setUnreadCount(0);
     setNotificationList((prev) => prev.map((n) => ({ ...n, read: true })));
   }
@@ -220,7 +271,7 @@ export function NotificationDropdown() {
           )}
         </ul>
         <Link
-          href="/dashboard/account"
+          href={isAdminContext ? "/admin/activity" : "/dashboard/account"}
           className="block px-4 py-2 mt-3 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
         >
           View All Notifications
