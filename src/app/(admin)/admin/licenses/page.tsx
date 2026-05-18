@@ -7,7 +7,7 @@ import { desc, eq } from "drizzle-orm";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Badge from "@/components/ui/badge/Badge";
-import CSVExportButton from "@/components/admin/CSVExportButton";
+import LicensesCSVExportButton from "@/components/admin/LicensesCSVExportButton";
 
 export const dynamic = "force-dynamic";
 
@@ -17,15 +17,6 @@ const statusBadgeMap: Record<string, { color: "success" | "warning" | "error" | 
   revoked: { color: "error", label: "Revoked" },
   suspended: { color: "light", label: "Suspended" },
 };
-
-const csvColumns = [
-  { header: "License Key", accessor: (r: Record<string, unknown>) => r.licenseKey as string },
-  { header: "Customer", accessor: (r: Record<string, unknown>) => (r.userName as string) || "Unknown" },
-  { header: "Plan", accessor: (r: Record<string, unknown>) => r.plan as string },
-  { header: "Status", accessor: (r: Record<string, unknown>) => r.status as string },
-  { header: "Activations", accessor: (r: Record<string, unknown>) => `${r.currentActivations}/${r.maxActivations}` },
-  { header: "Created", accessor: (r: Record<string, unknown>) => new Date(r.createdAt as Date).toLocaleDateString("en-BD") },
-];
 
 export default async function AdminLicensesPage() {
   const session = await auth.api.getSession({
@@ -62,8 +53,7 @@ export default async function AdminLicensesPage() {
 
       <ComponentCard title="License Management" desc="All license keys and their activation status.">
         <div className="flex justify-end mb-4">
-          <CSVExportButton
-            columns={csvColumns}
+          <LicensesCSVExportButton
             rows={licenseRows as unknown as Record<string, unknown>[]}
             filename="licenses"
           />
