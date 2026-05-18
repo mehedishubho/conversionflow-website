@@ -3,7 +3,7 @@ status: complete
 phase: 05-admin-dashboard
 source: 05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md
 started: 2026-05-18T13:05:00Z
-updated: 2026-05-18T16:00:00Z
+updated: 2026-05-18T17:30:00Z
 ---
 
 ## Current Test
@@ -54,17 +54,15 @@ result: pass
 
 ### 11. CSV Export
 expected: On the activity page, click the CSV export button. A CSV file downloads with dated filename. On the licenses page (/admin/licenses), same CSV export button works and downloads a licenses CSV.
-result: issue
-reported: "Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with 'use server'. {header: ..., accessor: function accessor}"
-severity: blocker
-resolved_by: "05-06 (LicensesCSVExportButton client wrapper)"
+result: pass
+retested: 2026-05-18 — fixed by 05-06 (LicensesCSVExportButton client wrapper)
 
 ### 12. Licenses Page
 expected: Navigate to /admin/licenses. Page shows a read-only table with columns: License Key, Customer, Plan, Status, Activations, Created. Status badges show correct colors (active=green, expired=yellow, revoked=red, suspended=gray).
 result: issue
-reported: "Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with 'use server'. {header: ..., accessor: function accessor}"
-severity: blocker
-resolved_by: "05-06 (LicensesCSVExportButton client wrapper)"
+reported: "no color show"
+severity: cosmetic
+retested: 2026-05-18
 
 ### 13. Admin Notification Dropdown
 expected: While on any /admin/* page, click the notification bell in the header. Dropdown opens showing notifications. If admin notifications exist, they show with appropriate icons (AlertTriangle for payment_failed, Clock for license_expiring, UserPlus for new_signup, MessageSquare for new_ticket, ShieldAlert for fraud_alert). "Mark all as read" and "View All Notifications" link works. Link goes to /admin/activity.
@@ -77,8 +75,8 @@ result: pass
 ## Summary
 
 total: 14
-passed: 12
-issues: 2
+passed: 13
+issues: 1
 pending: 0
 skipped: 0
 blocked: 0
@@ -108,3 +106,11 @@ blocked: 0
       issue: "Same root cause as test 11"
   missing:
     - "Same fix as test 11 — moving csvColumns into client-side scope resolves both"
+
+- truth: "Status badges on licenses table show correct colors (active=green, expired=yellow, revoked=red, suspended=gray)"
+  status: failed
+  reason: "User reported: no color show"
+  severity: cosmetic
+  test: 12
+  artifacts: []
+  missing: []
