@@ -168,7 +168,7 @@
 
 ### License Intelligence
 
-- [ ] **LINT-01**: License status dashboard (total/active/expired/revoked/renewal rate by product/plan)
+- [x] **LINT-01**: License status dashboard (total/active/expired/revoked/renewal rate by product/plan)
 - [ ] **LINT-02**: Domain tracking (activation domains per license, timestamps, multisite usage)
 - [ ] **LINT-03**: Piracy detection flagging (suspicious activation patterns for admin review)
 
@@ -310,7 +310,7 @@
 | LIC-03 | Phase 6 | Complete |
 | LIC-04 | Phase 6 | Complete |
 | LIC-05 | Phase 6 | Complete |
-| LINT-01 | Phase 6 | Pending |
+| LINT-01 | Phase 6 | Complete |
 | LINT-02 | Phase 6 | Pending |
 | LINT-03 | Phase 6 | Pending |
 
