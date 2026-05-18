@@ -124,7 +124,7 @@ Plans:
 - [x] 05-03-PLAN.md — User detail page: profile, order history, license status, activity; role change dropdown, ban/activate toggle
 - [x] 05-04-PLAN.md — Activity feed page with pagination/filters, CSV export utility, minimal licenses listing page
 - [x] 05-05-PLAN.md — Admin notifications: extend NotificationDropdown with admin context, admin notification server actions
-- [ ] 05-06-PLAN.md — Gap closure: fix server/client boundary serialization error on licenses CSV export
+- [x] 05-06-PLAN.md — Gap closure: fix server/client boundary serialization error on licenses CSV export
 
 **UI hint**: yes
 
