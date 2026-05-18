@@ -31,6 +31,7 @@ export interface WebhookEventData {
   centralLicenseId: string;
   licenseKey: string;
   userId: string;
+  productId: string;
   plan: string;
   status: string;
   activationDomains: ActivationDomain[];
