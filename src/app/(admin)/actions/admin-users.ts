@@ -154,6 +154,10 @@ export async function changeUserRole(targetUserId: string, newRole: string) {
     return { error: "Invalid role." };
   }
 
+  if (newRole === "super_admin" && adminRole !== "super_admin") {
+    return { error: "Only super admins can assign the super_admin role." };
+  }
+
   const [targetUser] = await db
     .select()
     .from(user)
