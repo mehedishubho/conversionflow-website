@@ -142,8 +142,8 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Webhook handler: HMAC verification, TypeScript payload types, four event-specific handlers, POST route
-- [ ] 06-02-PLAN.md — Background jobs: BullMQ license-sync worker, 15-min repeatable scheduler, instrumentation hook
+- [x] 06-01-PLAN.md — Webhook handler: HMAC verification, TypeScript payload types, four event-specific handlers, POST route
+- [x] 06-02-PLAN.md — Background jobs: BullMQ license-sync worker, 15-min repeatable scheduler, instrumentation hook
 - [ ] 06-03-PLAN.md — License Intelligence dashboard: KPI cards, plan distribution donut chart, enhanced licenses page with tab navigation (All/Flagged/Sync Failures)
 - [ ] 06-04-PLAN.md — Domain tracking + piracy detection: license detail page, piracy trigger evaluation, PiracyFlagBadge, domain table, flagged tab, review actions
 
