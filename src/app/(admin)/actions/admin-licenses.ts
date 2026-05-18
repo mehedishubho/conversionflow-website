@@ -8,6 +8,12 @@ import { licenses, orders, user } from "@/lib/db/schema";
 import { eq, isNull, desc, sql } from "drizzle-orm";
 import { licenseSyncQueue } from "@/jobs/queues";
 import { createAuditLog } from "@/lib/audit";
+import type { ActivationDomain } from "@/lib/webhook-types";
+import {
+  evaluatePiracyTriggers,
+  checkCrossSiteMatch,
+  type PiracyFlag,
+} from "@/lib/piracy-detection";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -233,4 +239,275 @@ export async function retryLicenseSync(
   });
 
   return { success: true };
+}
+
+// ──────────────────────────────────────────────
+// 5. License Detail (D-06, D-07, D-08, LINT-02)
+// ──────────────────────────────────────────────
+
+export interface LicenseDetail {
+  id: string;
+  licenseKey: string;
+  userId: string;
+  userName: string | null;
+  productId: string;
+  plan: string;
+  status: string;
+  activationDomains: ActivationDomain[];
+  maxActivations: number | null;
+  currentActivations: number | null;
+  expiresAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  centralLicenseId: string | null;
+  orderId: string | null;
+  centralOrderId: string | null;
+  orderStatus: string | null;
+  piracyFlags: PiracyFlag[];
+}
+
+export async function getLicenseDetail(
+  id: string
+): Promise<{ license: LicenseDetail } | { error: string }> {
+  const { session } = await requireAdmin();
+
+  const [row] = await db
+    .select({
+      id: licenses.id,
+      licenseKey: licenses.licenseKey,
+      userId: licenses.userId,
+      userName: user.name,
+      productId: licenses.productId,
+      plan: licenses.plan,
+      status: licenses.status,
+      activationDomains: licenses.activationDomains,
+      maxActivations: licenses.maxActivations,
+      currentActivations: licenses.currentActivations,
+      expiresAt: licenses.expiresAt,
+      createdAt: licenses.createdAt,
+      updatedAt: licenses.updatedAt,
+      centralLicenseId: licenses.centralLicenseId,
+      orderId: licenses.orderId,
+      centralOrderId: orders.centralOrderId,
+      orderStatus: orders.status,
+    })
+    .from(licenses)
+    .leftJoin(user, eq(licenses.userId, user.id))
+    .leftJoin(orders, eq(licenses.orderId, orders.id))
+    .where(eq(licenses.id, id))
+    .limit(1);
+
+  if (!row) {
+    return { error: "License not found. It may have been removed or the ID is invalid." };
+  }
+
+  // Cast jsonb to typed array (Drizzle jsonb does not enforce inner type)
+  const domains = (row.activationDomains ?? []) as unknown as ActivationDomain[];
+
+  // Evaluate piracy triggers (3 inline checks)
+  const flags = evaluatePiracyTriggers({
+    currentActivations: row.currentActivations ?? 0,
+    maxActivations: row.maxActivations ?? 1,
+    domains,
+    licenseKey: row.licenseKey,
+  });
+
+  // Cross-site match detection (requires DB query)
+  try {
+    const crossSiteFlag = await checkCrossSiteMatch(db, domains, row.id);
+    if (crossSiteFlag) {
+      flags.push(crossSiteFlag);
+    }
+  } catch (err) {
+    // Cross-site check failure should not block detail page
+    console.error("[LicenseDetail] Cross-site check failed:", err);
+  }
+
+  return {
+    license: {
+      id: row.id,
+      licenseKey: row.licenseKey,
+      userId: row.userId,
+      userName: row.userName,
+      productId: row.productId,
+      plan: row.plan,
+      status: row.status,
+      activationDomains: domains,
+      maxActivations: row.maxActivations,
+      currentActivations: row.currentActivations,
+      expiresAt: row.expiresAt,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      centralLicenseId: row.centralLicenseId,
+      orderId: row.orderId,
+      centralOrderId: row.centralOrderId,
+      orderStatus: row.orderStatus,
+      piracyFlags: flags,
+    },
+  };
+}
+
+// ──────────────────────────────────────────────
+// 6. Piracy Flag Dismissal (D-05)
+// ──────────────────────────────────────────────
+
+export async function dismissPiracyFlag(
+  licenseId: string,
+  flagType: string
+): Promise<{ success: boolean }> {
+  const { userId, role } = await requireAdmin();
+
+  // Dismissal is logged via audit trail -- flag is re-evaluated on next page load from live data
+  await createAuditLog({
+    actorId: userId,
+    actorRole: role,
+    action: "piracy.flag_dismissed",
+    targetType: "license",
+    targetId: licenseId,
+    details: { licenseId, flagType, dismissedBy: userId },
+  });
+
+  return { success: true };
+}
+
+// ──────────────────────────────────────────────
+// 7. Suspend License (D-05)
+// ──────────────────────────────────────────────
+
+export async function suspendLicense(
+  licenseId: string,
+  reason: string
+): Promise<{ success: boolean }> {
+  const { userId, role } = await requireAdmin();
+
+  // Get current status for audit trail
+  const [current] = await db
+    .select({ status: licenses.status })
+    .from(licenses)
+    .where(eq(licenses.id, licenseId))
+    .limit(1);
+
+  const previousStatus = current?.status ?? "unknown";
+
+  await db
+    .update(licenses)
+    .set({ status: "suspended" })
+    .where(eq(licenses.id, licenseId));
+
+  await createAuditLog({
+    actorId: userId,
+    actorRole: role,
+    action: "license.status_changed",
+    targetType: "license",
+    targetId: licenseId,
+    details: { from: previousStatus, to: "suspended", reason, suspendedBy: userId },
+  });
+
+  return { success: true };
+}
+
+// ──────────────────────────────────────────────
+// 8. Revoke License (D-05)
+// ──────────────────────────────────────────────
+
+export async function revokeLicense(
+  licenseId: string,
+  reason: string
+): Promise<{ success: boolean }> {
+  const { userId, role } = await requireAdmin();
+
+  // Get current status for audit trail
+  const [current] = await db
+    .select({ status: licenses.status })
+    .from(licenses)
+    .where(eq(licenses.id, licenseId))
+    .limit(1);
+
+  const previousStatus = current?.status ?? "unknown";
+
+  await db
+    .update(licenses)
+    .set({ status: "revoked" })
+    .where(eq(licenses.id, licenseId));
+
+  await createAuditLog({
+    actorId: userId,
+    actorRole: role,
+    action: "license.status_changed",
+    targetType: "license",
+    targetId: licenseId,
+    details: { from: previousStatus, to: "revoked", reason, revokedBy: userId },
+  });
+
+  return { success: true };
+}
+
+// ──────────────────────────────────────────────
+// 9. Flagged Licenses (D-04, D-05, LINT-03)
+// ──────────────────────────────────────────────
+
+export interface FlaggedLicense {
+  licenseId: string;
+  licenseKey: string;
+  userName: string | null;
+  plan: string;
+  status: string;
+  flags: PiracyFlag[];
+}
+
+export async function getFlaggedLicenses(): Promise<FlaggedLicense[]> {
+  await requireAdmin();
+
+  // Get all active licenses with their activation domains
+  const allLicenses = await db
+    .select({
+      id: licenses.id,
+      licenseKey: licenses.licenseKey,
+      userId: licenses.userId,
+      userName: user.name,
+      plan: licenses.plan,
+      status: licenses.status,
+      activationDomains: licenses.activationDomains,
+      currentActivations: licenses.currentActivations,
+      maxActivations: licenses.maxActivations,
+    })
+    .from(licenses)
+    .leftJoin(user, eq(licenses.userId, user.id));
+
+  const flagged: FlaggedLicense[] = [];
+
+  for (const license of allLicenses) {
+    const domains = (license.activationDomains ?? []) as unknown as ActivationDomain[];
+
+    // Evaluate inline triggers
+    const flags = evaluatePiracyTriggers({
+      currentActivations: license.currentActivations ?? 0,
+      maxActivations: license.maxActivations ?? 1,
+      domains,
+      licenseKey: license.licenseKey,
+    });
+
+    // Cross-site match check
+    try {
+      const crossSiteFlag = await checkCrossSiteMatch(db, domains, license.id);
+      if (crossSiteFlag) {
+        flags.push(crossSiteFlag);
+      }
+    } catch {
+      // Non-blocking: skip cross-site check on failure
+    }
+
+    if (flags.length > 0) {
+      flagged.push({
+        licenseId: license.id,
+        licenseKey: license.licenseKey,
+        userName: license.userName,
+        plan: license.plan,
+        status: license.status,
+        flags,
+      });
+    }
+  }
+
+  return flagged;
 }
