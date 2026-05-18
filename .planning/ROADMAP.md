@@ -19,7 +19,7 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 - [x] **Phase 2: Dashboard Shell** — `02-homepage` — VERIFIED (3/3 plans, UAT 9/9 pass)
 - [x] **Phase 3: Customer Portal** — `03-customer-portal` — VERIFIED (5/5 plans, UAT 6/6 pass)
 - [x] **Phase 4: Checkout and Payments** — `04-checkout-payments` — EXECUTED (6/6 plans, human UAT pending)
-- [x] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — EXECUTED (5/5 plans, human UAT pending)
+- [x] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — UAT 12/14 pass, gap closure in progress
 - [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — Not started
 
 ## Phase Details
@@ -116,7 +116,7 @@ Plans:
   4. Admin can list users, view user details, assign roles, and ban/activate accounts
   5. Admin can export any data table as CSV with client-side Blob download
   6. Admin sees an activity feed of events and receives admin-scoped notifications in the dropdown
-**Plans**: 5 plans
+**Plans**: 6 plans
 
 Plans:
 - [x] 05-01-PLAN.md — Dashboard overview: KPI cards with trends, adaptive revenue chart, date range selector, mini activity feed, recent orders table, sales redirect, nav update
@@ -124,6 +124,7 @@ Plans:
 - [x] 05-03-PLAN.md — User detail page: profile, order history, license status, activity; role change dropdown, ban/activate toggle
 - [x] 05-04-PLAN.md — Activity feed page with pagination/filters, CSV export utility, minimal licenses listing page
 - [x] 05-05-PLAN.md — Admin notifications: extend NotificationDropdown with admin context, admin notification server actions
+- [ ] 05-06-PLAN.md — Gap closure: fix server/client boundary serialization error on licenses CSV export
 
 **UI hint**: yes
 
@@ -152,5 +153,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Dashboard Shell | 02-homepage | 3/3 | Verified | 2026-05-16 |
 | 3. Customer Portal | 03-customer-portal | 5/5 | Verified | 2026-05-17 |
 | 4. Checkout and Payments | 04-checkout-payments | 6/6 | Executed (UAT pending) | 2026-05-17 |
-| 5. Admin BI Dashboard | 05-admin-dashboard | 5/5 | Executed (UAT pending) | 2026-05-18 |
+| 5. Admin BI Dashboard | 05-admin-dashboard | 5/6 | UAT gap closure | 2026-05-18 |
 | 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/? | Not started | - |
