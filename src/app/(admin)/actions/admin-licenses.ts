@@ -82,6 +82,10 @@ export async function getLicenseKPIs(): Promise<LicenseKPIs> {
   const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
+  const nowStr = now.toISOString();
+  const sevenStr = sevenDaysFromNow.toISOString();
+  const thirtyStr = thirtyDaysFromNow.toISOString();
+
   const [result] = await db
     .select({
       total: sql<number>`COUNT(*)`,
@@ -89,8 +93,8 @@ export async function getLicenseKPIs(): Promise<LicenseKPIs> {
       expired: sql<number>`COUNT(*) FILTER (WHERE ${licenses.status} = 'expired')`,
       revoked: sql<number>`COUNT(*) FILTER (WHERE ${licenses.status} = 'revoked')`,
       suspended: sql<number>`COUNT(*) FILTER (WHERE ${licenses.status} = 'suspended')`,
-      expiringSoon7d: sql<number>`COUNT(*) FILTER (WHERE ${licenses.expiresAt} <= ${sevenDaysFromNow} AND ${licenses.expiresAt} > ${now} AND ${licenses.status} = 'active')`,
-      expiringSoon30d: sql<number>`COUNT(*) FILTER (WHERE ${licenses.expiresAt} <= ${thirtyDaysFromNow} AND ${licenses.expiresAt} > ${sevenDaysFromNow} AND ${licenses.status} = 'active')`,
+      expiringSoon7d: sql<number>`COUNT(*) FILTER (WHERE ${licenses.expiresAt} <= ${sevenStr}::timestamptz AND ${licenses.expiresAt} > ${nowStr}::timestamptz AND ${licenses.status} = 'active')`,
+      expiringSoon30d: sql<number>`COUNT(*) FILTER (WHERE ${licenses.expiresAt} <= ${thirtyStr}::timestamptz AND ${licenses.expiresAt} > ${sevenStr}::timestamptz AND ${licenses.status} = 'active')`,
       unused: sql<number>`COUNT(*) FILTER (WHERE ${licenses.currentActivations} = 0)`,
     })
     .from(licenses);
