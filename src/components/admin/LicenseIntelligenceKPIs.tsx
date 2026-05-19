@@ -12,42 +12,6 @@ interface LicenseIntelligenceKPIsProps {
   };
 }
 
-const kpiCards = [
-  {
-    key: "total" as const,
-    label: "Total Licenses",
-    icon: Key,
-    getValue: (k: LicenseIntelligenceKPIsProps["kpis"]) => k.total.toLocaleString(),
-    getBadge: () => null,
-  },
-  {
-    key: "active" as const,
-    label: "Active Licenses",
-    icon: ShieldCheck,
-    getValue: (k: LicenseIntelligenceKPIsProps["kpis"]) => k.active.toLocaleString(),
-    getBadge: () => null,
-  },
-  {
-    key: "expiring" as const,
-    label: "Expiring Soon",
-    icon: Clock,
-    getValue: () => null,
-    getBadge: () => null,
-  },
-  {
-    key: "rate" as const,
-    label: "Activation Rate",
-    icon: Activity,
-    getValue: (k: LicenseIntelligenceKPIsProps["kpis"]) => `${k.activationRate}%`,
-    getBadge: (k: LicenseIntelligenceKPIsProps["kpis"]) => {
-      const rate = k.activationRate;
-      if (rate >= 80) return { color: "success" as const, text: "Healthy" };
-      if (rate >= 50) return { color: "warning" as const, text: "Monitor" };
-      return { color: "error" as const, text: "Low" };
-    },
-  },
-];
-
 export default function LicenseIntelligenceKPIs({ kpis }: LicenseIntelligenceKPIsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
