@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { licenses, orders, user } from "@/lib/db/schema";
-import { eq, isNull, desc, sql } from "drizzle-orm";
+import { eq, isNull, desc, sql, inArray } from "drizzle-orm";
 import { licenseSyncQueue } from "@/jobs/queues";
 import { createAuditLog } from "@/lib/audit";
 import type { ActivationDomain } from "@/lib/webhook-types";
@@ -462,7 +462,7 @@ export interface FlaggedLicense {
 export async function getFlaggedLicenses(): Promise<FlaggedLicense[]> {
   await requireAdmin();
 
-  // Get all active licenses with their activation domains
+  // Only check active/suspended licenses -- expired/revoked are not piracy candidates
   const allLicenses = await db
     .select({
       id: licenses.id,
@@ -476,7 +476,8 @@ export async function getFlaggedLicenses(): Promise<FlaggedLicense[]> {
       maxActivations: licenses.maxActivations,
     })
     .from(licenses)
-    .leftJoin(user, eq(licenses.userId, user.id));
+    .leftJoin(user, eq(licenses.userId, user.id))
+    .where(inArray(licenses.status, ["active", "suspended"]));
 
   const flagged: FlaggedLicense[] = [];
 
