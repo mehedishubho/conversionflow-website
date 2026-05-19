@@ -10,6 +10,8 @@
  */
 
 import type { ActivationDomain } from "@/lib/webhook-types";
+import { licenses } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 // ──────────────────────────────────────────────
 // Types
@@ -103,7 +105,8 @@ export function evaluatePiracyTriggers(params: {
 export async function checkCrossSiteMatch(
   db: any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Drizzle instance
   domains: ActivationDomain[],
-  currentLicenseId: string
+  currentLicenseId: string,
+  currentUserId?: string
 ): Promise<PiracyFlag | null> {
   if (!domains.length) return null;
 
@@ -111,9 +114,6 @@ export async function checkCrossSiteMatch(
   if (!activeDomains.length) return null;
 
   // Query all active licenses (excluding current) that have activation domains
-  const { licenses } = await import("@/lib/db/schema");
-  const { eq, not } = await import("drizzle-orm");
-
   const otherLicenses = await db
     .select({
       id: licenses.id,
@@ -129,6 +129,9 @@ export async function checkCrossSiteMatch(
 
   for (const license of otherLicenses) {
     if (license.id === currentLicenseId) continue;
+
+    // Skip if same user -- legitimate multi-license scenario
+    if (currentUserId && license.userId === currentUserId) continue;
 
     const otherDomains = (
       license.activationDomains as unknown as ActivationDomain[]

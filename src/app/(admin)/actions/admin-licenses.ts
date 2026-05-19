@@ -318,7 +318,7 @@ export async function getLicenseDetail(
 
   // Cross-site match detection (requires DB query)
   try {
-    const crossSiteFlag = await checkCrossSiteMatch(db, domains, row.id);
+    const crossSiteFlag = await checkCrossSiteMatch(db, domains, row.id, row.userId);
     if (crossSiteFlag) {
       flags.push(crossSiteFlag);
     }
@@ -494,7 +494,7 @@ export async function getFlaggedLicenses(): Promise<FlaggedLicense[]> {
 
     // Cross-site match check
     try {
-      const crossSiteFlag = await checkCrossSiteMatch(db, domains, license.id);
+      const crossSiteFlag = await checkCrossSiteMatch(db, domains, license.id, license.userId);
       if (crossSiteFlag) {
         flags.push(crossSiteFlag);
       }
