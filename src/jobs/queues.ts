@@ -1,4 +1,5 @@
 import { Queue } from "bullmq";
+import { redisConnection } from "@/jobs/redis";
 
 // Queue names as constants for reference
 export const QUEUE_NAMES = {
@@ -8,7 +9,7 @@ export const QUEUE_NAMES = {
 } as const;
 
 const connectionOptions = process.env.REDIS_URL
-  ? { connection: { host: "localhost", port: 6381 } }
+  ? { connection: redisConnection }
   : undefined;
 
 // Only create queues if Redis is available

@@ -7,9 +7,7 @@ import {
   mockImportOrderToCentral,
 } from "@/lib/central-api";
 import { createAuditLog } from "@/lib/audit";
-
-// Worker connection matches queue config in src/jobs/queues.ts
-const connection = { host: "localhost", port: 6381 };
+import { redisConnection } from "@/jobs/redis";
 
 /**
  * Start the BullMQ worker for the license-sync queue.
@@ -37,7 +35,7 @@ export function startLicenseSyncWorker(): Worker | undefined {
         }
       },
       {
-        connection,
+        connection: redisConnection,
         concurrency: 3,
         limiter: { max: 5, duration: 1000 },
       }
