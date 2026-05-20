@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Marketing & SEO Settings Dashboard
 status: executing
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-05-21T19:16:00Z"
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-05-21T19:25:00Z"
 last_activity: 2026-05-21
 progress:
   total_phases: 13
   completed_phases: 5
-  total_plans: 29
-  completed_plans: 26
-  percent: 90
+  total_plans: 34
+  completed_plans: 28
+  percent: 82
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 ## Current Position
 
 Phase: 11 (Tracking Pixels & Social SEO) — IN PROGRESS
-Plan: 1/5 complete (11-01 done, 11-02 next)
+Plan: 2/5 complete (11-02 done, 11-03 next)
 Status: Executing
 Last activity: 2026-05-21
 
@@ -60,6 +60,7 @@ Progress: [████░░░░░░] 40%
 | Phase 10 P04 | 4min | 2 tasks | 4 files |
 | Phase 10-core-seo P05 | 3min | 2 tasks | 3 files |
 | Phase 11 P01 | 7min | 3 tasks | 8 files |
+| Phase 11 P02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Recent decisions affecting current work:
 - [Phase 11]: GA4 summary uses service account JWT via Web Crypto API with 5-minute cache
 - [Phase 11]: SEO overview replaced with 9-card grid with completion status dots per D-10
 - [Phase 11]: TrackingScripts integrated into locale layout with production guard per D-03
+- [Phase 11]: Social preview uses 3 side-by-side platform cards (FB, Twitter/X, LinkedIn) with mobile/desktop toggle per D-01
+- [Phase 11]: MetaPixelForm implements full CAPI management with event checkboxes, advanced matching, connection test, event log per D-02/D-04/D-07/D-08/D-13
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-21T19:16:00Z
-Stopped at: Completed 11-01-PLAN.md
-Resume file: .planning/phases/11-tracking-pixels-social-seo/11-02-PLAN.md
+Last session: 2026-05-21T19:25:00Z
+Stopped at: Completed 11-02-PLAN.md
+Resume file: .planning/phases/11-tracking-pixels-social-seo/11-03-PLAN.md

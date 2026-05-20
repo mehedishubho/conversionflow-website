@@ -246,20 +246,20 @@
 
 ### Open Graph & Social SEO
 
-- [ ] **SOCL-01**: Admin can configure Facebook App ID, default share title, description, and image
-- [ ] **SOCL-02**: Admin can configure Twitter/X handle, card type (summary/summary_large_image), and default share image
-- [ ] **SOCL-03**: Admin can configure LinkedIn share image override
-- [ ] **SOCL-04**: Admin sees a social share preview simulator showing how links appear on Facebook, Twitter/X, and LinkedIn
-- [ ] **SOCL-05**: Admin can toggle between mobile and desktop preview modes
+- [x] **SOCL-01**: Admin can configure Facebook App ID, default share title, description, and image
+- [x] **SOCL-02**: Admin can configure Twitter/X handle, card type (summary/summary_large_image), and default share image
+- [x] **SOCL-03**: Admin can configure LinkedIn share image override
+- [x] **SOCL-04**: Admin sees a social share preview simulator showing how links appear on Facebook, Twitter/X, and LinkedIn
+- [x] **SOCL-05**: Admin can toggle between mobile and desktop preview modes
 
 ### Meta Pixel & Conversion API
 
-- [ ] **META-01**: Admin can configure Meta Pixel ID and Conversion API token
-- [ ] **META-02**: Admin can configure Dataset ID and Test Event Code for debugging
-- [ ] **META-03**: Admin can toggle Advanced Matching and Event Deduplication
-- [ ] **META-04**: Admin can select which standard events to track: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, Lead
-- [ ] **META-05**: Admin sees connection status indicator for Pixel and CAPI
-- [ ] **META-06**: Admin sees recent event firing logs for diagnostics
+- [x] **META-01**: Admin can configure Meta Pixel ID and Conversion API token
+- [x] **META-02**: Admin can configure Dataset ID and Test Event Code for debugging
+- [x] **META-03**: Admin can toggle Advanced Matching and Event Deduplication
+- [x] **META-04**: Admin can select which standard events to track: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, Lead
+- [x] **META-05**: Admin sees connection status indicator for Pixel and CAPI
+- [x] **META-06**: Admin sees recent event firing logs for diagnostics
 
 ### TikTok Tracking
 
@@ -549,17 +549,17 @@ Deferred to future release.
 | ROBT-03 | Phase 10 | Complete |
 | ROBT-04 | Phase 10 | Complete |
 | ROBT-05 | Phase 10 | Complete |
-| SOCL-01 | Phase 11 | Pending |
-| SOCL-02 | Phase 11 | Pending |
-| SOCL-03 | Phase 11 | Pending |
-| SOCL-04 | Phase 11 | Pending |
-| SOCL-05 | Phase 11 | Pending |
-| META-01 | Phase 11 | Pending |
-| META-02 | Phase 11 | Pending |
-| META-03 | Phase 11 | Pending |
-| META-04 | Phase 11 | Pending |
-| META-05 | Phase 11 | Pending |
-| META-06 | Phase 11 | Pending |
+| SOCL-01 | Phase 11 | Complete |
+| SOCL-02 | Phase 11 | Complete |
+| SOCL-03 | Phase 11 | Complete |
+| SOCL-04 | Phase 11 | Complete |
+| SOCL-05 | Phase 11 | Complete |
+| META-01 | Phase 11 | Complete |
+| META-02 | Phase 11 | Complete |
+| META-03 | Phase 11 | Complete |
+| META-04 | Phase 11 | Complete |
+| META-05 | Phase 11 | Complete |
+| META-06 | Phase 11 | Complete |
 | TIKT-01 | Phase 11 | Pending |
 | TIKT-02 | Phase 11 | Pending |
 | TIKT-03 | Phase 11 | Pending |
