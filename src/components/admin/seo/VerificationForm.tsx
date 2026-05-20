@@ -5,11 +5,8 @@ import ComponentCard from "@/components/common/ComponentCard";
 import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import { ChevronDown, Copy } from "lucide-react";
-import {
-  saveSeoSettings,
-  VERIFICATION_SEO_KEYS,
-  type SeoSettingsData,
-} from "@/app/(admin)/actions/admin-seo";
+import { saveSeoSettings } from "@/app/(admin)/actions/admin-seo";
+import { VERIFICATION_SEO_KEYS, type SeoSettingsData } from "@/lib/seo-keys";
 
 interface VerificationFormProps {
   initialData: SeoSettingsData;

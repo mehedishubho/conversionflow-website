@@ -35,7 +35,5 @@ export const adminNavItems: NavItem[] = [
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Invoices", icon: FileText, path: "/admin/invoices" },
-  { name: "Licenses", icon: Key, path: "/admin/licenses" },
-  { name: "Activity", icon: Activity, path: "/admin/activity" },
   { name: "Settings", icon: Settings, path: "/admin/settings" },
 ];

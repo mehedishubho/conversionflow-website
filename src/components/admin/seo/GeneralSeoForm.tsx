@@ -10,9 +10,8 @@ import SeoScore from "@/components/admin/seo/SeoScore";
 import {
   saveSeoSettings,
   getSeoScore,
-  GENERAL_SEO_KEYS,
-  type SeoSettingsData,
 } from "@/app/(admin)/actions/admin-seo";
+import { GENERAL_SEO_KEYS, type SeoSettingsData } from "@/lib/seo-keys";
 
 interface GeneralSeoFormProps {
   initialData: SeoSettingsData;

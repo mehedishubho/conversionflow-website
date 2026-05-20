@@ -5,11 +5,8 @@ import ComponentCard from "@/components/common/ComponentCard";
 import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import AiBotCards from "@/components/admin/seo/AiBotCards";
-import {
-  saveSeoSettings,
-  ROBOTS_SEO_KEYS,
-  type SeoSettingsData,
-} from "@/app/(admin)/actions/admin-seo";
+import { saveSeoSettings } from "@/app/(admin)/actions/admin-seo";
+import { ROBOTS_SEO_KEYS, type SeoSettingsData } from "@/lib/seo-keys";
 
 interface RobotsEditorProps {
   initialData: SeoSettingsData;

@@ -4,14 +4,14 @@ milestone: v2.1
 milestone_name: Marketing & SEO Settings Dashboard
 status: executing
 stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-05-21T19:25:00Z"
+last_updated: "2026-05-20T19:31:54.104Z"
 last_activity: 2026-05-21
 progress:
   total_phases: 13
   completed_phases: 5
   total_plans: 34
-  completed_plans: 28
-  percent: 82
+  completed_plans: 29
+  percent: 85
 ---
 
 # Project State
@@ -61,6 +61,7 @@ Progress: [████░░░░░░] 40%
 | Phase 10-core-seo P05 | 3min | 2 tasks | 3 files |
 | Phase 11 P01 | 7min | 3 tasks | 8 files |
 | Phase 11 P02 | 4min | 2 tasks | 5 files |
+| Phase 11 P03 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,9 @@ Recent decisions affecting current work:
 - [Phase 11]: TrackingScripts integrated into locale layout with production guard per D-03
 - [Phase 11]: Social preview uses 3 side-by-side platform cards (FB, Twitter/X, LinkedIn) with mobile/desktop toggle per D-01
 - [Phase 11]: MetaPixelForm implements full CAPI management with event checkboxes, advanced matching, connection test, event log per D-02/D-04/D-07/D-08/D-13
+- [Phase 11]: TikTok connection tester uses pixel ID format validation (C-prefix alphanumeric) plus Events API health check
+- [Phase 11]: GTM toggle derived from container ID presence -- no separate enable key per D-12
+- [Phase 11]: GA summary cards show graceful fallback with env var setup instructions when not configured
 
 ### Pending Todos
 

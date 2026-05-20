@@ -8,9 +8,8 @@ import Button from "@/components/ui/button/Button";
 import {
   saveSeoSettings,
   pingSearchEngines,
-  SITEMAP_SEO_KEYS,
-  type SeoSettingsData,
 } from "@/app/(admin)/actions/admin-seo";
+import { SITEMAP_SEO_KEYS, type SeoSettingsData } from "@/lib/seo-keys";
 
 interface SitemapFormProps {
   initialData: SeoSettingsData;
