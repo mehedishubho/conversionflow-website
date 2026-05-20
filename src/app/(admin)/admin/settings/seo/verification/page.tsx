@@ -1,16 +1,19 @@
-import ComponentCard from "@/components/common/ComponentCard";
+import { getSeoSettings } from "@/app/(admin)/actions/admin-seo";
+import VerificationForm from "@/components/admin/seo/VerificationForm";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
-export default function SeoVerificationPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SeoVerificationPage() {
+  const seoSettings = await getSeoSettings();
+
   return (
-    <ComponentCard
-      title="Search Engine Verification"
-      desc="Add verification codes for Google Search Console, Bing, Yandex, Baidu, and Pinterest."
-    >
-      <div className="flex items-center gap-3 py-4">
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-white/5 dark:text-gray-400">
-          Coming in Phase 10
-        </span>
-      </div>
-    </ComponentCard>
+    <div>
+      <PageBreadcrumb
+        pageTitle="Search Verification"
+        basePath="/admin/settings"
+      />
+      <VerificationForm initialData={seoSettings} />
+    </div>
   );
 }
