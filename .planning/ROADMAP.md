@@ -225,13 +225,14 @@ Plans:
   3. Admin can enter Google Search Console, Bing, Yandex, Baidu, and Pinterest verification codes and see connected/disconnected status indicators for each engine
   4. Admin can enable/disable XML sitemap generation, toggle individual sitemap types (product, blog, image), trigger manual regeneration, and see the sitemap URL and last-generated timestamp
   5. Admin can edit robots.txt using both a visual rule builder and a raw code editor, toggle AI bot access controls, apply crawl presets, and see a live preview of the generated robots.txt content
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [x] 10-01: SEO server actions foundation -- admin-seo.ts with get/save/score for all 22 settings keys, seo.ts DB integration with hardcoded fallback
 - [x] 10-02: General SEO form -- GeneralSeoForm, SerpPreview (Google snippet), SeoScore (progress bar), character counters, toggle switches
 - [x] 10-03: Verification + Sitemaps -- VerificationForm with status dots and copy buttons, SitemapForm with content type toggles, dynamic sitemap.ts
 - [x] 10-04: Robots.txt editor -- dual-mode visual/raw editor, AiBotCards (8 bots), crawl presets, live preview, dynamic robots.ts
+- [ ] 10-05: Gap closure -- last-generated timestamp (SITM-04), search engine ping (SITM-05), raw editor syntax highlighting (ROBT-02)
 
 **UI hint**: yes
 
@@ -319,7 +320,7 @@ v2.1: 9 -> 10 -> 11 -> 12 -> 13
 | 7. Notification Engine | 07-notification-engine | v2.0 | 3/5 | Partial | - |
 | 8. Affiliate Network | 08-affiliate-network | v2.0 | 0/TBD | Planned | - |
 | 9. Settings Foundation | 09-settings-foundation | v2.1 | 0/3 | Not started | - |
-| 10. Core SEO Configuration | 10-core-seo | v2.1 | 0/4 | Not started | - |
+| 10. Core SEO Configuration | 10-core-seo | v2.1 | 0/5 | Not started | - |
 | 11. Tracking Pixels & Social SEO | 11-tracking-social | v2.1 | 0/5 | Not started | - |
 | 12. Advanced SEO Controls | 12-advanced-seo | v2.1 | 0/5 | Not started | - |
 | 13. SEO Analytics Dashboard | 13-seo-analytics | v2.1 | 0/3 | Not started | - |
