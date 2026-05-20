@@ -20,6 +20,7 @@ import type {
 } from "@/lib/notifications/types";
 import { sendInApp } from "@/lib/notifications/channels/in-app";
 import { queueWhatsApp } from "@/lib/notifications/channels/whatsapp";
+import { sendEmail } from "@/lib/notifications/channels/email";
 import { getNotificationPreferences } from "@/lib/notifications/preferences";
 
 /**
@@ -65,8 +66,8 @@ export async function sendNotification(
     try {
       switch (channel) {
         case "email":
-          // Email channel adapter added in Plan 02 -- log as queued for now
-          await logNotification(userId, event, channel, "queued");
+          await sendEmail(userId, event, data);
+          await logNotification(userId, event, channel, "sent");
           break;
 
         case "in_app":
