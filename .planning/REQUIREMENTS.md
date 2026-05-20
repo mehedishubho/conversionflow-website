@@ -212,13 +212,13 @@
 
 ### General SEO
 
-- [ ] **GSEO-01**: Admin can configure website title, default meta title, meta description, meta keywords, and canonical URL
-- [ ] **GSEO-02**: Admin can set default robots meta directive, SEO separator character, and default Open Graph image
-- [ ] **GSEO-03**: Admin can toggle URL formatting options: lowercase URLs, trailing slash handling
-- [ ] **GSEO-04**: Admin can toggle auto meta generation (auto-generate meta titles and descriptions from content)
-- [ ] **GSEO-05**: Admin sees a real-time SERP preview snippet showing how the page will appear in Google search results
-- [ ] **GSEO-06**: Admin sees character count indicators for meta title (recommended 50-60) and meta description (recommended 150-160)
-- [ ] **GSEO-07**: Admin sees an SEO score indicator based on configured settings completeness
+- [x] **GSEO-01**: Admin can configure website title, default meta title, meta description, meta keywords, and canonical URL
+- [x] **GSEO-02**: Admin can set default robots meta directive, SEO separator character, and default Open Graph image
+- [x] **GSEO-03**: Admin can toggle URL formatting options: lowercase URLs, trailing slash handling
+- [x] **GSEO-04**: Admin can toggle auto meta generation (auto-generate meta titles and descriptions from content)
+- [x] **GSEO-05**: Admin sees a real-time SERP preview snippet showing how the page will appear in Google search results
+- [x] **GSEO-06**: Admin sees character count indicators for meta title (recommended 50-60) and meta description (recommended 150-160)
+- [x] **GSEO-07**: Admin sees an SEO score indicator based on configured settings completeness
 
 ### Search Engine Verification
 
@@ -527,13 +527,13 @@ Deferred to future release.
 | NAV-03 | Phase 9 | Pending |
 | NAV-04 | Phase 9 | Pending |
 | NAV-05 | Phase 9 | Pending |
-| GSEO-01 | Phase 10 | Pending |
-| GSEO-02 | Phase 10 | Pending |
-| GSEO-03 | Phase 10 | Pending |
-| GSEO-04 | Phase 10 | Pending |
-| GSEO-05 | Phase 10 | Pending |
-| GSEO-06 | Phase 10 | Pending |
-| GSEO-07 | Phase 10 | Pending |
+| GSEO-01 | Phase 10 | Complete |
+| GSEO-02 | Phase 10 | Complete |
+| GSEO-03 | Phase 10 | Complete |
+| GSEO-04 | Phase 10 | Complete |
+| GSEO-05 | Phase 10 | Complete |
+| GSEO-06 | Phase 10 | Complete |
+| GSEO-07 | Phase 10 | Complete |
 | VERF-01 | Phase 10 | Pending |
 | VERF-02 | Phase 10 | Pending |
 | VERF-03 | Phase 10 | Pending |
