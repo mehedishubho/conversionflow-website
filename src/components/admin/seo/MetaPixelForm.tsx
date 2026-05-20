@@ -14,11 +14,13 @@ import {
   type TrackingSettingsData,
 } from "@/lib/tracking-keys";
 import EmptyStateWarning from "@/components/admin/seo/EmptyStateWarning";
+import EventLogPanel, {
+  logTrackingEvent,
+} from "@/components/admin/seo/EventLogPanel";
 import {
   CheckCircle2,
   Loader2,
   XCircle,
-  ChevronDown,
   Circle,
 } from "lucide-react";
 
@@ -73,27 +75,6 @@ const MATCHING_FIELDS = [
   { id: "country", label: "Country" },
 ] as const;
 
-interface LogEntry {
-  time: string;
-  event: string;
-  platform: string;
-  status: "fired" | "pending";
-}
-
-// Session-scoped event buffer (module-level, last 50 events)
-const eventBuffer: LogEntry[] = [];
-const MAX_BUFFER = 50;
-
-function pushEvent(event: Omit<LogEntry, "time">) {
-  eventBuffer.unshift({
-    ...event,
-    time: new Date().toLocaleTimeString(),
-  });
-  if (eventBuffer.length > MAX_BUFFER) {
-    eventBuffer.length = MAX_BUFFER;
-  }
-}
-
 export default function MetaPixelForm({ initialData }: MetaPixelFormProps) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{
@@ -124,10 +105,6 @@ export default function MetaPixelForm({ initialData }: MetaPixelFormProps) {
     success: boolean;
     message: string;
   } | null>(null);
-
-  // Event log visibility
-  const [eventLogOpen, setEventLogOpen] = useState(false);
-  const [eventLogEntries] = useState<LogEntry[]>(() => [...eventBuffer]);
 
   // Advanced matching toggle
   const advancedMatchingEnabled =
@@ -214,8 +191,8 @@ export default function MetaPixelForm({ initialData }: MetaPixelFormProps) {
           setConnectionMessage(
             `Connected: "${result.name || "Pixel"}" (status: ${result.status || "active"})`
           );
-          pushEvent({
-            event: "ConnectionTest",
+          logTrackingEvent({
+            eventName: "ConnectionTest",
             platform: "meta",
             status: "fired",
           });
@@ -225,8 +202,8 @@ export default function MetaPixelForm({ initialData }: MetaPixelFormProps) {
           setConnectionMessage(
             `Connection failed: ${res.status} - ${errText.slice(0, 200)}`
           );
-          pushEvent({
-            event: "ConnectionTest",
+          logTrackingEvent({
+            eventName: "ConnectionTest",
             platform: "meta",
             status: "fired",
           });
@@ -255,8 +232,8 @@ export default function MetaPixelForm({ initialData }: MetaPixelFormProps) {
           success: result.success,
           message: result.response || "No response",
         });
-        pushEvent({
-          event: "Purchase (test)",
+        logTrackingEvent({
+          eventName: "Purchase (test)",
           platform: "meta",
           status: result.success ? "fired" : "pending",
         });
@@ -652,90 +629,7 @@ export default function MetaPixelForm({ initialData }: MetaPixelFormProps) {
       </ComponentCard>
 
       {/* Event Log Panel */}
-      <ComponentCard
-        title="Event Log"
-        desc="Session-scoped log of recent Meta pixel events. Events appear when tracking scripts fire on public pages."
-      >
-        <div className="space-y-3">
-          <button
-            type="button"
-            onClick={() => setEventLogOpen(!eventLogOpen)}
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors cursor-pointer"
-          >
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${
-                eventLogOpen ? "rotate-180" : ""
-              }`}
-            />
-            {eventLogOpen ? "Hide" : "Show"} Event Log ({eventLogEntries.length}
-            )
-          </button>
-
-          {eventLogOpen && (
-            <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-              {eventLogEntries.length === 0 ? (
-                <div className="px-4 py-6 text-center">
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    No events captured in this session.
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    Events will appear here when tracking scripts fire on public
-                    pages.
-                  </p>
-                </div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Time
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Event
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Platform
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {eventLogEntries.map((entry, i) => (
-                      <tr
-                        key={i}
-                        className="border-b border-gray-100 dark:border-gray-800 last:border-0"
-                      >
-                        <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
-                          {entry.time}
-                        </td>
-                        <td className="px-4 py-2 text-xs text-gray-700 dark:text-gray-300 font-mono">
-                          {entry.event}
-                        </td>
-                        <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
-                          {entry.platform}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                              entry.status === "fired"
-                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                            }`}
-                          >
-                            {entry.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
-        </div>
-      </ComponentCard>
+      <EventLogPanel platform="meta" />
 
       {/* Save Button */}
       <div className="flex justify-end">
