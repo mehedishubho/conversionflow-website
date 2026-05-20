@@ -232,7 +232,7 @@ Plans:
 - [x] 10-02: General SEO form -- GeneralSeoForm, SerpPreview (Google snippet), SeoScore (progress bar), character counters, toggle switches
 - [x] 10-03: Verification + Sitemaps -- VerificationForm with status dots and copy buttons, SitemapForm with content type toggles, dynamic sitemap.ts
 - [x] 10-04: Robots.txt editor -- dual-mode visual/raw editor, AiBotCards (8 bots), crawl presets, live preview, dynamic robots.ts
-- [ ] 10-05: Gap closure -- last-generated timestamp (SITM-04), search engine ping (SITM-05), raw editor syntax highlighting (ROBT-02)
+- [x] 10-05: Gap closure -- last-generated timestamp (SITM-04), search engine ping (SITM-05), raw editor syntax highlighting (ROBT-02)
 
 **UI hint**: yes
 
