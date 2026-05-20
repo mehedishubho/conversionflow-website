@@ -63,7 +63,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 **Milestone Goal:** Build a complete SEO & Marketing settings module in the admin dashboard with sub-page navigation, restructuring the flat settings page into a premium configuration system covering technical SEO, social metadata, tracking pixels, schema markup, AI crawler controls, redirect management, image/performance SEO, page-level SEO overrides, and an analytics dashboard.
 
 - [x] **Phase 9: Settings Foundation** -- Restructure settings navigation, create sub-routes, migrate existing forms
-- [ ] **Phase 10: Core SEO Configuration** -- General SEO, search verification, sitemaps, robots.txt
+- [x] **Phase 10: Core SEO Configuration** -- General SEO, search verification, sitemaps, robots.txt
 - [ ] **Phase 11: Tracking Pixels & Social SEO** -- Open Graph, Meta Pixel/CAPI, TikTok, Google Analytics/Ads, Schema Markup
 - [ ] **Phase 12: Advanced SEO Controls** -- Redirect Manager, AI SEO, Image SEO, Performance SEO, Page-Level SEO
 - [ ] **Phase 13: SEO Analytics Dashboard** -- Analytics overview, keyword rankings, 404 reports, crawl issues
@@ -237,7 +237,7 @@ Plans:
 **UI hint**: yes
 
 ### Phase 11: Tracking Pixels & Social SEO
-**Directory**: `11-tracking-social`
+**Directory**: `11-tracking-pixels-social-seo`
 **Goal**: Admin can configure all tracking integrations (Meta Pixel/CAPI, TikTok, Google Analytics/Ads/GTM), social sharing defaults (Open Graph for Facebook, Twitter/X, LinkedIn) with preview simulators, and schema markup (Organization, Product, Article, FAQ, HowTo, Review) with JSON-LD preview and validation.
 **Depends on**: Phase 9
 **Requirements**: SOCL-01, SOCL-02, SOCL-03, SOCL-04, SOCL-05, META-01, META-02, META-03, META-04, META-05, META-06, TIKT-01, TIKT-02, TIKT-03, GOOG-01, GOOG-02, GOOG-03, GOOG-04, GOOG-05, SCHM-01, SCHM-02, SCHM-03, SCHM-04, SCHM-05
@@ -250,11 +250,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 11-01: Open Graph & Social SEO -- social settings form, preview simulator component (Facebook/Twitter/LinkedIn cards), mobile/desktop toggle, server actions
-- [ ] 11-02: Meta Pixel & CAPI -- Meta settings form, event selector checkboxes, connection status badge, event log table, server actions
-- [ ] 11-03: TikTok tracking -- TikTok settings form, Advanced Matching toggle, status indicator, event log display, server actions
-- [ ] 11-04: Google Analytics & Ads -- Google settings form, GA4/Ads/GTM fields, server-side and enhanced ecommerce toggles, connection tester, summary cards
-- [ ] 11-05: Schema Markup -- schema settings form (global + content schemas), JSON-LD preview panel, Google validation link, auto-generation toggle, server actions
+- [ ] 11-01: Tracking Foundation & SEO Overview Redesign -- tracking-keys.ts, admin-tracking-v2.ts server actions, SeoOverviewCards, TrackingScripts integration with TikTok, migration cleanup
+- [ ] 11-02: Open Graph & Social + Meta Pixel & CAPI -- SocialForm with SocialPreviewSimulator (3 platform cards), MetaPixelForm with CAPI management, event checkboxes, connection test, event log
+- [ ] 11-03: TikTok + Google Analytics & Ads -- TikTokForm with pixel/Events API/advanced matching, GoogleTrackingForm with GA4/GTM/Ads, GA summary cards, connection tester
+- [ ] 11-04: Schema Markup -- SchemaForm with per-type forms, auto-generation, JSON-LD preview, Google Rich Results Test link, seo.ts override integration
+- [ ] 11-05: Migration Cleanup & Empty States -- EmptyStateWarning shared component, EventLogPanel shared component, delete TrackingSettingsForm
 
 **UI hint**: yes
 
@@ -321,6 +321,6 @@ v2.1: 9 -> 10 -> 11 -> 12 -> 13
 | 8. Affiliate Network | 08-affiliate-network | v2.0 | 0/TBD | Planned | - |
 | 9. Settings Foundation | 09-settings-foundation | v2.1 | 0/3 | Not started | - |
 | 10. Core SEO Configuration | 10-core-seo | v2.1 | 0/5 | Not started | - |
-| 11. Tracking Pixels & Social SEO | 11-tracking-social | v2.1 | 0/5 | Not started | - |
+| 11. Tracking Pixels & Social SEO | 11-tracking-pixels-social-seo | v2.1 | 0/5 | Not started | - |
 | 12. Advanced SEO Controls | 12-advanced-seo | v2.1 | 0/5 | Not started | - |
 | 13. SEO Analytics Dashboard | 13-seo-analytics | v2.1 | 0/3 | Not started | - |
