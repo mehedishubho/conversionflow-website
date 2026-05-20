@@ -7,6 +7,7 @@ import Switch from "@/components/form/switch/Switch";
 import Button from "@/components/ui/button/Button";
 import {
   saveSeoSettings,
+  pingSearchEngines,
   SITEMAP_SEO_KEYS,
   type SeoSettingsData,
 } from "@/app/(admin)/actions/admin-seo";
@@ -40,6 +41,14 @@ export default function SitemapForm({ initialData }: SitemapFormProps) {
     seo_sitemap_auto_regenerate: "false",
     ...initialData,
   });
+
+  const [lastGenerated, setLastGenerated] = useState<string>(
+    initialData.seo_sitemap_last_generated ?? ""
+  );
+  const [pingStatus, setPingStatus] = useState<{
+    google: boolean;
+    bing: boolean;
+  } | null>(null);
 
   const updateField = (key: string, value: string) => {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -77,9 +86,12 @@ export default function SitemapForm({ initialData }: SitemapFormProps) {
           sitemapData[key] = data[key] ?? "";
         }
         await saveSeoSettings(sitemapData);
+        const pingResult = await pingSearchEngines();
+        setLastGenerated(pingResult.timestamp);
+        setPingStatus({ google: pingResult.google, bing: pingResult.bing });
         setMessage({
           type: "success",
-          text: "Sitemap settings saved. Sitemap will regenerate on next request.",
+          text: "Sitemap regenerated and search engines pinged.",
         });
       } catch {
         setMessage({
@@ -230,6 +242,40 @@ export default function SitemapForm({ initialData }: SitemapFormProps) {
               {autoRegenerateEnabled ? "Enabled" : "Disabled"}
             </span>
           </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700 dark:text-gray-400">
+              Last generated:
+            </span>
+            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+              {lastGenerated
+                ? new Date(lastGenerated).toLocaleString()
+                : "Never"}
+            </span>
+          </div>
+
+          {pingStatus && (
+            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+              <span
+                className={
+                  pingStatus.google
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-orange-500"
+                }
+              >
+                Google: {pingStatus.google ? "Pinged" : "Failed"}
+              </span>
+              <span
+                className={
+                  pingStatus.bing
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-orange-500"
+                }
+              >
+                Bing: {pingStatus.bing ? "Pinged" : "Failed"}
+              </span>
+            </div>
+          )}
 
           {/* Manual Regenerate Button */}
           <Button

@@ -38,14 +38,16 @@ const SEO_KEYS = [
   // Robots (2)
   "seo_robots_txt",
   "seo_ai_bots",
+  // Sitemap meta (1)
+  "seo_sitemap_last_generated",
 ] as const;
 
 export type SeoKey = (typeof SEO_KEYS)[number];
 
 export const GENERAL_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(0, 10);
 export const VERIFICATION_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(10, 15);
-export const SITEMAP_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(15, 23);
-export const ROBOTS_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(23, 25);
+export const SITEMAP_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(15, 24);
+export const ROBOTS_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(24, 26);
 
 export interface SeoSettingsData {
   [key: string]: string;
@@ -146,4 +148,56 @@ export async function getSeoScore(): Promise<{
     total: SEO_KEYS.length,
     percentage: Math.round((filled / SEO_KEYS.length) * 100),
   };
+}
+
+export async function pingSearchEngines(): Promise<{
+  google: boolean;
+  bing: boolean;
+  timestamp: string;
+}> {
+  await requireAdmin();
+  const siteUrl = "https://conversionflow.com";
+  const sitemapUrl = `${siteUrl}/sitemap.xml`;
+  const now = new Date().toISOString();
+  let googleOk = false;
+  let bingOk = false;
+
+  try {
+    const gRes = await fetch(
+      `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
+      { method: "GET", signal: AbortSignal.timeout(10000) }
+    );
+    googleOk = gRes.ok;
+  } catch {
+    /* ping best-effort */
+  }
+  try {
+    const bRes = await fetch(
+      `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
+      { method: "GET", signal: AbortSignal.timeout(10000) }
+    );
+    bingOk = bRes.ok;
+  } catch {
+    /* ping best-effort */
+  }
+
+  // Store the timestamp in settings
+  const existing = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "seo_sitemap_last_generated"))
+    .limit(1);
+  if (existing.length > 0) {
+    await db
+      .update(settings)
+      .set({ value: now, updatedAt: new Date() })
+      .where(eq(settings.key, "seo_sitemap_last_generated"));
+  } else {
+    await db.insert(settings).values({
+      key: "seo_sitemap_last_generated",
+      value: now,
+    });
+  }
+
+  return { google: googleOk, bing: bingOk, timestamp: now };
 }
