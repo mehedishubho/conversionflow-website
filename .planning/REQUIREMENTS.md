@@ -200,6 +200,167 @@
 - [ ] **AFF-07**: Admin affiliate management — list affiliates, set commission rates, view performance, process payouts
 - [ ] **AFF-08**: DB schema — affiliates, affiliate_clicks, affiliate_commissions, affiliate_payouts tables linked to users and orders
 
+## v3 Requirements (Milestone: v2.1 Marketing & SEO Settings Dashboard)
+
+### Settings Navigation
+
+- [ ] **NAV-01**: Admin can access a settings landing page at /admin/settings with category cards linking to Payment Gateway, SMTP/Email, and SEO Settings
+- [ ] **NAV-02**: Each settings category has its own sub-route (/admin/settings/payment, /admin/settings/smtp, /admin/settings/seo)
+- [ ] **NAV-03**: SEO Settings has nested sub-routes for each SEO section (/admin/settings/seo/general, /admin/settings/seo/verification, etc.)
+- [ ] **NAV-04**: Existing Payment, Email, and Tracking forms are migrated from the flat settings page to their respective sub-routes without losing functionality
+- [ ] **NAV-05**: Settings sub-navigation uses a consistent tabbed or sidebar layout across all categories
+
+### General SEO
+
+- [ ] **GSEO-01**: Admin can configure website title, default meta title, meta description, meta keywords, and canonical URL
+- [ ] **GSEO-02**: Admin can set default robots meta directive, SEO separator character, and default Open Graph image
+- [ ] **GSEO-03**: Admin can toggle URL formatting options: lowercase URLs, trailing slash handling
+- [ ] **GSEO-04**: Admin can toggle auto meta generation (auto-generate meta titles and descriptions from content)
+- [ ] **GSEO-05**: Admin sees a real-time SERP preview snippet showing how the page will appear in Google search results
+- [ ] **GSEO-06**: Admin sees character count indicators for meta title (recommended 50-60) and meta description (recommended 150-160)
+- [ ] **GSEO-07**: Admin sees an SEO score indicator based on configured settings completeness
+
+### Search Engine Verification
+
+- [ ] **VERF-01**: Admin can enter and save Google Search Console verification meta tag
+- [ ] **VERF-02**: Admin can enter and save Bing Webmaster verification code
+- [ ] **VERF-03**: Admin can enter and save Yandex, Baidu, and Pinterest verification codes
+- [ ] **VERF-04**: Admin sees verification status indicators (connected/disconnected) for each search engine
+- [ ] **VERF-05**: Admin can copy verification codes to clipboard using a helper button
+
+### XML Sitemaps
+
+- [ ] **SITM-01**: Admin can enable/disable XML sitemap generation
+- [ ] **SITM-02**: Admin can enable/disable individual sitemap types: product sitemap, blog sitemap, image sitemap
+- [ ] **SITM-03**: Admin can toggle auto-regeneration of sitemaps when content changes
+- [ ] **SITM-04**: Admin sees the sitemap URL preview and last-generated timestamp
+- [ ] **SITM-05**: Admin can manually trigger sitemap regeneration and ping search engines
+
+### Robots.txt Manager
+
+- [ ] **ROBT-01**: Admin can edit robots.txt using a visual rule builder (user-agent, allow, disallow, sitemap)
+- [ ] **ROBT-02**: Admin can edit robots.txt using a raw code editor with syntax highlighting
+- [ ] **ROBT-03**: Admin can toggle AI bot access controls for GPTBot, ClaudeBot, and PerplexityBot (allow/block)
+- [ ] **ROBT-04**: Admin can apply crawl rule presets (allow all, block AI bots, block all, custom)
+- [ ] **ROBT-05**: Admin sees a live preview of the generated robots.txt content
+
+### Open Graph & Social SEO
+
+- [ ] **SOCL-01**: Admin can configure Facebook App ID, default share title, description, and image
+- [ ] **SOCL-02**: Admin can configure Twitter/X handle, card type (summary/summary_large_image), and default share image
+- [ ] **SOCL-03**: Admin can configure LinkedIn share image override
+- [ ] **SOCL-04**: Admin sees a social share preview simulator showing how links appear on Facebook, Twitter/X, and LinkedIn
+- [ ] **SOCL-05**: Admin can toggle between mobile and desktop preview modes
+
+### Meta Pixel & Conversion API
+
+- [ ] **META-01**: Admin can configure Meta Pixel ID and Conversion API token
+- [ ] **META-02**: Admin can configure Dataset ID and Test Event Code for debugging
+- [ ] **META-03**: Admin can toggle Advanced Matching and Event Deduplication
+- [ ] **META-04**: Admin can select which standard events to track: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, Lead
+- [ ] **META-05**: Admin sees connection status indicator for Pixel and CAPI
+- [ ] **META-06**: Admin sees recent event firing logs for diagnostics
+
+### TikTok Tracking
+
+- [ ] **TIKT-01**: Admin can configure TikTok Pixel ID and Events API token
+- [ ] **TIKT-02**: Admin can toggle Advanced Matching and server-side tracking
+- [ ] **TIKT-03**: Admin sees tracking status indicator and recent event logs
+
+### Google Analytics & Ads
+
+- [ ] **GOOG-01**: Admin can configure GA4 Measurement ID, Google Ads Conversion ID, and Conversion Label
+- [ ] **GOOG-02**: Admin can configure Google Tag Manager Container ID
+- [ ] **GOOG-03**: Admin can toggle server-side tracking and enhanced ecommerce
+- [ ] **GOOG-04**: Admin sees connection status and a connection tester
+- [ ] **GOOG-05**: Admin sees analytics summary cards (integrated with existing dashboard metrics)
+
+### Schema Markup
+
+- [ ] **SCHM-01**: Admin can configure global schema: Organization, Website, and Breadcrumb
+- [ ] **SCHM-02**: Admin can enable/configure content schemas: Product, Article, FAQ, HowTo, Review
+- [ ] **SCHM-03**: Admin sees a JSON-LD preview of the generated schema markup
+- [ ] **SCHM-04**: Admin can validate schema markup against Google structured data requirements
+- [ ] **SCHM-05**: Admin can toggle auto schema generation based on content type
+
+### Redirect Manager
+
+- [ ] **RDIR-01**: Admin can create 301 (permanent) and 302 (temporary) redirects with from/to URL fields
+- [ ] **RDIR-02**: Admin can create regex-based redirects for pattern matching
+- [ ] **RDIR-03**: Admin sees a redirect table with search/filter, status tracking, and hit counter
+- [ ] **RDIR-04**: Admin can bulk import and export redirects via CSV
+- [ ] **RDIR-05**: Admin can delete individual redirects or bulk delete selected redirects
+
+### AI SEO & LLM Controls
+
+- [ ] **AISE-01**: Admin can allow or block GPTBot from crawling the site
+- [ ] **AISE-02**: Admin can allow or block ClaudeBot from crawling the site
+- [ ] **AISE-03**: Admin can allow or block PerplexityBot from crawling the site
+- [ ] **AISE-04**: Admin can generate an llms.txt file for AI crawler consumption
+- [ ] **AISE-05**: Admin can configure AI content usage rules (how AI models may use site content)
+
+### Image SEO
+
+- [ ] **IMGS-01**: Admin can toggle auto ALT text generation for images
+- [ ] **IMGS-02**: Admin can toggle WebP conversion for uploaded images
+- [ ] **IMGS-03**: Admin can toggle lazy loading for images across the site
+- [ ] **IMGS-04**: Admin can toggle image compression and see optimization savings stats
+- [ ] **IMGS-05**: Admin sees image performance statistics (total images, optimized count, savings)
+
+### Performance SEO
+
+- [ ] **PERF-01**: Admin can toggle Critical CSS extraction and injection
+- [ ] **PERF-02**: Admin can toggle JS defer loading strategy
+- [ ] **PERF-03**: Admin can toggle HTML and CSS minification
+- [ ] **PERF-04**: Admin can configure CDN integration URL
+- [ ] **PERF-05**: Admin can configure cache control settings (max-age, stale-while-revalidate)
+- [ ] **PERF-06**: Admin sees Core Web Vitals monitor cards: LCP, CLS, INP, TTFB, and overall performance score
+
+### SEO Analytics
+
+- [ ] **ANLT-01**: Admin sees an SEO analytics overview dashboard with indexed pages count and trend
+- [ ] **ANLT-02**: Admin sees top performing pages ranked by organic traffic metrics
+- [ ] **ANLT-03**: Admin sees keyword rankings with position tracking and trend indicators
+- [ ] **ANLT-04**: Admin sees CTR and impressions data with trend charts
+- [ ] **ANLT-05**: Admin sees 404 error and broken link reports
+- [ ] **ANLT-06**: Admin sees sitemap health status and crawl issue reports
+- [ ] **ANLT-07**: Analytics data is displayed using charts, tables, status badges, and trend indicators
+
+### Page-Level SEO
+
+- [ ] **PLVL-01**: Each page, product, and blog post has editable SEO title, meta description, and canonical URL
+- [ ] **PLVL-02**: Each content item has a focus keyword field with density analysis
+- [ ] **PLVL-03**: Each content item has per-page robots indexing control (index/noindex, follow/nofollow)
+- [ ] **PLVL-04**: Each content item has a custom OG image override
+- [ ] **PLVL-05**: Each content item has a schema type selector and social preview
+
+## v4 Requirements (Future)
+
+Deferred to future release.
+
+### Advanced Analytics Integration
+
+- **ANLT-08**: Real-time Google Search Console API integration for live keyword data
+- **ANLT-09**: Automated weekly SEO audit reports with email delivery
+- **ANLT-10**: Competitor analysis dashboard
+
+### Advanced Redirect Features
+
+- **RDIR-06**: Auto-slug redirect creation when URLs change
+- **RDIR-07**: Redirect chain detection and warning
+
+### Advanced Schema
+
+- **SCHM-06**: LocalBusiness schema with geo coordinates
+- **SCHM-07**: Video schema markup
+- **SCHM-08**: Custom schema builder for arbitrary JSON-LD
+
+### Marketing Automation
+
+- **MKTG-01**: A/B testing for meta titles and descriptions
+- **MKTG-02**: Automated internal linking suggestions
+- **MKTG-03**: Content optimization scoring
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -210,6 +371,13 @@
 | Mobile app | Web-only platform |
 | Redesigning existing marketing pages | All v1.x pages preserved as-is |
 | Redesigning dashboard UI | Use backenddashboard/ folder design as-is |
+| Real-time Google Search Console API | Requires OAuth setup, API quotas, complex auth flow — defer to v4 |
+| Competitor analysis | Needs third-party data providers (Ahrefs/Semrush API) — out of budget scope |
+| A/B testing for meta tags | Requires traffic splitting infrastructure — complex for v1 |
+| WordPress plugin SEO integration | Plugin manages its own SEO; this dashboard controls the marketing site |
+| Multi-tenant SEO settings | Current platform is single-tenant; multi-tenant requires architecture changes |
+| Actual server-side image processing | Image SEO toggles save intent; actual WebP/compression is a deployment pipeline concern |
+| Actual CSS/JS minification at runtime | Performance toggles save preferences; optimization is a build-time/deployment concern |
 
 ## Traceability
 
@@ -353,9 +521,10 @@
 **Coverage:**
 - v1 requirements: 67 total (all Complete)
 - v2 requirements: 60 total
-- Mapped to phases: 60
-- Orphaned: 0
+- v3 requirements: 57 total (new milestone)
+- Mapped to phases: 60 (v2) + 0 (v3, pending roadmap)
+- Orphaned: 57 (v3, pending roadmap creation)
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-20 -- Phase 7 (NOTIF) and Phase 8 (AFF) requirements added*
+*Last updated: 2026-05-20 — v2.1 Marketing & SEO Settings requirements added (57 REQs)*
