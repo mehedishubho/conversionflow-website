@@ -6,6 +6,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CustomCursor } from "@/components/layout/CustomCursor";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { TrackingScripts } from "@/components/layout/TrackingScripts";
+import { getTrackingSettings } from "@/lib/tracking";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -90,6 +92,9 @@ export default async function LocaleLayout({
   // side is the easiest way to get started
   const messages = await getMessages();
 
+  // Read tracking settings server-side for script injection
+  const trackingSettings = await getTrackingSettings();
+
   return (
     <html
       lang={locale}
@@ -111,6 +116,14 @@ export default async function LocaleLayout({
                 window.plausible('register_props', { locale: '${locale}' });`}
             </Script>
           </>
+        )}
+        {process.env.NODE_ENV === "production" && (
+          <TrackingScripts
+            ga4Id={trackingSettings.google_analytics_id}
+            gtmId={trackingSettings.google_tag_manager_id}
+            facebookPixelId={trackingSettings.facebook_pixel_id}
+            tiktokPixelId={trackingSettings.tiktok_pixel_id}
+          />
         )}
         <ThemeProvider
           attribute="class"

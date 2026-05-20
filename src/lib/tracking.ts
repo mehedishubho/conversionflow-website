@@ -1,16 +1,9 @@
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { inArray } from "drizzle-orm";
+import { TRACKING_KEYS, type TrackingKey } from "@/lib/tracking-keys";
 
-const TRACKING_KEYS = [
-  "google_search_console_verification",
-  "facebook_pixel_id",
-  "facebook_capi_token",
-  "google_tag_manager_id",
-  "google_analytics_id",
-] as const;
-
-export type TrackingKey = (typeof TRACKING_KEYS)[number];
+export type { TrackingKey };
 
 export async function getTrackingSettings(): Promise<Record<TrackingKey, string>> {
   const rows = await db

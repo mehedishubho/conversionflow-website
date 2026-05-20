@@ -6,12 +6,14 @@ interface TrackingScriptsProps {
   ga4Id: string;
   gtmId: string;
   facebookPixelId: string;
+  tiktokPixelId: string;
 }
 
 export function TrackingScripts({
   ga4Id,
   gtmId,
   facebookPixelId,
+  tiktokPixelId,
 }: TrackingScriptsProps) {
   return (
     <>
@@ -55,6 +57,20 @@ export function TrackingScripts({
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${facebookPixelId}');
             fbq('track', 'PageView');`}
+        </Script>
+      )}
+
+      {/* TikTok Pixel */}
+      {tiktokPixelId && (
+        <Script id="tiktok-pixel" strategy="afterInteractive">
+          {`!function (w, d, t) {
+              w.TiktokAnalyticsObject=t;var ttq=w[t];w[t]=function(){
+              (w[t].q=w[t].q||[]).push(arguments)};w[t].q=[];ttq.load=function(e){
+              var n=d.createElement("script");n.async=!0;n.src="https://analytics.tiktok.com/i18n/pixel/events.js";
+              n.onload=function(){var t=w[t];t&&t._isLoaded&&t._isLoaded()};var a=d.getElementsByTagName("script")[0];
+              a.parentNode.insertBefore(n,a)};ttq.load('${tiktokPixelId}');
+              ttq.page();
+            }(window, document, 'ttq');`}
         </Script>
       )}
     </>
