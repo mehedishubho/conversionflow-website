@@ -15,7 +15,7 @@ import {
   websiteSchema,
   productSchema,
   breadcrumbSchema,
-} from "@/lib/seo";
+} from "@/lib/schema-helpers";
 import { ChevronDown, ExternalLink } from "lucide-react";
 
 interface SchemaFormProps {
