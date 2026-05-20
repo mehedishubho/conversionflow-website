@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Key, CreditCard, MessageSquare, Info, AlertTriangle, Clock, UserPlus, ShieldAlert } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Key, CreditCard, MessageSquare, Info, AlertTriangle, Clock, UserPlus, ShieldAlert, ShoppingCart, Globe } from "lucide-react";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import Link from "next/link";
@@ -29,24 +29,40 @@ type NotificationItem = {
 };
 
 function getNotificationIcon(type: string) {
-  switch (type) {
+  // Normalize type: handle both bare names ("order") and dotted names ("order.created")
+  const baseType = type.split(".")[0];
+
+  switch (baseType) {
+    case "order":
+      return {
+        icon: <ShoppingCart className="w-5 h-5" />,
+        bg: "bg-brand-50 dark:bg-brand-500/15",
+        color: "text-brand-500 dark:text-brand-400",
+      };
     case "license":
       return {
         icon: <Key className="w-5 h-5" />,
-        bg: "bg-brand-50 dark:bg-brand-500/15",
-        color: "text-brand-500 dark:text-brand-400",
+        bg: "bg-success-50 dark:bg-success-500/15",
+        color: "text-success-600 dark:text-success-500",
+      };
+    case "ticket":
+    case "support":
+      return {
+        icon: <MessageSquare className="w-5 h-5" />,
+        bg: "bg-warning-50 dark:bg-warning-500/15",
+        color: "text-warning-600 dark:text-warning-500",
+      };
+    case "system":
+      return {
+        icon: <Globe className="w-5 h-5" />,
+        bg: "bg-gray-100 dark:bg-gray-700",
+        color: "text-gray-600 dark:text-gray-400",
       };
     case "billing":
       return {
         icon: <CreditCard className="w-5 h-5" />,
         bg: "bg-success-50 dark:bg-success-500/15",
         color: "text-success-600 dark:text-success-500",
-      };
-    case "support":
-      return {
-        icon: <MessageSquare className="w-5 h-5" />,
-        bg: "bg-warning-50 dark:bg-warning-500/15",
-        color: "text-warning-600 dark:text-warning-500",
       };
     case "payment_failed":
       return {
@@ -97,6 +113,10 @@ export function NotificationDropdown() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Refs for polling without flicker (per RESEARCH Pitfall 6)
+  const prevDataRef = useRef<NotificationItem[]>([]);
+  const prevCountRef = useRef<number>(0);
+
   const fetchNotifications = useCallback(async () => {
     try {
       let result;
@@ -105,10 +125,21 @@ export function NotificationDropdown() {
       } else {
         result = await getNotifications();
       }
-      setNotificationList(
-        result.notifications as unknown as NotificationItem[]
-      );
-      setUnreadCount(result.unreadCount);
+      const newNotifs = result.notifications as unknown as NotificationItem[];
+      const newCount = result.unreadCount;
+
+      // Only update state if data actually changed (prevents flicker)
+      const idsChanged =
+        JSON.stringify(newNotifs.map((n) => n.id)) !==
+        JSON.stringify(prevDataRef.current.map((n) => n.id));
+      const countChanged = newCount !== prevCountRef.current;
+
+      if (idsChanged || countChanged) {
+        setNotificationList(newNotifs);
+        setUnreadCount(newCount);
+        prevDataRef.current = newNotifs;
+        prevCountRef.current = newCount;
+      }
     } catch {
       // Silently handle errors - show empty state
     } finally {
@@ -118,6 +149,8 @@ export function NotificationDropdown() {
 
   useEffect(() => {
     fetchNotifications();
+    const intervalId = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(intervalId);
   }, [fetchNotifications]);
 
   function toggleDropdown() {
@@ -253,7 +286,7 @@ export function NotificationDropdown() {
                         </span>
                         <span className="flex items-center gap-2 text-theme-xs text-gray-500 dark:text-gray-400 mt-1">
                           <span className="capitalize">
-                            {notification.type}
+                            {notification.type.split(".")[0]}
                           </span>
                           <span className="w-1 h-1 bg-gray-400 rounded-full" />
                           <span>
