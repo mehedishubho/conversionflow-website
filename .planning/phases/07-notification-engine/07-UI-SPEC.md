@@ -83,7 +83,7 @@ Follows dashboard.css `@theme` tokens:
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px (`--text-theme-sm`) | 400 (normal) | 20px (1.43) | `text-theme-sm` |
-| Label | 12px (`--text-theme-xs`) | 500 (medium) | 18px (1.5) | `text-theme-xs font-medium` |
+| Label | 12px (`--text-theme-xs`) | 400 (normal) | 18px (1.5) | `text-theme-xs` |
 | Heading | 18px (text-lg) | 600 (semibold) | 1.2 | `text-lg font-semibold` |
 | Page title | 20px (text-xl) | 600 (semibold) | 1.3 | `text-xl font-semibold` |
 
