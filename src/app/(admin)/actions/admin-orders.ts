@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { orders, licenses, user } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
+import { sendNotification } from "@/lib/notifications";
 import {
   importOrderToCentral,
   mockImportOrderToCentral,
@@ -176,6 +177,18 @@ export async function verifyOrder(orderId: string) {
     }
   } catch (emailError) {
     console.error(`[Admin] Failed to send confirmation email for order ${orderId}:`, emailError);
+  }
+
+  // Notify user that their order was confirmed
+  try {
+    await sendNotification(order.userId, "order.confirmed", {
+      orderNumber: orderId,
+      planName: order.plan,
+      amount: order.amount,
+      currency: order.currency,
+    });
+  } catch (notifError) {
+    console.error("[Notifications] Failed for order.confirmed:", notifError);
   }
 
   return { success: true };

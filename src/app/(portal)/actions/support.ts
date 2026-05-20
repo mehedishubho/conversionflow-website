@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { sendNotification } from "@/lib/notifications";
 
 export async function createTicket(formData: FormData) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -58,14 +59,24 @@ export async function createTicket(formData: FormData) {
     });
   }
 
-  await db.insert(tickets).values({
+  const [ticket] = await db.insert(tickets).values({
     userId,
     subject,
     description,
     priority,
     status: "open",
     attachments,
-  });
+  }).returning({ id: tickets.id });
+
+  // Notify user that their ticket was created
+  try {
+    await sendNotification(userId, "ticket.created", {
+      ticketId: ticket.id,
+      subject,
+    });
+  } catch (notifError) {
+    console.error("[Notifications] Failed for ticket.created:", notifError);
+  }
 
   return { success: true };
 }
@@ -122,6 +133,18 @@ export async function replyToTicket(ticketId: string, formData: FormData) {
     message,
     attachments,
   });
+
+  // Notify the ticket owner that a reply was received
+  try {
+    await sendNotification(ticket.userId, "ticket.reply_received", {
+      ticketId,
+      replyPreview: message.substring(0, 100),
+    });
+  } catch (notifError) {
+    console.error("[Notifications] Failed for ticket.reply_received:", notifError);
+  }
+
+  // TODO: Wire ticket.status_changed and ticket.resolved when admin ticket actions are implemented
 
   return { success: true };
 }

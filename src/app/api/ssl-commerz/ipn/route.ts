@@ -43,6 +43,8 @@ export async function POST(request: NextRequest) {
 
     if (validation.status !== "VALID") {
       console.warn(`[IPN] Payment validation failed for tran_id=${tranId}, status=${validation.status}`);
+      // TODO: Wire order.payment_failed notification in IPN handler
+      // Need order.userId and failure details to call sendNotification()
       return NextResponse.json(
         { error: "Payment validation failed" },
         { status: 400 }

@@ -14,6 +14,7 @@ import { db } from "@/lib/db";
 import { licenses, orders, licenseStatusEnum } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
+import { sendNotification } from "@/lib/notifications";
 import type { WebhookEventData } from "@/lib/webhook-types";
 
 // ──────────────────────────────────────────────
@@ -88,6 +89,17 @@ export async function handleLicenseCreated(
     console.log(
       `[Webhook] license.created: ${maskKey(data.licenseKey)} for user ${data.userId}`
     );
+
+    // Notify user that their license was generated
+    try {
+      await sendNotification(data.userId, "license.generated", {
+        licenseKey: data.licenseKey,
+        planName: data.plan,
+        productId: data.productId,
+      });
+    } catch (notifError) {
+      console.error("[Notifications] Failed for license.generated:", notifError);
+    }
   } catch (error) {
     console.error(
       `[Webhook] handleLicenseCreated failed for ${data.centralLicenseId}:`,
@@ -232,6 +244,16 @@ export async function handleLicenseExpired(
     console.log(
       `[Webhook] license.expired: ${maskKey(data.licenseKey)}`
     );
+
+    // Notify user that their license has expired
+    try {
+      await sendNotification(data.userId, "license.expired", {
+        planName: data.plan,
+        licenseKey: data.licenseKey.substring(0, 8) + "...",
+      });
+    } catch (notifError) {
+      console.error("[Notifications] Failed for license.expired:", notifError);
+    }
   } catch (error) {
     console.error(
       `[Webhook] handleLicenseExpired failed for ${data.centralLicenseId}:`,
@@ -308,6 +330,29 @@ export async function handlePaymentRefunded(
     console.log(
       `[Webhook] license.payment_refunded: ${maskKey(data.licenseKey)} revoked`
     );
+
+    // Notify user that their order was refunded
+    try {
+      // Fetch order for amount/currency if linked
+      let refundAmount: number | undefined;
+      let refundCurrency: string | undefined;
+      if (license.orderId) {
+        const [linkedOrder] = await db
+          .select({ amount: orders.amount, currency: orders.currency })
+          .from(orders)
+          .where(eq(orders.id, license.orderId))
+          .limit(1);
+        refundAmount = linkedOrder?.amount;
+        refundCurrency = linkedOrder?.currency;
+      }
+      await sendNotification(data.userId, "order.refunded", {
+        orderNumber: license.orderId,
+        amount: refundAmount,
+        currency: refundCurrency,
+      });
+    } catch (notifError) {
+      console.error("[Notifications] Failed for order.refunded:", notifError);
+    }
   } catch (error) {
     console.error(
       `[Webhook] handlePaymentRefunded failed for ${data.centralLicenseId}:`,

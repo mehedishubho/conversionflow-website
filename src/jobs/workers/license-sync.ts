@@ -7,6 +7,7 @@ import {
   mockImportOrderToCentral,
 } from "@/lib/central-api";
 import { createAuditLog } from "@/lib/audit";
+import { sendNotification } from "@/lib/notifications";
 import { redisConnection } from "@/jobs/redis";
 
 /**
@@ -229,6 +230,17 @@ async function syncOrderToCentral(order: (typeof orders.$inferSelect)): Promise<
         licenseKey: centralData.licenseKey.slice(0, 8) + "...",
       },
     });
+
+    // Notify user that their license was delivered
+    try {
+      await sendNotification(order.userId, "license.delivered", {
+        licenseKey: centralData.licenseKey,
+        planName: order.plan,
+        productId: order.productId,
+      });
+    } catch (notifError) {
+      console.error("[Notifications] Failed for license.delivered:", notifError);
+    }
 
     return true;
   } else {

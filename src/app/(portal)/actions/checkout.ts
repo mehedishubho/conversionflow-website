@@ -13,6 +13,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAuditLog } from "@/lib/audit";
+import { sendNotification } from "@/lib/notifications";
 
 // ── Server-side price map (authoritative, never trust client) ──
 // Plan names must match pricingTiers[].plan in @/data/pricing.ts
@@ -206,6 +207,19 @@ export async function createManualOrder(
     targetType: "order",
     targetId: order.id,
   });
+
+  // Notify user that their order was created
+  try {
+    await sendNotification(userId, "order.created", {
+      orderNumber: order.id,
+      planName: plan,
+      amount,
+      currency: "BDT",
+      paymentMethod,
+    });
+  } catch (notifError) {
+    console.error("[Notifications] Failed for order.created:", notifError);
+  }
 
   return { success: true, orderId: order.id };
 }
