@@ -11,7 +11,7 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 
 ## Current Milestone
 
-- **v2.0 Dual Portal SaaS Platform** - Phases 1-6
+- **v2.0 Dual Portal SaaS Platform** - Phases 1-8
 
 ## Phases
 
@@ -20,7 +20,9 @@ Transform the ConversionFlow marketing website (v1.x complete) into a full SaaS 
 - [x] **Phase 3: Customer Portal** — `03-customer-portal` — VERIFIED (5/5 plans, UAT 6/6 pass)
 - [x] **Phase 4: Checkout and Payments** — `04-checkout-payments` — EXECUTED (6/6 plans, human UAT pending)
 - [x] **Phase 5: Admin BI Dashboard** — `05-admin-dashboard` — UAT 12/14 pass, gap closure in progress
-- [ ] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — Planned (4 plans)
+- [x] **Phase 6: Webhooks, Background Jobs, and License Intelligence** — `06-webhooks-jobs` — COMPLETE (4/4 plans)
+- [ ] **Phase 7: Multi-channel Notification Engine** — `07-notification-engine` — Planned (5 plans)
+- [ ] **Phase 8: Affiliate Network System** — `08-affiliate-network` — Planned
 
 ## Phase Details
 
@@ -149,10 +151,52 @@ Plans:
 
 **UI hint**: yes
 
+### Phase 7: Multi-channel Notification Engine
+**Directory**: `07-notification-engine`
+**Goal**: Build a unified notification engine delivering messages across three channels — email (generic SMTP), in-app notification bell, and WhatsApp for BD customers — covering transactional, support, and system events.
+**Depends on**: Phase 6
+**Requirements**: NOTIF-01, NOTIF-02, NOTIF-03, NOTIF-04, NOTIF-05, NOTIF-06, NOTIF-07
+**Success Criteria** (what must be TRUE):
+  1. Core notification service routes events to the correct channels (email, in-app, WhatsApp) based on event type and user preferences
+  2. Email channel sends HTML emails via generic SMTP with configurable templates for orders, licenses, tickets, and system events
+  3. In-app notification bell shows unread count badge and dropdown with notification list, mark-as-read, and per-type grouping
+  4. WhatsApp channel sends concise BD-formatted messages for order confirmations, license delivery, and ticket updates
+  5. Event catalog covers all trigger events: order (created/confirmed/payment_failed/refunded), license (generated/delivered/expiring_soon/expired), ticket (created/reply/status_changed/resolved), system (blog_published/security_alert)
+  6. Admin can manage notification templates and view notification delivery logs
+  7. Users can manage per-channel notification preferences (opt in/out of email, in-app, WhatsApp per event category)
+**Plans**: 5 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Notification engine core: schema tables (notification_log, notification_preferences), event catalog, central sendNotification() service, in-app/WhatsApp channel adapters, BullMQ notification worker
+- [ ] 07-02-PLAN.md — Email channel: dual provider adapter (Resend + SMTP), email template registry, 10 notification email templates, wire into central service
+- [ ] 07-03-PLAN.md — Trigger wiring + WhatsApp: sendNotification() calls at 8 trigger points (order, license, ticket, blog), wa.me link generator for manual WhatsApp
+- [ ] 07-04-PLAN.md — Admin UI: delivery log page with filters/retry, email provider settings (Resend/SMTP toggle), template preview modal, WhatsApp send button, admin nav update
+- [ ] 07-05-PLAN.md — User preferences + polling: per-category per-channel matrix UI, preference server actions, 60s notification bell polling, schema push
+
+**UI hint**: yes
+
+### Phase 8: Affiliate Network System
+**Directory**: `08-affiliate-network`
+**Goal**: Build a full affiliate marketing system where customers become affiliates, share referral links, track conversions, and earn percentage-based commission payouts processed manually by admin via bKash/Nagad/bank transfer.
+**Depends on**: Phase 7 (for affiliate approval/payout notifications)
+**Requirements**: AFF-01, AFF-02, AFF-03, AFF-04, AFF-05, AFF-06, AFF-07, AFF-08
+**Success Criteria** (what must be TRUE):
+  1. Customers can apply to become affiliates; admin can approve, reject, or suspend affiliate accounts
+  2. Each affiliate gets a unique referral code; `?ref=CODE` links set a 30-day cookie on the visitor
+  3. Click tracking records every referral link visit with timestamp, landing page, and visitor metadata
+  4. Commission is auto-calculated (percentage-based, configurable per affiliate) when a referred visitor completes a purchase
+  5. Affiliate dashboard shows clicks, conversions, earnings breakdown, referral link copy button, and payout history
+  6. Affiliates can request payouts; admin reviews, approves, and marks as paid after manual bKash/Nagad/bank transfer
+  7. Admin can manage affiliates (list, set commission rates, view performance, process payouts)
+  8. DB schema supports affiliates, affiliate_clicks, affiliate_commissions, affiliate_payouts tables linked to existing users and orders
+**Plans**: TBD
+
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 (Phase 5 and Phase 6 both depend on Phase 4 and could partially overlap, but sequential is recommended)
 
 | Phase | Directory | Plans Complete | Status | Completed |
@@ -162,4 +206,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Customer Portal | 03-customer-portal | 5/5 | Verified | 2026-05-17 |
 | 4. Checkout and Payments | 04-checkout-payments | 6/6 | Executed (UAT pending) | 2026-05-17 |
 | 5. Admin BI Dashboard | 05-admin-dashboard | 5/6 | UAT gap closure | 2026-05-18 |
-| 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 0/4 | Planned | - |
+| 6. Webhooks, Jobs, License Intelligence | 06-webhooks-jobs | 4/4 | Complete | 2026-05-19 |
+| 7. Multi-channel Notification Engine | 07-notification-engine | 0/5 | Planned | - |
+| 8. Affiliate Network System | 08-affiliate-network | 0/TBD | Planned | - |
