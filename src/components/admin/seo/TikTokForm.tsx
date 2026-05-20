@@ -10,8 +10,8 @@ import {
   TIKTOK_KEYS,
   type TrackingSettingsData,
 } from "@/lib/tracking-keys";
+import EmptyStateWarning from "@/components/admin/seo/EmptyStateWarning";
 import {
-  AlertTriangle,
   CheckCircle2,
   Loader2,
   XCircle,
@@ -281,25 +281,11 @@ export default function TikTokForm({ initialData }: TikTokFormProps) {
       )}
 
       {/* Empty State Warning */}
-      {!pixelIdConfigured && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-900/20">
-          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500" />
-          <div>
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-              TikTok Pixel is not connected.
-            </p>
-            <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400">
-              Configure your Pixel ID below to start tracking.{" "}
-              <a
-                href="#pixel-id-field"
-                className="underline font-medium hover:text-amber-700 dark:hover:text-amber-300"
-              >
-                Configure Now
-              </a>
-            </p>
-          </div>
-        </div>
-      )}
+      <EmptyStateWarning
+        platformName="TikTok"
+        targetId="tiktok-pixel-id"
+        isConfigured={pixelIdConfigured}
+      />
 
       {/* Pixel Configured Banner */}
       {pixelIdConfigured && (
@@ -327,7 +313,7 @@ export default function TikTokForm({ initialData }: TikTokFormProps) {
       >
         <div className="space-y-5">
           {/* Pixel ID */}
-          <div id="pixel-id-field">
+          <div id="tiktok-pixel-id">
             <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
               TikTok Pixel ID
             </label>

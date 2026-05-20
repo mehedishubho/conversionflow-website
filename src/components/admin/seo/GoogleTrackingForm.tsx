@@ -13,8 +13,8 @@ import {
   GOOGLE_KEYS,
   type TrackingSettingsData,
 } from "@/lib/tracking-keys";
+import EmptyStateWarning from "@/components/admin/seo/EmptyStateWarning";
 import {
-  AlertTriangle,
   CheckCircle2,
   Loader2,
   XCircle,
@@ -336,25 +336,11 @@ export default function GoogleTrackingForm({
       </ComponentCard>
 
       {/* Empty State Warning */}
-      {!ga4Configured && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-900/20">
-          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500" />
-          <div>
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-              Google Analytics is not connected.
-            </p>
-            <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400">
-              Configure your GA4 Measurement ID below to start tracking.{" "}
-              <a
-                href="#ga4-id-field"
-                className="underline font-medium hover:text-amber-700 dark:hover:text-amber-300"
-              >
-                Configure Now
-              </a>
-            </p>
-          </div>
-        </div>
-      )}
+      <EmptyStateWarning
+        platformName="Google Analytics"
+        targetId="google-analytics-id"
+        isConfigured={ga4Configured}
+      />
 
       {/* GA4 Configured Banner */}
       {ga4Configured && (
@@ -372,7 +358,7 @@ export default function GoogleTrackingForm({
         desc="Configure your GA4 Measurement ID and verify the connection."
       >
         <div className="space-y-5">
-          <div id="ga4-id-field">
+          <div id="google-analytics-id">
             <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
               GA4 Measurement ID
             </label>
