@@ -6,14 +6,14 @@ import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import {
   saveTrackingSettings,
-  type TrackingData,
-} from "@/app/(admin)/actions/admin-tracking";
+  type TrackingSettingsData,
+} from "@/app/(admin)/actions/admin-tracking-v2";
 
 interface TrackingSettingsFormProps {
-  initialData: TrackingData;
+  initialData: TrackingSettingsData;
 }
 
-const FIELDS: { key: keyof TrackingData; label: string; placeholder: string; help?: string }[] = [
+const FIELDS: { key: keyof TrackingSettingsData; label: string; placeholder: string; help?: string }[] = [
   {
     key: "google_search_console_verification",
     label: "Google Search Console Verification",
@@ -55,9 +55,9 @@ export default function TrackingSettingsForm({
     text: string;
   } | null>(null);
 
-  const [data, setData] = useState<TrackingData>({ ...initialData });
+  const [data, setData] = useState<TrackingSettingsData>({ ...initialData });
 
-  const updateField = (key: keyof TrackingData, value: string) => {
+  const updateField = (key: keyof TrackingSettingsData, value: string) => {
     setData((prev) => ({ ...prev, [key]: value }));
   };
 
