@@ -8,20 +8,26 @@ ConversionFlow is a dual-portal SaaS platform for Devsroom. The public marketing
 
 A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase ConversionFlow licenses, manage billing and downloads, get support — while Devsroom operators gain real-time business intelligence, revenue analytics, and license intelligence across all products.
 
-## Current Milestone: v2.0 Dual Portal SaaS Platform
+## Current Milestone: v2.1 Marketing & SEO Settings Dashboard
 
-**Goal:** Transform the marketing site into a full SaaS platform with Customer Portal and Admin BI Dashboard, integrating with the central Devsroom licensing engine at license.devsroom.com.
+**Goal:** Build a complete SEO & Marketing settings module in the admin dashboard with sub-page navigation, restructuring the flat settings page into a premium, enterprise-grade configuration system covering technical SEO, social metadata, tracking pixels, schema markup, AI crawler controls, redirect management, image/performance SEO, and analytics.
 
 **Target features:**
-- Authentication System (Better Auth, dual auth, 4 roles, 2FA-ready, audit logging)
-- Database Layer (PostgreSQL + Drizzle ORM + Redis)
-- Customer Portal (overview, licenses, billing, downloads, support tickets, notifications)
-- Admin BI Dashboard (revenue intelligence, sales analytics, churn, conversion funnel, geographic analytics, exports)
-- Checkout System (bKash, Nagad, Rocket, Bank Transfer, SSL Commerce, coupons, tax/VAT, invoices)
-- License Intelligence (central API sync, webhooks, piracy detection)
-- Admin Operations (invoice management, user management, activity feed, CSV/Excel/PDF export)
-- Security (RBAC, signed webhooks, encrypted secrets, CSRF, rate limiting)
-- Dashboard Design ported from `backenddashboard/` folder
+- Settings sub-page navigation system (Payment Gateway / SMTP / SEO Settings)
+- General SEO configuration (title, meta, canonical, URL formatting, auto-generation)
+- Search Engine Verification (Google, Bing, Yandex, Baidu, Pinterest)
+- XML Sitemap management with content type controls
+- Robots.txt visual + raw editor with AI bot controls
+- Open Graph & Social SEO (Facebook, Twitter/X, LinkedIn)
+- Meta Pixel & Conversion API with event tracking
+- TikTok Pixel tracking
+- Google Analytics 4 & Google Ads integration
+- Schema Markup system (Organization, Product, Article, FAQ, HowTo, Review)
+- Redirect Manager (301/302/regex, bulk import/export)
+- AI SEO & LLM crawler controls (GPTBot, ClaudeBot, PerplexityBot)
+- Image SEO (auto ALT, WebP, lazy loading, compression)
+- Performance SEO (CSS/JS optimization, CDN, Core Web Vitals)
+- SEO Analytics dashboard (indexed pages, keywords, 404s, crawl issues)
 
 ## Requirements
 
@@ -45,68 +51,56 @@ A production-grade SaaS platform where Bangladeshi WooCommerce store owners purc
 
 ### Active
 
-<!-- v2.0 scope. Building toward these. -->
+<!-- v2.1 scope. Building toward these. -->
 
-**Authentication**
-- [ ] Better Auth integration with dual auth (customer/admin login)
-- [ ] 4-role RBAC system (customer, admin, support_staff, super_admin)
-- [ ] Email verification, password reset, session management
-- [ ] Admin 2FA-ready, IP logging, audit logging
+**Settings Navigation Restructure**
+- [ ] Sub-page navigation system for Settings (Payment / SMTP / SEO)
+- [ ] Migrate existing Payment, Email, Tracking forms to sub-routes
+- [ ] Settings landing page with category cards
 
-**Database & Infrastructure**
-- [ ] PostgreSQL + Drizzle ORM setup with migration system
-- [ ] Redis for sessions, caching, queues
-- [ ] Background job system for sync tasks
-- [ ] Database schema: users, orders, licenses, downloads, tickets, notifications
+**General SEO**
+- [ ] Website title, meta title, meta description, keywords, canonical URL
+- [ ] Default robots meta, SEO separator, OG image, favicon upload
+- [ ] URL formatting controls (lowercase, trailing slash)
+- [ ] Auto meta generation toggle
+- [ ] Real-time SERP preview snippet with character counts
 
-**Central Licensing Integration**
-- [ ] POST to license.devsroom.com/api/orders/import on purchase
-- [ ] Store central_user_id + central_license_id mappings locally
-- [ ] Webhook handlers for license-created/updated/expired/payment-refunded
-- [ ] Scheduled fallback sync when webhooks fail
+**Search Engine Verification**
+- [ ] Google Search Console, Bing, Yandex, Baidu, Pinterest verification fields
+- [ ] Verification status indicators
 
-**Customer Portal**
-- [ ] Customer dashboard overview (active licenses, expiring, downloads, tickets)
-- [ ] License management (view, copy, renew, upgrade, deactivate domain, sync)
-- [ ] Billing section (invoices, payment history, refunds)
-- [ ] Downloads section (latest + old versions, changelogs)
-- [ ] Support tickets (create, reply, attachments)
-- [ ] Notification center
+**Sitemaps & Robots.txt**
+- [ ] XML sitemap enable/configure with content type inclusion
+- [ ] Robots.txt visual + raw editor with AI bot controls
 
-**Checkout & Payments**
-- [ ] Manual BD payments (bKash, Nagad, Rocket, Bank Transfer)
-- [ ] SSL Commerce payment gateway
-- [ ] Coupon codes, tax/VAT calculation
-- [ ] Invoice generation
-- [ ] Purchase flow: payment -> create/find customer -> call central API -> store mapping
+**Social & Open Graph**
+- [ ] Facebook, Twitter/X, LinkedIn social sharing defaults
+- [ ] Social share preview simulator (mobile + desktop)
 
-**Admin BI Dashboard**
-- [ ] Executive overview (total revenue, MRR, ARR, active customers, CLV, CAC)
-- [ ] Sales performance (total sales, conversion rate, refund rate)
-- [ ] User growth (daily signups, weekly growth, activation rate)
-- [ ] Churn analytics (cancellations, churn rate, downgrade alerts)
-- [ ] Conversion funnel (impressions -> visits -> checkout -> purchase -> activation)
-- [ ] Product performance (plugin sales, renewals, plans)
-- [ ] Revenue trend charts (daily/weekly/monthly/yearly)
-- [ ] Retention analytics (day 1/7/30/90)
-- [ ] Geographic analytics (sales by country, revenue heatmap)
-- [ ] Invoice management (paid/pending/failed/overdue)
-- [ ] Activity feed (real-time events)
-- [ ] Filtering (date range, product, plan, channel)
-- [ ] Export (CSV, Excel, PDF)
-- [ ] Notifications (failed payment, expiring license, churn, fraud alerts)
+**Tracking Pixels**
+- [ ] Meta Pixel & Conversion API with event tracking
+- [ ] TikTok Pixel tracking
+- [ ] Google Analytics 4 & Google Ads integration
 
-**License & Plugin Intelligence**
-- [ ] License sync from central API (total/active/expired/revoked/renewal rate)
-- [ ] Plugin intelligence (activation domains, multisite usage, suspicious activations)
-- [ ] Piracy detection
+**Schema Markup**
+- [ ] Global schema (Organization, Website, Breadcrumb)
+- [ ] Content schema (Product, Article, FAQ, HowTo, Review)
+- [ ] JSON-LD preview and validation
 
-**Dashboard UI**
-- [ ] Port dashboard design from `backenddashboard/` folder
-- [ ] Customer portal layout with sidebar navigation
-- [ ] Admin portal layout with sidebar navigation
-- [ ] Charts via ApexCharts (from dashboard template)
-- [ ] Data tables, forms, modals from dashboard UI components
+**Redirect Manager**
+- [ ] 301/302/regex redirects with table UI
+- [ ] Bulk import/export, hit counter, search/filter
+
+**AI SEO & Performance**
+- [ ] AI crawler allow/block controls (GPTBot, ClaudeBot, PerplexityBot)
+- [ ] Image SEO (auto ALT, WebP, lazy loading, compression stats)
+- [ ] Performance SEO (Critical CSS, JS defer, minify, CDN, cache)
+- [ ] Core Web Vitals monitor cards
+
+**SEO Analytics**
+- [ ] Indexed pages, keyword rankings, CTR, impressions
+- [ ] 404 errors, broken links, sitemap health, crawl issues
+- [ ] Charts, tables, status badges, trend indicators
 
 ### Out of Scope
 
@@ -175,4 +169,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-15 — Milestone v2.0 started*
+*Last updated: 2026-05-20 — Milestone v2.1 Marketing & SEO Settings started*
