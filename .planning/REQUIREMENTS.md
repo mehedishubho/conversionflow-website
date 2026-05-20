@@ -518,13 +518,106 @@ Deferred to future release.
 | AFF-07 | Phase 8 | Pending |
 | AFF-08 | Phase 8 | Pending |
 
+### v3 Requirements (Milestone: v2.1 Marketing & SEO Settings Dashboard)
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| NAV-01 | Phase 9 | Pending |
+| NAV-02 | Phase 9 | Pending |
+| NAV-03 | Phase 9 | Pending |
+| NAV-04 | Phase 9 | Pending |
+| NAV-05 | Phase 9 | Pending |
+| GSEO-01 | Phase 10 | Pending |
+| GSEO-02 | Phase 10 | Pending |
+| GSEO-03 | Phase 10 | Pending |
+| GSEO-04 | Phase 10 | Pending |
+| GSEO-05 | Phase 10 | Pending |
+| GSEO-06 | Phase 10 | Pending |
+| GSEO-07 | Phase 10 | Pending |
+| VERF-01 | Phase 10 | Pending |
+| VERF-02 | Phase 10 | Pending |
+| VERF-03 | Phase 10 | Pending |
+| VERF-04 | Phase 10 | Pending |
+| VERF-05 | Phase 10 | Pending |
+| SITM-01 | Phase 10 | Pending |
+| SITM-02 | Phase 10 | Pending |
+| SITM-03 | Phase 10 | Pending |
+| SITM-04 | Phase 10 | Pending |
+| SITM-05 | Phase 10 | Pending |
+| ROBT-01 | Phase 10 | Pending |
+| ROBT-02 | Phase 10 | Pending |
+| ROBT-03 | Phase 10 | Pending |
+| ROBT-04 | Phase 10 | Pending |
+| ROBT-05 | Phase 10 | Pending |
+| SOCL-01 | Phase 11 | Pending |
+| SOCL-02 | Phase 11 | Pending |
+| SOCL-03 | Phase 11 | Pending |
+| SOCL-04 | Phase 11 | Pending |
+| SOCL-05 | Phase 11 | Pending |
+| META-01 | Phase 11 | Pending |
+| META-02 | Phase 11 | Pending |
+| META-03 | Phase 11 | Pending |
+| META-04 | Phase 11 | Pending |
+| META-05 | Phase 11 | Pending |
+| META-06 | Phase 11 | Pending |
+| TIKT-01 | Phase 11 | Pending |
+| TIKT-02 | Phase 11 | Pending |
+| TIKT-03 | Phase 11 | Pending |
+| GOOG-01 | Phase 11 | Pending |
+| GOOG-02 | Phase 11 | Pending |
+| GOOG-03 | Phase 11 | Pending |
+| GOOG-04 | Phase 11 | Pending |
+| GOOG-05 | Phase 11 | Pending |
+| SCHM-01 | Phase 11 | Pending |
+| SCHM-02 | Phase 11 | Pending |
+| SCHM-03 | Phase 11 | Pending |
+| SCHM-04 | Phase 11 | Pending |
+| SCHM-05 | Phase 11 | Pending |
+| RDIR-01 | Phase 12 | Pending |
+| RDIR-02 | Phase 12 | Pending |
+| RDIR-03 | Phase 12 | Pending |
+| RDIR-04 | Phase 12 | Pending |
+| RDIR-05 | Phase 12 | Pending |
+| AISE-01 | Phase 12 | Pending |
+| AISE-02 | Phase 12 | Pending |
+| AISE-03 | Phase 12 | Pending |
+| AISE-04 | Phase 12 | Pending |
+| AISE-05 | Phase 12 | Pending |
+| IMGS-01 | Phase 12 | Pending |
+| IMGS-02 | Phase 12 | Pending |
+| IMGS-03 | Phase 12 | Pending |
+| IMGS-04 | Phase 12 | Pending |
+| IMGS-05 | Phase 12 | Pending |
+| PERF-01 | Phase 12 | Pending |
+| PERF-02 | Phase 12 | Pending |
+| PERF-03 | Phase 12 | Pending |
+| PERF-04 | Phase 12 | Pending |
+| PERF-05 | Phase 12 | Pending |
+| PERF-06 | Phase 12 | Pending |
+| PLVL-01 | Phase 12 | Pending |
+| PLVL-02 | Phase 12 | Pending |
+| PLVL-03 | Phase 12 | Pending |
+| PLVL-04 | Phase 12 | Pending |
+| PLVL-05 | Phase 12 | Pending |
+| ANLT-01 | Phase 13 | Pending |
+| ANLT-02 | Phase 13 | Pending |
+| ANLT-03 | Phase 13 | Pending |
+| ANLT-04 | Phase 13 | Pending |
+| ANLT-05 | Phase 13 | Pending |
+| ANLT-06 | Phase 13 | Pending |
+| ANLT-07 | Phase 13 | Pending |
+
 **Coverage:**
 - v1 requirements: 67 total (all Complete)
-- v2 requirements: 60 total
-- v3 requirements: 57 total (new milestone)
-- Mapped to phases: 60 (v2) + 0 (v3, pending roadmap)
-- Orphaned: 57 (v3, pending roadmap creation)
+- v2 requirements: 60 total (mapped to v2.0 Phases 1-8)
+- v3 requirements: 84 total (mapped to v2.1 Phases 9-13)
+- Phase 9: NAV-01 to NAV-05 (5 requirements)
+- Phase 10: GSEO-01 to GSEO-07, VERF-01 to VERF-05, SITM-01 to SITM-05, ROBT-01 to ROBT-05 (22 requirements)
+- Phase 11: SOCL-01 to SOCL-05, META-01 to META-06, TIKT-01 to TIKT-03, GOOG-01 to GOOG-05, SCHM-01 to SCHM-05 (24 requirements)
+- Phase 12: RDIR-01 to RDIR-05, AISE-01 to AISE-05, IMGS-01 to IMGS-05, PERF-01 to PERF-06, PLVL-01 to PLVL-05 (26 requirements)
+- Phase 13: ANLT-01 to ANLT-07 (7 requirements)
+- Orphaned: 0 -- all v3 requirements mapped
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-20 — v2.1 Marketing & SEO Settings requirements added (57 REQs)*
+*Last updated: 2026-05-20 -- v2.1 roadmap created, 89 v3 requirements mapped to Phases 9-13*
