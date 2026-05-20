@@ -292,6 +292,43 @@ export const settings = pgTable("settings", {
     .$onUpdate(() => new Date()),
 });
 
+export const notificationLog = pgTable(
+  "notification_log",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    event: text("event").notNull(),
+    channel: text("channel").notNull(), // "email" | "in_app" | "whatsapp"
+    status: text("status").notNull(),   // "sent" | "failed" | "queued" | "skipped"
+    errorMessage: text("error_message"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    index("notif_log_user_idx").on(t.userId),
+    index("notif_log_created_idx").on(t.createdAt),
+    index("notif_log_event_idx").on(t.event),
+  ]
+);
+
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    category: text("category").notNull(), // "orders" | "licenses" | "tickets" | "system"
+    channel: text("channel").notNull(),   // "email" | "in_app" | "whatsapp"
+    enabled: boolean("enabled").default(true),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    unique("notif_prefs_user_cat_ch_unique").on(t.userId, t.category, t.channel),
+    index("notif_prefs_user_idx").on(t.userId),
+  ]
+);
+
 // ──────────────────────────────────────────────
 // Relations
 // ──────────────────────────────────────────────
@@ -305,6 +342,8 @@ export const userRelations = relations(user, ({ many }) => ({
   downloads: many(downloads),
   tickets: many(tickets),
   notifications: many(notifications),
+  notificationLogs: many(notificationLog),
+  notificationPreferences: many(notificationPreferences),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -365,6 +404,20 @@ export const ticketMessagesRelations = relations(ticketMessages, ({ one }) => ({
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(user, {
     fields: [notifications.userId],
+    references: [user.id],
+  }),
+}));
+
+export const notificationLogRelations = relations(notificationLog, ({ one }) => ({
+  user: one(user, {
+    fields: [notificationLog.userId],
+    references: [user.id],
+  }),
+}));
+
+export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
+  user: one(user, {
+    fields: [notificationPreferences.userId],
     references: [user.id],
   }),
 }));

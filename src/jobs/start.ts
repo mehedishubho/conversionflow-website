@@ -1,5 +1,6 @@
-import { licenseSyncQueue } from "@/jobs/queues";
+import { licenseSyncQueue, notificationQueue } from "@/jobs/queues";
 import { startLicenseSyncWorker } from "@/jobs/workers/license-sync";
+import { startNotificationWorker } from "@/jobs/workers/notification";
 
 /**
  * Start background jobs: register schedulers and start workers.
@@ -37,6 +38,12 @@ export async function startJobs(): Promise<void> {
     startLicenseSyncWorker();
 
     console.log("[Jobs] License sync scheduler registered (every 15 min)");
+
+    // Start the notification worker if the notification queue is available
+    if (notificationQueue) {
+      startNotificationWorker();
+      console.log("[Jobs] Notification worker started");
+    }
   } catch (error) {
     // Startup should never crash due to job registration failure
     console.error(
