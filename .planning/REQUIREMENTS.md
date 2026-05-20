@@ -222,19 +222,19 @@
 
 ### Search Engine Verification
 
-- [ ] **VERF-01**: Admin can enter and save Google Search Console verification meta tag
-- [ ] **VERF-02**: Admin can enter and save Bing Webmaster verification code
-- [ ] **VERF-03**: Admin can enter and save Yandex, Baidu, and Pinterest verification codes
-- [ ] **VERF-04**: Admin sees verification status indicators (connected/disconnected) for each search engine
-- [ ] **VERF-05**: Admin can copy verification codes to clipboard using a helper button
+- [x] **VERF-01**: Admin can enter and save Google Search Console verification meta tag
+- [x] **VERF-02**: Admin can enter and save Bing Webmaster verification code
+- [x] **VERF-03**: Admin can enter and save Yandex, Baidu, and Pinterest verification codes
+- [x] **VERF-04**: Admin sees verification status indicators (connected/disconnected) for each search engine
+- [x] **VERF-05**: Admin can copy verification codes to clipboard using a helper button
 
 ### XML Sitemaps
 
-- [ ] **SITM-01**: Admin can enable/disable XML sitemap generation
-- [ ] **SITM-02**: Admin can enable/disable individual sitemap types: product sitemap, blog sitemap, image sitemap
-- [ ] **SITM-03**: Admin can toggle auto-regeneration of sitemaps when content changes
-- [ ] **SITM-04**: Admin sees the sitemap URL preview and last-generated timestamp
-- [ ] **SITM-05**: Admin can manually trigger sitemap regeneration and ping search engines
+- [x] **SITM-01**: Admin can enable/disable XML sitemap generation
+- [x] **SITM-02**: Admin can enable/disable individual sitemap types: product sitemap, blog sitemap, image sitemap
+- [x] **SITM-03**: Admin can toggle auto-regeneration of sitemaps when content changes
+- [x] **SITM-04**: Admin sees the sitemap URL preview and last-generated timestamp
+- [x] **SITM-05**: Admin can manually trigger sitemap regeneration and ping search engines
 
 ### Robots.txt Manager
 
@@ -534,16 +534,16 @@ Deferred to future release.
 | GSEO-05 | Phase 10 | Complete |
 | GSEO-06 | Phase 10 | Complete |
 | GSEO-07 | Phase 10 | Complete |
-| VERF-01 | Phase 10 | Pending |
-| VERF-02 | Phase 10 | Pending |
-| VERF-03 | Phase 10 | Pending |
-| VERF-04 | Phase 10 | Pending |
-| VERF-05 | Phase 10 | Pending |
-| SITM-01 | Phase 10 | Pending |
-| SITM-02 | Phase 10 | Pending |
-| SITM-03 | Phase 10 | Pending |
-| SITM-04 | Phase 10 | Pending |
-| SITM-05 | Phase 10 | Pending |
+| VERF-01 | Phase 10 | Complete |
+| VERF-02 | Phase 10 | Complete |
+| VERF-03 | Phase 10 | Complete |
+| VERF-04 | Phase 10 | Complete |
+| VERF-05 | Phase 10 | Complete |
+| SITM-01 | Phase 10 | Complete |
+| SITM-02 | Phase 10 | Complete |
+| SITM-03 | Phase 10 | Complete |
+| SITM-04 | Phase 10 | Complete |
+| SITM-05 | Phase 10 | Complete |
 | ROBT-01 | Phase 10 | Pending |
 | ROBT-02 | Phase 10 | Pending |
 | ROBT-03 | Phase 10 | Pending |

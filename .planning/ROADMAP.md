@@ -230,7 +230,7 @@ Plans:
 Plans:
 - [x] 10-01: SEO server actions foundation -- admin-seo.ts with get/save/score for all 22 settings keys, seo.ts DB integration with hardcoded fallback
 - [x] 10-02: General SEO form -- GeneralSeoForm, SerpPreview (Google snippet), SeoScore (progress bar), character counters, toggle switches
-- [ ] 10-03: Verification + Sitemaps -- VerificationForm with status dots and copy buttons, SitemapForm with content type toggles, dynamic sitemap.ts
+- [x] 10-03: Verification + Sitemaps -- VerificationForm with status dots and copy buttons, SitemapForm with content type toggles, dynamic sitemap.ts
 - [ ] 10-04: Robots.txt editor -- dual-mode visual/raw editor, AiBotCards (8 bots), crawl presets, live preview, dynamic robots.ts
 
 **UI hint**: yes

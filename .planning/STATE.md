@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Marketing & SEO Settings Dashboard
 status: executing
-stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-05-20T14:02:19.387Z"
+stopped_at: Completed 10-03-PLAN.md
+last_updated: "2026-05-20T14:09:16.311Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 13
   completed_phases: 4
   total_plans: 28
-  completed_plans: 23
-  percent: 82
+  completed_plans: 24
+  percent: 86
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 ## Current Position
 
 Phase: 10 (Core SEO Configuration) — EXECUTING
-Plan: 2 of 4 complete (Wave 1 done)
+Plan: 3 of 4 complete (Wave 1 done)
 Status: Ready to execute
 Last activity: 2026-05-20
 
@@ -56,6 +56,7 @@ Progress: [███░░░░░░░] 25%
 | v2.1 Phase 9 | 3/3 | Complete | Settings Foundation |
 | v2.1 Phase 10 | 1/4 | Executing | Core SEO Configuration |
 | Phase 10 P02 | 3min | 2 tasks | 4 files |
+| Phase 10 P03 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [Phase 09]: Settings restructured into sub-page navigation with SettingsShell
 - [Phase 10]: SEO library reads DB first with hardcoded fallback (D-01)
 - [Phase 10]: SerpPreview uses Google-only snippet (D-02); SeoScore reads all 25 keys for completeness (D-06); URL toggles in separate card (GSEO-03)
+- [Phase 10]: VerificationForm uses expand/collapse per engine with status dots (green checkmark/gray circle) per D-08
+- [Phase 10]: sitemap.ts reads DB with try/catch fallback -- static behavior preserved when no DB rows exist
+- [Phase 10]: Auto-regeneration controlled via revalidate export (0 when ON, 3600 when OFF) per SITM-03
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-20T14:02:19.384Z
-Stopped at: Completed 10-02-PLAN.md
+Last session: 2026-05-20T14:09:16.308Z
+Stopped at: Completed 10-03-PLAN.md
 Resume file: None
