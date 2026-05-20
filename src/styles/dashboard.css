@@ -217,6 +217,30 @@
   @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
 }
 
+@utility settings-nav-item {
+  @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors;
+}
+
+@utility settings-nav-item-active {
+  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+}
+
+@utility settings-nav-item-inactive {
+  @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200;
+}
+
+@utility settings-nav-subitem {
+  @apply flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors;
+}
+
+@utility settings-nav-subitem-active {
+  @apply text-brand-500 font-medium dark:text-brand-400;
+}
+
+@utility settings-nav-subitem-inactive {
+  @apply text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300;
+}
+
 @utility no-scrollbar {
   &::-webkit-scrollbar {
     display: none;
