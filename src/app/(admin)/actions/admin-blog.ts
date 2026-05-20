@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { blogPosts, blogCategories } from "@/lib/db/schema";
 import { eq, and, desc, ilike, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
+import { sendNotification } from "@/lib/notifications";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({
@@ -237,6 +238,24 @@ export async function toggleBlogPostStatus(id: string) {
     targetId: id,
     details: { from: post.status, to: newStatus },
   });
+
+  if (newStatus === "published") {
+    const [fullPost] = await db
+      .select({ title: blogPosts.title, slug: blogPosts.slug, locale: blogPosts.locale })
+      .from(blogPosts)
+      .where(eq(blogPosts.id, id))
+      .limit(1);
+
+    try {
+      await sendNotification(userId, "system.blog_published", {
+        postTitle: fullPost?.title || "Untitled",
+        slug: fullPost?.slug || "",
+        locale: fullPost?.locale || "en",
+      });
+    } catch (e) {
+      console.error("Failed to send blog notification:", e);
+    }
+  }
 
   return { success: true, newStatus };
 }

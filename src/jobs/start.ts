@@ -1,6 +1,7 @@
 import { licenseSyncQueue, notificationQueue } from "@/jobs/queues";
 import { startLicenseSyncWorker } from "@/jobs/workers/license-sync";
 import { startNotificationWorker } from "@/jobs/workers/notification";
+import { registerLicenseExpiryCheck } from "@/jobs/workers/license-expiry-check";
 
 /**
  * Start background jobs: register schedulers and start workers.
@@ -44,6 +45,9 @@ export async function startJobs(): Promise<void> {
       startNotificationWorker();
       console.log("[Jobs] Notification worker started");
     }
+
+    // Register the daily license expiry check scheduler
+    registerLicenseExpiryCheck();
   } catch (error) {
     // Startup should never crash due to job registration failure
     console.error(
