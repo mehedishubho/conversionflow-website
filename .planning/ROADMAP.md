@@ -167,11 +167,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Notification engine core: schema tables (notification_log, notification_preferences), event catalog, central sendNotification() service, in-app/WhatsApp channel adapters, BullMQ notification worker
-- [ ] 07-02-PLAN.md — Email channel: dual provider adapter (Resend + SMTP), email template registry, 10 notification email templates, wire into central service
+- [x] 07-01-PLAN.md — Notification engine core: schema tables (notification_log, notification_preferences), event catalog, central sendNotification() service, in-app/WhatsApp channel adapters, BullMQ notification worker
+- [x] 07-02-PLAN.md — Email channel: dual provider adapter (Resend + SMTP), email template registry, 10 notification email templates, wire into central service
 - [ ] 07-03-PLAN.md — Trigger wiring + WhatsApp: sendNotification() calls at 8 trigger points (order, license, ticket, blog), wa.me link generator for manual WhatsApp
 - [ ] 07-04-PLAN.md — Admin UI: delivery log page with filters/retry, email provider settings (Resend/SMTP toggle), template preview modal, WhatsApp send button, admin nav update
-- [ ] 07-05-PLAN.md — User preferences + polling: per-category per-channel matrix UI, preference server actions, 60s notification bell polling, schema push
+- [x] 07-05-PLAN.md — User preferences + polling: per-category per-channel matrix UI, preference server actions, 60s notification bell polling, schema push
 
 **UI hint**: yes
 
