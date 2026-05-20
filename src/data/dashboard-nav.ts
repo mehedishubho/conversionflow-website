@@ -45,6 +45,7 @@ export const adminNavItems: NavItem[] = [
       { name: "Intelligence", path: "/admin/licenses" },
     ],
   },
+  { name: "Blog", icon: FileText, path: "/admin/blog" },
   { name: "Activity", icon: Activity, path: "/admin/activity" },
   { name: "Notifications", icon: Bell, path: "/admin/notifications" },
   { name: "Settings", icon: Settings, path: "/admin/settings" },

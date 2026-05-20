@@ -558,22 +558,13 @@ Based on codebase analysis, these are the exact files where `sendNotification()`
 | A6 | Resend API error response format is `{ data, error }` as shown in docs | Standard Stack | Existing code does not destructure error -- pattern needs verification |
 | A7 | `smtp_pass` stored in plain text in settings table is acceptable for this project | Security Domain | May need encryption at rest for production; acceptable for dev/staging |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **SMTP credential storage security**
-   - What we know: Settings table stores SSL Commerce credentials in plain text already.
-   - What's unclear: Whether SMTP passwords need encryption at rest for production.
-   - Recommendation: Follow existing pattern (plain text in settings table) for consistency. Add encryption later if compliance requires it.
+1. **SMTP credential storage security** — RESOLVED: Follow existing pattern (plain text in settings table) for consistency. Add encryption later if compliance requires it.
 
-2. **Notification template count**
-   - What we know: 4 email templates exist. 13+ new events need email templates (or some can share templates).
-   - What's unclear: How many distinct email templates are needed vs. how many events can share a generic template.
-   - Recommendation: Create templates per category (order, license, ticket, system) not per event. 4-6 new templates total. Use data interpolation within each template for event-specific content.
+2. **Notification template count** — RESOLVED: CONTEXT D-02 decided HTML string templates per existing pattern. Plans create 10 templates total (license-delivery, license-expiring, license-expired, ticket-created, ticket-reply, ticket-resolved, order-confirmed, payment-failed, order-refunded, security-alert).
 
-3. **Admin notification routing**
-   - What we know: Admin notifications currently use `ADMIN_NOTIFICATION_TYPES` with the admin user's own userId.
-   - What's unclear: Should ALL admins receive notifications, or just the acting admin?
-   - Recommendation: For system-wide events (new ticket, fraud alert), notify ALL admins. For action-specific events, only log. This matches the existing pattern where each admin sees their own notification list.
+3. **Admin notification routing** — RESOLVED: System-wide events notify ALL admins. Action-specific events only log. Matches existing `ADMIN_NOTIFICATION_TYPES` pattern.
 
 ## Environment Availability
 

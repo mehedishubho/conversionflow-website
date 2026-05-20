@@ -6,18 +6,21 @@ import { getDocPosts } from "@/lib/mdx";
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return [
-    { locale: "en", slug: "getting-started" },
-    { locale: "en", slug: "courier-sync" },
-    { locale: "en", slug: "meta-capi" },
-    { locale: "en", slug: "fraud-shield" },
-    { locale: "en", slug: "analytics" },
-    { locale: "bn", slug: "getting-started" },
-    { locale: "bn", slug: "courier-sync" },
-    { locale: "bn", slug: "meta-capi" },
-    { locale: "bn", slug: "fraud-shield" },
-    { locale: "bn", slug: "analytics" },
+  const slugs = [
+    "getting-started",
+    "platform-editions",
+    "courier-sync",
+    "meta-capi",
+    "fraud-shield",
+    "analytics",
+    "partial-payments",
+    "checkout-recovery",
+    "courier-history",
+    "laravel-setup",
+    "nextjs-mern-setup",
   ];
+
+  return ["en", "bn"].flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
 export async function generateMetadata({

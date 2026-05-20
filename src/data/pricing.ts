@@ -1,87 +1,104 @@
-interface PricingFeature {
-  text: string;
-  included: boolean;
-}
-
-interface PricingTier {
-  plan: string;
+export interface PlatformPlan {
+  name: string;
   priceUSD: string;
   priceBDT: string;
   period: string;
-  desc: string;
-  popular: boolean;
-  features: PricingFeature[];
-  buttonText: string;
-  buttonStyle: "btn-primary" | "btn-outline";
   checkoutUrl: string;
-  whatsappMessage: string;
+  popular?: boolean;
+  support: string;
 }
 
-export const pricingTiers: PricingTier[] = [
+export interface PlatformPricing {
+  key: "woocommerce" | "laravel" | "nextjs";
+  name: string;
+  label: string;
+  positioning: string;
+  bestFor: string;
+  cta: string;
+  whatsappMessage: string;
+  features: string[];
+  plans: PlatformPlan[];
+}
+
+export const platformPricing: PlatformPricing[] = [
   {
-    plan: "Starter",
-    priceUSD: "$18",
-    priceBDT: "≈ ৳2,150 BDT",
-    period: "/year",
-    desc: "For a single WooCommerce store — 1 year updates",
-    popular: false,
+    key: "woocommerce",
+    name: "WooCommerce Edition",
+    label: "For WordPress stores",
+    positioning: "WordPress-native setup for merchants who need Meta CAPI, courier automation, COD protection, and recovery workflows without custom engineering.",
+    bestFor: "WooCommerce store owners, Facebook Ads-driven shops, COD-heavy Bangladesh commerce teams.",
+    cta: "Start WooCommerce Edition",
+    whatsappMessage: "Hi, I want to buy ConversionFlow WooCommerce Edition.",
     features: [
-      { text: "1 WordPress Site", included: true },
-      { text: "All 6 Modules", included: true },
-      { text: "Steadfast + Pathao + RedX", included: true },
-      { text: "Meta Pixel + CAPI", included: true },
-      { text: "Fraud Shield", included: true },
-      { text: "1 Year Updates", included: true },
-      { text: "Email Support", included: true },
-      { text: "Priority Support", included: false },
+      "WordPress-native setup",
+      "Meta Pixel + Conversions API",
+      "Steadfast, Pathao, RedX workflows",
+      "Fraud Shield and COD booking money",
+      "Partial payments and checkout recovery",
+      "Operational dashboard for store teams",
     ],
-    buttonText: "Get Starter",
-    buttonStyle: "btn-outline",
-    checkoutUrl: "/dashboard/checkout?plan=starter",
-    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Starter. I want to pay via bKash/Nagad.",
+    plans: [
+      { name: "1 Year", priceUSD: "$18", priceBDT: "≈ ৳2,150 BDT", period: "1 year updates", checkoutUrl: "/dashboard/checkout?platform=woocommerce&plan=1-year", support: "Email support" },
+      { name: "2 Years", priceUSD: "$28", priceBDT: "≈ ৳3,000 BDT", period: "2 years updates", checkoutUrl: "/dashboard/checkout?platform=woocommerce&plan=2-years", popular: true, support: "Priority email support" },
+      { name: "Lifetime", priceUSD: "$75", priceBDT: "≈ ৳8,000 BDT", period: "Lifetime license", checkoutUrl: "/dashboard/checkout?platform=woocommerce&plan=lifetime", support: "Priority WhatsApp support" },
+    ],
   },
   {
-    plan: "Professional",
-    priceUSD: "$28",
-    priceBDT: "≈ ৳3,000 BDT",
-    period: "/2 years",
-    desc: "For agencies managing 3 stores — 2 year updates",
-    popular: true,
+    key: "laravel",
+    name: "Laravel Edition",
+    label: "For custom commerce stacks",
+    positioning: "Developer-first commerce intelligence for Laravel stores that need API-ready tracking, courier workflows, and operational customization.",
+    bestFor: "Laravel developers, agencies, custom checkout teams, and enterprise commerce operations.",
+    cta: "Start Laravel Edition",
+    whatsappMessage: "Hi, I want to buy ConversionFlow Laravel Edition.",
     features: [
-      { text: "3 WordPress Sites", included: true },
-      { text: "All 6 Modules", included: true },
-      { text: "Steadfast + Pathao + RedX", included: true },
-      { text: "Meta Pixel + CAPI", included: true },
-      { text: "Fraud Shield", included: true },
-      { text: "Lifetime Updates", included: true },
-      { text: "Priority Email Support", included: true },
-      { text: "WhatsApp Support (BD)", included: true },
+      "API-ready event workflows",
+      "Laravel-friendly integration layer",
+      "Server-side Meta CAPI architecture",
+      "Custom courier and payment workflows",
+      "Operational analytics and activity logs",
+      "Enterprise customization path",
     ],
-    buttonText: "Get Professional",
-    buttonStyle: "btn-primary",
-    checkoutUrl: "/dashboard/checkout?plan=professional",
-    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Professional. I want to pay via bKash/Nagad.",
+    plans: [
+      { name: "1 Year", priceUSD: "$42", priceBDT: "≈ ৳5,000 BDT", period: "1 year updates", checkoutUrl: "/dashboard/checkout?platform=laravel&plan=1-year", support: "Developer email support" },
+      { name: "2 Years", priceUSD: "$68", priceBDT: "≈ ৳8,000 BDT", period: "2 years updates", checkoutUrl: "/dashboard/checkout?platform=laravel&plan=2-years", popular: true, support: "Priority developer support" },
+      { name: "Lifetime", priceUSD: "$170", priceBDT: "≈ ৳20,000 BDT", period: "Lifetime license", checkoutUrl: "/dashboard/checkout?platform=laravel&plan=lifetime", support: "Priority implementation support" },
+    ],
   },
   {
-    plan: "Agency",
-    priceUSD: "$75",
-    priceBDT: "≈ ৳8,000 BDT",
-    period: "/lifetime",
-    desc: "Unlimited sites for agencies — lifetime updates",
-    popular: false,
+    key: "nextjs",
+    name: "Next.js / MERN Edition",
+    label: "For headless teams",
+    positioning: "Headless-ready event infrastructure for React, Node, and MERN commerce teams that need scalable server-side tracking and analytics.",
+    bestFor: "Next.js commerce, MERN platforms, headless stores, and teams building modern tracking infrastructure.",
+    cta: "Start Headless Edition",
+    whatsappMessage: "Hi, I want to buy ConversionFlow Next.js / MERN Edition.",
     features: [
-      { text: "Unlimited Sites", included: true },
-      { text: "All 6 Modules", included: true },
-      { text: "Steadfast + Pathao + RedX", included: true },
-      { text: "Meta Pixel + CAPI", included: true },
-      { text: "Fraud Shield", included: true },
-      { text: "Lifetime Updates", included: true },
-      { text: "Priority WhatsApp Support", included: true },
-      { text: "White-label Ready", included: true },
+      "React ecosystem optimized",
+      "Server-side event architecture",
+      "Headless commerce tracking layer",
+      "Meta CAPI and analytics event APIs",
+      "Scalable reporting data flow",
+      "Developer-controlled integration surface",
     ],
-    buttonText: "Get Agency",
-    buttonStyle: "btn-outline",
-    checkoutUrl: "/dashboard/checkout?plan=agency",
-    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Agency. I want to pay via bKash/Nagad.",
+    plans: [
+      { name: "1 Year", priceUSD: "$68", priceBDT: "≈ ৳8,000 BDT", period: "1 year updates", checkoutUrl: "/dashboard/checkout?platform=nextjs&plan=1-year", support: "Developer email support" },
+      { name: "2 Years", priceUSD: "$100", priceBDT: "≈ ৳12,000 BDT", period: "2 years updates", checkoutUrl: "/dashboard/checkout?platform=nextjs&plan=2-years", popular: true, support: "Priority developer support" },
+      { name: "Lifetime", priceUSD: "$210", priceBDT: "≈ ৳25,000 BDT", period: "Lifetime license", checkoutUrl: "/dashboard/checkout?platform=nextjs&plan=lifetime", support: "Priority architecture support" },
+    ],
   },
 ];
+
+export const pricingTiers = platformPricing[0].plans.map((plan) => ({
+  plan: plan.name,
+  priceUSD: plan.priceUSD,
+  priceBDT: plan.priceBDT,
+  period: plan.period,
+  desc: platformPricing[0].positioning,
+  popular: Boolean(plan.popular),
+  features: platformPricing[0].features.map((text) => ({ text, included: true })),
+  buttonText: platformPricing[0].cta,
+  buttonStyle: plan.popular ? "btn-primary" as const : "btn-outline" as const,
+  checkoutUrl: plan.checkoutUrl,
+  whatsappMessage: platformPricing[0].whatsappMessage,
+}));

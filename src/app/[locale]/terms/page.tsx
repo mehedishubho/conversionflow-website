@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms of Service for ConversionFlow WooCommerce automation plugin.",
+  description: "Terms of Service for the ConversionFlow commerce operations platform.",
 };
 
 export default function TermsPage() {
@@ -93,7 +93,7 @@ export default function TermsPage() {
       <h2>Contact</h2>
       <p>
         For questions about these terms, contact Devsroom at
-        support@conversionflow.com.
+        support@salesconversionflow.com.
       </p>
       <p>
         These terms are product terms, not legal advice, and should be reviewed

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/lib/site";
 
-const siteUrl = "https://conversionflow.com";
+const siteUrl = siteConfig.url;
 
 export default function robots(): MetadataRoute.Robots {
   return {

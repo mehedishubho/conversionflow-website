@@ -1,16 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { pricingTiers } from "@/data/pricing";
+import { platformPricing } from "@/data/pricing";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
 
 export function PricingGrid() {
   const [currency, setCurrency] = useState<"USD" | "BDT">("USD");
-  const t = useTranslations("pricingPage");
+  const [platformKey, setPlatformKey] = useState(platformPricing[0].key);
+  const activePlatform = platformPricing.find((platform) => platform.key === platformKey) ?? platformPricing[0];
 
   return (
     <>
+      <div className="flex flex-wrap gap-2 justify-center mb-4">
+        {platformPricing.map((platform) => (
+          <button
+            key={platform.key}
+            onClick={() => setPlatformKey(platform.key)}
+            className={cn("btn", platform.key === platformKey ? "btn-primary" : "btn-outline")}
+          >
+            {platform.name}
+          </button>
+        ))}
+      </div>
+
       <div className="flex gap-2 justify-center mb-8">
         <button
           onClick={() => setCurrency("USD")}
@@ -26,56 +38,58 @@ export function PricingGrid() {
         </button>
       </div>
 
+      <div className="max-w-[860px] mx-auto mb-8 text-center">
+        <div className="eyebrow">{activePlatform.label}</div>
+        <h2 className="font-dm-sans text-[clamp(24px,3vw,36px)] font-black tracking-[-1px] text-foreground mb-3">
+          {activePlatform.positioning}
+        </h2>
+        <p className="text-text2 leading-[1.8]">{activePlatform.bestFor}</p>
+      </div>
+
       <div className="price-grid">
-        {pricingTiers.map((tier, i) => (
-          <div key={tier.plan} className={`pc${tier.popular ? " pop" : ""}`}>
-            {tier.popular && <div className="pop-tag">{t("mostPopular")}</div>}
-            <div className="p-plan">{t(`tiers.${i}.plan`)}</div>
+        {activePlatform.plans.map((plan) => (
+          <div key={plan.name} className={`pc${plan.popular ? " pop" : ""}`}>
+            {plan.popular && <div className="pop-tag">Best Value</div>}
+            <div className="p-plan">{plan.name}</div>
             <div className="p-price">
-              {currency === "USD" ? tier.priceUSD : tier.priceBDT}
-              <span>{t(`tiers.${i}.period`)}</span>
+              {currency === "USD" ? plan.priceUSD : plan.priceBDT}
+              <span>{plan.period}</span>
             </div>
-            <div className="p-bdt">{currency === "USD" ? tier.priceBDT : tier.priceUSD}</div>
-            <div className="p-desc">{t(`tiers.${i}.desc`)}</div>
+            <div className="p-bdt">{currency === "USD" ? plan.priceBDT : plan.priceUSD}</div>
+            <div className="p-desc">{plan.support}</div>
             <ul className="p-features">
-              {tier.features.map((f, j) => {
-                const localizedFeatures = t.raw(`tiers.${i}.features`);
-                const localizedText = Array.isArray(localizedFeatures) ? localizedFeatures[j] : f.text;
-                return (
-                  <li key={j}>
-                    <span className={f.included ? "p-ck" : "p-no"}>{f.included ? "✓" : "✗"}</span>
-                    {localizedText}
-                  </li>
-                );
-              })}
+              {activePlatform.features.map((feature) => (
+                <li key={feature}>
+                  <span className="p-ck">✓</span>
+                  {feature}
+                </li>
+              ))}
             </ul>
             <a
-              href={tier.checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`btn ${tier.buttonStyle}`}
+              href={plan.checkoutUrl}
+              className={`btn ${plan.popular ? "btn-primary" : "btn-outline"}`}
               style={{ width: "100%", justifyContent: "center", padding: "13px", cursor: "pointer" }}
             >
-              {t(`tiers.${i}.buttonText`)}
+              {activePlatform.cta}
             </a>
             <a
-              href={`https://wa.me/8801721328992?text=${encodeURIComponent(tier.whatsappMessage)}`}
+              href={`https://wa.me/8801721328992?text=${encodeURIComponent(activePlatform.whatsappMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block text-center text-[11px] text-muted mt-2 hover:text-accent transition-colors"
             >
-              {t("whatsappPay")}
+              Buy with bKash/Nagad via WhatsApp
             </a>
           </div>
         ))}
       </div>
 
       <div className="trust-strip">
-        <div className="ts-it">{t("trustSecure")}</div>
-        <div className="ts-it">{t("trustPayment")}</div>
-        <div className="ts-it">{t("trustRefund")}</div>
-        <div className="ts-it">{t("trustDelivery")}</div>
-        <div className="ts-it">{t("trustSupport")}</div>
+        <div className="ts-it">Secure checkout</div>
+        <div className="ts-it">bKash, Nagad, Rocket, Bank Transfer</div>
+        <div className="ts-it">License portal included</div>
+        <div className="ts-it">Platform upgrade path</div>
+        <div className="ts-it">Devsroom support</div>
       </div>
     </>
   );

@@ -37,7 +37,7 @@ export async function sendOrderConfirmationEmail(
   } = params;
 
   const formattedAmount = formatCurrency(amount, currency);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://conversionflow.com";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://salesconversionflow.com";
 
   const isCompleted = status === "completed";
 
@@ -124,14 +124,14 @@ export async function sendOrderConfirmationEmail(
           ConversionFlow by Devsroom - WooCommerce automation for Bangladeshi eCommerce
         </p>
         <p style="color: #7C87BB; font-size: 12px; margin: 4px 0 0 0;">
-          Need help? Contact us at support@conversionflow.com
+          Need help? Contact us at support@salesconversionflow.com
         </p>
       </div>
     </div>
   `;
 
   await resend.emails.send({
-    from: process.env.EMAIL_FROM || "noreply@conversionflow.com",
+    from: process.env.EMAIL_FROM || "noreply@salesconversionflow.com",
     to,
     subject: "Order Confirmation - ConversionFlow",
     html,

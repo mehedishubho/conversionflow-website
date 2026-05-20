@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendVerificationEmail(email: string, url: string) {
   await resend.emails.send({
-    from: process.env.EMAIL_FROM || "noreply@conversionflow.com",
+    from: process.env.EMAIL_FROM || "noreply@salesconversionflow.com",
     to: email,
     subject: "Verify your email - ConversionFlow",
     html: `

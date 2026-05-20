@@ -18,9 +18,15 @@ import { sendNotification } from "@/lib/notifications";
 // ── Server-side price map (authoritative, never trust client) ──
 // Plan names must match pricingTiers[].plan in @/data/pricing.ts
 const PLAN_PRICES: Record<string, { amount: number; productId: string }> = {
-  Starter: { amount: 2150, productId: "conversionflow-wp" },
-  Professional: { amount: 3000, productId: "conversionflow-wp" },
-  Agency: { amount: 8000, productId: "conversionflow-wp" },
+  "woocommerce:1 Year": { amount: 2150, productId: "conversionflow-wp" },
+  "woocommerce:2 Years": { amount: 3000, productId: "conversionflow-wp" },
+  "woocommerce:Lifetime": { amount: 8000, productId: "conversionflow-wp" },
+  "laravel:1 Year": { amount: 5000, productId: "conversionflow-laravel" },
+  "laravel:2 Years": { amount: 8000, productId: "conversionflow-laravel" },
+  "laravel:Lifetime": { amount: 20000, productId: "conversionflow-laravel" },
+  "nextjs:1 Year": { amount: 8000, productId: "conversionflow-nextjs" },
+  "nextjs:2 Years": { amount: 12000, productId: "conversionflow-nextjs" },
+  "nextjs:Lifetime": { amount: 25000, productId: "conversionflow-nextjs" },
 };
 
 // ── Types ──
@@ -135,6 +141,7 @@ export async function createManualOrder(
 
   // Extract form fields
   const plan = formData.get("plan") as string;
+  const platform = (formData.get("platform") as string) || "woocommerce";
   const paymentMethodRaw = formData.get("paymentMethod") as string;
   const paymentRef = (formData.get("paymentRef") as string)?.trim();
   const couponCode = (formData.get("couponCode") as string)?.trim() || null;
@@ -143,7 +150,7 @@ export async function createManualOrder(
   const clientDiscountAmount = formData.get("discountAmount") as string;
 
   // Validate plan exists and get server-side price (T-04-01)
-  const planPrice = PLAN_PRICES[plan];
+  const planPrice = PLAN_PRICES[`${platform}:${plan}`];
   if (!planPrice) {
     return { error: "Invalid plan selected" };
   }

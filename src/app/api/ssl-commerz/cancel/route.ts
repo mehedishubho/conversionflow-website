@@ -6,11 +6,16 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const plan = searchParams.get("value_c") || "";
+  const valueC = searchParams.get("value_c") || "";
+  const [platform, plan] = valueC.includes(":") ? valueC.split(":") : ["woocommerce", valueC];
+
+  const params = new URLSearchParams();
+  if (plan) params.set("plan", plan);
+  if (platform) params.set("platform", platform);
 
   return NextResponse.redirect(
     new URL(
-      `/dashboard/checkout${plan ? `?plan=${encodeURIComponent(plan)}` : ""}`,
+      `/dashboard/checkout${params.toString() ? `?${params.toString()}` : ""}`,
       request.url
     )
   );

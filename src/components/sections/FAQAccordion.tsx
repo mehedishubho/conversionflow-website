@@ -2,25 +2,28 @@
 
 import { useState } from "react";
 import { faqItems } from "@/data/faq";
-import { useTranslations } from "next-intl";
 
-export function FAQAccordion() {
+export function FAQAccordion({ category }: { category?: string }) {
+  const filteredItems = category ? faqItems.filter((item) => item.category === category) : faqItems;
   const [openIndex, setOpenIndex] = useState(0);
-  const t = useTranslations("pricingPage");
 
   return (
     <div className="faq-list">
-      {faqItems.map((_, index) => (
-        <div key={index} className={`fi${index === openIndex ? " open" : ""}`}>
-          <div
-            className="fi-q"
+      {filteredItems.map((item, index) => (
+        <div key={`${item.category}-${item.question}`} className={`fi${index === openIndex ? " open" : ""}`}>
+          <button
+            type="button"
+            className="fi-q w-full text-left"
             onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
           >
-            {t(`faqItems.${index}.question`)}
+            <span>
+              <span className="block text-[10px] uppercase tracking-[1.2px] text-muted mb-1">{item.category}</span>
+              {item.question}
+            </span>
             <span className="fi-ic">+</span>
-          </div>
+          </button>
           <div className="fi-a">
-            <div className="fi-a-in">{t(`faqItems.${index}.answer`)}</div>
+            <div className="fi-a-in">{item.answer}</div>
           </div>
         </div>
       ))}

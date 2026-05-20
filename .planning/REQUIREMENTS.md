@@ -179,6 +179,27 @@
 - [x] **DASH-03**: Unified next-themes across marketing + dashboard (delete dashboard's ThemeContext)
 - [x] **DASH-04**: Route group architecture: (auth)/, (portal)/, (admin)/ separate from [locale]/
 
+### Notification Engine
+
+- [ ] **NOTIF-01**: Core notification service with channel router — `sendNotification(userId, event, data, channels)` dispatches to email, in-app, and/or WhatsApp
+- [ ] **NOTIF-02**: Email channel via generic SMTP — configurable transport, HTML templates for transactional/support/system events, no vendor lock-in
+- [ ] **NOTIF-03**: In-app notification bell — unread count badge, dropdown with notification list, mark-as-read, per-type grouping, extends existing notifications table
+- [ ] **NOTIF-04**: WhatsApp channel for BD customers — concise messages for order confirmations, license delivery, ticket updates via Meta Business API or BD provider
+- [ ] **NOTIF-05**: Complete event catalog — order (created/confirmed/payment_failed/refunded), license (generated/delivered/expiring_soon/expired), ticket (created/reply/status_changed/resolved), system (blog_published/security_alert)
+- [ ] **NOTIF-06**: Admin notification management — view delivery logs, manage templates, test notifications
+- [ ] **NOTIF-07**: User notification preferences — per-channel opt-in/out per event category
+
+### Affiliate Network
+
+- [ ] **AFF-01**: Affiliate registration and approval — customers apply, admin approves/rejects/suspends affiliate accounts
+- [ ] **AFF-02**: Unique referral links — each affiliate gets a code, `?ref=CODE` sets 30-day cookie on visitor
+- [ ] **AFF-03**: Click tracking — records referral link visits with timestamp, landing page, visitor metadata
+- [ ] **AFF-04**: Commission auto-calculation — percentage-based (configurable per affiliate) on completed referred orders
+- [ ] **AFF-05**: Affiliate dashboard — clicks, conversions, earnings, referral link copy, payout history
+- [ ] **AFF-06**: Payout management — affiliates request payouts, admin approves and marks paid after manual bKash/Nagad/bank transfer
+- [ ] **AFF-07**: Admin affiliate management — list affiliates, set commission rates, view performance, process payouts
+- [ ] **AFF-08**: DB schema — affiliates, affiliate_clicks, affiliate_commissions, affiliate_payouts tables linked to users and orders
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -313,13 +334,28 @@
 | LINT-01 | Phase 6 | Complete |
 | LINT-02 | Phase 6 | Complete |
 | LINT-03 | Phase 6 | Complete |
+| NOTIF-01 | Phase 7 | Pending |
+| NOTIF-02 | Phase 7 | Pending |
+| NOTIF-03 | Phase 7 | Pending |
+| NOTIF-04 | Phase 7 | Pending |
+| NOTIF-05 | Phase 7 | Pending |
+| NOTIF-06 | Phase 7 | Pending |
+| NOTIF-07 | Phase 7 | Pending |
+| AFF-01 | Phase 8 | Pending |
+| AFF-02 | Phase 8 | Pending |
+| AFF-03 | Phase 8 | Pending |
+| AFF-04 | Phase 8 | Pending |
+| AFF-05 | Phase 8 | Pending |
+| AFF-06 | Phase 8 | Pending |
+| AFF-07 | Phase 8 | Pending |
+| AFF-08 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 67 total (all Complete)
-- v2 requirements: 45 total
-- Mapped to phases: 45
+- v2 requirements: 60 total
+- Mapped to phases: 60
 - Orphaned: 0
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-15 -- v2.0 requirements added, traceability mapped*
+*Last updated: 2026-05-20 -- Phase 7 (NOTIF) and Phase 8 (AFF) requirements added*
