@@ -238,11 +238,11 @@
 
 ### Robots.txt Manager
 
-- [ ] **ROBT-01**: Admin can edit robots.txt using a visual rule builder (user-agent, allow, disallow, sitemap)
-- [ ] **ROBT-02**: Admin can edit robots.txt using a raw code editor with syntax highlighting
-- [ ] **ROBT-03**: Admin can toggle AI bot access controls for GPTBot, ClaudeBot, and PerplexityBot (allow/block)
-- [ ] **ROBT-04**: Admin can apply crawl rule presets (allow all, block AI bots, block all, custom)
-- [ ] **ROBT-05**: Admin sees a live preview of the generated robots.txt content
+- [x] **ROBT-01**: Admin can edit robots.txt using a visual rule builder (user-agent, allow, disallow, sitemap)
+- [x] **ROBT-02**: Admin can edit robots.txt using a raw code editor with syntax highlighting
+- [x] **ROBT-03**: Admin can toggle AI bot access controls for GPTBot, ClaudeBot, and PerplexityBot (allow/block)
+- [x] **ROBT-04**: Admin can apply crawl rule presets (allow all, block AI bots, block all, custom)
+- [x] **ROBT-05**: Admin sees a live preview of the generated robots.txt content
 
 ### Open Graph & Social SEO
 
@@ -544,11 +544,11 @@ Deferred to future release.
 | SITM-03 | Phase 10 | Complete |
 | SITM-04 | Phase 10 | Complete |
 | SITM-05 | Phase 10 | Complete |
-| ROBT-01 | Phase 10 | Pending |
-| ROBT-02 | Phase 10 | Pending |
-| ROBT-03 | Phase 10 | Pending |
-| ROBT-04 | Phase 10 | Pending |
-| ROBT-05 | Phase 10 | Pending |
+| ROBT-01 | Phase 10 | Complete |
+| ROBT-02 | Phase 10 | Complete |
+| ROBT-03 | Phase 10 | Complete |
+| ROBT-04 | Phase 10 | Complete |
+| ROBT-05 | Phase 10 | Complete |
 | SOCL-01 | Phase 11 | Pending |
 | SOCL-02 | Phase 11 | Pending |
 | SOCL-03 | Phase 11 | Pending |
