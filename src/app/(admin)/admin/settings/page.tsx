@@ -3,11 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import PaymentSettingsForm from "@/components/admin/PaymentSettingsForm";
-import EmailProviderSettings from "@/components/admin/EmailProviderSettings";
-import TrackingSettingsForm from "@/components/admin/TrackingSettingsForm";
 import { getPaymentSettings } from "@/app/(admin)/actions/admin-settings";
-import { getEmailProviderSettings } from "@/app/(admin)/actions/admin-notif-settings";
-import { getTrackingSettingsAdmin } from "@/app/(admin)/actions/admin-tracking";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +24,6 @@ export default async function AdminSettingsPage() {
 
   // Load current payment settings
   const settings = await getPaymentSettings();
-
-  // Load email provider settings
-  const emailSettings = await getEmailProviderSettings();
-
-  // Load tracking settings
-  const trackingSettings = await getTrackingSettingsAdmin();
 
   return (
     <div>
@@ -60,9 +50,6 @@ export default async function AdminSettingsPage() {
           centralApi: settings.centralApi,
         }}
       />
-
-      <EmailProviderSettings initialData={emailSettings} />
-      <TrackingSettingsForm initialData={trackingSettings} />
     </div>
   );
 }

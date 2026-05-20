@@ -1,0 +1,47 @@
+---
+title: "Getting Started with WooBooster"
+date: "2025-06-01"
+excerpt: "A practical setup guide for Bangladeshi WooCommerce stores that want courier sync, fraud protection, and reliable tracking in one plugin."
+---
+
+WooBooster brings the core operations of a Bangladeshi WooCommerce store into one plugin: courier sync, fraud review, analytics, lead recovery, and Meta CAPI tracking. The goal is simple: fewer manual tabs, fewer missed orders, and cleaner data for every campaign.
+
+## Installation Steps
+
+1. Download the latest WooBooster plugin ZIP from your customer dashboard.
+2. Open your WordPress admin panel and go to **Plugins > Add New > Upload Plugin**.
+3. Upload the ZIP file, install it, and activate WooBooster.
+4. Open **WooBooster > License** and paste your license key.
+5. Visit each module settings page and connect the services you use.
+
+### Recommended First Modules
+
+Most stores should start with Courier Sync and Fraud Shield before moving into advanced tracking.
+
+| Module | Best first use | Setup time |
+| --- | --- | --- |
+| Courier Sync | Send orders to Steadfast, Pathao, or RedX | 10 minutes |
+| Fraud Shield | Review repeat return customers | 5 minutes |
+| Meta CAPI | Improve ad tracking after checkout | 15 minutes |
+
+## Store Readiness Checklist
+
+- WooCommerce checkout is active and tested.
+- Courier merchant accounts are ready.
+- Order statuses are mapped to your fulfillment process.
+- Support contact details are current.
+
+## Example WordPress Filter
+
+Developers can customize parts of WooBooster with WordPress filters:
+
+```php
+add_filter('woobooster_order_payload', function ($payload, $order) {
+    $payload['source'] = 'dhaka-storefront';
+    return $payload;
+}, 10, 2);
+```
+
+## After Activation
+
+Place a test order, send it to a courier sandbox or low-risk delivery flow, and confirm that status updates return to WooCommerce. Once the first order loop is verified, WooBooster is ready for daily operations.

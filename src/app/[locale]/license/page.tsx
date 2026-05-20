@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "License Agreement",
-  description: "ConversionFlow License Agreement -- terms of use for WooCommerce, Laravel, and Next.js/MERN editions.",
+  description: "ConversionFlow License Agreement -- terms of use for the WooCommerce automation plugin.",
 };
 
 export default function LicensePage() {
@@ -98,7 +98,7 @@ export default function LicensePage() {
 
       <h2>Contact</h2>
       <p>
-        Questions about licensing may be sent to support@salesconversionflow.com.
+        Questions about licensing may be sent to support@conversionflow.com.
       </p>
       <p>
         This agreement is a product-use draft and should be reviewed by a lawyer

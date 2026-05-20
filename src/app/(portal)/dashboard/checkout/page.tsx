@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { platformPricing } from "@/data/pricing";
+import { pricingTiers } from "@/data/pricing";
 import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import OrderSummary from "@/components/checkout/OrderSummary";
@@ -15,15 +15,9 @@ import PaymentInstructions from "@/components/checkout/PaymentInstructions";
 
 // Authoritative price map (matches server-side PLAN_PRICES in checkout.ts)
 const planPrices: Record<string, number> = {
-  "woocommerce:1 Year": 2150,
-  "woocommerce:2 Years": 3000,
-  "woocommerce:Lifetime": 8000,
-  "laravel:1 Year": 5000,
-  "laravel:2 Years": 8000,
-  "laravel:Lifetime": 20000,
-  "nextjs:1 Year": 8000,
-  "nextjs:2 Years": 12000,
-  "nextjs:Lifetime": 25000,
+  starter: 2150,
+  professional: 3000,
+  agency: 8000,
 };
 
 type PaymentAccount = {
@@ -38,16 +32,13 @@ type PaymentAccount = {
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const platformParam = searchParams.get("platform") || "";
   const planParam = searchParams.get("plan")?.toLowerCase() || "";
 
-  // Find matching platform and plan
-  const platform = platformPricing.find((p) => p.key === platformParam);
-  const plan = platform?.plans.find(
-    (p) => p.name.toLowerCase().replace(/\s+/g, "-") === planParam
+  // Find matching pricing tier
+  const tier = pricingTiers.find(
+    (t) => t.plan.toLowerCase() === planParam
   );
-  const priceKey = plan ? `${platformParam}:${plan.name}` : "";
-  const basePrice = planPrices[priceKey] ?? 0;
+  const basePrice = planPrices[planParam] ?? 0;
 
   // State
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -83,7 +74,7 @@ function CheckoutContent() {
 
   // Load VAT and payment accounts on mount
   useEffect(() => {
-    if (!plan || !basePrice) return;
+    if (!tier || !basePrice) return;
 
     async function load() {
       try {
@@ -99,7 +90,7 @@ function CheckoutContent() {
       }
     }
     load();
-  }, [plan, basePrice]);
+  }, [tier, basePrice]);
 
   // Computed values
   const discountAmount = appliedCoupon?.discount ?? 0;
@@ -146,8 +137,7 @@ function CheckoutContent() {
       setSubmitError(null);
       try {
         const formData = new FormData();
-        formData.append("plan", plan!.name);
-        formData.append("platform", platformParam);
+        formData.append("plan", tier!.plan);
         formData.append("paymentMethod", selectedMethod!);
         formData.append("paymentRef", transactionId);
         if (appliedCoupon) {
@@ -171,12 +161,12 @@ function CheckoutContent() {
         setIsSubmitting(false);
       }
     },
-    [plan, platformParam, selectedMethod, appliedCoupon, basePrice, vatAmount, discountAmount, router]
+    [tier, selectedMethod, appliedCoupon, basePrice, vatAmount, discountAmount, router]
   );
 
   // SSL Commerce handler
   const handleSSLPayment = useCallback(async () => {
-    if (!plan) return;
+    if (!tier) return;
     setSslLoading(true);
     setSslError(null);
     try {
@@ -184,8 +174,7 @@ function CheckoutContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          plan: plan.name,
-          platform: platformParam,
+          plan: tier.plan,
           couponCode: appliedCoupon?.code || null,
           discountAmount: discountAmount,
           taxAmount: vatAmount,
@@ -209,10 +198,10 @@ function CheckoutContent() {
     } finally {
       setSslLoading(false);
     }
-  }, [plan, platformParam, appliedCoupon, discountAmount, vatAmount, total]);
+  }, [tier, appliedCoupon, discountAmount, vatAmount, total]);
 
   // Invalid plan state
-  if (!plan || !basePrice) {
+  if (!tier || !basePrice) {
     return (
       <div>
         <PageBreadcrumb pageTitle="Checkout" basePath="/dashboard" />
@@ -250,7 +239,7 @@ function CheckoutContent() {
         {/* Left Column: Order Summary */}
         <div className="space-y-6">
           <OrderSummary
-            planName={`${platform?.name || platformParam} — ${plan.name}`}
+            planName={tier.plan}
             basePrice={basePrice}
             vatAmount={vatAmount}
             vatRate={vatRate}

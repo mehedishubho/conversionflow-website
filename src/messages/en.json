@@ -3,8 +3,6 @@
     "home": "Home",
     "features": "Features",
     "pricing": "Pricing",
-    "platformComparison": "Platforms",
-    "faq": "FAQ",
     "changelog": "Changelog",
     "support": "Support",
     "docs": "Docs",
@@ -14,7 +12,7 @@
     "language": "Language"
   },
   "footer": {
-    "tagline": "A premium commerce operations layer for tracking, courier automation, COD protection, partial payments, recovery, and analytics across WooCommerce, Laravel, and Next.js/MERN.",
+    "tagline": "The ultimate WooCommerce automation plugin for Bangladeshi store owners. Courier sync, fraud protection, and tracking — one plugin.",
     "madeIn": "🇧🇩 Developed in Dhaka, Bangladesh",
     "product": "Product",
     "resources": "Resources",
@@ -22,7 +20,7 @@
     "newsletterLabel": "Stay updated",
     "newsletterPlaceholder": "Your email address",
     "newsletterBtn": "Subscribe",
-    "newsletterNote": "Get tracking, courier automation, and COD operations updates. No spam.",
+    "newsletterNote": "Get plugin updates and WooCommerce tips. No spam.",
     "badge1Num": "500+",
     "badge1Label": "Active Stores",
     "badge2Num": "30-Day",
@@ -46,15 +44,15 @@
     "capiAccuracy": "CAPI Accuracy"
   },
   "hero": {
-    "eyebrow": "Commerce Operations, Tracking, and COD Protection",
-    "title1": "Run tracking, courier operations, and COD protection from",
-    "titleAccent": "one commerce layer",
-    "subtitle": "ConversionFlow unifies Meta Conversions API, browser pixels, courier automation, fraud protection, partial payments, checkout recovery, and operational analytics for WooCommerce, Laravel, and modern Next.js/MERN commerce stacks.",
-    "ctaPrimary": "Compare Pricing",
-    "ctaSecondary": "Explore Platform Editions",
-    "pill1": "Built for Bangladesh COD commerce",
-    "pill2": "Meta CAPI + browser tracking",
-    "pill3": "WooCommerce, Laravel, Next.js/MERN",
+    "eyebrow": "v0.0.14 — Analytics Suite Live",
+    "title1": "Run Your WooCommerce Store on",
+    "titleAccent": "Autopilot",
+    "subtitle": "Automated courier sync with Steadfast, Pathao & RedX. Meta CAPI tracking that survives iOS 14. Fraud Shield. Real-time analytics. Built for Bangladeshi WooCommerce sellers.",
+    "ctaPrimary": "Get ConversionFlow — $18/yr",
+    "ctaSecondary": "See Features",
+    "pill1": "500+ Active Stores",
+    "pill2": "30-Day Money Back",
+    "pill3": "bKash & Nagad Ready",
     "dashRevenue": "Revenue",
     "dashOrders": "Orders",
     "dashBlocked": "Blocked",
@@ -73,8 +71,8 @@
   },
   "featuresBento": {
     "eyebrow": "Everything You Need",
-    "title": "One Operational Layer. Multiple Commerce Stacks.",
-    "subtitle": "ConversionFlow replaces scattered tracking, courier, fraud, payment, and recovery tools with one infrastructure-grade commerce operations layer."
+    "title": "6 Powerful Modules. One Plugin.",
+    "subtitle": "ConversionFlow replaces 6 separate tools with one seamlessly integrated plugin built specifically for Bangladeshi WooCommerce stores."
   },
   "videoSection": {
     "label": "Watch it in action",
@@ -87,9 +85,9 @@
   },
   "bdSection": {
     "eyebrow": "🇧🇩 Built for Bangladesh",
-    "title1": "Courier and COD Intelligence",
-    "title2": "Built for Bangladesh Commerce",
-    "subtitle": "Operational workflows for Steadfast, Pathao, RedX, booking money, partial payments, delivery analytics, and customer courier history.",
+    "title1": "The Only WooCommerce Plugin",
+    "title2": "Built for BD Sellers",
+    "subtitle": "Deep native integration with Bangladesh's top 3 courier services. Auto-synced, auto-updated — no manual dashboard checking ever again.",
     "flowTitle": "Automated Order Flow",
     "flowDesc": "Stop checking courier dashboards manually 10 times a day. ConversionFlow polls all three in the background and updates WooCommerce automatically.",
     "statusPending": "Pending",
@@ -145,10 +143,10 @@
   },
   "cta": {
     "bdTag": "🇧🇩 Made for Bangladeshi Sellers",
-    "title": "Build a cleaner commerce operation before your next campaign scale-up.",
-    "subtitle": "Use ConversionFlow to improve event accuracy, reduce COD risk, recover checkout leads, and see courier outcomes in one operational view.",
-    "button": "Compare Platform Pricing →",
-    "note": "WooCommerce, Laravel, and Next.js/MERN editions · BDT payment support · Devsroom implementation guidance"
+    "title": "Start Automating Your Store Today",
+    "subtitle": "Join 500+ WooCommerce store owners who save hours every week with ConversionFlow.",
+    "button": "Get ConversionFlow Now — $18/yr →",
+    "note": "Per year / one-time payment · 30-day refund · bKash / Nagad · Instant delivery"
   },
   "featuresPage": {
     "eyebrow": "All Features",
@@ -173,78 +171,57 @@
     "fraudStatusReturned": "Returned",
     "modules": {
       "0": {
-        "title": "Tracking & Analytics",
-        "description": "Server-side and browser tracking for serious ad operations. Meta Conversions API, GA4, Google Ads, TikTok Pixel, Pinterest Tag, Bing UET, and GTM in one controlled tracking layer.",
-        "detailDescription": "Improve event accuracy, recover lost purchase signals, and give ad platforms cleaner data after iOS and browser tracking limits.",
-        "tags": ["Meta CAPI", "GA4", "Google Ads", "TikTok", "GTM"],
+        "title": "Automated Courier Sync",
+        "description": "Automatically polls Steadfast, Pathao, and RedX in the background and updates your WooCommerce order statuses in real-time. Zero manual tracking.",
+        "detailDescription": "ConversionFlow polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
+        "tags": ["Steadfast", "Pathao", "RedX", "Auto Poll", "Status Mapping"],
         "checks": [
-          "Meta Conversions API + browser Pixel",
-          "GA4, Google Ads, TikTok, Pinterest, Bing",
-          "Checkout, paid, shipped, delivered, returned event tracking",
-          "Operational event quality"
+          "Background polling — no manual action needed",
+          "Real-time status: Delivered / Returned / Cancelled",
+          "Per-courier API key from WordPress admin",
+          "One-click manual sync from order list"
         ]
       },
       "1": {
-        "title": "Courier Automation",
-        "description": "Courier workflows built for Bangladesh delivery operations. Automate Steadfast, Pathao, and RedX with booking, sync, and status mapping.",
-        "detailDescription": "Reduce courier dashboard switching and give teams reliable delivery status inside the commerce platform.",
-        "tags": ["Steadfast", "Pathao", "RedX", "Auto Sync", "Status Mapping"],
-        "checks": [
-          "Steadfast, Pathao, and RedX integration",
-          "Delivery success analytics",
-          "Customer courier history",
-          "One-click manual sync"
-        ]
+        "title": "Advanced Analytics",
+        "description": "Revenue trends, courier performance charts, and live-polling stats — all in one beautiful dashboard.",
+        "tags": ["Live Data", "Charts"]
       },
       "2": {
-        "title": "Fraud & COD Protection",
-        "description": "Protect COD revenue before fake orders hit your delivery cost. Fraud rules, booking money, advance payment workflows, and order risk visibility.",
-        "detailDescription": "Stop repeat fake orders, reduce delivery failure, and protect margin before fulfillment begins.",
-        "tags": ["Fraud Shield", "Booking Money", "Activity Log"],
+        "title": "Fraud Shield",
+        "description": "Block bad actors by phone, IP, or email. Velocity limits stop automated abuse before orders are placed.",
+        "detailDescription": "Bangladesh eCommerce has a high fake-order rate. Block bad actors before they cost you money — by phone number, IP address, or email. Velocity limits stop repeat abuse.",
+        "tags": ["Blacklist", "IP Block"],
         "checks": [
-          "Phone, IP, email, velocity pattern flagging",
-          "COD booking money collection",
-          "Traceable record of order actions",
-          "Customer risk checks"
+          "Global blacklist: phone, IP, email",
+          "Velocity limits — max orders per user",
+          "One-click block from the order table",
+          "Blocked orders auto-cancelled pre-payment"
         ],
         "blockedThisMonth": "{count} Fraud Orders Blocked",
         "protectedThisMonth": "৳{amount} protected this month"
       },
       "3": {
-        "title": "Checkout Recovery",
-        "description": "Recover abandoned checkout intent before the buyer disappears. Capture checkout leads, incomplete order data, and payment intent signals.",
-        "detailDescription": "Turn lost checkout starts into actionable leads for follow-up and remarketing.",
-        "tags": ["Checkout Leads", "Abandoned Cart", "Notifications"],
+        "title": "Meta Pixel + CAPI",
+        "description": "Hybrid browser + server-side tracking that survives iOS 14 and ad-blockers. 100% accurate conversions.",
+        "detailDescription": "Browser-side pixels miss 30–40% of conversions. ConversionFlow’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
+        "tags": ["CAPI", "iOS 14+", "GA4"],
         "checks": [
-          "Incomplete order recovery",
-          "Checkout lead capture",
-          "Notification engine",
-          "High-intent lead alerts"
+          "Unified Tracking Hub for all platforms",
+          "GA4, TikTok, Pinterest, GTM supported",
+          "Auto-fire OrderDelivered & OrderReturned",
+          "One-click manual CAPI sync"
         ]
       },
       "4": {
-        "title": "Partial Payments",
-        "description": "Advance payment controls for COD-heavy commerce. Partial payment workflows, payment verification, and invoice visibility.",
-        "detailDescription": "Reduce fake COD dispatches and give teams a cleaner payment-to-delivery workflow.",
-        "tags": ["Partial Payment", "bKash", "Nagad", "Invoices"],
-        "checks": [
-          "Partial payment system",
-          "bKash, Nagad, Rocket, bank transfer verification",
-          "Invoices and payment history",
-          "Fixed or percentage advance"
-        ]
+        "title": "Lead Recovery",
+        "description": "Capture checkout fields in real-time as users type. Convert incomplete orders into paying customers.",
+        "tags": ["Leads", "Abandoned Cart"]
       },
       "5": {
-        "title": "Developer Infrastructure",
-        "description": "Platform editions for merchants, custom stacks, and headless teams. WooCommerce, Laravel, and Next.js/MERN editions with the same commerce intelligence layer.",
-        "detailDescription": "Give technical teams the same commerce intelligence layer without forcing every business into WordPress.",
-        "tags": ["WooCommerce", "Laravel", "Next.js", "API", "Headless"],
-        "checks": [
-          "WooCommerce Edition — WordPress-native workflows",
-          "Laravel Edition — API-ready custom commerce",
-          "Next.js/MERN Edition — headless event infrastructure",
-          "Same intelligence layer across platforms"
-        ]
+        "title": "Premium UI System",
+        "description": "Light & dark admin themes with glassmorphism, emerald accents, and micro-animations.",
+        "tags": ["Dark Mode", "Animations"]
       }
     }
   },
@@ -456,7 +433,7 @@
     "back": "Back to Home"
   },
   "Metadata": {
-    "title": "ConversionFlow — Commerce Tracking, Courier Automation & COD Protection",
-    "description": "Premium commerce operations layer for Meta CAPI, browser tracking, courier automation, COD protection, partial payments, checkout recovery, and analytics."
+    "title": "ConversionFlow — WooCommerce Automation for Bangladesh",
+    "description": "All-in-one WooCommerce automation plugin for Bangladeshi stores. Courier sync, Meta CAPI, fraud protection, analytics, and more."
   }
 }

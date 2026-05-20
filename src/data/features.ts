@@ -1,195 +1,120 @@
-export interface FeatureItem {
+interface FeatureTag {
+  label: string;
+}
+
+interface TrackingPlatform {
+  name: string;
+  status: string;
+}
+
+interface FraudOrder {
+  id: string;
+  phone: string;
+  status: string;
+  statusClass: string;
+  action: string;
+}
+
+interface FeatureModule {
+  icon: string;
   title: string;
   description: string;
-  keywords: string[];
+  tags: FeatureTag[];
+  eyebrow?: string;
+  detailDescription?: string;
+  checks?: string[];
+  trackingPlatforms?: TrackingPlatform[];
+  fraudOrders?: FraudOrder[];
+  fraudStats?: { blocked: number; protected: string };
 }
 
-export interface FeatureCategory {
-  slug: string;
-  eyebrow: string;
-  title: string;
-  summary: string;
-  intent: string;
-  items: FeatureItem[];
-}
-
-export const featureCategories: FeatureCategory[] = [
+export const featureModules: FeatureModule[] = [
   {
-    slug: "tracking-analytics",
-    eyebrow: "Tracking & Analytics",
-    title: "Server-side and browser tracking for serious ad operations",
-    summary:
-      "ConversionFlow combines Meta Conversions API, browser Pixel, GA4, Google Ads tracking, TikTok Pixel, Pinterest Tag, Bing UET, and Google Tag Manager into one controlled tracking layer.",
-    intent: "Improve event accuracy, recover lost purchase signals, and give ad platforms cleaner data after iOS and browser tracking limits.",
-    items: [
-      {
-        title: "Meta Conversions API + Meta Pixel",
-        description:
-          "Send browser and server-side purchase, lead, delivery, and return events so Meta campaigns receive reliable conversion signals.",
-        keywords: ["WooCommerce Meta CAPI plugin", "Meta Conversion API WooCommerce"],
-      },
-      {
-        title: "GA4, Google Ads, GTM, TikTok, Pinterest, Bing",
-        description:
-          "Centralize campaign measurement across major ad and analytics platforms without stacking fragile tracking plugins.",
-        keywords: ["WooCommerce tracking plugin", "Google Ads Tracking WooCommerce"],
-      },
-      {
-        title: "Operational event quality",
-        description:
-          "Track checkout, paid, shipped, delivered, returned, and failed delivery outcomes so reporting follows the real order lifecycle.",
-        keywords: ["Facebook Ads tracking for WooCommerce", "WooCommerce analytics dashboard"],
-      },
+    icon: "🚚",
+    title: "Automated Courier Sync",
+    description:
+      "Automatically polls Steadfast, Pathao, and RedX in the background and updates your WooCommerce order statuses in real-time. Zero manual tracking.",
+    tags: [
+      { label: "Steadfast" },
+      { label: "Pathao" },
+      { label: "RedX" },
+      { label: "Auto Poll" },
+      { label: "Status Mapping" },
+    ],
+    eyebrow: "Module 01",
+    detailDescription:
+      "ConversionFlow polls Steadfast, Pathao, and RedX every hour in the background, automatically updating your WooCommerce order statuses — delivered, returned, or cancelled.",
+    checks: [
+      "Background polling — no manual action needed",
+      "Real-time status: Delivered / Returned / Cancelled",
+      "Per-courier API key from WordPress admin",
+      "One-click manual sync from order list",
     ],
   },
   {
-    slug: "courier-automation",
-    eyebrow: "Courier Automation",
-    title: "Courier workflows built for Bangladesh delivery operations",
-    summary:
-      "Automate Steadfast, Pathao, and RedX workflows with courier booking, sync, status mapping, delivery visibility, and one-click order operations.",
-    intent: "Reduce courier dashboard switching and give teams reliable delivery status inside the commerce platform.",
-    items: [
-      {
-        title: "Steadfast, Pathao, and RedX integration",
-        description:
-          "Connect the courier partners Bangladesh stores actually use and keep operational status close to the order record.",
-        keywords: ["WooCommerce Steadfast integration", "WooCommerce Pathao integration", "WooCommerce RedX integration"],
-      },
-      {
-        title: "Delivery success analytics",
-        description:
-          "See delivered, returned, cancelled, and in-transit patterns so teams can identify courier and customer risk faster.",
-        keywords: ["WooCommerce delivery analytics", "Bangladesh courier automation"],
-      },
-      {
-        title: "Customer courier history",
-        description:
-          "Review customer delivery behavior before accepting risky COD orders or shipping repeat-return customers.",
-        keywords: ["WooCommerce courier history", "COD fraud protection system"],
-      },
+    icon: "📊",
+    title: "Advanced Analytics",
+    description:
+      "Revenue trends, courier performance charts, and live-polling stats — all in one beautiful dashboard.",
+    tags: [{ label: "Live Data" }, { label: "Charts" }],
+  },
+  {
+    icon: "🛡️",
+    title: "Fraud Shield",
+    description:
+      "Block bad actors by phone, IP, or email. Velocity limits stop automated abuse before orders are placed.",
+    tags: [{ label: "Blacklist" }, { label: "IP Block" }],
+    eyebrow: "Module 03",
+    detailDescription:
+      "Bangladesh eCommerce has a high fake-order rate. Block bad actors before they cost you money — by phone number, IP address, or email. Velocity limits stop repeat abuse.",
+    checks: [
+      "Global blacklist: phone, IP, email",
+      "Velocity limits — max orders per user",
+      "One-click block from the order table",
+      "Blocked orders auto-cancelled pre-payment",
+    ],
+    fraudOrders: [
+      { id: "#8834", phone: "017XXXXX", status: "Pending", statusClass: "bd-pn", action: "Block" },
+      { id: "#8833", phone: "018XXXXX", status: "BLOCKED", statusClass: "", action: "Auto-cancelled" },
+      { id: "#8832", phone: "019XXXXX", status: "Delivered", statusClass: "bd-ok", action: "Block" },
+    ],
+    fraudStats: { blocked: 12, protected: "৳18,400 protected this month" },
+  },
+  {
+    icon: "📈",
+    title: "Meta Pixel + CAPI",
+    description:
+      "Hybrid browser + server-side tracking that survives iOS 14 and ad-blockers. 100% accurate conversions.",
+    tags: [{ label: "CAPI" }, { label: "iOS 14+" }, { label: "GA4" }],
+    eyebrow: "Module 02",
+    detailDescription:
+      "Browser-side pixels miss 30–40% of conversions. ConversionFlow’s hybrid approach combines browser Pixel with server-side CAPI — every purchase tracked, every time.",
+    checks: [
+      "Unified Tracking Hub for all platforms",
+      "GA4, TikTok, Pinterest, GTM supported",
+      "Auto-fire OrderDelivered & OrderReturned",
+      "One-click manual CAPI sync",
+    ],
+    trackingPlatforms: [
+      { name: "Meta Pixel", status: "Active + CAPI" },
+      { name: "Google GA4", status: "Active" },
+      { name: "TikTok Pixel", status: "Active" },
+      { name: "Pinterest Tag", status: "Active" },
+      { name: "Google Tag Manager", status: "Active" },
     ],
   },
   {
-    slug: "fraud-cod-protection",
-    eyebrow: "Fraud & COD Protection",
-    title: "Protect COD revenue before fake orders hit your delivery cost",
-    summary:
-      "Use fraud rules, customer courier intelligence, booking money, advance payment workflows, and order risk visibility to control COD exposure.",
-    intent: "Stop repeat fake orders, reduce delivery failure, and protect margin before fulfillment begins.",
-    items: [
-      {
-        title: "Fraud Shield",
-        description:
-          "Flag suspicious phone, email, IP, velocity, courier history, and repeat-return patterns before dispatch.",
-        keywords: ["WooCommerce fraud protection plugin", "WooCommerce COD protection"],
-      },
-      {
-        title: "COD booking money",
-        description:
-          "Collect partial advance payment or booking money for high-risk COD orders before sending inventory out.",
-        keywords: ["Booking money WooCommerce", "Advance payment WooCommerce"],
-      },
-      {
-        title: "Activity logging",
-        description:
-          "Keep a traceable record of order actions, customer risk checks, payment updates, and admin decisions.",
-        keywords: ["WooCommerce order automation", "WooCommerce operational dashboard"],
-      },
-    ],
+    icon: "🛒",
+    title: "Lead Recovery",
+    description:
+      "Capture checkout fields in real-time as users type. Convert incomplete orders into paying customers.",
+    tags: [{ label: "Leads" }, { label: "Abandoned Cart" }],
   },
   {
-    slug: "checkout-recovery",
-    eyebrow: "Checkout Recovery",
-    title: "Recover abandoned checkout intent before the buyer disappears",
-    summary:
-      "Capture checkout leads, incomplete order data, and payment intent signals so sales teams can recover buyers while interest is still warm.",
-    intent: "Turn lost checkout starts into actionable leads for follow-up and remarketing.",
-    items: [
-      {
-        title: "Incomplete order recovery",
-        description:
-          "Save checkout fields as buyers type, then convert incomplete checkout sessions into sales follow-up opportunities.",
-        keywords: ["WooCommerce abandoned checkout recovery", "checkout lead capture"],
-      },
-      {
-        title: "Checkout lead capture",
-        description:
-          "Capture name, phone, product interest, and cart context before the final payment step fails or gets abandoned.",
-        keywords: ["lost checkout leads", "WooCommerce checkout recovery"],
-      },
-      {
-        title: "Notification engine",
-        description:
-          "Alert teams when a high-intent checkout lead, payment issue, or risky COD order needs action.",
-        keywords: ["WooCommerce order automation", "eCommerce notification engine"],
-      },
-    ],
-  },
-  {
-    slug: "partial-payments",
-    eyebrow: "Partial Payments",
-    title: "Advance payment controls for COD-heavy commerce",
-    summary:
-      "Support partial payment workflows, COD booking money, payment verification, and invoice visibility for stores that need commitment before delivery.",
-    intent: "Reduce fake COD dispatches and give teams a cleaner payment-to-delivery workflow.",
-    items: [
-      {
-        title: "Partial payment system",
-        description:
-          "Let teams collect a fixed or percentage advance before approving high-risk orders for courier booking.",
-        keywords: ["WooCommerce partial payment plugin", "partial payment system"],
-      },
-      {
-        title: "Manual BD payment workflows",
-        description:
-          "Support bKash, Nagad, Rocket, and bank transfer verification for local commerce teams.",
-        keywords: ["bKash WooCommerce payment", "Nagad WooCommerce payment"],
-      },
-      {
-        title: "Invoices and payment history",
-        description:
-          "Keep customer and admin views aligned with order payment state, invoice records, and verification outcomes.",
-        keywords: ["WooCommerce invoice management", "BD payment automation"],
-      },
-    ],
-  },
-  {
-    slug: "developer-infrastructure",
-    eyebrow: "Developer Infrastructure",
-    title: "Platform editions for merchants, custom stacks, and headless teams",
-    summary:
-      "Use WooCommerce Edition for WordPress-native operations, Laravel Edition for API-ready custom commerce, and Next.js/MERN Edition for headless tracking infrastructure.",
-    intent: "Give technical teams the same commerce intelligence layer without forcing every business into WordPress.",
-    items: [
-      {
-        title: "WooCommerce Edition",
-        description:
-          "Best for non-technical merchants that need fast setup, WordPress-native workflows, and marketing-friendly tracking.",
-        keywords: ["WooCommerce Meta CAPI plugin", "WooCommerce courier integration Bangladesh"],
-      },
-      {
-        title: "Laravel Edition",
-        description:
-          "Developer-first architecture for custom Laravel commerce stacks, API-ready workflows, and enterprise customization.",
-        keywords: ["Laravel Meta CAPI", "Laravel eCommerce analytics"],
-      },
-      {
-        title: "Next.js / MERN Edition",
-        description:
-          "Headless-ready event infrastructure for React, Node, and modern commerce teams that need server-side analytics control.",
-        keywords: ["Next.js eCommerce tracking", "MERN commerce analytics"],
-      },
-    ],
+    icon: "💎",
+    title: "Premium UI System",
+    description:
+      "Light & dark admin themes with glassmorphism, emerald accents, and micro-animations.",
+    tags: [{ label: "Dark Mode" }, { label: "Animations" }],
   },
 ];
-
-export const featureModules = featureCategories.map((category) => ({
-  icon: "◆",
-  title: category.eyebrow,
-  description: category.summary,
-  tags: category.items.slice(0, 3).map((item) => ({ label: item.title })),
-  eyebrow: category.eyebrow,
-  detailDescription: category.intent,
-  checks: category.items.map((item) => item.title),
-}));

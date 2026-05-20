@@ -9,7 +9,7 @@ import { LanguageToggle } from "./LanguageToggle";
 const socialLinks = [
   {
     label: "Facebook",
-    href: "https://facebook.com/salesconversionflow",
+    href: "https://facebook.com/conversionflow",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
@@ -28,7 +28,7 @@ const socialLinks = [
   },
   {
     label: "Email",
-    href: "mailto:support@salesconversionflow.com",
+    href: "mailto:mhs@wpmhs.com",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect width="20" height="16" x="2" y="4" rx="2" />
@@ -38,7 +38,7 @@ const socialLinks = [
   },
   {
     label: "LinkedIn",
-    href: "https://linkedin.com/company/devsroom",
+    href: "https://linkedin.com/company/conversionflow",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
         <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
@@ -112,8 +112,8 @@ export function Footer() {
             {/* Contact */}
             <div className="ft-col">
               <h4 className="ft-col-heading">{t("connectLabel")}</h4>
-              <a href="mailto:support@salesconversionflow.com" className="ft-link">
-                support@salesconversionflow.com
+              <a href="mailto:mhs@wpmhs.com" className="ft-link">
+                mhs@wpmhs.com
               </a>
               <a href="https://wa.me/8801721328992" target="_blank" rel="noopener noreferrer" className="ft-link">
                 WhatsApp BD

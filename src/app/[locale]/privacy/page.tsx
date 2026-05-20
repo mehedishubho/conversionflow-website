@@ -101,7 +101,7 @@ export default async function PrivacyPage({
       <h2>Your Rights</h2>
       <p>
         You may request access, correction, or deletion of personal data by
-        contacting support@salesconversionflow.com. We may need to verify ownership before
+        contacting support@conversionflow.com. We may need to verify ownership before
         making changes to license records.
       </p>
       <p>
@@ -113,7 +113,7 @@ export default async function PrivacyPage({
       <h2>Contact Us</h2>
       <p>
         ConversionFlow is operated by Devsroom in Dhaka, Bangladesh. For privacy
-        questions, contact support@salesconversionflow.com.
+        questions, contact support@conversionflow.com.
       </p>
       <p>
         This policy is intended for product transparency and should be reviewed

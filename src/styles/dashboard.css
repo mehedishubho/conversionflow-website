@@ -36,38 +36,6 @@
   --color-brand-900: #262e89;
   --color-brand-950: #161950;
 
-  --color-success-50: #ecfdf5;
-  --color-success-500: #22c55e;
-  --color-success-600: #16a34a;
-
-  --color-error-50: #fef2f2;
-  --color-error-500: #ef4444;
-  --color-error-600: #dc2626;
-
-  --color-warning-50: #fffbeb;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
-
-  --color-blue-light-50: #eff6ff;
-  --color-blue-light-500: #3b82f6;
-}
-
-@theme {
-  --color-success-50: #ecfdf5;
-  --color-success-500: #22c55e;
-  --color-success-600: #16a34a;
-
-  --color-error-50: #fef2f2;
-  --color-error-500: #ef4444;
-  --color-error-600: #dc2626;
-
-  --color-warning-50: #fffbeb;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
-
-  --color-blue-light-50: #eff6ff;
-  --color-blue-light-500: #3b82f6;
-
   --text-theme-sm: 14px;
   --text-theme-sm--line-height: 20px;
   --text-theme-xs: 12px;
@@ -247,6 +215,30 @@
 
 @utility menu-dropdown-item-inactive {
   @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
+}
+
+@utility settings-nav-item {
+  @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors;
+}
+
+@utility settings-nav-item-active {
+  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+}
+
+@utility settings-nav-item-inactive {
+  @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200;
+}
+
+@utility settings-nav-subitem {
+  @apply flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors;
+}
+
+@utility settings-nav-subitem-active {
+  @apply text-brand-500 font-medium dark:text-brand-400;
+}
+
+@utility settings-nav-subitem-inactive {
+  @apply text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300;
 }
 
 @utility no-scrollbar {

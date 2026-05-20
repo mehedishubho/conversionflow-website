@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { createSSLSession } from "@/lib/ssl-commerz";
 import { createAuditLog } from "@/lib/audit";
-import { platformPricing } from "@/data/pricing";
+import { pricingTiers } from "@/data/pricing";
 
 // ──────────────────────────────────────────────
 // Server-side price map (T-04-07: authoritative source of truth)
@@ -13,22 +13,12 @@ import { platformPricing } from "@/data/pricing";
 // ──────────────────────────────────────────────
 
 const PLAN_PRICES_BDT: Record<string, number> = {
-  "woocommerce:1 Year": 2150,
-  "woocommerce:2 Years": 3000,
-  "woocommerce:Lifetime": 8000,
-  "laravel:1 Year": 5000,
-  "laravel:2 Years": 8000,
-  "laravel:Lifetime": 20000,
-  "nextjs:1 Year": 8000,
-  "nextjs:2 Years": 12000,
-  "nextjs:Lifetime": 25000,
+  Starter: 2150,
+  Professional: 3000,
+  Agency: 8000,
 };
 
-const PRODUCT_IDS: Record<string, string> = {
-  woocommerce: "conversionflow-wp",
-  laravel: "conversionflow-laravel",
-  nextjs: "conversionflow-nextjs",
-};
+const PRODUCT_ID = "conversionflow-wp-plugin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,18 +38,14 @@ export async function POST(request: NextRequest) {
 
     // 2. Parse request body
     const body = await request.json();
-    const { plan, platform, couponCode, discountAmount, taxAmount } = body as {
+    const { plan, couponCode, discountAmount, taxAmount } = body as {
       plan: string;
-      platform?: string;
       couponCode?: string;
       discountAmount?: number;
       taxAmount?: number;
     };
 
-    const platformKey = platform || "woocommerce";
-    const priceKey = `${platformKey}:${plan}`;
-
-    if (!plan || !PLAN_PRICES_BDT[priceKey]) {
+    if (!plan || !PLAN_PRICES_BDT[plan]) {
       return NextResponse.json(
         { error: "Invalid plan selected" },
         { status: 400 }
@@ -67,8 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Validate plan exists in pricing tiers
-    const pricingPlatform = platformPricing.find((p) => p.key === platformKey);
-    const tier = pricingPlatform?.plans.find((p) => p.name === plan);
+    const tier = pricingTiers.find((t) => t.plan === plan);
     if (!tier) {
       return NextResponse.json(
         { error: "Plan not found" },
@@ -77,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Compute authoritative price server-side (T-04-07)
-    const baseAmount = PLAN_PRICES_BDT[priceKey];
+    const baseAmount = PLAN_PRICES_BDT[plan];
     const discount = Math.max(0, Number(discountAmount) || 0);
     const tax = Math.max(0, Number(taxAmount) || 0);
     const totalAmount = Math.max(baseAmount - discount + tax, 0);
@@ -87,7 +72,7 @@ export async function POST(request: NextRequest) {
       .insert(orders)
       .values({
         userId: user.id,
-        productId: PRODUCT_IDS[platformKey] || "conversionflow-wp",
+        productId: PRODUCT_ID,
         plan,
         amount: baseAmount,
         currency: "BDT",
@@ -127,8 +112,8 @@ export async function POST(request: NextRequest) {
       failUrl: `${appUrl}/api/ssl-commerz/fail`,
       cancelUrl: `${appUrl}/api/ssl-commerz/cancel`,
       ipnUrl: `${appUrl}/api/ssl-commerz/ipn`,
-      productName: `ConversionFlow ${pricingPlatform?.name || plan}`,
-      productCategory: "Software License",
+      productName: `ConversionFlow ${plan}`,
+      productCategory: "WordPress Plugin",
       cusName: user.name,
       cusEmail: user.email,
       cusPhone: user.phone || "",
@@ -137,7 +122,7 @@ export async function POST(request: NextRequest) {
       cusCountry: "Bangladesh",
       valueA: order.id,
       valueB: user.id,
-      valueC: `${platformKey}:${plan}`,
+      valueC: plan,
       valueD: couponCode || "",
     });
 

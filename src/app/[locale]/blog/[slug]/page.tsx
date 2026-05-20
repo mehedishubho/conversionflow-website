@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/routing";
 import { notFound } from "next/navigation";
-import { getPostBySlug } from "@/lib/blog";
+import { getBlogPosts } from "@/lib/mdx";
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return [
-    { locale: "en" },
-    { locale: "bn" },
-  ];
+  const posts = getBlogPosts();
+  return posts.flatMap(post => [
+    { locale: "en", slug: post.slug },
+    { locale: "bn", slug: post.slug },
+  ]);
 }
 
 export async function generateMetadata({
@@ -17,18 +18,17 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { locale, slug } = await params;
-  const post = await getPostBySlug(slug, locale);
+  const { slug } = await params;
+  const post = getBlogPosts().find((item) => item.slug === slug);
 
   if (!post) return { title: "Post Not Found" };
 
   return {
-    title: post.seoTitle ?? post.title,
-    description: post.seoDescription ?? post.excerpt ?? undefined,
+    title: post.title,
+    description: post.excerpt,
     openGraph: {
-      title: `${post.seoTitle ?? post.title} | ConversionFlow`,
-      description: post.seoDescription ?? post.excerpt ?? undefined,
-      images: post.ogImage ?? post.coverImage ?? undefined,
+      title: `${post.title} | ConversionFlow`,
+      description: post.excerpt,
     },
   };
 }
@@ -38,18 +38,17 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { locale, slug } = await params;
-  const post = await getPostBySlug(slug, locale);
+  const { slug } = await params;
+  const post = getBlogPosts().find((item) => item.slug === slug);
 
   if (!post) notFound();
 
-  const date = post.publishedAt
-    ? new Date(post.publishedAt).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
+  const { default: Post } = await import(`@/content/blog/${slug}.mdx`);
+  const date = new Date(post.date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <>
@@ -59,7 +58,7 @@ export default async function BlogPostPage({
             href="/blog"
             className="text-[13px] font-semibold text-muted hover:text-accent transition-colors inline-flex items-center gap-1.5 mb-6"
           >
-            <span aria-hidden="true">&larr;</span>
+            <span aria-hidden="true">←</span>
             Back to blog
           </Link>
           <h1
@@ -69,18 +68,17 @@ export default async function BlogPostPage({
             {post.title}
           </h1>
           <div className="text-sm text-muted mt-3 flex items-center justify-center gap-3">
-            {date && <span>{date}</span>}
-            {date && <span aria-hidden="true">/</span>}
-            <span>{post.authorName}</span>
+            <span>{date}</span>
+            <span aria-hidden="true">/</span>
+            <span>{post.readingTime} min read</span>
           </div>
         </div>
       </div>
 
       <div className="max-w-[760px] mx-auto px-7 py-16">
-        <article
-          className="prose dark:prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <article className="prose dark:prose-invert max-w-none">
+          <Post />
+        </article>
       </div>
     </>
   );

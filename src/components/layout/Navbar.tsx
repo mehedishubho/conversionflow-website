@@ -21,8 +21,6 @@ export function Navbar() {
     { name: t("home"), href: "/" },
     { name: t("features"), href: "/features" },
     { name: t("pricing"), href: "/pricing" },
-    { name: t("platformComparison"), href: "/platform-comparison" },
-    { name: t("faq"), href: "/faq" },
     { name: t("changelog"), href: "/changelog" },
     { name: t("support"), href: "/support" },
     { name: t("docs"), href: "/docs" },

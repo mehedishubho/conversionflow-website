@@ -1,21 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Key, CreditCard, MessageSquare, Info, AlertTriangle, Clock, UserPlus, ShieldAlert, ShoppingCart, Globe } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Key, CreditCard, MessageSquare, Info } from "lucide-react";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   getNotifications,
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/app/(portal)/actions/notifications";
-import {
-  getAdminNotifications,
-  markAdminNotificationRead,
-  markAllAdminNotificationsRead,
-} from "@/app/(admin)/actions/admin-notifications";
 import { formatDistanceToNow } from "date-fns";
 
 type NotificationItem = {
@@ -29,34 +23,12 @@ type NotificationItem = {
 };
 
 function getNotificationIcon(type: string) {
-  // Normalize type: handle both bare names ("order") and dotted names ("order.created")
-  const baseType = type.split(".")[0];
-
-  switch (baseType) {
-    case "order":
-      return {
-        icon: <ShoppingCart className="w-5 h-5" />,
-        bg: "bg-brand-50 dark:bg-brand-500/15",
-        color: "text-brand-500 dark:text-brand-400",
-      };
+  switch (type) {
     case "license":
       return {
         icon: <Key className="w-5 h-5" />,
-        bg: "bg-success-50 dark:bg-success-500/15",
-        color: "text-success-600 dark:text-success-500",
-      };
-    case "ticket":
-    case "support":
-      return {
-        icon: <MessageSquare className="w-5 h-5" />,
-        bg: "bg-warning-50 dark:bg-warning-500/15",
-        color: "text-warning-600 dark:text-warning-500",
-      };
-    case "system":
-      return {
-        icon: <Globe className="w-5 h-5" />,
-        bg: "bg-gray-100 dark:bg-gray-700",
-        color: "text-gray-600 dark:text-gray-400",
+        bg: "bg-brand-50 dark:bg-brand-500/15",
+        color: "text-brand-500 dark:text-brand-400",
       };
     case "billing":
       return {
@@ -64,35 +36,11 @@ function getNotificationIcon(type: string) {
         bg: "bg-success-50 dark:bg-success-500/15",
         color: "text-success-600 dark:text-success-500",
       };
-    case "payment_failed":
-      return {
-        icon: <AlertTriangle className="w-5 h-5" />,
-        bg: "bg-error-50 dark:bg-error-500/15",
-        color: "text-error-600 dark:text-error-500",
-      };
-    case "license_expiring":
-      return {
-        icon: <Clock className="w-5 h-5" />,
-        bg: "bg-warning-50 dark:bg-warning-500/15",
-        color: "text-warning-600 dark:text-warning-500",
-      };
-    case "new_signup":
-      return {
-        icon: <UserPlus className="w-5 h-5" />,
-        bg: "bg-success-50 dark:bg-success-500/15",
-        color: "text-success-600 dark:text-success-500",
-      };
-    case "new_ticket":
+    case "support":
       return {
         icon: <MessageSquare className="w-5 h-5" />,
         bg: "bg-warning-50 dark:bg-warning-500/15",
         color: "text-warning-600 dark:text-warning-500",
-      };
-    case "fraud_alert":
-      return {
-        icon: <ShieldAlert className="w-5 h-5" />,
-        bg: "bg-error-50 dark:bg-error-500/15",
-        color: "text-error-600 dark:text-error-500",
       };
     default:
       return {
@@ -104,8 +52,6 @@ function getNotificationIcon(type: string) {
 }
 
 export function NotificationDropdown() {
-  const pathname = usePathname();
-  const isAdminContext = pathname.startsWith("/admin");
   const [isOpen, setIsOpen] = useState(false);
   const [notificationList, setNotificationList] = useState<NotificationItem[]>(
     []
@@ -113,44 +59,22 @@ export function NotificationDropdown() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Refs for polling without flicker (per RESEARCH Pitfall 6)
-  const prevDataRef = useRef<NotificationItem[]>([]);
-  const prevCountRef = useRef<number>(0);
-
   const fetchNotifications = useCallback(async () => {
     try {
-      let result;
-      if (isAdminContext) {
-        result = await getAdminNotifications();
-      } else {
-        result = await getNotifications();
-      }
-      const newNotifs = result.notifications as unknown as NotificationItem[];
-      const newCount = result.unreadCount;
-
-      // Only update state if data actually changed (prevents flicker)
-      const idsChanged =
-        JSON.stringify(newNotifs.map((n) => n.id)) !==
-        JSON.stringify(prevDataRef.current.map((n) => n.id));
-      const countChanged = newCount !== prevCountRef.current;
-
-      if (idsChanged || countChanged) {
-        setNotificationList(newNotifs);
-        setUnreadCount(newCount);
-        prevDataRef.current = newNotifs;
-        prevCountRef.current = newCount;
-      }
+      const result = await getNotifications();
+      setNotificationList(
+        result.notifications as unknown as NotificationItem[]
+      );
+      setUnreadCount(result.unreadCount);
     } catch {
       // Silently handle errors - show empty state
     } finally {
       setIsLoading(false);
     }
-  }, [isAdminContext]);
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(intervalId);
   }, [fetchNotifications]);
 
   function toggleDropdown() {
@@ -165,11 +89,7 @@ export function NotificationDropdown() {
     notificationId: string,
     entityUrl?: string
   ) {
-    if (isAdminContext) {
-      await markAdminNotificationRead(notificationId);
-    } else {
-      await markNotificationRead(notificationId);
-    }
+    await markNotificationRead(notificationId);
 
     setUnreadCount((prev) => Math.max(0, prev - 1));
     setNotificationList((prev) =>
@@ -184,11 +104,7 @@ export function NotificationDropdown() {
   }
 
   async function handleMarkAllRead() {
-    if (isAdminContext) {
-      await markAllAdminNotificationsRead();
-    } else {
-      await markAllNotificationsRead();
-    }
+    await markAllNotificationsRead();
     setUnreadCount(0);
     setNotificationList((prev) => prev.map((n) => ({ ...n, read: true })));
   }
@@ -286,7 +202,7 @@ export function NotificationDropdown() {
                         </span>
                         <span className="flex items-center gap-2 text-theme-xs text-gray-500 dark:text-gray-400 mt-1">
                           <span className="capitalize">
-                            {notification.type.split(".")[0]}
+                            {notification.type}
                           </span>
                           <span className="w-1 h-1 bg-gray-400 rounded-full" />
                           <span>
@@ -304,7 +220,7 @@ export function NotificationDropdown() {
           )}
         </ul>
         <Link
-          href={isAdminContext ? "/admin/activity" : "/dashboard/account"}
+          href="/dashboard/account"
           className="block px-4 py-2 mt-3 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
         >
           View All Notifications

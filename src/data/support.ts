@@ -8,27 +8,27 @@ interface SupportChannel {
 
 export const supportChannels: SupportChannel[] = [
   {
-    icon: "Email",
+    icon: "📧",
     title: "Email Support",
     description:
-      "Send platform selection, tracking, courier, licensing, or billing questions to the Devsroom team.",
-    action: "support@salesconversionflow.com",
-    href: "mailto:support@salesconversionflow.com",
+      "Send us a detailed message and we'll respond within 24 hours, usually much faster.",
+    action: "mhs@wpmhs.com",
+    href: "mailto:mhs@wpmhs.com",
   },
   {
-    icon: "WA",
+    icon: "💬",
     title: "WhatsApp (BD)",
     description:
-      "Bangladesh-based direct support via WhatsApp for pricing, local payment, and implementation questions.",
+      "Bangladesh-based direct support via WhatsApp. Reply within business hours (9AM–6PM BST).",
     action: "+880 1721-328992",
     href: "https://wa.me/8801721328992",
   },
   {
-    icon: "Docs",
+    icon: "📖",
     title: "Documentation",
     description:
-      "Setup guides for Meta CAPI, courier automation, COD protection, partial payments, checkout recovery, and developer editions.",
-    action: "Browse Docs",
-    href: "/docs",
+      "Step-by-step guides for every module — from first install to advanced CAPI configuration.",
+    action: "Browse Docs →",
+    href: "#",
   },
 ];

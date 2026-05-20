@@ -1,45 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { featureCategories } from "@/data/features";
+import { featureModules } from "@/data/features";
 import { StaggerReveal, StaggerItem } from "@/components/layout/StaggerReveal";
-
-const categoryIcons: Record<string, string> = {
-  "Tracking & Analytics": "📊",
-  "Courier Automation": "🚚",
-  "Fraud & COD Protection": "🛡️",
-  "Checkout Recovery": "🔄",
-  "Partial Payments": "💳",
-  "Developer Infrastructure": "⚙️",
-};
-
-// 4-row repeating cycle: [w2, n] [n,n,n] [n, w2] [n,n,n]
-function isWide(index: number) {
-  const pos = index % 10;
-  return pos === 0 || pos === 6;
-}
-
-const allCards = featureCategories.flatMap((category) => [
-  // Category header card
-  {
-    type: "category" as const,
-    icon: categoryIcons[category.eyebrow] || "◆",
-    title: category.eyebrow,
-    description: category.summary,
-    tag: null as string | null,
-  },
-  // 3 feature cards
-  ...category.items.map((item) => ({
-    type: "feature" as const,
-    icon: categoryIcons[category.eyebrow] || "◆",
-    title: item.title,
-    description: item.description,
-    tag: category.eyebrow,
-  })),
-]);
 
 export function FeaturesBento() {
   const t = useTranslations("featuresBento");
+  const tf = useTranslations("featuresPage");
 
   return (
     <section className="sec">
@@ -50,19 +17,18 @@ export function FeaturesBento() {
           <p className="sec-sub">{t("subtitle")}</p>
         </div>
         <StaggerReveal className="bento">
-          {allCards.map((card, index) => (
-            <StaggerItem
-              key={`${card.type}-${index}`}
-              className={`bc${isWide(index) ? " w2" : ""}`}
-            >
-              <div className="bc-icon">{card.icon}</div>
-              <div className="bc-title">{card.title}</div>
-              <div className="bc-desc">{card.description}</div>
-              {card.tag && (
-                <div className="tags">
-                  <span className="tag">{card.tag}</span>
-                </div>
-              )}
+          {featureModules.map((module, index) => (
+            <StaggerItem key={index} className={`bc${index === 0 ? " w2" : ""}`}>
+              <div className="bc-icon">{module.icon}</div>
+              <div className="bc-title">{tf(`modules.${index}.title`)}</div>
+              <div className="bc-desc">{tf(`modules.${index}.description`)}</div>
+              <div className="tags">
+                {tf.raw(`modules.${index}.tags`)?.map((tag: string) => (
+                  <span key={tag} className="tag">{tag}</span>
+                )) || module.tags.map((tag) => (
+                  <span key={tag.label} className="tag">{tag.label}</span>
+                ))}
+              </div>
             </StaggerItem>
           ))}
         </StaggerReveal>

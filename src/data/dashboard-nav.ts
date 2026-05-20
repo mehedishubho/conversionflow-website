@@ -12,7 +12,6 @@ import {
   Settings,
   ShoppingCart,
   Activity,
-  Bell,
 } from "lucide-react";
 
 export type NavItem = {
@@ -36,17 +35,7 @@ export const adminNavItems: NavItem[] = [
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Invoices", icon: FileText, path: "/admin/invoices" },
-  {
-    name: "Licenses",
-    icon: Key,
-    path: "/admin/licenses",
-    subItems: [
-      { name: "All Licenses", path: "/admin/licenses" },
-      { name: "Intelligence", path: "/admin/licenses" },
-    ],
-  },
-  { name: "Blog", icon: FileText, path: "/admin/blog" },
+  { name: "Licenses", icon: Key, path: "/admin/licenses" },
   { name: "Activity", icon: Activity, path: "/admin/activity" },
-  { name: "Notifications", icon: Bell, path: "/admin/notifications" },
   { name: "Settings", icon: Settings, path: "/admin/settings" },
 ];

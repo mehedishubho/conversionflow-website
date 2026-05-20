@@ -24,7 +24,7 @@ export default function RefundPage() {
 
       <h2>How to Request a Refund</h2>
       <p>
-        Email support@salesconversionflow.com with your license key, order details, and
+        Email support@conversionflow.com with your license key, order details, and
         the email used during purchase.
       </p>
       <p>
@@ -69,7 +69,7 @@ export default function RefundPage() {
       <h2>Contact</h2>
       <p>
         ConversionFlow is operated by Devsroom in Dhaka, Bangladesh. Refund questions
-        can be sent to support@salesconversionflow.com.
+        can be sent to support@conversionflow.com.
       </p>
       <p>
         This refund policy is intended to be customer-friendly while protecting

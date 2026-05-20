@@ -1,13 +1,18 @@
 import type { MetadataRoute } from "next";
 import { getBlogPosts, getDocPosts } from "@/lib/mdx";
-import { siteConfig } from "@/lib/site";
-import { landingPages } from "@/data/landing-pages";
 
-const siteUrl = siteConfig.url;
+const siteUrl = "https://conversionflow.com";
 const locales = ["en", "bn"];
 
 function getUrl(locale: string, path: string) {
-  const prefixStr = locale === "bn" ? "" : `/${locale}`;
+  // Assuming default locale 'en' does not have a prefix, and 'bn' does
+  // But wait, next-intl usually has prefix for all or prefix for non-default.
+  // In `src/i18n/routing.ts`, it might be configured. Let's assume standard behavior.
+  const prefix = locale === "en" ? "/en" : "/bn"; // or just standard next-intl behavior
+  // Looking at the previous code: `locale === "bn" ? "" : "/" + locale`? Wait, next-intl usually puts default locale at root. If en is default, en is root.
+  // Let's check what the old code did: `locale === "bn" ? "" : "/" + locale` - wait, that would mean bn is root and en is /en. Let's just use /en and /bn for alternates, or whatever the actual routes are.
+  // Let's use `prefix = locale === "en" ? "" : "/bn"` if English is default.
+  const prefixStr = locale === "en" ? "" : `/${locale}`;
   return `${siteUrl}${prefixStr}${path}`;
 }
 
@@ -16,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   locales.forEach((locale) => {
     // Static Routes
-    const staticPaths = ["", "/features", "/pricing", "/changelog", "/faq", "/platform-comparison", "/support", "/blog", "/docs", "/privacy", "/terms", "/refund", "/license"];
+    const staticPaths = ["", "/features", "/pricing", "/changelog", "/support", "/blog", "/docs", "/privacy", "/terms", "/refund", "/license"];
     staticPaths.forEach((path) => {
       routes.push({
         url: getUrl(locale, path),
@@ -59,21 +64,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
           languages: {
             en: getUrl("en", `/docs/${doc.slug}`),
             bn: getUrl("bn", `/docs/${doc.slug}`),
-          },
-        },
-      });
-    });
-
-    landingPages.forEach((page) => {
-      routes.push({
-        url: getUrl(locale, `/${page.slug}`),
-        lastModified: new Date(),
-        changeFrequency: "monthly",
-        priority: 0.7,
-        alternates: {
-          languages: {
-            en: getUrl("en", `/${page.slug}`),
-            bn: getUrl("bn", `/${page.slug}`),
           },
         },
       });

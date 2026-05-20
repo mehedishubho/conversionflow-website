@@ -10,9 +10,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { siteConfig } from "@/lib/site";
-import { getTrackingSettings } from "@/lib/tracking";
-import { TrackingScripts } from "@/components/layout/TrackingScripts";
 import "../globals.css";
 
 const dmSans = DM_Sans({
@@ -37,19 +34,18 @@ const dmSansMono = JetBrains_Mono({
 });
 
 const plausibleDomain =
-  process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? siteConfig.plausibleDomain;
+  process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "conversionflow.com";
 
 const plausibleScriptSrc =
   process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC ??
-  siteConfig.plausibleScriptSrc;
+  "https://plausible.conversionflow.com/js/script.js";
 
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Metadata'});
-  const tracking = await getTrackingSettings();
 
   return {
-    metadataBase: new URL(siteConfig.url),
+    metadataBase: new URL("https://conversionflow.com"),
     title: {
       default: t('title'),
       template: "%s | ConversionFlow",
@@ -58,8 +54,8 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
     openGraph: {
       type: "website",
       locale: locale === 'bn' ? 'bn_BD' : 'en_US',
-      url: siteConfig.url,
-      siteName: siteConfig.legalName,
+      url: "https://conversionflow.com",
+      siteName: "ConversionFlow",
     },
     twitter: {
       card: "summary_large_image",
@@ -70,12 +66,9 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
     alternates: {
       languages: {
         en: '/en',
-        bn: '/',
+        bn: '/bn',
       },
     },
-    ...(tracking.google_search_console_verification
-      ? { verification: { google: tracking.google_search_console_verification } }
-      : {}),
   };
 }
 
@@ -96,7 +89,6 @@ export default async function LocaleLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-  const tracking = await getTrackingSettings();
 
   return (
     <html
@@ -119,13 +111,6 @@ export default async function LocaleLayout({
                 window.plausible('register_props', { locale: '${locale}' });`}
             </Script>
           </>
-        )}
-        {process.env.NODE_ENV === "production" && (
-          <TrackingScripts
-            ga4Id={tracking.google_analytics_id}
-            gtmId={tracking.google_tag_manager_id}
-            facebookPixelId={tracking.facebook_pixel_id}
-          />
         )}
         <ThemeProvider
           attribute="class"

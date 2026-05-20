@@ -9,7 +9,6 @@ import {
 } from "@/lib/central-api";
 import { createAuditLog } from "@/lib/audit";
 import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
-import { sendNotification } from "@/lib/notifications";
 
 /**
  * SSL Commerz IPN (Instant Payment Notification) handler.
@@ -42,8 +41,15 @@ export async function POST(request: NextRequest) {
     // 2. Validate payment server-to-server (T-04-06, T-04-08)
     const validation = await validateSSLPayment(valId);
 
+    if (validation.status !== "VALID") {
+      console.warn(`[IPN] Payment validation failed for tran_id=${tranId}, status=${validation.status}`);
+      return NextResponse.json(
+        { error: "Payment validation failed" },
+        { status: 400 }
+      );
+    }
+
     // 3. Find order by tran_id (our order UUID)
-    // Queried early so we can send payment_failed notification if validation fails
     const orderResults = await db
       .select()
       .from(orders)
@@ -56,32 +62,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Order not found" },
         { status: 404 }
-      );
-    }
-
-    if (validation.status !== "VALID") {
-      console.warn(`[IPN] Payment validation failed for tran_id=${tranId}, status=${validation.status}`);
-
-      // Send payment failure notification to the order owner
-      try {
-        await sendNotification(
-          order.userId,
-          "order.payment_failed",
-          {
-            orderId: order.id,
-            orderNumber: order.id.slice(0, 8),
-            amount: order.amount,
-            planName: order.plan,
-            reason: `Payment validation returned: ${validation.status}`,
-          }
-        );
-      } catch (notifError) {
-        console.error("[IPN] Failed to send payment failure notification:", notifError);
-      }
-
-      return NextResponse.json(
-        { error: "Payment validation failed" },
-        { status: 400 }
       );
     }
 

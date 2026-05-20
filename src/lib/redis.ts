@@ -72,3 +72,5 @@ export async function kvDelete(key: string): Promise<void> {
   }
   memoryStore?.delete(key);
 }
+
+export { redis, memoryStore };
