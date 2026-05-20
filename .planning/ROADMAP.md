@@ -252,9 +252,9 @@ Plans:
 Plans:
 - [x] 11-01: Tracking Foundation & SEO Overview Redesign -- tracking-keys.ts, admin-tracking-v2.ts server actions, SeoOverviewCards, TrackingScripts integration with TikTok, migration cleanup
 - [x] 11-02: Open Graph & Social + Meta Pixel & CAPI -- SocialForm with SocialPreviewSimulator (3 platform cards), MetaPixelForm with CAPI management, event checkboxes, connection test, event log
-- [ ] 11-03: TikTok + Google Analytics & Ads -- TikTokForm with pixel/Events API/advanced matching, GoogleTrackingForm with GA4/GTM/Ads, GA summary cards, connection tester
-- [ ] 11-04: Schema Markup -- SchemaForm with per-type forms, auto-generation, JSON-LD preview, Google Rich Results Test link, seo.ts override integration
-- [ ] 11-05: Migration Cleanup & Empty States -- EmptyStateWarning shared component, EventLogPanel shared component, delete TrackingSettingsForm
+- [x] 11-03: TikTok + Google Analytics & Ads -- TikTokForm with pixel/Events API/advanced matching, GoogleTrackingForm with GA4/GTM/Ads, GA summary cards, connection tester
+- [x] 11-04: Schema Markup -- SchemaForm with per-type forms, auto-generation, JSON-LD preview, Google Rich Results Test link, seo.ts override integration
+- [x] 11-05: Migration Cleanup & Empty States -- EmptyStateWarning shared component, EventLogPanel shared component, delete TrackingSettingsForm
 
 **UI hint**: yes
 
