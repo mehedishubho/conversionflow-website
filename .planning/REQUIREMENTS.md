@@ -131,9 +131,9 @@
 
 - [ ] **LIC-01**: POST to license.devsroom.com/api/orders/import on purchase completion
 - [ ] **LIC-02**: Store central_user_id + central_license_id mappings locally
-- [ ] **LIC-03**: Webhook handlers for license-created/updated/expired/payment-refunded events
-- [ ] **LIC-04**: Scheduled fallback sync (every 15 minutes) when webhooks fail
-- [ ] **LIC-05**: HMAC signature verification on all incoming webhooks
+- [x] **LIC-03**: Webhook handlers for license-created/updated/expired/payment-refunded events
+- [x] **LIC-04**: Scheduled fallback sync (every 15 minutes) when webhooks fail
+- [x] **LIC-05**: HMAC signature verification on all incoming webhooks
 
 ### Customer Portal
 
@@ -168,9 +168,9 @@
 
 ### License Intelligence
 
-- [ ] **LINT-01**: License status dashboard (total/active/expired/revoked/renewal rate by product/plan)
-- [ ] **LINT-02**: Domain tracking (activation domains per license, timestamps, multisite usage)
-- [ ] **LINT-03**: Piracy detection flagging (suspicious activation patterns for admin review)
+- [x] **LINT-01**: License status dashboard (total/active/expired/revoked/renewal rate by product/plan)
+- [x] **LINT-02**: Domain tracking (activation domains per license, timestamps, multisite usage)
+- [x] **LINT-03**: Piracy detection flagging (suspicious activation patterns for admin review)
 
 ### Dashboard UI
 
@@ -178,6 +178,188 @@
 - [x] **DASH-02**: Separate CSS for dashboard routes (prevent CSS token conflict with marketing site)
 - [x] **DASH-03**: Unified next-themes across marketing + dashboard (delete dashboard's ThemeContext)
 - [x] **DASH-04**: Route group architecture: (auth)/, (portal)/, (admin)/ separate from [locale]/
+
+### Notification Engine
+
+- [ ] **NOTIF-01**: Core notification service with channel router — `sendNotification(userId, event, data, channels)` dispatches to email, in-app, and/or WhatsApp
+- [ ] **NOTIF-02**: Email channel via generic SMTP — configurable transport, HTML templates for transactional/support/system events, no vendor lock-in
+- [ ] **NOTIF-03**: In-app notification bell — unread count badge, dropdown with notification list, mark-as-read, per-type grouping, extends existing notifications table
+- [ ] **NOTIF-04**: WhatsApp channel for BD customers — concise messages for order confirmations, license delivery, ticket updates via Meta Business API or BD provider
+- [ ] **NOTIF-05**: Complete event catalog — order (created/confirmed/payment_failed/refunded), license (generated/delivered/expiring_soon/expired), ticket (created/reply/status_changed/resolved), system (blog_published/security_alert)
+- [ ] **NOTIF-06**: Admin notification management — view delivery logs, manage templates, test notifications
+- [ ] **NOTIF-07**: User notification preferences — per-channel opt-in/out per event category
+
+### Affiliate Network
+
+- [ ] **AFF-01**: Affiliate registration and approval — customers apply, admin approves/rejects/suspends affiliate accounts
+- [ ] **AFF-02**: Unique referral links — each affiliate gets a code, `?ref=CODE` sets 30-day cookie on visitor
+- [ ] **AFF-03**: Click tracking — records referral link visits with timestamp, landing page, visitor metadata
+- [ ] **AFF-04**: Commission auto-calculation — percentage-based (configurable per affiliate) on completed referred orders
+- [ ] **AFF-05**: Affiliate dashboard — clicks, conversions, earnings, referral link copy, payout history
+- [ ] **AFF-06**: Payout management — affiliates request payouts, admin approves and marks paid after manual bKash/Nagad/bank transfer
+- [ ] **AFF-07**: Admin affiliate management — list affiliates, set commission rates, view performance, process payouts
+- [ ] **AFF-08**: DB schema — affiliates, affiliate_clicks, affiliate_commissions, affiliate_payouts tables linked to users and orders
+
+## v3 Requirements (Milestone: v2.1 Marketing & SEO Settings Dashboard)
+
+### Settings Navigation
+
+- [ ] **NAV-01**: Admin can access a settings landing page at /admin/settings with category cards linking to Payment Gateway, SMTP/Email, and SEO Settings
+- [ ] **NAV-02**: Each settings category has its own sub-route (/admin/settings/payment, /admin/settings/smtp, /admin/settings/seo)
+- [ ] **NAV-03**: SEO Settings has nested sub-routes for each SEO section (/admin/settings/seo/general, /admin/settings/seo/verification, etc.)
+- [ ] **NAV-04**: Existing Payment, Email, and Tracking forms are migrated from the flat settings page to their respective sub-routes without losing functionality
+- [ ] **NAV-05**: Settings sub-navigation uses a consistent tabbed or sidebar layout across all categories
+
+### General SEO
+
+- [ ] **GSEO-01**: Admin can configure website title, default meta title, meta description, meta keywords, and canonical URL
+- [ ] **GSEO-02**: Admin can set default robots meta directive, SEO separator character, and default Open Graph image
+- [ ] **GSEO-03**: Admin can toggle URL formatting options: lowercase URLs, trailing slash handling
+- [ ] **GSEO-04**: Admin can toggle auto meta generation (auto-generate meta titles and descriptions from content)
+- [ ] **GSEO-05**: Admin sees a real-time SERP preview snippet showing how the page will appear in Google search results
+- [ ] **GSEO-06**: Admin sees character count indicators for meta title (recommended 50-60) and meta description (recommended 150-160)
+- [ ] **GSEO-07**: Admin sees an SEO score indicator based on configured settings completeness
+
+### Search Engine Verification
+
+- [ ] **VERF-01**: Admin can enter and save Google Search Console verification meta tag
+- [ ] **VERF-02**: Admin can enter and save Bing Webmaster verification code
+- [ ] **VERF-03**: Admin can enter and save Yandex, Baidu, and Pinterest verification codes
+- [ ] **VERF-04**: Admin sees verification status indicators (connected/disconnected) for each search engine
+- [ ] **VERF-05**: Admin can copy verification codes to clipboard using a helper button
+
+### XML Sitemaps
+
+- [ ] **SITM-01**: Admin can enable/disable XML sitemap generation
+- [ ] **SITM-02**: Admin can enable/disable individual sitemap types: product sitemap, blog sitemap, image sitemap
+- [ ] **SITM-03**: Admin can toggle auto-regeneration of sitemaps when content changes
+- [ ] **SITM-04**: Admin sees the sitemap URL preview and last-generated timestamp
+- [ ] **SITM-05**: Admin can manually trigger sitemap regeneration and ping search engines
+
+### Robots.txt Manager
+
+- [ ] **ROBT-01**: Admin can edit robots.txt using a visual rule builder (user-agent, allow, disallow, sitemap)
+- [ ] **ROBT-02**: Admin can edit robots.txt using a raw code editor with syntax highlighting
+- [ ] **ROBT-03**: Admin can toggle AI bot access controls for GPTBot, ClaudeBot, and PerplexityBot (allow/block)
+- [ ] **ROBT-04**: Admin can apply crawl rule presets (allow all, block AI bots, block all, custom)
+- [ ] **ROBT-05**: Admin sees a live preview of the generated robots.txt content
+
+### Open Graph & Social SEO
+
+- [ ] **SOCL-01**: Admin can configure Facebook App ID, default share title, description, and image
+- [ ] **SOCL-02**: Admin can configure Twitter/X handle, card type (summary/summary_large_image), and default share image
+- [ ] **SOCL-03**: Admin can configure LinkedIn share image override
+- [ ] **SOCL-04**: Admin sees a social share preview simulator showing how links appear on Facebook, Twitter/X, and LinkedIn
+- [ ] **SOCL-05**: Admin can toggle between mobile and desktop preview modes
+
+### Meta Pixel & Conversion API
+
+- [ ] **META-01**: Admin can configure Meta Pixel ID and Conversion API token
+- [ ] **META-02**: Admin can configure Dataset ID and Test Event Code for debugging
+- [ ] **META-03**: Admin can toggle Advanced Matching and Event Deduplication
+- [ ] **META-04**: Admin can select which standard events to track: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, Lead
+- [ ] **META-05**: Admin sees connection status indicator for Pixel and CAPI
+- [ ] **META-06**: Admin sees recent event firing logs for diagnostics
+
+### TikTok Tracking
+
+- [ ] **TIKT-01**: Admin can configure TikTok Pixel ID and Events API token
+- [ ] **TIKT-02**: Admin can toggle Advanced Matching and server-side tracking
+- [ ] **TIKT-03**: Admin sees tracking status indicator and recent event logs
+
+### Google Analytics & Ads
+
+- [ ] **GOOG-01**: Admin can configure GA4 Measurement ID, Google Ads Conversion ID, and Conversion Label
+- [ ] **GOOG-02**: Admin can configure Google Tag Manager Container ID
+- [ ] **GOOG-03**: Admin can toggle server-side tracking and enhanced ecommerce
+- [ ] **GOOG-04**: Admin sees connection status and a connection tester
+- [ ] **GOOG-05**: Admin sees analytics summary cards (integrated with existing dashboard metrics)
+
+### Schema Markup
+
+- [ ] **SCHM-01**: Admin can configure global schema: Organization, Website, and Breadcrumb
+- [ ] **SCHM-02**: Admin can enable/configure content schemas: Product, Article, FAQ, HowTo, Review
+- [ ] **SCHM-03**: Admin sees a JSON-LD preview of the generated schema markup
+- [ ] **SCHM-04**: Admin can validate schema markup against Google structured data requirements
+- [ ] **SCHM-05**: Admin can toggle auto schema generation based on content type
+
+### Redirect Manager
+
+- [ ] **RDIR-01**: Admin can create 301 (permanent) and 302 (temporary) redirects with from/to URL fields
+- [ ] **RDIR-02**: Admin can create regex-based redirects for pattern matching
+- [ ] **RDIR-03**: Admin sees a redirect table with search/filter, status tracking, and hit counter
+- [ ] **RDIR-04**: Admin can bulk import and export redirects via CSV
+- [ ] **RDIR-05**: Admin can delete individual redirects or bulk delete selected redirects
+
+### AI SEO & LLM Controls
+
+- [ ] **AISE-01**: Admin can allow or block GPTBot from crawling the site
+- [ ] **AISE-02**: Admin can allow or block ClaudeBot from crawling the site
+- [ ] **AISE-03**: Admin can allow or block PerplexityBot from crawling the site
+- [ ] **AISE-04**: Admin can generate an llms.txt file for AI crawler consumption
+- [ ] **AISE-05**: Admin can configure AI content usage rules (how AI models may use site content)
+
+### Image SEO
+
+- [ ] **IMGS-01**: Admin can toggle auto ALT text generation for images
+- [ ] **IMGS-02**: Admin can toggle WebP conversion for uploaded images
+- [ ] **IMGS-03**: Admin can toggle lazy loading for images across the site
+- [ ] **IMGS-04**: Admin can toggle image compression and see optimization savings stats
+- [ ] **IMGS-05**: Admin sees image performance statistics (total images, optimized count, savings)
+
+### Performance SEO
+
+- [ ] **PERF-01**: Admin can toggle Critical CSS extraction and injection
+- [ ] **PERF-02**: Admin can toggle JS defer loading strategy
+- [ ] **PERF-03**: Admin can toggle HTML and CSS minification
+- [ ] **PERF-04**: Admin can configure CDN integration URL
+- [ ] **PERF-05**: Admin can configure cache control settings (max-age, stale-while-revalidate)
+- [ ] **PERF-06**: Admin sees Core Web Vitals monitor cards: LCP, CLS, INP, TTFB, and overall performance score
+
+### SEO Analytics
+
+- [ ] **ANLT-01**: Admin sees an SEO analytics overview dashboard with indexed pages count and trend
+- [ ] **ANLT-02**: Admin sees top performing pages ranked by organic traffic metrics
+- [ ] **ANLT-03**: Admin sees keyword rankings with position tracking and trend indicators
+- [ ] **ANLT-04**: Admin sees CTR and impressions data with trend charts
+- [ ] **ANLT-05**: Admin sees 404 error and broken link reports
+- [ ] **ANLT-06**: Admin sees sitemap health status and crawl issue reports
+- [ ] **ANLT-07**: Analytics data is displayed using charts, tables, status badges, and trend indicators
+
+### Page-Level SEO
+
+- [ ] **PLVL-01**: Each page, product, and blog post has editable SEO title, meta description, and canonical URL
+- [ ] **PLVL-02**: Each content item has a focus keyword field with density analysis
+- [ ] **PLVL-03**: Each content item has per-page robots indexing control (index/noindex, follow/nofollow)
+- [ ] **PLVL-04**: Each content item has a custom OG image override
+- [ ] **PLVL-05**: Each content item has a schema type selector and social preview
+
+## v4 Requirements (Future)
+
+Deferred to future release.
+
+### Advanced Analytics Integration
+
+- **ANLT-08**: Real-time Google Search Console API integration for live keyword data
+- **ANLT-09**: Automated weekly SEO audit reports with email delivery
+- **ANLT-10**: Competitor analysis dashboard
+
+### Advanced Redirect Features
+
+- **RDIR-06**: Auto-slug redirect creation when URLs change
+- **RDIR-07**: Redirect chain detection and warning
+
+### Advanced Schema
+
+- **SCHM-06**: LocalBusiness schema with geo coordinates
+- **SCHM-07**: Video schema markup
+- **SCHM-08**: Custom schema builder for arbitrary JSON-LD
+
+### Marketing Automation
+
+- **MKTG-01**: A/B testing for meta titles and descriptions
+- **MKTG-02**: Automated internal linking suggestions
+- **MKTG-03**: Content optimization scoring
 
 ## Out of Scope
 
@@ -189,6 +371,13 @@
 | Mobile app | Web-only platform |
 | Redesigning existing marketing pages | All v1.x pages preserved as-is |
 | Redesigning dashboard UI | Use backenddashboard/ folder design as-is |
+| Real-time Google Search Console API | Requires OAuth setup, API quotas, complex auth flow — defer to v4 |
+| Competitor analysis | Needs third-party data providers (Ahrefs/Semrush API) — out of budget scope |
+| A/B testing for meta tags | Requires traffic splitting infrastructure — complex for v1 |
+| WordPress plugin SEO integration | Plugin manages its own SEO; this dashboard controls the marketing site |
+| Multi-tenant SEO settings | Current platform is single-tenant; multi-tenant requires architecture changes |
+| Actual server-side image processing | Image SEO toggles save intent; actual WebP/compression is a deployment pipeline concern |
+| Actual CSS/JS minification at runtime | Performance toggles save preferences; optimization is a build-time/deployment concern |
 
 ## Traceability
 
@@ -307,19 +496,128 @@
 | ADMN-08 | Phase 5 | Pending |
 | ADMN-09 | Phase 5 | Pending |
 | ADMN-10 | Phase 5 | Pending |
-| LIC-03 | Phase 6 | Pending |
-| LIC-04 | Phase 6 | Pending |
-| LIC-05 | Phase 6 | Pending |
-| LINT-01 | Phase 6 | Pending |
-| LINT-02 | Phase 6 | Pending |
-| LINT-03 | Phase 6 | Pending |
+| LIC-03 | Phase 6 | Complete |
+| LIC-04 | Phase 6 | Complete |
+| LIC-05 | Phase 6 | Complete |
+| LINT-01 | Phase 6 | Complete |
+| LINT-02 | Phase 6 | Complete |
+| LINT-03 | Phase 6 | Complete |
+| NOTIF-01 | Phase 7 | Pending |
+| NOTIF-02 | Phase 7 | Pending |
+| NOTIF-03 | Phase 7 | Pending |
+| NOTIF-04 | Phase 7 | Pending |
+| NOTIF-05 | Phase 7 | Pending |
+| NOTIF-06 | Phase 7 | Pending |
+| NOTIF-07 | Phase 7 | Pending |
+| AFF-01 | Phase 8 | Pending |
+| AFF-02 | Phase 8 | Pending |
+| AFF-03 | Phase 8 | Pending |
+| AFF-04 | Phase 8 | Pending |
+| AFF-05 | Phase 8 | Pending |
+| AFF-06 | Phase 8 | Pending |
+| AFF-07 | Phase 8 | Pending |
+| AFF-08 | Phase 8 | Pending |
+
+### v3 Requirements (Milestone: v2.1 Marketing & SEO Settings Dashboard)
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| NAV-01 | Phase 9 | Pending |
+| NAV-02 | Phase 9 | Pending |
+| NAV-03 | Phase 9 | Pending |
+| NAV-04 | Phase 9 | Pending |
+| NAV-05 | Phase 9 | Pending |
+| GSEO-01 | Phase 10 | Pending |
+| GSEO-02 | Phase 10 | Pending |
+| GSEO-03 | Phase 10 | Pending |
+| GSEO-04 | Phase 10 | Pending |
+| GSEO-05 | Phase 10 | Pending |
+| GSEO-06 | Phase 10 | Pending |
+| GSEO-07 | Phase 10 | Pending |
+| VERF-01 | Phase 10 | Pending |
+| VERF-02 | Phase 10 | Pending |
+| VERF-03 | Phase 10 | Pending |
+| VERF-04 | Phase 10 | Pending |
+| VERF-05 | Phase 10 | Pending |
+| SITM-01 | Phase 10 | Pending |
+| SITM-02 | Phase 10 | Pending |
+| SITM-03 | Phase 10 | Pending |
+| SITM-04 | Phase 10 | Pending |
+| SITM-05 | Phase 10 | Pending |
+| ROBT-01 | Phase 10 | Pending |
+| ROBT-02 | Phase 10 | Pending |
+| ROBT-03 | Phase 10 | Pending |
+| ROBT-04 | Phase 10 | Pending |
+| ROBT-05 | Phase 10 | Pending |
+| SOCL-01 | Phase 11 | Pending |
+| SOCL-02 | Phase 11 | Pending |
+| SOCL-03 | Phase 11 | Pending |
+| SOCL-04 | Phase 11 | Pending |
+| SOCL-05 | Phase 11 | Pending |
+| META-01 | Phase 11 | Pending |
+| META-02 | Phase 11 | Pending |
+| META-03 | Phase 11 | Pending |
+| META-04 | Phase 11 | Pending |
+| META-05 | Phase 11 | Pending |
+| META-06 | Phase 11 | Pending |
+| TIKT-01 | Phase 11 | Pending |
+| TIKT-02 | Phase 11 | Pending |
+| TIKT-03 | Phase 11 | Pending |
+| GOOG-01 | Phase 11 | Pending |
+| GOOG-02 | Phase 11 | Pending |
+| GOOG-03 | Phase 11 | Pending |
+| GOOG-04 | Phase 11 | Pending |
+| GOOG-05 | Phase 11 | Pending |
+| SCHM-01 | Phase 11 | Pending |
+| SCHM-02 | Phase 11 | Pending |
+| SCHM-03 | Phase 11 | Pending |
+| SCHM-04 | Phase 11 | Pending |
+| SCHM-05 | Phase 11 | Pending |
+| RDIR-01 | Phase 12 | Pending |
+| RDIR-02 | Phase 12 | Pending |
+| RDIR-03 | Phase 12 | Pending |
+| RDIR-04 | Phase 12 | Pending |
+| RDIR-05 | Phase 12 | Pending |
+| AISE-01 | Phase 12 | Pending |
+| AISE-02 | Phase 12 | Pending |
+| AISE-03 | Phase 12 | Pending |
+| AISE-04 | Phase 12 | Pending |
+| AISE-05 | Phase 12 | Pending |
+| IMGS-01 | Phase 12 | Pending |
+| IMGS-02 | Phase 12 | Pending |
+| IMGS-03 | Phase 12 | Pending |
+| IMGS-04 | Phase 12 | Pending |
+| IMGS-05 | Phase 12 | Pending |
+| PERF-01 | Phase 12 | Pending |
+| PERF-02 | Phase 12 | Pending |
+| PERF-03 | Phase 12 | Pending |
+| PERF-04 | Phase 12 | Pending |
+| PERF-05 | Phase 12 | Pending |
+| PERF-06 | Phase 12 | Pending |
+| PLVL-01 | Phase 12 | Pending |
+| PLVL-02 | Phase 12 | Pending |
+| PLVL-03 | Phase 12 | Pending |
+| PLVL-04 | Phase 12 | Pending |
+| PLVL-05 | Phase 12 | Pending |
+| ANLT-01 | Phase 13 | Pending |
+| ANLT-02 | Phase 13 | Pending |
+| ANLT-03 | Phase 13 | Pending |
+| ANLT-04 | Phase 13 | Pending |
+| ANLT-05 | Phase 13 | Pending |
+| ANLT-06 | Phase 13 | Pending |
+| ANLT-07 | Phase 13 | Pending |
 
 **Coverage:**
 - v1 requirements: 67 total (all Complete)
-- v2 requirements: 45 total
-- Mapped to phases: 45
-- Orphaned: 0
+- v2 requirements: 60 total (mapped to v2.0 Phases 1-8)
+- v3 requirements: 84 total (mapped to v2.1 Phases 9-13)
+- Phase 9: NAV-01 to NAV-05 (5 requirements)
+- Phase 10: GSEO-01 to GSEO-07, VERF-01 to VERF-05, SITM-01 to SITM-05, ROBT-01 to ROBT-05 (22 requirements)
+- Phase 11: SOCL-01 to SOCL-05, META-01 to META-06, TIKT-01 to TIKT-03, GOOG-01 to GOOG-05, SCHM-01 to SCHM-05 (24 requirements)
+- Phase 12: RDIR-01 to RDIR-05, AISE-01 to AISE-05, IMGS-01 to IMGS-05, PERF-01 to PERF-06, PLVL-01 to PLVL-05 (26 requirements)
+- Phase 13: ANLT-01 to ANLT-07 (7 requirements)
+- Orphaned: 0 -- all v3 requirements mapped
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-15 -- v2.0 requirements added, traceability mapped*
+*Last updated: 2026-05-20 -- v2.1 roadmap created, 89 v3 requirements mapped to Phases 9-13*

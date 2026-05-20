@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1779214356767,
+      "tag": "0000_overrated_prima",
+      "breakpoints": true
+    }
+  ]
+}

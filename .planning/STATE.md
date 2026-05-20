@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: milestone
-status: All plans executed, human UAT pending
-stopped_at: Phase 5 UI-SPEC approved
-last_updated: "2026-05-17T22:39:44.057Z"
-last_activity: 2026-05-17 -- Phase 4 execution complete
+milestone: v2.1
+milestone_name: Marketing & SEO Settings Dashboard
+status: executing
+stopped_at: Phase 10 Wave 1 complete
+last_updated: "2026-05-20T14:00:00.000Z"
+last_activity: 2026-05-20 -- Phase 10 Wave 1 complete
 progress:
-  total_phases: 6
-  completed_phases: 4
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 4
+  completed_plans: 1
+  percent: 25
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-**Current focus:** Phase 4 — Checkout and Payments
+**Current focus:** Phase 10 — Core SEO Configuration
 
 ## Current Position
 
-Phase: 4 (Checkout and Payments) — EXECUTED (human UAT pending)
-Plan: 6 of 6 complete
-Status: All plans executed, human UAT pending
-Last activity: 2026-05-17 -- Phase 4 execution complete
+Phase: 10 (Core SEO Configuration) — EXECUTING
+Plan: 1 of 4 complete (Wave 1 done)
+Status: Wave 1 complete, Wave 2 pending
+Last activity: 2026-05-20
 
-Progress: [██████████] 100%
+Progress: [███░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 28 (v1.0/v1.1 milestones)
+- Total plans completed: 31 (v1.0/v1.1 milestones)
 - v2.0 plans completed: 12
 - Average duration: -
 - Total execution time: -
@@ -51,26 +51,10 @@ Progress: [██████████] 100%
 | v2.0 Phase 2 | 3/3 | Verified | Dashboard shell, TailAdmin port, UAT 9/9 |
 | v2.0 Phase 3 | 5/5 | Verified | Customer Portal, UAT 6/6, route fix |
 | v2.0 Phase 4 | 6/6 | Executed (UAT pending) | Checkout and Payments |
-| v2.0 Phase 5 | 0/? | Not started | Admin BI Dashboard |
-| v2.0 Phase 6 | 0/? | Not started | Webhooks, Jobs, License Intelligence |
-
-**Recent Trend:**
-
-- Last 31 plans: All completed successfully
-- Trend: Smooth execution, consistent patterns
-
-| Phase 01 P01 | 5min | 2 tasks | 10 files |
-| Phase 01 P02 | 12min | 2 tasks | 8 files |
-| Phase 01 P03 | 13min | 2 tasks | 12 files |
-| Phase 01 P04 | 5min | 2 tasks | 8 files |
-| Phase 02 P01 | 2min | 2 tasks | 4 files |
-| Phase 02 P02 | 3min | 2 tasks | 5 files |
-| Phase 02 P03 | 2min | 1 task | 6 files |
-| Phase 03 P01 | 3min | 2 tasks | 4 files |
-| Phase 03 P02 | 10min | 2 tasks | 6 files |
-| Phase 03 P03 | 6min | 2 tasks | 5 files |
-| Phase 03 P04 | 11min | 2 tasks | 7 files |
-| Phase 03 P05 | 11min | 2 tasks | 7 files |
+| v2.0 Phase 5 | 6/6 | Complete | Admin BI Dashboard |
+| v2.0 Phase 6 | 4/4 | Complete | Webhooks, Jobs, License Intelligence |
+| v2.1 Phase 9 | 3/3 | Complete | Settings Foundation |
+| v2.1 Phase 10 | 1/4 | Executing | Core SEO Configuration |
 
 ## Accumulated Context
 
@@ -82,54 +66,16 @@ Recent decisions affecting current work:
 - [v1.x]: All marketing site decisions preserved in shipped codebase
 - [v2.0]: Better Auth chosen for dual auth (customer + admin)
 - [v2.0]: PostgreSQL + Drizzle ORM for database
-- [v2.0]: Redis for caching, sessions, queues
-- [v2.0]: Dashboard design from backenddashboard/ folder, no redesign
-- [v2.0]: Central licensing only -- never generate locally
-- [v2.0]: Route group isolation: [locale]/ marketing, (auth)/ login, (portal)/ customer, (admin)/ admin
-- [v2.0]: Unified next-themes across all layouts, delete dashboard ThemeContext
-- [v2.0]: Separate CSS files for dashboard routes to prevent marketing site token conflicts
-- [Phase 01]: Application tables only in schema.ts - no user table, Better Auth owns auth tables
-- [Phase 01]: Redis port 6380 externally to avoid conflicts; in-memory Map fallback when REDIS_URL unset
-- [Phase 01]: Seed script uses raw SQL via postgres.js for direct table access before Better Auth setup
-- [Phase 01]: Account lockout implemented as custom Better Auth plugin (top-level hooks only accept single AuthMiddleware, not matcher/handler arrays)
-- [Phase 01]: Auth client uses actual Better Auth operationIds: requestPasswordReset, sendVerificationEmail (not forgotPassword, emailVerification)
-- [Phase 01]: pnpm override for better-call@^1.3.5 to resolve version conflict between @better-auth/core@1.4.21 (CLI) and @better-auth/core@1.6.11 (better-auth)
-- [Phase 01]: Phone field passed via fetchOptions.body since Better Auth client types don't include custom additionalFields
-- [Phase 01]: Route group isolation pattern established: (auth)/ layout loads dashboard.css separately from marketing globals.css
-- [Phase 01]: Admin pages nested under (admin)/admin/ since route groups are URL-invisible in Next.js
-- [Phase 02]: SessionUser type cast needed for Better Auth additionalFields (role) in client components
-- [Phase 02]: DashboardShell parameterized by navItems prop for portal/admin reuse
-- [Phase 03]: Used dashboard.css semantic color tokens (green-lt, orange-lt, accent-light) for metric card icon backgrounds
-- [Phase 03]: All portal DB queries filter by session.user.id to prevent cross-user data access (T-03-01)
-- [Phase 03]: License detail standalone page uses ComponentCard layout instead of slide-in panel overlay for cleaner URL-based UX
-- [Phase 03]: TableCell UI primitive extended with colSpan prop for table empty state spanning
-- [Phase 03]: Wrapped Badge in span for spacing since Badge component does not accept className prop; download buttons disabled (no file serving route yet)
-- [Phase ?]: Validated priority form input against enum values before Drizzle insert to avoid string-to-enum type mismatch
-- [Phase ?]: Cast JSONB attachments from unknown to typed Attachment[] via map() in ticket detail page (Drizzle jsonb does not enforce inner type)
-- [Phase 03]: Password change uses authClient.changePassword directly from client component since Better Auth handles current password verification server-side
-- [Phase 03]: Notification preferences Save button is present but no-op since user table lacks notificationPreferences column (deferred to Phase 6)
-- [Phase 03]: Portal pages nested under (portal)/dashboard/ not (portal)/ — /[locale]/support route group collision with marketing site; nav paths in dashboard-nav.ts already used /dashboard/* prefix
+- [v2.0]: Central licensing only -- never generate licenses locally
+- [Phase 09]: Settings restructured into sub-page navigation with SettingsShell
+- [Phase 10]: SEO library reads DB first with hardcoded fallback (D-01)
 
 ### Pending Todos
 
 None.
 
-### Blockers/Concerns
-
-- Central licensing API at license.devsroom.com must be available for integration testing (Phase 4+)
-- SSL Commerce gateway credentials needed for payment integration (Phase 4)
-- bKash/Nagad/Rocket API credentials needed for BD payment integration (Phase 4)
-- Better Auth + Drizzle dual migration workflow needs hands-on validation (Phase 1 research flag)
-- Backenddashboard/ component inventory -- 65+ components, not all needed (Phase 2 planning)
-
-## Quick Tasks Completed
-
-| ID | Description | Date | Files |
-|----|-------------|------|-------|
-| 260516-bw9 | Fix UAT issues: add logout system + verify role default | 2026-05-16 | 3 |
-
 ## Session Continuity
 
-Last session: 2026-05-17T22:39:44.055Z
-Stopped at: Phase 5 UI-SPEC approved
-Resume file: .planning/phases/05-admin-dashboard/05-UI-SPEC.md
+Last session: 2026-05-20T14:00:00.000Z
+Stopped at: Phase 10 Wave 1 complete
+Resume file: .planning/phases/10-core-seo/10-01-SUMMARY.md
