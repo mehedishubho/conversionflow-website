@@ -10,9 +10,9 @@ status: Approved
 ## Scope
 
 Phase 10 builds the first 4 SEO sub-sections under `/admin/settings/seo/`:
-- **General SEO** (`/general`) — meta title, description, keywords, canonical, separator, robots directive, OG image
-- **Search Verification** (`/verification`) — Google, Bing, Yandex, Baidu, Pinterest meta tag verification
-- **Sitemaps** (`/sitemaps`) — toggle-based sitemap configuration
+- **General SEO** (`/general`) — meta title, description, keywords, canonical, separator, robots directive, OG image, URL formatting toggles
+- **Search Verification** (`/verification`) — Google, Bing, Yandex, Baidu, Pinterest meta tag verification with expand/collapse cards
+- **Sitemaps** (`/sitemaps`) — toggle-based sitemap configuration with auto-regeneration
 - **Robots.txt** (`/robots`) — visual + raw dual-mode robots.txt editor
 
 **Requirements covered:** GSEO-01 through GSEO-07, VERF-01 through VERF-05, SITM-01 through SITM-05, ROBT-01 through ROBT-05 (22 requirements)
@@ -86,14 +86,16 @@ Settings form with toggle switches for sitemap configuration:
 - Content type toggles: Pages, Blog posts, Documentation, Landing pages
 - Exclude patterns textarea (one URL pattern per line)
 - Sitemap frequency selector (daily, weekly, monthly)
-- Regenerate sitemap button (triggers regeneration on save)
+- Auto-regeneration toggle (sitemap updates when content changes)
+- Regenerate sitemap button (triggers manual regeneration on save)
 
 **Implementation:**
-- Settings keys: `seo_sitemap_enabled`, `seo_sitemap_pages`, `seo_sitemap_blog`, `seo_sitemap_docs`, `seo_sitemap_landing`, `seo_sitemap_excludes`, `seo_sitemap_frequency`
+- Settings keys: `seo_sitemap_enabled`, `seo_sitemap_pages`, `seo_sitemap_blog`, `seo_sitemap_docs`, `seo_sitemap_landing`, `seo_sitemap_excludes`, `seo_sitemap_frequency`, `seo_sitemap_auto_regenerate`
 - Dynamic route handler `src/app/sitemap.ts` (already exists) reads settings from DB
+- Auto-regeneration: when enabled, sitemap.ts sets `revalidate = 0` (no caching); when disabled, uses default caching
 - Current static sitemap generation falls back when no DB overrides
 
-**Why:** Toggle-based config is simpler than a full priority/frequency matrix. Content type toggles cover the 4 content types in this codebase.
+**Why:** Toggle-based config is simpler than a full priority/frequency matrix. Content type toggles cover the 4 content types in this codebase. Auto-regeneration ensures freshness without manual intervention.
 
 ### D-06: SEO Score — Simple filled count
 
@@ -120,12 +122,13 @@ Non-interactive metric showing: filled fields count / total fields. Displayed as
 Each search engine (Google, Bing, Yandex, Baidu, Pinterest) shows:
 - Green checkmark dot if verification tag is configured
 - Gray dot if not configured
-- Expand to show the meta tag name + value with copy button
+- Click to expand/collapse — reveals the meta tag name + value with copy button
 
 **Implementation:**
 - Settings keys: `seo_verify_google`, `seo_verify_bing`, `seo_verify_yandex`, `seo_verify_baidu`, `seo_verify_pinterest`
-- Verification page lists all 5 engines as cards
-- Each card shows input field for verification code, status dot, and a "Verify" info text explaining the process
+- Verification page lists all 5 engines as expand/collapse cards
+- Each card shows status dot and engine name when collapsed; input field, meta tag reference, copy button when expanded
+- ChevronDown icon indicates expandable state
 - No actual API verification — just storing the meta tag content
 
 **Why:** Dots provide instant visual status. Expand-on-click keeps the page clean. No external API calls needed — admins paste the verification code from each search engine's console.
@@ -153,7 +156,7 @@ Each search engine (Google, Bing, Yandex, Baidu, Pinterest) shows:
 - `src/app/(admin)/admin/settings/seo/robots/page.tsx` — Replace placeholder with robots.txt editor
 - `src/components/admin/seo/` — Form components: GeneralSeoForm, VerificationForm, SitemapForm, RobotsEditor, SerpPreview, SeoScore
 
-### Settings keys to add
+### Settings keys to add (25 total)
 
 | Key | Type | Default | Section |
 |-----|------|---------|---------|
@@ -165,6 +168,8 @@ Each search engine (Google, Bing, Yandex, Baidu, Pinterest) shows:
 | `seo_robots_default` | string | "index, follow" | General |
 | `seo_og_image` | string | "" | General |
 | `seo_auto_meta` | boolean | false | General |
+| `seo_lowercase_urls` | boolean | false | General |
+| `seo_trailing_slash` | boolean | false | General |
 | `seo_verify_google` | string | "" | Verification |
 | `seo_verify_bing` | string | "" | Verification |
 | `seo_verify_yandex` | string | "" | Verification |
@@ -177,6 +182,7 @@ Each search engine (Google, Bing, Yandex, Baidu, Pinterest) shows:
 | `seo_sitemap_landing` | boolean | false | Sitemaps |
 | `seo_sitemap_excludes` | string | "" | Sitemaps |
 | `seo_sitemap_frequency` | string | "weekly" | Sitemaps |
+| `seo_sitemap_auto_regenerate` | boolean | false | Sitemaps |
 | `seo_robots_txt` | string | (current robots.txt) | Robots |
 | `seo_ai_bots` | json | (all allowed) | Robots |
 
@@ -189,6 +195,8 @@ Each search engine (Google, Bing, Yandex, Baidu, Pinterest) shows:
 - SERP preview component (Google only)
 - SEO score (simple filled/total count)
 - AI bot toggle cards
+- URL formatting toggles (lowercase URLs, trailing slash)
+- Auto-regeneration toggle for sitemaps
 
 **Out of scope (deferred to later phases):**
 - Open Graph & Social SEO settings (Phase 11)
