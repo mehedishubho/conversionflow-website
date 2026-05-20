@@ -184,11 +184,11 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   1. Customers can apply to become affiliates; admin can approve, reject, or suspend
   2. Each affiliate gets a unique referral code with 30-day cookie
   3. Click tracking records every referral link visit
-  4. Commission is auto-calculated on referred purchases
+  4. Commission is auto-calculated on completed referred purchases
   5. Affiliate dashboard shows clicks, conversions, earnings, and payout history
   6. Affiliates can request payouts; admin processes them
   7. Admin can manage affiliates and set commission rates
-  8. DB schema supports affiliates, clicks, commissions, payouts tables
+  8. DB schema supports affiliates, clicks, commissions, payouts tables linked to users and orders
 **Plans**: TBD
 **UI hint**: yes
 
@@ -228,10 +228,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 10-01: General SEO form -- settings server actions, form component with all fields, SERP preview component, character counters, SEO score indicator
-- [ ] 10-02: Search verification -- verification form component, status indicators, copy-to-clipboard helper, server actions for save/load
-- [ ] 10-03: Sitemap management -- sitemap settings form with content type toggles, auto-regeneration toggle, manual trigger button, URL preview, last-generated display
-- [ ] 10-04: Robots.txt editor -- visual rule builder component, raw editor with syntax highlighting, AI bot toggle cards, crawl presets selector, live preview panel
+- [ ] 10-01: SEO server actions foundation -- admin-seo.ts with get/save/score for all 22 settings keys, seo.ts DB integration with hardcoded fallback
+- [ ] 10-02: General SEO form -- GeneralSeoForm, SerpPreview (Google snippet), SeoScore (progress bar), character counters, toggle switches
+- [ ] 10-03: Verification + Sitemaps -- VerificationForm with status dots and copy buttons, SitemapForm with content type toggles, dynamic sitemap.ts
+- [ ] 10-04: Robots.txt editor -- dual-mode visual/raw editor, AiBotCards (8 bots), crawl presets, live preview, dynamic robots.ts
 
 **UI hint**: yes
 
@@ -244,7 +244,7 @@ Plans:
   1. Admin can configure Facebook App ID, share title/description/image, Twitter/X handle and card type, and LinkedIn share image -- and sees a social share preview simulator for all three platforms with mobile/desktop toggle
   2. Admin can configure Meta Pixel ID, CAPI token, Dataset ID, Test Event Code, toggle Advanced Matching and Event Deduplication, select standard events to track, and see connection status and recent event logs
   3. Admin can configure TikTok Pixel ID, Events API token, toggle Advanced Matching and server-side tracking, and see tracking status and event logs
-  4. Admin can configure GA4 Measurement ID, Google Ads Conversion ID/Label, GTM Container ID, toggle server-side tracking and enhanced ecommerce, and see connection status with a connection tester
+  4. Admin can configure GA4 Measurement Id, Google Ads Conversion ID/Label, GTM Container ID, toggle server-side tracking and enhanced ecommerce, and see connection status with a connection tester
   5. Admin can configure global schema (Organization, Website, Breadcrumb) and content schemas (Product, Article, FAQ, HowTo, Review), see a JSON-LD preview, validate against Google requirements, and toggle auto schema generation
 **Plans**: 5 plans
 
