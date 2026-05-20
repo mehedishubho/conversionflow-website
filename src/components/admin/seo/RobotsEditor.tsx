@@ -89,6 +89,34 @@ function parseRobotsTxt(raw: string): {
   };
 }
 
+function highlightRobots(raw: string): string {
+  return raw
+    .split("\n")
+    .map((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return "";
+      if (trimmed.startsWith("#")) {
+        return `<span class="text-gray-400 dark:text-gray-500">${line.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
+      }
+      const match = trimmed.match(/^([^:]+):\s*(.*)$/);
+      if (!match) {
+        return `<span class="text-gray-700 dark:text-gray-300">${line.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
+      }
+      const [, directive, value] = match;
+      const dl = directive.trim().toLowerCase();
+      let directiveColor = "text-purple-600 dark:text-purple-400"; // default
+      if (dl === "user-agent") directiveColor = "text-blue-600 dark:text-blue-400";
+      else if (dl === "allow") directiveColor = "text-green-600 dark:text-green-400";
+      else if (dl === "disallow") directiveColor = "text-red-600 dark:text-red-400";
+      else if (dl === "sitemap") directiveColor = "text-cyan-600 dark:text-cyan-400";
+      else if (dl === "crawl-delay") directiveColor = "text-amber-600 dark:text-amber-400";
+      const escapedLine = line.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const prefix = line.substring(0, line.indexOf(directive));
+      return `${prefix}<span class="${directiveColor} font-semibold">${directive}</span>:<span class="text-gray-700 dark:text-gray-300">${value.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
+    })
+    .join("\n");
+}
+
 export default function RobotsEditor({ initialData }: RobotsEditorProps) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{
@@ -449,13 +477,36 @@ export default function RobotsEditor({ initialData }: RobotsEditorProps) {
           title="Raw Robots.txt Editor"
           desc="Edit the robots.txt file content directly. Changes will be parsed when switching back to Visual mode."
         >
-          <textarea
-            value={rawContent}
-            onChange={(e) => setRawContent(e.target.value)}
-            rows={15}
-            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-mono text-sm leading-relaxed shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-            placeholder={`User-agent: *\nAllow: /\nDisallow: /_next/\nDisallow: /api/\n\nSitemap: https://conversionflow.com/sitemap.xml`}
-          />
+          <div className="relative">
+            {/* Highlighted background layer */}
+            <div
+              className="absolute inset-0 overflow-auto rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-mono text-sm leading-relaxed whitespace-pre-wrap break-words pointer-events-none dark:border-gray-700 dark:bg-gray-900"
+              aria-hidden="true"
+              dangerouslySetInnerHTML={{
+                __html:
+                  highlightRobots(rawContent) ||
+                  `<span class="text-gray-400 dark:text-gray-500">User-agent: *\nAllow: /\nDisallow: /_next/\nDisallow: /api/\n\nSitemap: https://conversionflow.com/sitemap.xml</span>`,
+              }}
+            />
+            {/* Transparent textarea on top */}
+            <textarea
+              value={rawContent}
+              onChange={(e) => setRawContent(e.target.value)}
+              rows={15}
+              spellCheck={false}
+              className="relative w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-transparent caret-gray-800 dark:caret-gray-200 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:placeholder:text-white/30 dark:focus:border-brand-800 resize-y"
+              placeholder={`User-agent: *\nAllow: /\nDisallow: /_next/\nDisallow: /api/\n\nSitemap: https://conversionflow.com/sitemap.xml`}
+            />
+          </div>
+          {/* Legend */}
+          <div className="mt-3 flex flex-wrap gap-3 text-xs">
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-blue-500"></span> User-agent</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-green-500"></span> Allow</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-red-500"></span> Disallow</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-cyan-500"></span> Sitemap</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-amber-500"></span> Crawl-delay</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-gray-400"></span> Comment</span>
+          </div>
         </ComponentCard>
       )}
 
