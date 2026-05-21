@@ -11,6 +11,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import type { SeoOverrides } from "@/lib/seo";
 
 // ──────────────────────────────────────────────
 // Enums
@@ -324,16 +325,6 @@ export const redirects = pgTable(
 // ──────────────────────────────────────────────
 // Blog Tables
 // ──────────────────────────────────────────────
-
-export interface SeoOverrides {
-  title?: string;
-  description?: string;
-  canonicalUrl?: string;
-  focusKeyword?: string;
-  robots?: { index: boolean; follow: boolean };
-  ogImage?: string;
-  schemaType?: string;
-}
 
 export const blogPostStatusEnum = pgEnum("blog_post_status", [
   "draft",

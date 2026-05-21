@@ -5,22 +5,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { settings, blogPosts } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
-
-// ──────────────────────────────────────────────
-// Types
-// ──────────────────────────────────────────────
-
-export interface SeoOverrides {
-  title?: string;
-  description?: string;
-  canonicalUrl?: string;
-  focusKeyword?: string;
-  robots?: { index: boolean; follow: boolean };
-  ogImage?: string;
-  schemaType?: string;
-}
+import type { SeoOverrides } from "@/lib/seo";
 
 // ──────────────────────────────────────────────
 // Auth Guard
@@ -155,6 +142,3 @@ export async function saveBlogSeoOverrides(
 
   return { success: true };
 }
-
-// Import sql helper for LIKE queries
-import { sql } from "drizzle-orm";
