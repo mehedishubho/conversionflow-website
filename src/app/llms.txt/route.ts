@@ -68,7 +68,8 @@ export async function GET() {
         "Cache-Control": "public, max-age=3600",
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("llms.txt generation failed:", error);
     // Minimal fallback on any failure
     const fallback = [
       `# ${siteConfig.name}`,
