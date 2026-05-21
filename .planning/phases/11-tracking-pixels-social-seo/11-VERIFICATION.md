@@ -1,9 +1,11 @@
 ---
 phase: 11-tracking-pixels-social-seo
 verified: 2026-05-21T20:00:00Z
-status: gaps_found
-score: 18/19 must-haves verified
+status: passed
+score: 19/19 must-haves verified
 overrides_applied: 0
+resolved_gaps:
+  - "Key name mismatch facebook_pixel_id -> meta_pixel_id fixed in commit 2a69ce6"
 gaps:
   - truth: "TrackingScripts renders GA4, GTM, FB Pixel, and TikTok pixel on public pages per D-03"
     status: failed
@@ -33,7 +35,7 @@ Truths derived from ROADMAP.md success criteria and PLAN must-haves merged acros
 | 1 | All ~30 tracking settings keys registered in tracking-keys.ts with slice groups | VERIFIED | tracking-keys.ts: 30 keys in TRACKING_KEYS, 5 slice exports (SOCIAL_KEYS, META_PIXEL_KEYS, TIKTOK_KEYS, GOOGLE_KEYS, SCHEMA_KEYS) |
 | 2 | Server actions in admin-tracking-v2.ts can get/save settings per sub-section | VERIFIED | admin-tracking-v2.ts: getTrackingSettings (line 38), saveTrackingSettings (line 60) with TRACKING_KEYS validation, sendMetaTestEvent (line 103), getGa4Summary (line 175) |
 | 3 | SEO overview page shows 9-card grid with completion status per D-10 | VERIFIED | SeoOverviewCards.tsx (132 lines): 9 CARDS array with isFilled checks, responsive grid 3/2/1 cols |
-| 4 | TrackingScripts renders GA4, GTM, FB Pixel, and TikTok pixel on public pages per D-03 | FAILED | layout.tsx line 124 reads `facebook_pixel_id` but tracking-keys.ts defines `meta_pixel_id`. FB pixel never receives ID from public reader. |
+| 4 | TrackingScripts renders GA4, GTM, FB Pixel, and TikTok pixel on public pages per D-03 | VERIFIED | layout.tsx line 124 now reads meta_pixel_id matching tracking-keys.ts registry; fixed in commit 2a69ce6 |
 | 5 | Old admin-tracking.ts deleted with zero imports per D-05 | VERIFIED | File deleted; TrackingSettingsForm.tsx deleted; zero grep results for old import |
 | 6 | Admin can configure social OG fields and sees 3 side-by-side preview cards with mobile/desktop toggle (SOCL-01-05) | VERIFIED | SocialForm.tsx (231 lines) with 7 fields; SocialPreviewSimulator.tsx (405 lines) with FacebookPreviewCard, TwitterPreviewCard, LinkedInPreviewCard; isMobile toggle state |
 | 7 | Admin can configure Meta Pixel ID, CAPI token, Dataset ID, Test Event Code, Advanced Matching, Event Deduplication, events, connection status, event log (META-01-06) | VERIFIED | MetaPixelForm.tsx (642 lines): pixel config section, Advanced Matching toggle with field checkboxes, 6 event checkboxes, Event Deduplication switch, connection status tester, EventLogPanel integration |
