@@ -8,6 +8,29 @@ import { eq, and, sql } from 'drizzle-orm';
 
 const handleI18nRouting = createMiddleware(routing);
 
+// ──────────────────────────────────────────────
+// Regex safety validation (ReDoS protection)
+// ──────────────────────────────────────────────
+
+const REDOS_PATTERNS = /(\.+\+)+|(\.\*)\*|(\.+\+)|(\.\+)\+/;
+
+function validateRegex(pattern: string): { valid: boolean; error?: string } {
+  try {
+    new RegExp(pattern);
+  } catch {
+    return { valid: false, error: "Invalid regex pattern." };
+  }
+
+  if (REDOS_PATTERNS.test(pattern)) {
+    return {
+      valid: false,
+      error: "Potentially dangerous regex pattern (nested quantifiers). Please simplify.",
+    };
+  }
+
+  return { valid: true };
+}
+
 // Route category definitions
 const AUTH_PAGES = [
   '/login',
@@ -87,6 +110,12 @@ export async function proxy(request: NextRequest) {
 
     for (const rule of regexRules) {
       try {
+        // Validate regex pattern before execution to prevent ReDoS attacks
+        const validation = validateRegex(rule.fromUrl);
+        if (!validation.valid) {
+          continue; // Skip invalid patterns
+        }
+
         const regex = new RegExp(rule.fromUrl);
         const match = regex.exec(pathname);
         if (match) {
