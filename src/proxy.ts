@@ -9,6 +9,13 @@ import { eq, and, sql } from 'drizzle-orm';
 const handleI18nRouting = createMiddleware(routing);
 
 // ──────────────────────────────────────────────
+// Regex rules cache (60 second TTL)
+// ──────────────────────────────────────────────
+
+let regexRulesCache: { data: typeof[]; timestamp: number } | null = null;
+const CACHE_TTL = 60000; // 1 minute
+
+// ──────────────────────────────────────────────
 // Regex safety validation (ReDoS protection)
 // ──────────────────────────────────────────────
 
@@ -105,10 +112,16 @@ export async function proxy(request: NextRequest) {
     }
 
     // Regex match lookup (only if no exact match)
-    const regexRules = await db
-      .select()
-      .from(redirects)
-      .where(and(eq(redirects.isRegex, true), eq(redirects.status, 'active')));
+    // Use cache to reduce database load
+    const now = Date.now();
+    if (!regexRulesCache || now - regexRulesCache.timestamp > CACHE_TTL) {
+      const rules = await db
+        .select()
+        .from(redirects)
+        .where(and(eq(redirects.isRegex, true), eq(redirects.status, 'active')));
+      regexRulesCache = { data: rules, timestamp: now };
+    }
+    const regexRules = regexRulesCache.data;
 
     for (const rule of regexRules) {
       try {
