@@ -92,11 +92,13 @@ export async function proxy(request: NextRequest) {
 
     if (exactMatches.length > 0) {
       const match = exactMatches[0];
-      // Fire-and-forget hit count increment
+      // Fire-and-forget hit count increment (best-effort metric, uses atomic DB increment)
       db.update(redirects)
         .set({ hitCount: sql`${redirects.hitCount} + 1` })
         .where(eq(redirects.id, match.id))
-        .catch(() => {});
+        .catch(() => {
+          // Hit count failures don't block redirects
+        });
       return NextResponse.redirect(new URL(match.toUrl, request.url), {
         status: parseInt(match.type),
       });
@@ -119,11 +121,13 @@ export async function proxy(request: NextRequest) {
         const regex = new RegExp(rule.fromUrl);
         const match = regex.exec(pathname);
         if (match) {
-          // Fire-and-forget hit count increment
+          // Fire-and-forget hit count increment (best-effort metric, uses atomic DB increment)
           db.update(redirects)
             .set({ hitCount: sql`${redirects.hitCount} + 1` })
             .where(eq(redirects.id, rule.id))
-            .catch(() => {});
+            .catch(() => {
+              // Hit count failures don't block redirects
+            });
 
           // Build destination with capture group replacement
           const destination = rule.toUrl.replace(/\$(\d+)/g, (_, idx) => {
