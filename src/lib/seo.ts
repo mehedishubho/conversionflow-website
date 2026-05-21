@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getLocalizedUrl, siteConfig } from "@/lib/site";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
+import { inArray, eq } from "drizzle-orm";
 
 type PageSeo = {
   title: string;
@@ -87,6 +87,16 @@ export const pageSeo: Record<string, PageSeo> = {
   },
 };
 
+export interface SeoOverrides {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  focusKeyword?: string;
+  robots?: { index: boolean; follow: boolean };
+  ogImage?: string;
+  schemaType?: string;
+}
+
 const SEO_OVERRIDE_KEYS = [
   "seo_title",
   "seo_description",
@@ -120,6 +130,28 @@ async function getCachedSeoOverrides(): Promise<Record<string, string>> {
 }
 
 /**
+ * Read page-level SEO overrides from settings table for a specific page key.
+ * Returns empty SeoOverrides if not set or on failure.
+ */
+async function getPageLevelOverrides(pageKey: string): Promise<SeoOverrides> {
+  try {
+    const rows = await db
+      .select()
+      .from(settings)
+      .where(eq(settings.key, `seo_page_overrides_${pageKey}`))
+      .limit(1);
+
+    if (rows.length === 0 || !rows[0].value) {
+      return {};
+    }
+
+    return JSON.parse(rows[0].value) as SeoOverrides;
+  } catch {
+    return {};
+  }
+}
+
+/**
  * Get a single SEO setting from DB, falling back to the provided default.
  */
 async function getSeoSetting(key: string, fallback: string): Promise<string> {
@@ -131,21 +163,31 @@ async function getSeoSetting(key: string, fallback: string): Promise<string> {
 export async function createPageMetadata(key: keyof typeof pageSeo, locale: string): Promise<Metadata> {
   const seo = pageSeo[key];
   const overrides = await getCachedSeoOverrides();
+  const pageLevelOverrides = await getPageLevelOverrides(key);
 
-  // Canonical URL: use DB override as base if set, otherwise siteConfig.url
-  const siteUrl = overrides["seo_canonical_url"]?.trim() || siteConfig.url;
+  // Canonical URL: page-level override takes precedence, then global override, then siteConfig.url
+  const siteUrl = pageLevelOverrides.canonicalUrl?.trim() || overrides["seo_canonical_url"]?.trim() || siteConfig.url;
   const canonical = `${siteUrl}${seo.path ? seo.path : ""}`;
 
-  // OG image: use DB override if set
-  const ogImage = overrides["seo_og_image"]?.trim() || undefined;
+  // OG image: page-level override takes precedence, then global override
+  const ogImage = pageLevelOverrides.ogImage?.trim() || overrides["seo_og_image"]?.trim() || undefined;
 
-  // Title: keep page-specific title as-is (per-page titles are better than global override)
-  const title = seo.title;
+  // Title: page-level override takes precedence, then page-specific default
+  const title = pageLevelOverrides.title?.trim() || seo.title;
 
-  return {
+  // Description: page-level override takes precedence, then page-specific default
+  const description = pageLevelOverrides.description?.trim() || seo.description;
+
+  // Keywords: combine page-specific keywords with focus keyword if set
+  const keywords = pageLevelOverrides.focusKeyword
+    ? [...seo.keywords, pageLevelOverrides.focusKeyword]
+    : seo.keywords;
+
+  // Build metadata object
+  const metadata: Metadata = {
     title,
-    description: seo.description,
-    keywords: seo.keywords,
+    description,
+    keywords,
     alternates: {
       canonical,
       languages: {
@@ -155,7 +197,7 @@ export async function createPageMetadata(key: keyof typeof pageSeo, locale: stri
     },
     openGraph: {
       title,
-      description: seo.description,
+      description,
       url: canonical,
       siteName: siteConfig.legalName,
       type: "website",
@@ -165,9 +207,21 @@ export async function createPageMetadata(key: keyof typeof pageSeo, locale: stri
     twitter: {
       card: "summary_large_image",
       title,
-      description: seo.description,
+      description,
     },
   };
+
+  // Add robots meta if page-level override is set
+  if (pageLevelOverrides.robots) {
+    const robotsDirectives: string[] = [];
+    if (!pageLevelOverrides.robots.index) robotsDirectives.push("noindex");
+    if (!pageLevelOverrides.robots.follow) robotsDirectives.push("nofollow");
+    if (robotsDirectives.length > 0) {
+      metadata.robots = robotsDirectives.join(", ");
+    }
+  }
+
+  return metadata;
 }
 
 export { organizationSchema, websiteSchema, productSchema, breadcrumbSchema } from "@/lib/schema-helpers";

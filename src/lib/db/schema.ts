@@ -322,6 +322,77 @@ export const redirects = pgTable(
 );
 
 // ──────────────────────────────────────────────
+// Blog Tables
+// ──────────────────────────────────────────────
+
+export interface SeoOverrides {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  focusKeyword?: string;
+  robots?: { index: boolean; follow: boolean };
+  ogImage?: string;
+  schemaType?: string;
+}
+
+export const blogPostStatusEnum = pgEnum("blog_post_status", [
+  "draft",
+  "published",
+]);
+
+export const blogCategories = pgTable(
+  "blog_categories",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    locale: text("locale").notNull(),
+    description: text("description"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index("blog_categories_locale_idx").on(table.locale),
+    unique("blog_categories_slug_locale_unique").on(table.slug, table.locale),
+  ]
+);
+
+export const blogPosts = pgTable(
+  "blog_posts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull(),
+    content: text("content").notNull(),
+    excerpt: text("excerpt"),
+    coverImage: text("cover_image"),
+    authorName: text("author_name").notNull(),
+    locale: text("locale").notNull(),
+    status: blogPostStatusEnum("status").notNull().default("draft"),
+    categoryId: uuid("category_id").references(() => blogCategories.id),
+    tags: jsonb("tags").$type<string[]>().default([]),
+    seoTitle: text("seo_title"),
+    seoDescription: text("seo_description"),
+    ogImage: text("og_image"),
+    seoOverrides: jsonb("seo_overrides").$type<SeoOverrides>(),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index("blog_posts_locale_idx").on(table.locale),
+    index("blog_posts_status_idx").on(table.status),
+    unique("blog_posts_slug_locale_unique").on(table.slug, table.locale),
+  ]
+);
+
+// ──────────────────────────────────────────────
 // Relations
 // ──────────────────────────────────────────────
 
