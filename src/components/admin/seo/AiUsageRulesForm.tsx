@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Switch from "@/components/form/switch/Switch";
 import ComponentCard from "@/components/common/ComponentCard";
 import { getSeoSettings, saveSeoSettings } from "@/app/(admin)/actions/admin-seo";
@@ -46,14 +46,18 @@ export default function AiUsageRulesForm() {
   const [rules, setRules] = useState<UsageRules>(DEFAULT_RULES);
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     async function loadRules() {
       try {
         const data = await getSeoSettings(["seo_ai_usage_rules"]);
+        console.log("Loaded data:", data);
         const raw = data["seo_ai_usage_rules"];
+        console.log("Raw value:", raw);
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<UsageRules>;
+          console.log("Parsed rules:", parsed);
           setRules({
             allowSummarization: parsed.allowSummarization ?? DEFAULT_RULES.allowSummarization,
             allowTraining: parsed.allowTraining ?? DEFAULT_RULES.allowTraining,
@@ -61,31 +65,53 @@ export default function AiUsageRulesForm() {
             allowCommercialUse: parsed.allowCommercialUse ?? DEFAULT_RULES.allowCommercialUse,
           });
         }
-      } catch {
+      } catch (error) {
+        console.error("Load error:", error);
         // Use defaults on parse error
       }
     }
     loadRules();
   }, []);
 
-  const handleToggle = useCallback((key: keyof UsageRules, checked: boolean) => {
-    setRules((prev) => ({ ...prev, [key]: checked }));
-  }, []);
-
-  const handleSave = async () => {
+  const saveRules = useCallback(async (rulesToSave: UsageRules) => {
     setIsPending(true);
     setMessage(null);
     try {
-      await saveSeoSettings({
-        seo_ai_usage_rules: JSON.stringify(rules),
+      const jsonValue = JSON.stringify(rulesToSave);
+      console.log("Saving rules:", jsonValue);
+      const result = await saveSeoSettings({
+        seo_ai_usage_rules: jsonValue,
       });
+      console.log("Save result:", result);
       setMessage({ type: "success", text: "AI usage rules saved successfully." });
-    } catch {
-      setMessage({ type: "error", text: "Failed to save AI usage rules." });
+    } catch (error) {
+      console.error("Save error:", error);
+      setMessage({ type: "error", text: `Failed: ${error instanceof Error ? error.message : "Unknown error"}` });
     } finally {
       setIsPending(false);
     }
-  };
+  }, []);
+
+  const handleToggle = useCallback((key: keyof UsageRules, checked: boolean) => {
+    // Use functional state update to get the latest state
+    setRules((prevRules) => {
+      const newRules = { ...prevRules, [key]: checked };
+      console.log("Toggle:", key, "to", checked, "newRules:", newRules);
+      setMessage({ type: "success", text: "Saving..." });
+
+      // Clear existing timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Debounced save
+      saveTimeoutRef.current = setTimeout(() => {
+        saveRules(newRules);
+      }, 800);
+
+      return newRules;
+    });
+  }, [saveRules]);
 
   return (
     <ComponentCard
@@ -117,19 +143,17 @@ export default function AiUsageRulesForm() {
         ))}
       </div>
 
-      <div className="mt-6 flex items-center gap-4">
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={isPending}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-theme-sm hover:bg-brand-600 disabled:opacity-50"
-        >
-          {isPending ? "Saving..." : "Save Usage Rules"}
-        </button>
-        {message && (
-          <span
-            className={`text-sm ${message.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
-          >
+      <div className="mt-4 flex items-center gap-3 text-sm">
+        {isPending ? (
+          <span className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Saving...
+          </span>
+        ) : message && (
+          <span className={`${message.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
             {message.text}
           </span>
         )}

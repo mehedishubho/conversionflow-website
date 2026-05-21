@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import AiBotCards from "@/components/admin/seo/AiBotCards";
@@ -27,6 +27,7 @@ export default function SeoAiSeoPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     async function loadBots() {
@@ -46,24 +47,35 @@ export default function SeoAiSeoPage() {
     loadBots();
   }, []);
 
-  const handleBotChange = (updatedBots: Record<string, boolean>) => {
-    setBotsData(updatedBots);
-  };
-
-  const handleSaveBots = async () => {
+  const saveBotsData = useCallback(async (botsToSave: Record<string, boolean>) => {
     setIsPending(true);
     setMessage(null);
     try {
       await saveSeoSettings({
-        seo_ai_bots: JSON.stringify(botsData),
+        seo_ai_bots: JSON.stringify(botsToSave),
       });
-      setMessage({ type: "success", text: "Bot settings saved successfully." });
+      setMessage({ type: "success", text: "Bot settings saved." });
     } catch {
       setMessage({ type: "error", text: "Failed to save bot settings." });
     } finally {
       setIsPending(false);
     }
-  };
+  }, []);
+
+  const handleBotChange = useCallback((updatedBots: Record<string, boolean>) => {
+    setBotsData(updatedBots);
+    setMessage({ type: "success", text: "Saving..." });
+
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Debounced save
+    saveTimeoutRef.current = setTimeout(() => {
+      saveBotsData(updatedBots);
+    }, 800);
+  }, [saveBotsData]);
 
   return (
     <div>
@@ -83,19 +95,17 @@ export default function SeoAiSeoPage() {
             {/* Section 1: AI Bot Controls */}
             <div>
               <AiBotCards bots={botsData} onChange={handleBotChange} />
-              <div className="mt-4 flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={handleSaveBots}
-                  disabled={isPending}
-                  className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-theme-sm hover:bg-brand-600 disabled:opacity-50"
-                >
-                  {isPending ? "Saving..." : "Save Bot Settings"}
-                </button>
-                {message && (
-                  <span
-                    className={`text-sm ${message.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
-                  >
+              <div className="mt-3 flex items-center gap-3 text-sm">
+                {isPending ? (
+                  <span className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Saving...
+                  </span>
+                ) : message && (
+                  <span className={`${message.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                     {message.text}
                   </span>
                 )}

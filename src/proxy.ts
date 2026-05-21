@@ -12,7 +12,7 @@ const handleI18nRouting = createMiddleware(routing);
 // Regex rules cache (60 second TTL)
 // ──────────────────────────────────────────────
 
-let regexRulesCache: { data: typeof[]; timestamp: number } | null = null;
+let regexRulesCache: { data: typeof redirects.$inferSelect[]; timestamp: number } | null = null;
 const CACHE_TTL = 60000; // 1 minute
 
 // ──────────────────────────────────────────────

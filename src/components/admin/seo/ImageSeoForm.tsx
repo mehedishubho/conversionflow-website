@@ -129,7 +129,7 @@ export default function ImageSeoForm() {
             <div className="flex-shrink-0">
               <Switch
                 label={toggles[toggle.key] ? "Enabled" : "Disabled"}
-                defaultChecked={toggles[toggle.key]}
+                checked={toggles[toggle.key]}
                 onChange={(checked) => handleToggle(toggle.key, checked)}
               />
             </div>

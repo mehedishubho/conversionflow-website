@@ -1,27 +1,33 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 
 interface SwitchProps {
   label: string;
+  checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
   onChange?: (checked: boolean) => void;
-  color?: "blue" | "gray"; // Added prop to toggle color theme
+  color?: "blue" | "gray";
 }
 
 const Switch: React.FC<SwitchProps> = ({
   label,
+  checked,
   defaultChecked = false,
   disabled = false,
   onChange,
-  color = "blue", // Default to blue color
+  color = "blue",
 }) => {
-  const [isChecked, setIsChecked] = useState(defaultChecked);
+  // Use checked prop if provided (controlled), otherwise use internal state (uncontrolled)
+  const [internalChecked, setInternalChecked] = React.useState(defaultChecked);
+  const isChecked = checked !== undefined ? checked : internalChecked;
 
   const handleToggle = () => {
     if (disabled) return;
     const newCheckedState = !isChecked;
-    setIsChecked(newCheckedState);
+    if (checked === undefined) {
+      setInternalChecked(newCheckedState);
+    }
     if (onChange) {
       onChange(newCheckedState);
     }

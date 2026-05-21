@@ -529,19 +529,19 @@ export async function importRedirectsCsv(csvText: string) {
 | A4 | `blogPosts` table exists in the database despite missing from schema.ts | Pitfalls | If it doesn't exist, blog features are broken and page-level SEO can't extend it. Critical to verify. |
 | A5 | The fire-and-forget hit counter update won't cause connection pool exhaustion | Code Examples | Under high traffic, many pending updates could drain the pool. Low risk for current scale. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does the blogPosts table exist in the database?**
+1. **Does the blogPosts table exist in the database?** RESOLVED: Plan 12-05 Task 1 includes verification and schema addition.
    - What we know: `src/lib/blog.ts` imports `blogPosts` from `@/lib/db/schema`, but schema.ts has no such export. Blog admin pages reference `admin-blog` actions that don't exist as files.
    - What's unclear: Whether the tables were created via direct SQL, a migration that wasn't committed, or if this is a partially-implemented feature.
    - Recommendation: Planner should include a verification step at the start. If `blogPosts` doesn't exist in the DB, the page-level SEO plan must create both the table AND the admin-blog.ts actions file as a prerequisite.
 
-2. **Does proxy.ts handle async return values correctly?**
+2. **Does proxy.ts handle async return values correctly?** RESOLVED: Plan 12-01 Task 1 converts proxy to async with try/catch.
    - What we know: Current proxy function is synchronous. Adding DB queries requires making it async.
    - What's unclear: How Next.js consumes the proxy function export. The file uses `export function proxy()` -- changing to `export async function proxy()` may or may not be compatible with the caller.
    - Recommendation: Test by adding a simple async operation to proxy.ts and verifying the middleware still works. If not, consider caching redirects in memory with periodic DB refresh instead.
 
-3. **Should admin-blog.ts be created as part of Phase 12 or a prerequisite?**
+3. **Should admin-blog.ts be created as part of Phase 12 or a prerequisite?** RESOLVED: Plan 12-05 Task 2 includes conditional admin-blog.ts creation if missing.
    - What we know: The file is imported by existing components but doesn't exist. Page-level SEO for blog posts depends on it.
    - What's unclear: Whether this is an oversight or a separate work item.
    - Recommendation: Include blog table verification and admin-blog.ts creation in the page-level SEO plan (Plan 12-05), since it directly blocks that work.
