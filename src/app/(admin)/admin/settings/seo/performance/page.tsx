@@ -1,16 +1,17 @@
-import ComponentCard from "@/components/common/ComponentCard";
+import CoreWebVitalsCards from "@/components/admin/seo/CoreWebVitalsCards";
+import PerformanceSeoForm from "@/components/admin/seo/PerformanceSeoForm";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+
+export const dynamic = "force-dynamic";
 
 export default function SeoPerformancePage() {
   return (
-    <ComponentCard
-      title="Performance SEO"
-      desc="Configure Critical CSS, JS defer, minification, CDN, and cache settings with Core Web Vitals monitoring."
-    >
-      <div className="flex items-center gap-3 py-4">
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-white/5 dark:text-gray-400">
-          Coming in Phase 12
-        </span>
+    <div>
+      <PageBreadcrumb pageTitle="Performance" basePath="/admin/settings" />
+      <div className="space-y-6">
+        <CoreWebVitalsCards />
+        <PerformanceSeoForm />
       </div>
-    </ComponentCard>
+    </div>
   );
 }
