@@ -294,9 +294,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01-PLAN.md -- Backend foundation: seo_404_errors DB table + schema push, analytics server actions (get404Errors, getSitemapHealth, log404Error), extend getGa4Summary with date range, not-found page 404 logging
-- [ ] 13-02-PLAN.md -- Analytics overview UI: SeoAnalyticsClient orchestrator, IndexedPagesCards, TopPagesTable, TrafficOverviewChart, keyword rankings placeholder, CTR/impressions placeholder
-- [ ] 13-03-PLAN.md -- Health reports UI: Errors404Table (real 404 data with search), SitemapHealthCards (real sitemap analysis with Badge indicators), CrawlIssuesPanel (placeholder crawl issues)
+- [x] 13-01-PLAN.md -- Backend foundation: seo_404_errors DB table + schema push, analytics server actions (get404Errors, getSitemapHealth, log404Error), extend getGa4Summary with date range, not-found page 404 logging
+- [x] 13-02-PLAN.md -- Analytics overview UI: SeoAnalyticsClient orchestrator, IndexedPagesCards, TopPagesTable, TrafficOverviewChart, keyword rankings placeholder, CTR/impressions placeholder
+- [x] 13-03-PLAN.md -- Health reports UI: Errors404Table (real 404 data with search), SitemapHealthCards (real sitemap analysis with Badge indicators), CrawlIssuesPanel (placeholder crawl issues)
 
 **UI hint**: yes
 
