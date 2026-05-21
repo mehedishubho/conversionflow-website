@@ -52,7 +52,7 @@ export default function BlogPostTable({
         } else {
           setMessage({
             type: "success",
-            text: `Post ${result.newStatus === "published" ? "published" : "unpublished"}.`,
+            text: "Post status updated.",
           });
         }
       } catch {

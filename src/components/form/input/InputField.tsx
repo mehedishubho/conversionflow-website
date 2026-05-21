@@ -4,6 +4,7 @@ interface InputProps {
   type?: "text" | "number" | "email" | "password" | "date" | "time" | string;
   id?: string;
   name?: string;
+  label?: string;
   placeholder?: string;
   defaultValue?: string | number;
   value?: string;
@@ -16,12 +17,14 @@ interface InputProps {
   success?: boolean;
   error?: boolean;
   hint?: string; // Optional hint text
+  helperText?: string; // Alias for hint
 }
 
 const Input: FC<InputProps> = ({
   type = "text",
   id,
   name,
+  label,
   placeholder,
   defaultValue,
   value,
@@ -34,6 +37,7 @@ const Input: FC<InputProps> = ({
   success = false,
   error = false,
   hint,
+  helperText,
 }) => {
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
@@ -49,11 +53,19 @@ const Input: FC<InputProps> = ({
     inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800`;
   }
 
+  const displayHint = hint || helperText;
+  const inputId = id || name || label?.toLowerCase().replace(/\s+/g, "-");
+
   return (
     <div className="relative">
+      {label && (
+        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+          {label}
+        </label>
+      )}
       <input
         type={type}
-        id={id}
+        id={inputId}
         name={name}
         placeholder={placeholder}
         defaultValue={defaultValue}
@@ -67,7 +79,7 @@ const Input: FC<InputProps> = ({
       />
 
       {/* Optional Hint Text */}
-      {hint && (
+      {displayHint && (
         <p
           className={`mt-1.5 text-xs ${
             error
@@ -77,7 +89,7 @@ const Input: FC<InputProps> = ({
               : "text-gray-500"
           }`}
         >
-          {hint}
+          {displayHint}
         </p>
       )}
     </div>

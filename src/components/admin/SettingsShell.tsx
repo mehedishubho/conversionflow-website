@@ -23,6 +23,7 @@ import {
   Image as ImageIcon,
   Zap,
   LineChart,
+  Layers,
 } from "lucide-react";
 
 const SETTINGS_NAV = [
@@ -34,20 +35,25 @@ const SETTINGS_NAV = [
     href: "/admin/settings/seo",
     icon: Search,
     children: [
+      // Core SEO
       { label: "General", href: "/admin/settings/seo/general", icon: Globe },
       { label: "Verification", href: "/admin/settings/seo/verification", icon: Shield },
       { label: "Sitemaps", href: "/admin/settings/seo/sitemaps", icon: FileText },
       { label: "Robots.txt", href: "/admin/settings/seo/robots", icon: FileCode },
+      // Structured Data
+      { label: "Schema", href: "/admin/settings/seo/schema", icon: Code },
+      // Social & Analytics
       { label: "Social / OG", href: "/admin/settings/seo/social", icon: Share2 },
       { label: "Meta Pixel", href: "/admin/settings/seo/meta-pixel", icon: Target },
       { label: "TikTok", href: "/admin/settings/seo/tiktok", icon: Music },
       { label: "Google", href: "/admin/settings/seo/google", icon: BarChart3 },
-      { label: "Schema", href: "/admin/settings/seo/schema", icon: Code },
+      { label: "Analytics", href: "/admin/settings/seo/analytics", icon: LineChart },
+      // Advanced SEO
       { label: "Redirects", href: "/admin/settings/seo/redirects", icon: ArrowRightLeft },
       { label: "AI SEO", href: "/admin/settings/seo/ai-seo", icon: Bot },
       { label: "Image SEO", href: "/admin/settings/seo/image-seo", icon: ImageIcon },
       { label: "Performance", href: "/admin/settings/seo/performance", icon: Zap },
-      { label: "Analytics", href: "/admin/settings/seo/analytics", icon: LineChart },
+      { label: "Page-Level SEO", href: "/admin/settings/seo/page-level", icon: Layers },
     ],
   },
 ];

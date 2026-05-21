@@ -12,6 +12,10 @@ import {
   Settings,
   ShoppingCart,
   Activity,
+  PenTool,
+  Bell,
+  Webhook,
+  ScrollText,
 } from "lucide-react";
 
 export type NavItem = {
@@ -33,7 +37,12 @@ export const customerNavItems: NavItem[] = [
 export const adminNavItems: NavItem[] = [
   { name: "Overview", icon: BarChart3, path: "/admin/dashboard" },
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
+  { name: "Licenses", icon: Key, path: "/admin/licenses" },
   { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Invoices", icon: FileText, path: "/admin/invoices" },
+  { name: "Activity", icon: Activity, path: "/admin/activity" },
+  { name: "Notifications", icon: Bell, path: "/admin/notifications" },
+  { name: "Webhooks", icon: Webhook, path: "/admin/webhooks" },
+  { name: "Blog", icon: PenTool, path: "/admin/blog" },
   { name: "Settings", icon: Settings, path: "/admin/settings" },
 ];

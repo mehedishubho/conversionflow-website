@@ -2,8 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import PaymentSettingsForm from "@/components/admin/PaymentSettingsForm";
-import { getPaymentSettings } from "@/app/(admin)/actions/admin-settings";
+import SettingsOverviewCards from "@/components/admin/SettingsOverviewCards";
 
 export const dynamic = "force-dynamic";
 
@@ -22,34 +21,20 @@ export default async function AdminSettingsPage() {
     redirect("/admin/dashboard");
   }
 
-  // Load current payment settings
-  const settings = await getPaymentSettings();
-
   return (
     <div>
       <PageBreadcrumb pageTitle="Settings" basePath="/admin/dashboard" />
 
-      <PaymentSettingsForm
-        initialData={{
-          paymentAccounts: settings.paymentAccounts.map((a) => ({
-            id: a.id,
-            method: a.method,
-            accountName: a.accountName,
-            accountNumber: a.accountNumber,
-            bankName: a.bankName,
-            branch: a.branch,
-            routingNumber: a.routingNumber,
-            instructions: a.instructions,
-            active: a.active,
-          })),
-          vatRate: settings.vatRate,
-          vatMode: settings.vatMode,
-          vatEnabled: settings.vatEnabled,
-          sslCommerzEnabled: settings.sslCommerzEnabled,
-          sslCommerz: settings.sslCommerz,
-          centralApi: settings.centralApi,
-        }}
-      />
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Settings
+        </h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Manage your application settings and configurations
+        </p>
+      </div>
+
+      <SettingsOverviewCards />
     </div>
   );
 }

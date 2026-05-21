@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
+import BackButton from "@/components/common/BackButton";
 import BlogPostForm from "@/components/admin/blog/BlogPostForm";
 import {
   getPostById,
@@ -51,7 +52,10 @@ export default async function EditBlogPostPage({
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Edit Post" basePath="/admin/dashboard" />
+      <div className="flex items-center gap-4 mb-4">
+        <BackButton href="/admin/blog" />
+        <PageBreadcrumb pageTitle="Edit Post" basePath="/admin/dashboard" />
+      </div>
 
       <ComponentCard
         title={`Edit: ${post.title}`}

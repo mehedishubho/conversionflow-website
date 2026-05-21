@@ -1,5 +1,5 @@
 import { JsonLd } from "@/components/seo/JsonLd";
-import { platformPricing } from "@/data/pricing";
+import { pricingTiers } from "@/data/pricing";
 import { Link } from "@/i18n/routing";
 import { breadcrumbSchema, createPageMetadata, productSchema } from "@/lib/seo";
 
@@ -46,17 +46,22 @@ export default function PlatformComparisonPage() {
       <section className="sec">
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-16">
-            {platformPricing.map((platform) => (
-              <div key={platform.key} className="pc">
-                <div className="p-plan">{platform.name}</div>
-                <div className="p-desc">{platform.bestFor}</div>
-                <p className="text-sm text-text2 leading-[1.8] mb-5">{platform.positioning}</p>
+            {pricingTiers.map((tier) => (
+              <div key={tier.plan} className="pc">
+                <div className="p-plan">{tier.plan}</div>
+                <div className="p-desc">{tier.priceBDT}{tier.period}</div>
+                <p className="text-sm text-text2 leading-[1.8] mb-5">{tier.desc}</p>
                 <ul className="p-features">
-                  {platform.features.map((feature) => (
-                    <li key={feature}><span className="p-ck">✓</span>{feature}</li>
+                  {tier.features.map((feature) => (
+                    <li key={feature.text}>
+                      <span className="p-ck">{feature.included ? "✓" : "✗"}</span>
+                      {feature.text}
+                    </li>
                   ))}
                 </ul>
-                <Link href="/pricing" className="btn btn-outline w-full justify-center">Compare Platform Pricing</Link>
+                <Link href={tier.checkoutUrl} className="btn btn-outline w-full justify-center">
+                  {tier.buttonText}
+                </Link>
               </div>
             ))}
           </div>

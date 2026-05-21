@@ -8,7 +8,7 @@ import {
   getAllPageSeoOverrides,
 } from "@/app/(admin)/actions/admin-page-seo";
 import type { SeoOverrides } from "@/app/(admin)/actions/admin-page-seo";
-import { pageSeo } from "@/lib/seo";
+import { pageSeo } from "@/lib/page-seo-config";
 
 const PAGE_OPTIONS = Object.keys(pageSeo).map((key) => ({
   value: key,

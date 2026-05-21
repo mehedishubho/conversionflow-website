@@ -1,18 +1,15 @@
 ---
-status: testing
+status: completed
 phase: 12-advanced-seo
 source: [12-01-SUMMARY.md, 12-02-SUMMARY.md, 12-03-SUMMARY.md, 12-04-SUMMARY.md, 12-05-SUMMARY.md]
 started: 2026-05-21T09:34:30.694Z
-updated: 2026-05-21T11:00:00.000Z
+updated: 2026-05-21T12:30:00.000Z
+completed: 2026-05-21T16:00:00.000Z
 ---
 
 ## Current Test
 
-number: 7
-name: Image SEO - Config Toggles
-expected: |
-  Navigate to /admin/settings/seo/image-seo. See 4 toggle switches: Auto ALT Text, WebP Conversion, Lazy Loading, Image Compression. All toggles save to database. Below toggles, see 3 placeholder stat cards showing '--' values with info banner about server integration.
-awaiting: user response
+All tests completed.
 
 ## Tests
 
@@ -42,30 +39,30 @@ result: pass
 
 ### 7. Image SEO - Config Toggles
 expected: Navigate to /admin/settings/seo/image-seo. See 4 toggle switches: Auto ALT Text, WebP Conversion, Lazy Loading, Image Compression. All toggles save to database. Below toggles, see 3 placeholder stat cards showing '--' values with info banner about server integration.
-result: pending
+result: pass
 
 ### 8. Performance SEO - Config Toggles
 expected: Navigate to /admin/settings/seo/performance. See 3 toggle switches: Critical CSS, JS Defer, Minification. See CDN URL text input and Cache Settings inputs. All controls save to database.
-result: pending
+result: pass
 
 ### 9. Performance SEO - CWV Cards
 expected: On Performance SEO page, see 5 Core Web Vitals cards: LCP, CLS, INP, TTFB, Overall Score. Each card shows placeholder '--' value. Info banner notes 'Connect Google PageSpeed Insights API for real monitoring data'.
-result: pending
+result: pass
 
 ### 10. Page-Level SEO - Marketing Page Form
 expected: Navigate to /admin/settings/seo/page-level. See dropdown to select marketing page (Home, Features, Pricing, etc.). Form fields appear: Title, Meta Description, Canonical URL, Focus Keyword, Robots controls (index/follow), OG Image, Schema Type selector. All fields save to database.
-result: pending
+result: pass
 
 ### 11. Page-Level SEO - Blog Post Editor
 expected: Navigate to /admin/blog/[id]/edit for any blog post. See 'SEO Settings' section with same fields as marketing page form (title, description, canonical, keyword, robots, OG image, schema type). 'Advanced SEO' section is expandable with additional options. Changes save to seo_overrides JSONB column.
-result: pending
+result: pass
 
 ## Summary
 
 total: 11
-passed: 6
+passed: 11
 issues: 0
-pending: 5
+pending: 0
 skipped: 0
 
 ## Gaps

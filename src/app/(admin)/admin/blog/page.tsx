@@ -60,7 +60,7 @@ export default async function AdminBlogPage({
             ...p,
             publishedAt: p.publishedAt ?? null,
             createdAt: p.createdAt,
-            categoryName: p.categoryName ?? null,
+            categoryName: null,
           }))}
           total={total}
           page={page}

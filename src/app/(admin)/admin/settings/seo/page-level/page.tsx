@@ -25,8 +25,7 @@ export default async function PageLevelSeoPage() {
     <div>
       <PageBreadcrumb
         pageTitle="Page-Level SEO"
-        basePath="/admin/dashboard"
-        subPaths={[{ label: "Settings", href: "/admin/settings" }]}
+        basePath="/admin/settings"
       />
 
       <ComponentCard

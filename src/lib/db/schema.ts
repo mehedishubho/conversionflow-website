@@ -300,6 +300,43 @@ export const settings = pgTable("settings", {
     .$onUpdate(() => new Date()),
 });
 
+// ──────────────────────────────────────────────
+// Webhook Tables
+// ──────────────────────────────────────────────
+
+export const webhookStatusEnum = pgEnum("webhook_status", [
+  "active",
+  "inactive",
+]);
+
+export const webhooks = pgTable("webhooks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  url: text("url").notNull(),
+  events: jsonb("events").$type<string[]>().notNull(),
+  secret: text("secret").notNull(),
+  status: webhookStatusEnum("status").notNull().default("active"),
+  lastTriggeredAt: timestamp("last_triggered_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const webhookDeliveries = pgTable("webhook_deliveries", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  webhookId: uuid("webhook_id")
+    .notNull()
+    .references(() => webhooks.id, { onDelete: "cascade" }),
+  event: text("event").notNull(),
+  payload: jsonb("payload"),
+  statusCode: integer("status_code"),
+  response: text("response"),
+  success: boolean("success").default(false),
+  attempts: integer("attempts").default(1),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const redirects = pgTable(
   "redirects",
   {
@@ -457,5 +494,16 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(user, {
     fields: [notifications.userId],
     references: [user.id],
+  }),
+}));
+
+export const webhooksRelations = relations(webhooks, ({ many }) => ({
+  deliveries: many(webhookDeliveries),
+}));
+
+export const webhookDeliveriesRelations = relations(webhookDeliveries, ({ one }) => ({
+  webhook: one(webhooks, {
+    fields: [webhookDeliveries.webhookId],
+    references: [webhooks.id],
   }),
 }));

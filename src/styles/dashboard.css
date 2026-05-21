@@ -238,3 +238,28 @@
     @apply bg-gray-200 rounded-full dark:bg-gray-700;
   }
 }
+
+@utility settings-nav-item {
+  @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-sm;
+}
+
+@utility settings-nav-item-active {
+  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+}
+
+@utility settings-nav-item-inactive {
+  @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
+}
+
+@utility settings-nav-subitem {
+  @apply relative flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg;
+}
+
+@utility settings-nav-subitem-active {
+  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+}
+
+@utility settings-nav-subitem-inactive {
+  @apply text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5;
+}
+

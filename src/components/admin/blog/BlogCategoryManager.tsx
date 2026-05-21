@@ -63,6 +63,7 @@ export default function BlogCategoryManager({
         await updateBlogCategory(id, {
           name: editName,
           slug: editSlug,
+          locale: "en",
         });
         setEditId(null);
         setMessage({ type: "success", text: "Category updated." });

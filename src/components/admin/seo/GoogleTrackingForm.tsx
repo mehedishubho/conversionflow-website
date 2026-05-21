@@ -271,7 +271,7 @@ export default function GoogleTrackingForm({
                       </span>
                     </div>
                     <p className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                      {gaSummary?.[metric.key as keyof GaSummary] ?? "--"}
+                      {String(gaSummary?.[metric.key as keyof GaSummary] ?? "--")}
                     </p>
                   </div>
                 ))}

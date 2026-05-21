@@ -12,6 +12,12 @@ import {
   Music,
   BarChart3,
   Code,
+  ArrowRightLeft,
+  Bot,
+  Image as ImageIcon,
+  Zap,
+  LineChart,
+  Layers,
 } from "lucide-react";
 
 interface SeoOverviewCardsProps {
@@ -26,6 +32,7 @@ interface CardConfig {
 }
 
 const CARDS: CardConfig[] = [
+  // Core SEO
   {
     label: "General",
     href: "/admin/settings/seo/general",
@@ -55,6 +62,16 @@ const CARDS: CardConfig[] = [
     icon: FileCode,
     isFilled: (d) => !!d["seo_robots_txt"],
   },
+  // Structured Data
+  {
+    label: "Schema",
+    href: "/admin/settings/seo/schema",
+    icon: Code,
+    isFilled: (d) =>
+      d["seo_schema_auto_generate"] === "true" ||
+      !!d["seo_schema_types_enabled"],
+  },
+  // Social & Analytics
   {
     label: "Social / OG",
     href: "/admin/settings/seo/social",
@@ -81,12 +98,47 @@ const CARDS: CardConfig[] = [
     isFilled: (d) => !!d["google_analytics_id"],
   },
   {
-    label: "Schema",
-    href: "/admin/settings/seo/schema",
-    icon: Code,
+    label: "Analytics",
+    href: "/admin/settings/seo/analytics",
+    icon: LineChart,
+    isFilled: (d) => !!d["google_analytics_id"],
+  },
+  // Advanced SEO
+  {
+    label: "Redirects",
+    href: "/admin/settings/seo/redirects",
+    icon: ArrowRightLeft,
+    isFilled: (d) => false, // Redirects don't have a simple config check
+  },
+  {
+    label: "AI SEO",
+    href: "/admin/settings/seo/ai-seo",
+    icon: Bot,
     isFilled: (d) =>
-      d["seo_schema_auto_generate"] === "true" ||
-      !!d["seo_schema_types_enabled"],
+      d["seo_ai_bot_gptbot"] === "true" ||
+      d["seo_ai_bot_claudebot"] === "true",
+  },
+  {
+    label: "Image SEO",
+    href: "/admin/settings/seo/image-seo",
+    icon: ImageIcon,
+    isFilled: (d) =>
+      d["seo_image_auto_alt"] === "true" ||
+      d["seo_image_webp"] === "true",
+  },
+  {
+    label: "Performance",
+    href: "/admin/settings/seo/performance",
+    icon: Zap,
+    isFilled: (d) =>
+      d["seo_perf_critical_css"] === "true" ||
+      d["seo_perf_js_defer"] === "true",
+  },
+  {
+    label: "Page-Level SEO",
+    href: "/admin/settings/seo/page-level",
+    icon: Layers,
+    isFilled: (d) => false, // Page-level SEO is per-page, not global
   },
 ];
 

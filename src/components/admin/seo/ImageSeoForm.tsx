@@ -52,12 +52,15 @@ export default function ImageSeoForm() {
     setLoading(true);
     getSeoSettings([...IMAGE_SEO_KEYS])
       .then((data: SeoSettingsData) => {
-        setToggles({
+        console.log("Loaded image SEO data:", data);
+        const newToggles = {
           seo_image_auto_alt: data.seo_image_auto_alt === "true",
           seo_image_webp: data.seo_image_webp === "true",
           seo_image_lazy_loading: data.seo_image_lazy_loading === "true",
           seo_image_compression: data.seo_image_compression === "true",
-        });
+        };
+        console.log("Parsed toggles:", newToggles);
+        setToggles(newToggles);
       })
       .catch(() => {
         setMessage({ type: "error", text: "Failed to load image SEO settings." });
@@ -66,6 +69,7 @@ export default function ImageSeoForm() {
   }, []);
 
   const handleToggle = (key: string, checked: boolean) => {
+    console.log("Toggle:", key, "to", checked);
     setToggles((prev) => ({ ...prev, [key]: checked }));
   };
 
@@ -77,9 +81,12 @@ export default function ImageSeoForm() {
         for (const key of IMAGE_SEO_KEYS) {
           data[key] = String(toggles[key] ?? false);
         }
-        await saveSeoSettings(data);
+        console.log("Saving image SEO data:", data);
+        const result = await saveSeoSettings(data);
+        console.log("Save result:", result);
         setMessage({ type: "success", text: "Image SEO settings saved." });
-      } catch {
+      } catch (error) {
+        console.error("Save error:", error);
         setMessage({ type: "error", text: "Failed to save image SEO settings." });
       }
     });

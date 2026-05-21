@@ -55,7 +55,7 @@ export default function InlineSeoEditor({
   const updateRobots = (key: "index" | "follow", value: boolean) => {
     onChange({
       ...overrides,
-      robots: { ...overrides.robots, [key]: value },
+      robots: { index: overrides.robots?.index ?? true, follow: overrides.robots?.follow ?? true, [key]: value },
     });
   };
 
@@ -133,8 +133,9 @@ export default function InlineSeoEditor({
                 </p>
               </div>
               <Switch
+                label=""
                 checked={overrides.robots?.index ?? true}
-                onCheckedChange={(checked) => updateRobots("index", checked)}
+                onChange={(checked) => updateRobots("index", checked)}
               />
             </div>
 
@@ -148,8 +149,9 @@ export default function InlineSeoEditor({
                 </p>
               </div>
               <Switch
+                label=""
                 checked={overrides.robots?.follow ?? true}
-                onCheckedChange={(checked) => updateRobots("follow", checked)}
+                onChange={(checked) => updateRobots("follow", checked)}
               />
             </div>
           </div>

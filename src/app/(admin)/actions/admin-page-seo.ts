@@ -9,6 +9,8 @@ import { eq, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 import type { SeoOverrides } from "@/lib/seo";
 
+export type { SeoOverrides };
+
 // ──────────────────────────────────────────────
 // Auth Guard
 // ──────────────────────────────────────────────

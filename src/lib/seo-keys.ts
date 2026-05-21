@@ -50,11 +50,11 @@ export type SeoKey = (typeof SEO_KEYS)[number];
 
 export const GENERAL_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(0, 10);
 export const VERIFICATION_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(10, 15);
-export const SITEMAP_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(15, 24);
-export const ROBOTS_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(24, 26);
-export const AI_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(27, 29);
-export const IMAGE_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(29, 33);
-export const PERFORMANCE_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(33, 38);
+export const SITEMAP_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(15, 23);
+export const ROBOTS_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(23, 25);
+export const AI_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(26, 28);
+export const IMAGE_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(28, 32);
+export const PERFORMANCE_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(32, 37);
 
 export interface SeoSettingsData {
   [key: string]: string;
