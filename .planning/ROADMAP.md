@@ -268,15 +268,15 @@ Plans:
   2. Admin can allow or block individual AI crawlers (GPTBot, ClaudeBot, PerplexityBot), generate an llms.txt file, and configure AI content usage rules
   3. Admin can toggle auto ALT text, WebP conversion, lazy loading, and image compression -- and sees image performance statistics (total images, optimized count, savings)
   4. Admin can toggle Critical CSS, JS defer, HTML/CSS minification, configure CDN URL and cache settings -- and sees Core Web Vitals monitor cards (LCP, CLS, INP, TTFB, overall score)
-  5. Admin can set per-page SEO overrides (title, meta description, canonical URL, focus keyword with density analysis, robots control, custom OG image, schema type selector, social preview) for each page, product, and blog post
+  5. Admin can set per-page SEO overrides (title, meta description, canonical URL, focus keyword, robots control, custom OG image, schema type selector) for each page and blog post
 **Plans**: 5 plans
 
 Plans:
-- [ ] 12-01: Redirect Manager -- redirect table component, create/edit modal (301/302/regex), search/filter, hit counter, bulk CSV import/export, delete actions
-- [ ] 12-02: AI SEO & LLM Controls -- AI crawler toggle cards, llms.txt generation preview, content usage rules form, server actions
-- [ ] 12-03: Image SEO -- toggle form (auto ALT, WebP, lazy loading, compression), image statistics cards, server actions
-- [ ] 12-04: Performance SEO -- toggle form (Critical CSS, JS defer, minification), CDN URL input, cache settings, Core Web Vitals monitor cards, server actions
-- [ ] 12-05: Page-Level SEO -- per-content-item SEO override form, focus keyword with density analysis, robots control, OG image override, schema selector, social preview
+- [ ] 12-01-PLAN.md -- Redirect Manager: redirects DB table, async proxy.ts with redirect matching + hit counter, admin CRUD actions, RedirectTable/RedirectForm/RedirectCsvImport UI components
+- [ ] 12-02-PLAN.md -- AI SEO & LLM Controls: reuse AiBotCards, llms.txt route handler, AiUsageRulesForm (4 toggles), LlmsTxtPreview
+- [ ] 12-03-PLAN.md -- Image SEO: 4 config-only toggles (auto ALT, WebP, lazy loading, compression), ImageStatsCards with placeholder values
+- [ ] 12-04-PLAN.md -- Performance SEO: 3 toggles (Critical CSS, JS defer, minification), CDN URL + cache inputs, CoreWebVitalsCards with placeholder values
+- [ ] 12-05-PLAN.md -- Page-Level SEO: JSONB seo_overrides on blogPosts, PageLevelSeoForm for marketing pages, InlineSeoEditor for blog posts, seo.ts override integration
 
 **UI hint**: yes
 
