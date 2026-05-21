@@ -294,9 +294,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01: Analytics overview -- dashboard page layout, indexed pages card with trend, top pages table with traffic metrics, overview chart
-- [ ] 13-02: Keyword & CTR analytics -- keyword rankings table with position and trend, CTR/impressions trend charts with date range selector
-- [ ] 13-03: Health reports -- 404 errors table, broken links report, sitemap health status, crawl issues panel, status badges
+- [ ] 13-01-PLAN.md -- Backend foundation: seo_404_errors DB table + schema push, analytics server actions (get404Errors, getSitemapHealth, log404Error), extend getGa4Summary with date range, not-found page 404 logging
+- [ ] 13-02-PLAN.md -- Analytics overview UI: SeoAnalyticsClient orchestrator, IndexedPagesCards, TopPagesTable, TrafficOverviewChart, keyword rankings placeholder, CTR/impressions placeholder
+- [ ] 13-03-PLAN.md -- Health reports UI: Errors404Table (real 404 data with search), SitemapHealthCards (real sitemap analysis with Badge indicators), CrawlIssuesPanel (placeholder crawl issues)
 
 **UI hint**: yes
 
@@ -312,7 +312,7 @@ v2.1: 9 -> 10 -> 11 -> 12 -> 13
 | Phase | Directory | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|-----------|----------------|--------|-----------|
 | 1. Database, Auth, Route Foundation | 01-foundation | v2.0 | 4/4 | Complete | 2026-05-16 |
-| 2. Dashboard Shell | 02-homepage | v2.0 | 3/3 | Verified | 2026-05-16 |
+| 2. Dashboard Shell | 02-homeway | v2.0 | 3/3 | Verified | 2026-05-16 |
 | 3. Customer Portal | 03-customer-portal | v2.0 | 5/5 | Verified | 2026-05-17 |
 | 4. Checkout and Payments | 04-checkout-payments | v2.0 | 6/6 | Executed | 2026-05-17 |
 | 5. Admin BI Dashboard | 05-admin-dashboard | v2.0 | 6/6 | Complete | 2026-05-18 |
