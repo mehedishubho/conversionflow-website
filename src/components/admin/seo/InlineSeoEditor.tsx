@@ -39,7 +39,17 @@ export default function InlineSeoEditor({
     key: K,
     value: SeoOverrides[K]
   ) => {
-    onChange({ ...overrides, [key]: value });
+    let processed = value;
+
+    // Truncate excessively long values to prevent poor SEO
+    if (key === 'title' && typeof value === 'string' && value.length > 60) {
+      processed = value.slice(0, 60) as SeoOverrides[K];
+    }
+    if (key === 'description' && typeof value === 'string' && value.length > 160) {
+      processed = value.slice(0, 160) as SeoOverrides[K];
+    }
+
+    onChange({ ...overrides, [key]: processed });
   };
 
   const updateRobots = (key: "index" | "follow", value: boolean) => {
