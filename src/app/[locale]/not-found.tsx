@@ -1,26 +1,14 @@
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { headers } from "next/headers";
-import { log404Error } from "@/app/(admin)/actions/admin-seo";
+import NotFoundLogger from "@/components/common/NotFoundLogger";
 
 export default async function NotFound() {
-  // Log 404 error for SEO analytics
-  try {
-    const headersList = await headers();
-    const url = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
-    const referrer = headersList.get("referer") || null;
-    if (url) {
-      await log404Error(url, referrer);
-    }
-  } catch {
-    // Never block 404 page rendering if logging fails
-  }
-
   const t = useTranslations("notFound");
   const tNav = useTranslations("nav");
 
   return (
     <div className="page-hero-sm" style={{ minHeight: "70vh", display: "flex", alignItems: "center" }}>
+      <NotFoundLogger />
       <div className="max-w-[1280px] mx-auto px-7 page-hero-sm-inner">
         <div
           className="font-dm-sans font-black text-foreground"
