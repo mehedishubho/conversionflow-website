@@ -29,6 +29,18 @@ const statusOptions = [
   { value: "inactive", label: "Inactive" },
 ];
 
+// URL validation helper (accepts both absolute and relative URLs)
+function isValidUrl(url: string): boolean {
+  if (!url.trim()) return false;
+  try {
+    // Accept relative URLs by providing a base URL
+    new URL(url, 'http://example.com');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function RedirectForm({
   open,
   onClose,
@@ -65,6 +77,12 @@ export default function RedirectForm({
 
     if (!fromUrl.trim() || !toUrl.trim()) {
       setError("From URL and To URL are required.");
+      return;
+    }
+
+    // Validate URL formats to prevent broken redirects
+    if (!isValidUrl(fromUrl.trim()) || !isValidUrl(toUrl.trim())) {
+      setError("From URL and To URL must be valid URLs.");
       return;
     }
 
