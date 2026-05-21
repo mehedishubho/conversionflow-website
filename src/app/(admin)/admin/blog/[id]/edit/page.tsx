@@ -9,6 +9,7 @@ import {
   getPostById,
   getAllCategories,
 } from "@/app/(admin)/actions/admin-blog";
+import type { SeoOverrides } from "@/app/(admin)/actions/admin-page-seo";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +69,7 @@ export default async function EditBlogPostPage({
             seoTitle: post.seoTitle ?? undefined,
             seoDescription: post.seoDescription ?? undefined,
             ogImage: post.ogImage ?? undefined,
+            seoOverrides: (post.seoOverrides as SeoOverrides) ?? undefined,
           }}
         />
       </ComponentCard>

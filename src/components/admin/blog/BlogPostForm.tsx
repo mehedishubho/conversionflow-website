@@ -4,11 +4,13 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import InputField from "@/components/form/input/InputField";
 import TiptapEditor from "./TiptapEditor";
+import InlineSeoEditor from "@/components/admin/seo/InlineSeoEditor";
 import {
   createBlogPost,
   updateBlogPost,
 } from "@/app/(admin)/actions/admin-blog";
 import type { BlogPostInput } from "@/app/(admin)/actions/admin-blog";
+import type { SeoOverrides } from "@/app/(admin)/actions/admin-page-seo";
 
 interface Category {
   id: string;
@@ -57,6 +59,9 @@ export default function BlogPostForm({
     initialData?.seoDescription ?? ""
   );
   const [ogImage, setOgImage] = useState(initialData?.ogImage ?? "");
+  const [seoOverrides, setSeoOverrides] = useState<SeoOverrides>(
+    initialData?.seoOverrides ?? {}
+  );
 
   const handleSlugFromTitle = () => {
     const generated = title
@@ -99,6 +104,7 @@ export default function BlogPostForm({
       seoTitle: seoTitle || undefined,
       seoDescription: seoDescription || undefined,
       ogImage: ogImage || undefined,
+      seoOverrides,
     };
 
     startTransition(async () => {
@@ -320,6 +326,8 @@ export default function BlogPostForm({
               </div>
             </div>
           </div>
+
+          <InlineSeoEditor overrides={seoOverrides} onChange={setSeoOverrides} />
         </div>
       </div>
 
