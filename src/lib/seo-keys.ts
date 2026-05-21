@@ -30,6 +30,20 @@ export const SEO_KEYS = [
   "seo_ai_bots",
   // Sitemap meta (1)
   "seo_sitemap_last_generated",
+  // AI SEO (2) - Plan 12-02
+  "seo_ai_usage_rules",
+  "seo_llms_txt_custom",
+  // Image SEO (4) - Plan 12-03
+  "seo_image_auto_alt",
+  "seo_image_webp",
+  "seo_image_lazy_loading",
+  "seo_image_compression",
+  // Performance SEO (5) - Plan 12-04
+  "seo_perf_critical_css",
+  "seo_perf_js_defer",
+  "seo_perf_minification",
+  "seo_perf_cdn_url",
+  "seo_perf_cache_settings",
 ] as const;
 
 export type SeoKey = (typeof SEO_KEYS)[number];
@@ -38,6 +52,9 @@ export const GENERAL_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(0, 10);
 export const VERIFICATION_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(10, 15);
 export const SITEMAP_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(15, 24);
 export const ROBOTS_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(24, 26);
+export const AI_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(27, 29);
+export const IMAGE_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(29, 33);
+export const PERFORMANCE_SEO_KEYS: readonly SeoKey[] = SEO_KEYS.slice(33, 38);
 
 export interface SeoSettingsData {
   [key: string]: string;

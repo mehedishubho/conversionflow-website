@@ -2,6 +2,9 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { redirects } from '@/lib/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -41,7 +44,7 @@ function isSetupPage(pathname: string): boolean {
   return pathname === '/admin/setup';
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip static files, API routes, and _next
@@ -51,6 +54,64 @@ export function proxy(request: NextRequest) {
     pathname.startsWith('/_next')
   ) {
     return;
+  }
+
+  // ──────────────────────────────────────────────
+  // Redirect matching (before auth/i18n checks)
+  // ──────────────────────────────────────────────
+  try {
+    // Exact match lookup
+    const exactMatches = await db
+      .select()
+      .from(redirects)
+      .where(and(eq(redirects.fromUrl, pathname), eq(redirects.status, 'active')))
+      .limit(1);
+
+    if (exactMatches.length > 0) {
+      const match = exactMatches[0];
+      // Fire-and-forget hit count increment
+      db.update(redirects)
+        .set({ hitCount: sql`${redirects.hitCount} + 1` })
+        .where(eq(redirects.id, match.id))
+        .catch(() => {});
+      return NextResponse.redirect(new URL(match.toUrl, request.url), {
+        status: parseInt(match.type),
+      });
+    }
+
+    // Regex match lookup (only if no exact match)
+    const regexRules = await db
+      .select()
+      .from(redirects)
+      .where(and(eq(redirects.isRegex, true), eq(redirects.status, 'active')));
+
+    for (const rule of regexRules) {
+      try {
+        const regex = new RegExp(rule.fromUrl);
+        const match = regex.exec(pathname);
+        if (match) {
+          // Fire-and-forget hit count increment
+          db.update(redirects)
+            .set({ hitCount: sql`${redirects.hitCount} + 1` })
+            .where(eq(redirects.id, rule.id))
+            .catch(() => {});
+
+          // Build destination with capture group replacement
+          const destination = rule.toUrl.replace(/\$(\d+)/g, (_, idx) => {
+            const groupIndex = parseInt(idx);
+            return match[groupIndex] ?? '';
+          });
+
+          return NextResponse.redirect(new URL(destination, request.url), {
+            status: parseInt(rule.type),
+          });
+        }
+      } catch {
+        // Skip invalid regex patterns
+      }
+    }
+  } catch {
+    // DB unavailability gracefully falls through to existing logic
   }
 
   const authPage = isAuthPage(pathname);
