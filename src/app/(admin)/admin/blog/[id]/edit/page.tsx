@@ -9,9 +9,18 @@ import {
   getPostById,
   getAllCategories,
 } from "@/app/(admin)/actions/admin-blog";
-import type { SeoOverrides } from "@/app/(admin)/actions/admin-page-seo";
+import type { SeoOverrides } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+// Safe parser for SeoOverrides to handle malformed JSON
+function safeParseSeoOverrides(value: unknown): SeoOverrides | undefined {
+  if (!value) return undefined;
+  if (typeof value === 'object' && value !== null) {
+    return value as SeoOverrides;
+  }
+  return undefined;
+}
 
 export default async function EditBlogPostPage({
   params,
@@ -69,7 +78,7 @@ export default async function EditBlogPostPage({
             seoTitle: post.seoTitle ?? undefined,
             seoDescription: post.seoDescription ?? undefined,
             ogImage: post.ogImage ?? undefined,
-            seoOverrides: (post.seoOverrides as SeoOverrides) ?? undefined,
+            seoOverrides: safeParseSeoOverrides(post.seoOverrides),
           }}
         />
       </ComponentCard>
