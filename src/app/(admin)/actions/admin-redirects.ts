@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { redirects } from "@/lib/db/schema";
-import { eq, and, sql, ilike } from "drizzle-orm";
+import { eq, and, sql, ilike, or } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 
 // ──────────────────────────────────────────────
@@ -211,7 +211,7 @@ export async function deleteRedirects(
 
   await db
     .delete(redirects)
-    .where(sql`${redirects.id} = ANY(${ids})`);
+    .where(or(...ids.map(id => eq(redirects.id, id))));
 
   await createAuditLog({
     actorId: userId,
