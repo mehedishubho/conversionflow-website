@@ -359,6 +359,22 @@ export const redirects = pgTable(
   ]
 );
 
+export const seo404Errors = pgTable(
+  "seo_404_errors",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    url: text("url").notNull(),
+    referrer: text("referrer"),
+    hitCount: integer("hit_count").default(1).notNull(),
+    lastSeenAt: timestamp("last_seen_at").notNull().defaultNow(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    unique("seo_404_errors_url_unique").on(table.url),
+    index("seo_404_errors_last_seen_idx").on(table.lastSeenAt),
+  ]
+);
+
 // ──────────────────────────────────────────────
 // Blog Tables
 // ──────────────────────────────────────────────
