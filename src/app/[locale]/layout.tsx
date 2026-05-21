@@ -121,7 +121,7 @@ export default async function LocaleLayout({
           <TrackingScripts
             ga4Id={trackingSettings.google_analytics_id}
             gtmId={trackingSettings.google_tag_manager_id}
-            facebookPixelId={trackingSettings.facebook_pixel_id}
+            facebookPixelId={trackingSettings.meta_pixel_id}
             tiktokPixelId={trackingSettings.tiktok_pixel_id}
           />
         )}
