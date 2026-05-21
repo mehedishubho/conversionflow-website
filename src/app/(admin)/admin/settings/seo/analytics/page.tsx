@@ -1,16 +1,20 @@
-import ComponentCard from "@/components/common/ComponentCard";
+import SeoAnalyticsClient from "@/components/admin/seo/SeoAnalyticsClient";
+import { getGa4Summary } from "@/app/(admin)/actions/admin-tracking-v2";
+import { get404Errors, getSitemapHealth } from "@/app/(admin)/actions/admin-seo";
 
-export default function SeoAnalyticsPage() {
+export default async function SeoAnalyticsPage() {
+  const [ga4Data, errorsData, sitemapHealth] = await Promise.all([
+    getGa4Summary("7d"),
+    get404Errors(50),
+    getSitemapHealth(),
+  ]);
+
   return (
-    <ComponentCard
-      title="SEO Analytics"
-      desc="View indexed pages, keyword rankings, CTR data, 404 reports, and crawl issues."
-    >
-      <div className="flex items-center gap-3 py-4">
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-white/5 dark:text-gray-400">
-          Coming in Phase 13
-        </span>
-      </div>
-    </ComponentCard>
+    <SeoAnalyticsClient
+      initialGa4Data={ga4Data}
+      initialErrors={errorsData}
+      initialSitemapHealth={sitemapHealth}
+      initialRange="7d"
+    />
   );
 }
