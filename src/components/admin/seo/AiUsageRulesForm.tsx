@@ -109,7 +109,7 @@ export default function AiUsageRulesForm() {
             <div className="ml-4 flex-shrink-0">
               <Switch
                 label={rules[rule.key] ? "Enabled" : "Disabled"}
-                defaultChecked={rules[rule.key]}
+                checked={rules[rule.key]}
                 onChange={(checked) => handleToggle(rule.key, checked)}
               />
             </div>
