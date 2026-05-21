@@ -4,8 +4,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { settings } from "@/lib/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { settings, seo404Errors } from "@/lib/db/schema";
+import { eq, inArray, desc, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 import { SEO_KEYS, type SeoSettingsData } from "@/lib/seo-keys";
 
@@ -156,4 +156,105 @@ export async function pingSearchEngines(): Promise<{
   }
 
   return { google: googleOk, bing: bingOk, timestamp: now };
+}
+
+export async function get404Errors(limit = 50): Promise<{
+  errors: Array<{
+    id: string;
+    url: string;
+    referrer: string | null;
+    hitCount: number;
+    lastSeenAt: Date;
+    createdAt: Date;
+  }>;
+  total: number;
+}> {
+  await requireAdmin();
+
+  const errors = await db
+    .select()
+    .from(seo404Errors)
+    .orderBy(desc(seo404Errors.lastSeenAt))
+    .limit(limit);
+
+  const countResult = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(seo404Errors);
+
+  return {
+    errors,
+    total: Number(countResult[0]?.count ?? 0),
+  };
+}
+
+export async function getSitemapHealth(): Promise<{
+  totalUrls: number;
+  lastGenerated: string;
+  xmlValid: boolean;
+  sitemapEnabled: boolean;
+}> {
+  await requireAdmin();
+
+  try {
+    const sitemapModule = await import("@/app/sitemap");
+    const sitemapFn = sitemapModule.default;
+    const entries = await sitemapFn();
+
+    const [enabledRow, lastGenRow] = await Promise.all([
+      db
+        .select()
+        .from(settings)
+        .where(eq(settings.key, "seo_sitemap_enabled"))
+        .limit(1),
+      db
+        .select()
+        .from(settings)
+        .where(eq(settings.key, "seo_sitemap_last_generated"))
+        .limit(1),
+    ]);
+
+    return {
+      totalUrls: entries.length,
+      lastGenerated: lastGenRow[0]?.value ?? "Never",
+      xmlValid: Array.isArray(entries) && entries.length >= 0,
+      sitemapEnabled: enabledRow[0]?.value !== "false",
+    };
+  } catch {
+    return {
+      totalUrls: 0,
+      lastGenerated: "Never",
+      xmlValid: false,
+      sitemapEnabled: false,
+    };
+  }
+}
+
+export async function log404Error(
+  url: string,
+  referrer: string | null
+): Promise<{ success: boolean }> {
+  try {
+    if (!url || typeof url !== "string" || url.trim().length === 0) {
+      return { success: false };
+    }
+
+    const sanitizedUrl = url.replace(/<[^>]*>/g, "");
+    const sanitizedReferrer = referrer ? referrer.replace(/<[^>]*>/g, "") : null;
+
+    await db
+      .insert(seo404Errors)
+      .values({ url: sanitizedUrl, referrer: sanitizedReferrer })
+      .onConflictDoUpdate({
+        target: seo404Errors.url,
+        set: {
+          hitCount: sql`${seo404Errors.hitCount} + 1`,
+          lastSeenAt: new Date(),
+          referrer: sanitizedReferrer ?? sql`COALESCE(${seo404Errors.referrer}, '')`,
+        },
+      });
+
+    return { success: true };
+  } catch {
+    return { success: false };
+  }
 }

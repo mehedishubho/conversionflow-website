@@ -162,6 +162,8 @@ export async function sendMetaTestEvent(
   }
 }
 
+type DateRange = "7d" | "30d" | "90d" | "year";
+
 interface Ga4SummaryData {
   activeUsers: string;
   pageviews: string;
@@ -172,7 +174,7 @@ interface Ga4SummaryData {
 let ga4Cache: { data: Ga4SummaryData; timestamp: number } | null = null;
 const GA4_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export async function getGa4Summary(): Promise<Ga4SummaryData> {
+export async function getGa4Summary(range: DateRange = "7d"): Promise<Ga4SummaryData> {
   await requireAdmin();
 
   // Return cached data if still fresh
@@ -222,11 +224,16 @@ export async function getGa4Summary(): Promise<Ga4SummaryData> {
     const tokenData = (await tokenRes.json()) as { access_token: string };
     const accessToken = tokenData.access_token;
 
-    // Calculate date range (last 7 days)
+    // Calculate date range based on selected range
     const now = new Date();
-    const sevenDaysAgo = new Date(now);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const startDate = sevenDaysAgo.toISOString().split("T")[0];
+    let start: Date;
+    switch (range) {
+      case "30d": start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); break;
+      case "90d": start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000); break;
+      case "year": start = new Date(now.getFullYear(), 0, 1); break;
+      default: start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); break;
+    }
+    const startDate = start.toISOString().split("T")[0];
     const endDate = now.toISOString().split("T")[0];
 
     // Run report for active users, pageviews, sessions

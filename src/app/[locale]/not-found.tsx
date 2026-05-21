@@ -1,7 +1,21 @@
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import { headers } from "next/headers";
+import { log404Error } from "@/app/(admin)/actions/admin-seo";
 
-export default function NotFound() {
+export default async function NotFound() {
+  // Log 404 error for SEO analytics
+  try {
+    const headersList = await headers();
+    const url = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
+    const referrer = headersList.get("referer") || null;
+    if (url) {
+      await log404Error(url, referrer);
+    }
+  } catch {
+    // Never block 404 page rendering if logging fails
+  }
+
   const t = useTranslations("notFound");
   const tNav = useTranslations("nav");
 
