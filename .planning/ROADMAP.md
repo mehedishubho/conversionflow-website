@@ -272,11 +272,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 12-01-PLAN.md -- Redirect Manager: redirects DB table, async proxy.ts with redirect matching + hit counter, admin CRUD actions, RedirectTable/RedirectForm/RedirectCsvImport UI components
-- [ ] 12-02-PLAN.md -- AI SEO & LLM Controls: reuse AiBotCards, llms.txt route handler, AiUsageRulesForm (4 toggles), LlmsTxtPreview
-- [ ] 12-03-PLAN.md -- Image SEO: 4 config-only toggles (auto ALT, WebP, lazy loading, compression), ImageStatsCards with placeholder values
-- [ ] 12-04-PLAN.md -- Performance SEO: 3 toggles (Critical CSS, JS defer, minification), CDN URL + cache inputs, CoreWebVitalsCards with placeholder values
-- [ ] 12-05-PLAN.md -- Page-Level SEO: JSONB seo_overrides on blogPosts, PageLevelSeoForm for marketing pages, InlineSeoEditor for blog posts, seo.ts override integration
+- [x] 12-01-PLAN.md -- Redirect Manager: redirects DB table, async proxy.ts with redirect matching + hit counter, admin CRUD actions, RedirectTable/RedirectForm/RedirectCsvImport UI components
+- [x] 12-02-PLAN.md -- AI SEO & LLM Controls: reuse AiBotCards, llms.txt route handler, AiUsageRulesForm (4 toggles), LlmsTxtPreview
+- [x] 12-03-PLAN.md -- Image SEO: 4 config-only toggles (auto ALT, WebP, lazy loading, compression), ImageStatsCards with placeholder values
+- [x] 12-04-PLAN.md -- Performance SEO: 3 toggles (Critical CSS, JS defer, minification), CDN URL + cache inputs, CoreWebVitalsCards with placeholder values
+- [x] 12-05-PLAN.md -- Page-Level SEO: JSONB seo_overrides on blogPosts, PageLevelSeoForm for marketing pages, InlineSeoEditor for blog posts, seo.ts override integration
 
 **UI hint**: yes
 
