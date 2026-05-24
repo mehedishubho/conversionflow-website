@@ -1,4 +1,4 @@
-import { getBlogPosts } from "@/lib/mdx";
+import { getPublishedPosts } from "@/lib/blog";
 import { BlogPageClient } from "@/components/blog/BlogPageClient";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
@@ -14,7 +14,9 @@ export default async function BlogPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  const posts = getBlogPosts();
+  const { locale } = await params;
+  const { posts } = await getPublishedPosts(locale, 1, 12);
+
   return (
     <ScrollReveal>
       <BlogPageClient posts={posts} />

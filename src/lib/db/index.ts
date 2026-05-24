@@ -12,10 +12,21 @@ const globalForDb = globalThis as unknown as {
   client: ReturnType<typeof postgres> | undefined;
 };
 
-const client = globalForDb.client ?? postgres(connectionString);
+// Database connection optimization with proper pooling
+const client = globalForDb.client ?? postgres(connectionString, {
+  max: 10, // Maximum connections in the pool
+  idle_timeout: 20, // Close idle connections after 20 seconds
+  connect_timeout: 10, // Connection timeout
+  statement_timeout: 30, // Query timeout (30 seconds)
+  // Enable prepared statements for better performance
+  prepare: true,
+});
 
 if (process.env.NODE_ENV !== "production") {
   globalForDb.client = client;
 }
 
-export const db = drizzle(client, { schema });
+export const db = drizzle(client, {
+  schema,
+  logger: process.env.NODE_ENV === "development", // Enable query logging in dev
+});

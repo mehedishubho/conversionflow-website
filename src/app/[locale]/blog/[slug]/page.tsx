@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/routing";
 import { notFound } from "next/navigation";
-import { getBlogPosts } from "@/lib/mdx";
+import { getPostBySlug, getPublishedPosts } from "@/lib/blog";
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const posts = getBlogPosts();
-  return posts.flatMap(post => [
-    { locale: "en", slug: post.slug },
-    { locale: "bn", slug: post.slug },
-  ]);
+  // For static generation, we'll generate params for published posts
+  // This will be populated once you have database posts
+  return [];
 }
 
 export async function generateMetadata({
@@ -18,17 +16,18 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = getBlogPosts().find((item) => item.slug === slug);
+  const { slug, locale } = await params;
+  const post = await getPostBySlug(slug, locale);
 
   if (!post) return { title: "Post Not Found" };
 
   return {
-    title: post.title,
-    description: post.excerpt,
+    title: post.seoTitle || post.title,
+    description: post.seoDescription || post.excerpt,
     openGraph: {
-      title: `${post.title} | ConversionFlow`,
-      description: post.excerpt,
+      title: post.seoTitle || post.title,
+      description: post.seoDescription || post.excerpt,
+      images: post.ogImage ? [post.ogImage] : undefined,
     },
   };
 }
@@ -38,17 +37,18 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const post = getBlogPosts().find((item) => item.slug === slug);
+  const { slug, locale } = await params;
+  const post = await getPostBySlug(slug, locale);
 
   if (!post) notFound();
 
-  const { default: Post } = await import(`@/content/blog/${slug}.mdx`);
-  const date = new Date(post.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const date = post.publishedAt
+    ? new Date(post.publishedAt).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <>
@@ -68,17 +68,27 @@ export default async function BlogPostPage({
             {post.title}
           </h1>
           <div className="text-sm text-muted mt-3 flex items-center justify-center gap-3">
-            <span>{date}</span>
-            <span aria-hidden="true">/</span>
-            <span>{post.readingTime} min read</span>
+            {post.authorName && <span>By {post.authorName}</span>}
+            {post.authorName && date && <span aria-hidden="true">/</span>}
+            {date && <span>{date}</span>}
           </div>
         </div>
       </div>
 
       <div className="max-w-[760px] mx-auto px-7 py-16">
-        <article className="prose dark:prose-invert max-w-none">
-          <Post />
-        </article>
+        {post.coverImage && (
+          <div className="mb-8 rounded-lg overflow-hidden">
+            <img
+              src={post.coverImage}
+              alt={post.title}
+              className="w-full h-auto"
+            />
+          </div>
+        )}
+        <article
+          className="prose dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
       </div>
     </>
   );

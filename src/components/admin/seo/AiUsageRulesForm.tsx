@@ -52,12 +52,9 @@ export default function AiUsageRulesForm() {
     async function loadRules() {
       try {
         const data = await getSeoSettings(["seo_ai_usage_rules"]);
-        console.log("Loaded data:", data);
         const raw = data["seo_ai_usage_rules"];
-        console.log("Raw value:", raw);
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<UsageRules>;
-          console.log("Parsed rules:", parsed);
           setRules({
             allowSummarization: parsed.allowSummarization ?? DEFAULT_RULES.allowSummarization,
             allowTraining: parsed.allowTraining ?? DEFAULT_RULES.allowTraining,
@@ -78,11 +75,9 @@ export default function AiUsageRulesForm() {
     setMessage(null);
     try {
       const jsonValue = JSON.stringify(rulesToSave);
-      console.log("Saving rules:", jsonValue);
       const result = await saveSeoSettings({
         seo_ai_usage_rules: jsonValue,
       });
-      console.log("Save result:", result);
       setMessage({ type: "success", text: "AI usage rules saved successfully." });
     } catch (error) {
       console.error("Save error:", error);
@@ -96,7 +91,6 @@ export default function AiUsageRulesForm() {
     // Use functional state update to get the latest state
     setRules((prevRules) => {
       const newRules = { ...prevRules, [key]: checked };
-      console.log("Toggle:", key, "to", checked, "newRules:", newRules);
       setMessage({ type: "success", text: "Saving..." });
 
       // Clear existing timeout

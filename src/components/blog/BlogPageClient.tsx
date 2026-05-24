@@ -2,12 +2,23 @@
 
 import { motion } from "framer-motion";
 import { BlogCard } from "@/components/blog/BlogCard";
-import type { BlogPostMeta } from "@/lib/mdx";
 import { StaggerReveal, StaggerItem } from "@/components/layout/StaggerReveal";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function BlogPageClient({ posts }: { posts: BlogPostMeta[] }) {
+export interface DatabaseBlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage: string | null;
+  authorName: string | null;
+  locale: string;
+  publishedAt: Date | null;
+  categoryName: string | null;
+}
+
+export function BlogPageClient({ posts }: { posts: DatabaseBlogPost[] }) {
   return (
     <>
       <div className="page-hero-sm">
@@ -36,7 +47,7 @@ export function BlogPageClient({ posts }: { posts: BlogPostMeta[] }) {
         <div className="max-w-[1280px] mx-auto px-7">
           <StaggerReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {posts.map((post, index) => (
-              <StaggerItem key={post.slug}>
+              <StaggerItem key={post.id}>
                 <BlogCard post={post} index={index} />
               </StaggerItem>
             ))}

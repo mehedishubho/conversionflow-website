@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getBlogPosts, getDocPosts } from "@/lib/mdx";
+import { getDocPosts } from "@/lib/mdx";
+import { getPublishedPosts } from "@/lib/blog";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { inArray } from "drizzle-orm";
@@ -104,12 +105,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Blog Routes
     const includeBlog = sitemapOverrides.seo_sitemap_blog !== "false";
     if (includeBlog) {
-      getBlogPosts().forEach((post) => {
+      const { posts } = await getPublishedPosts(locale, 1, 1000); // Get all published posts
+      posts.forEach((post) => {
         const url = getUrl(locale, `/blog/${post.slug}`);
         if (!isExcluded(url)) {
           routes.push({
             url,
-            lastModified: new Date(post.date),
+            lastModified: post.publishedAt ? new Date(post.publishedAt) : new Date(),
             changeFrequency: "monthly",
             priority: 0.6,
             alternates: {

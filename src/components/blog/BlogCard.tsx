@@ -1,13 +1,15 @@
 import Link from "next/link";
-import type { BlogPostMeta } from "@/lib/mdx";
+import type { DatabaseBlogPost } from "@/components/blog/BlogPageClient";
 import { GradientThumbnail } from "@/components/blog/GradientThumbnail";
 
-export function BlogCard({ post, index }: { post: BlogPostMeta; index: number }) {
-  const date = new Date(post.date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+export function BlogCard({ post, index }: { post: DatabaseBlogPost; index: number }) {
+  const date = post.publishedAt
+    ? new Date(post.publishedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <Link
@@ -20,9 +22,11 @@ export function BlogCard({ post, index }: { post: BlogPostMeta; index: number })
         {post.title}
       </h2>
       <p className="text-sm text-text2 leading-relaxed">{post.excerpt}</p>
-      <div className="mt-5 inline-flex rounded-full bg-[--bg2] border border-[--border] px-3 py-1 text-xs font-bold text-muted">
-        {post.readingTime} min read
-      </div>
+      {post.categoryName && (
+        <div className="mt-5 inline-flex rounded-full bg-[--bg2] border border-[--border] px-3 py-1 text-xs font-bold text-muted">
+          {post.categoryName}
+        </div>
+      )}
     </Link>
   );
 }
