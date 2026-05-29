@@ -1,43 +1,44 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: Marketing & SEO Settings Dashboard
-status: executing
-stopped_at: Completed 13-02-PLAN.md
-last_updated: "2026-05-21T19:00:14.263Z"
-last_activity: 2026-05-21
+milestone: v3.0
+milestone_name: Self-Contained Licensing Architecture
+status: planning
+stopped_at: Defining requirements
+last_updated: "2026-05-29T00:00:00.000Z"
+last_activity: 2026-05-29
 progress:
-  total_phases: 13
-  completed_phases: 8
-  total_plans: 42
-  completed_plans: 39
-  percent: 93
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15)
+See: .planning/PROJECT.md (updated 2026-05-29)
 
-**Core value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-**Current focus:** Phase 11 — Tracking Pixels & Social SEO
+**Core value:** A self-contained licensing platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and complete control over the licensing lifecycle — all managed internally without external dependencies.
+
+**Current focus:** v3.0 — Self-Contained Licensing Architecture
 
 ## Current Position
 
-Phase: 13
-Plan: Not started
-Status: Executing Phase 11
-Last activity: 2026-05-21
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-29 — Milestone v3.0 started
 
-Progress: [████░░░░░░] 40%
+Progress: [──────────] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 41 (v1.0/v1.1 milestones)
-- v2.0 plans completed: 12
+- Total plans completed: 42 (v1.0/v1.1/v2.0/v2.1 milestones)
+- v3.0 plans completed: 0
 - Average duration: -
 - Total execution time: -
 
@@ -55,48 +56,26 @@ Progress: [████░░░░░░] 40%
 | v2.0 Phase 6 | 4/4 | Complete | Webhooks, Jobs, License Intelligence |
 | v2.1 Phase 9 | 3/3 | Complete | Settings Foundation |
 | v2.1 Phase 10 | 5/5 | Complete | Core SEO Configuration |
-| Phase 10 P02 | 3min | 2 tasks | 4 files |
-| Phase 10 P03 | 4min | 2 tasks | 5 files |
-| Phase 10 P04 | 4min | 2 tasks | 4 files |
-| Phase 10-core-seo P05 | 3min | 2 tasks | 3 files |
-| Phase 11 P01 | 7min | 3 tasks | 8 files |
-| Phase 11 P02 | 4min | 2 tasks | 5 files |
-| Phase 11 P03 | 4min | 2 tasks | 4 files |
-| Phase 13 P02 | 6min | 2 tasks | 7 files |
+| v2.1 Phase 11 | 5/5 | Complete | Tracking Pixels & Social SEO |
+| v2.1 Phase 12 | 5/5 | Complete | Advanced SEO Controls |
+| v2.1 Phase 13 | 3/3 | Complete | SEO Analytics Dashboard |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
+
 Recent decisions affecting current work:
 
-- [v1.x]: All marketing site decisions preserved in shipped codebase
-- [v2.0]: Better Auth chosen for dual auth (customer + admin)
-- [v2.0]: PostgreSQL + Drizzle ORM for database
-- [v2.0]: Central licensing only -- never generate licenses locally
-- [Phase 09]: Settings restructured into sub-page navigation with SettingsShell
-- [Phase 10]: SEO library reads DB first with hardcoded fallback (D-01)
-- [Phase 10]: SerpPreview uses Google-only snippet (D-02); SeoScore reads all 25 keys for completeness (D-06); URL toggles in separate card (GSEO-03)
-- [Phase 10]: VerificationForm uses expand/collapse per engine with status dots (green checkmark/gray circle) per D-08
-- [Phase 10]: sitemap.ts reads DB with try/catch fallback -- static behavior preserved when no DB rows exist
-- [Phase 10]: Auto-regeneration controlled via revalidate export (0 when ON, 3600 when OFF) per SITM-03
-- [Phase 10]: RobotsEditor generates robots.txt from visual form state; raw mode edits raw string; switching tabs syncs bidirectionally
-- [Phase 10]: AI bots stored as JSON boolean map in seo_ai_bots key; blocked bots generate separate User-agent/Disallow blocks in robots.txt
-- [Phase 10]: pingSearchEngines uses best-effort fetch with AbortSignal.timeout(10000) -- failures shown as Failed in UI
-- [Phase 10]: highlightRobots uses CSS overlay technique: transparent textarea over highlighted div with pointer-events-none
-- [Phase 11]: 30 tracking keys in 5 slice groups (Social, Meta, TikTok, Google, Schema) matching SEO sub-sections
-- [Phase 11]: GA4 summary uses service account JWT via Web Crypto API with 5-minute cache
-- [Phase 11]: SEO overview replaced with 9-card grid with completion status dots per D-10
-- [Phase 11]: TrackingScripts integrated into locale layout with production guard per D-03
-- [Phase 11]: Social preview uses 3 side-by-side platform cards (FB, Twitter/X, LinkedIn) with mobile/desktop toggle per D-01
-- [Phase 11]: MetaPixelForm implements full CAPI management with event checkboxes, advanced matching, connection test, event log per D-02/D-04/D-07/D-08/D-13
-- [Phase 11]: TikTok connection tester uses pixel ID format validation (C-prefix alphanumeric) plus Events API health check
-- [Phase 11]: GTM toggle derived from container ID presence -- no separate enable key per D-12
-- [Phase 11]: GA summary cards show graceful fallback with env var setup instructions when not configured
-- [Phase 13]: Only GA4 data re-fetches on date range change; 404/sitemap are not time-series
-- [Phase 13]: GA4 '--' fallback rendered in gray with blue info banner matching CoreWebVitalsCards pattern
-- [Phase 13]: Keyword and CTR sections use honest '--' placeholders with Search Console info banners per D-01
+- [v3.0]: Self-contained licensing — no external dependencies, complete control
+- [v3.0]: Modular Monolith + DDD — scalable architecture with clear domain boundaries
+- [v3.0]: Service Layer Pattern — business logic abstraction, testability
+- [v3.0]: Repository Pattern — data access abstraction, easier testing
+- [v2.1]: SEO Analytics Dashboard — 404 tracking, sitemap health, crawl issues
+- [v2.1]: Advanced SEO Controls — redirects, AI bots, image/performance SEO
+- [v2.1]: Tracking Pixels & Social SEO — Meta CAPI, TikTok, Google Analytics, Schema
+- [v2.1]: Core SEO Configuration — general settings, verification, sitemaps, robots.txt
 
 ### Pending Todos
 
@@ -104,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-21T18:59:56.666Z
-Stopped at: Completed 13-02-PLAN.md
+Last session: 2026-05-29T00:00:00.000Z
+Stopped at: Milestone v3.0 started
 Resume file: None

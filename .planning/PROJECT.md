@@ -2,26 +2,25 @@
 
 ## What This Is
 
-ConversionFlow is a dual-portal SaaS platform for Devsroom. The public marketing site (already built in v1.x) presents the ConversionFlow plugin to Bangladeshi WooCommerce store owners. The v2.0 platform adds a **Customer Portal** for license management, billing, downloads, and support — plus an **Admin BI Dashboard** for revenue intelligence, sales analytics, license intelligence, and operational management. All licensing is handled by the central authority at `license.devsroom.com`.
+ConversionFlow is a self-contained SaaS platform for Devsroom. The public marketing site (already built in v1.x) presents the ConversionFlow plugin to Bangladeshi WooCommerce store owners. v2.0 added a **Customer Portal** and **Admin BI Dashboard**. v3.0 refactors the platform into a completely self-contained licensing system with modular monolith architecture — managing all products, customers, licenses, subscriptions, activations, and analytics internally without external dependencies.
 
 ## Core Value
 
-A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase ConversionFlow licenses, manage billing and downloads, get support — while Devsroom operators gain real-time business intelligence, revenue analytics, and license intelligence across all products.
+A production-grade, self-contained licensing platform where Bangladeshi WooCommerce store owners purchase ConversionFlow licenses, manage billing and downloads, get support — while Devsroom operators gain real-time business intelligence, revenue analytics, and complete control over the licensing lifecycle. All licensing operations are managed directly within ConversionFlow.
 
-## Current Milestone: v2.0 Dual Portal SaaS Platform
+## Current Milestone: v3.0 Self-Contained Licensing Architecture
 
-**Goal:** Transform the marketing site into a full SaaS platform with Customer Portal and Admin BI Dashboard, integrating with the central Devsroom licensing engine at license.devsroom.com.
+**Goal:** Refactor ConversionFlow into a completely self-contained licensing platform where all licensing, subscriptions, customers, products, activations, domains, orders, and analytics are managed directly within ConversionFlow — no external licensing dependencies.
 
 **Target features:**
-- Authentication System (Better Auth, dual auth, 4 roles, 2FA-ready, audit logging)
-- Database Layer (PostgreSQL + Drizzle ORM + Redis)
-- Customer Portal (overview, licenses, billing, downloads, support tickets, notifications)
-- Admin BI Dashboard (revenue intelligence, sales analytics, churn, conversion funnel, geographic analytics, exports)
-- Checkout System (bKash, Nagad, Rocket, Bank Transfer, SSL Commerce, coupons, tax/VAT, invoices)
-- License Intelligence (central API sync, webhooks, piracy detection)
-- Admin Operations (invoice management, user management, activity feed, CSV/Excel/PDF export)
-- Security (RBAC, signed webhooks, encrypted secrets, CSRF, rate limiting)
-- Dashboard Design ported from `backenddashboard/` folder
+- **Product Management** — Create Products, Manage Product Versions, Manage Product Plans, Configure Licensing Rules
+- **Customer Management** — Store Customer Information, Manage Customer Purchases, Track Customer Activity
+- **License Management** — Generate, Validate, Activate, Deactivate, Suspend, Revoke, Extend Licenses
+- **Activation Management** — Track Domains, Track Installations, Track Device Activations, Enforce Activation Limits
+- **Subscription Management** — Manage Renewals, Track Expiration Dates, Handle Subscription Statuses, Manage Lifetime Licenses
+- **Analytics & Reporting** — License Analytics, Revenue Analytics, Product Performance, Customer Growth, Activation Statistics
+- **Technical Architecture** — Modular Monolith, DDD, Service Layer Pattern, Repository Pattern, Event-Driven Internal Actions, Background Jobs, API-First Design
+- **Removal** — No dependency on `license.devsroom.com`, no `centralOrderId`, `centralLicenseId`, `centralUserId` fields
 
 ## Requirements
 
@@ -43,91 +42,83 @@ A production-grade SaaS platform where Bangladeshi WooCommerce store owners purc
 - Interactive: currency toggle, contact form, count-up animations — shipped v1.1
 - Responsive design verified at all breakpoints — shipped v1.1
 
+<!-- v2.0 + v2.1 shipped work. -->
+
+- Authentication System (Better Auth, dual auth, 4 roles) — shipped v2.0
+- Database Layer (PostgreSQL + Drizzle ORM + Redis) — shipped v2.0
+- Customer Portal (licenses, billing, downloads, support) — shipped v2.0
+- Admin BI Dashboard (revenue, sales, analytics, exports) — shipped v2.0
+- Checkout System (bKash, Nagad, Rocket, SSL Commerce, coupons) — shipped v2.0
+- Webhooks, Background Jobs, License Intelligence — shipped v2.0
+- Settings Foundation (sub-page navigation) — shipped v2.1
+- Core SEO Configuration — shipped v2.1
+- Tracking Pixels & Social SEO — shipped v2.1
+- Advanced SEO Controls — shipped v2.1
+- SEO Analytics Dashboard — shipped v2.1
+
 ### Active
 
-<!-- v2.0 scope. Building toward these. -->
+<!-- v3.0 scope. Building toward these. -->
 
-**Authentication**
-- [ ] Better Auth integration with dual auth (customer/admin login)
-- [ ] 4-role RBAC system (customer, admin, support_staff, super_admin)
-- [ ] Email verification, password reset, session management
-- [ ] Admin 2FA-ready, IP logging, audit logging
+**Licensing Architecture**
+- [ ] Modular Monolith structure with Domain-Driven Design
+- [ ] Service Layer Pattern for all business logic
+- [ ] Repository Pattern for data access abstraction
+- [ ] Event-driven internal actions for decoupled operations
+- [ ] Background job system for scheduled tasks
 
-**Database & Infrastructure**
-- [ ] PostgreSQL + Drizzle ORM setup with migration system
-- [ ] Redis for sessions, caching, queues
-- [ ] Background job system for sync tasks
-- [ ] Database schema: users, orders, licenses, downloads, tickets, notifications
+**Product & License Core**
+- [ ] Products table and management (products, versions, plans)
+- [ ] Product Plans configuration (licensing rules, activation limits)
+- [ ] Local License Generation (no external dependency)
+- [ ] License Validation service
+- [ ] License Activation/Deactivation service
+- [ ] License Status management (active, expired, revoked, suspended)
 
-**Central Licensing Integration**
-- [ ] POST to license.devsroom.com/api/orders/import on purchase
-- [ ] Store central_user_id + central_license_id mappings locally
-- [ ] Webhook handlers for license-created/updated/expired/payment-refunded
-- [ ] Scheduled fallback sync when webhooks fail
+**Customer & Order Management**
+- [ ] Customer activity tracking
+- [ ] Order lifecycle management
+- [ ] Subscription handling (renewals, expirations, lifetime)
+- [ ] Remove centralOrderId, centralLicenseId, centralUserId fields
 
-**Customer Portal**
-- [ ] Customer dashboard overview (active licenses, expiring, downloads, tickets)
-- [ ] License management (view, copy, renew, upgrade, deactivate domain, sync)
-- [ ] Billing section (invoices, payment history, refunds)
-- [ ] Downloads section (latest + old versions, changelogs)
-- [ ] Support tickets (create, reply, attachments)
-- [ ] Notification center
+**Activation & Domain Tracking**
+- [ ] Domain activation tracking
+- [ ] Installation tracking
+- [ ] Device activation management
+- [ ] Activation limit enforcement
 
-**Checkout & Payments**
-- [ ] Manual BD payments (bKash, Nagad, Rocket, Bank Transfer)
-- [ ] SSL Commerce payment gateway
-- [ ] Coupon codes, tax/VAT calculation
-- [ ] Invoice generation
-- [ ] Purchase flow: payment -> create/find customer -> call central API -> store mapping
+**Analytics & Reporting**
+- [ ] License analytics dashboard
+- [ ] Revenue analytics
+- [ ] Product performance metrics
+- [ ] Customer growth tracking
+- [ ] Activation statistics
 
-**Admin BI Dashboard**
-- [ ] Executive overview (total revenue, MRR, ARR, active customers, CLV, CAC)
-- [ ] Sales performance (total sales, conversion rate, refund rate)
-- [ ] User growth (daily signups, weekly growth, activation rate)
-- [ ] Churn analytics (cancellations, churn rate, downgrade alerts)
-- [ ] Conversion funnel (impressions -> visits -> checkout -> purchase -> activation)
-- [ ] Product performance (plugin sales, renewals, plans)
-- [ ] Revenue trend charts (daily/weekly/monthly/yearly)
-- [ ] Retention analytics (day 1/7/30/90)
-- [ ] Geographic analytics (sales by country, revenue heatmap)
-- [ ] Invoice management (paid/pending/failed/overdue)
-- [ ] Activity feed (real-time events)
-- [ ] Filtering (date range, product, plan, channel)
-- [ ] Export (CSV, Excel, PDF)
-- [ ] Notifications (failed payment, expiring license, churn, fraud alerts)
-
-**License & Plugin Intelligence**
-- [ ] License sync from central API (total/active/expired/revoked/renewal rate)
-- [ ] Plugin intelligence (activation domains, multisite usage, suspicious activations)
-- [ ] Piracy detection
-
-**Dashboard UI**
-- [ ] Port dashboard design from `backenddashboard/` folder
-- [ ] Customer portal layout with sidebar navigation
-- [ ] Admin portal layout with sidebar navigation
-- [ ] Charts via ApexCharts (from dashboard template)
-- [ ] Data tables, forms, modals from dashboard UI components
+**API Design**
+- [ ] Public API endpoints for license validation
+- [ ] Webhook system for external integrations
+- [ ] API authentication and rate limiting
 
 ### Out of Scope
 
 <!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
 
 - WordPress plugin development — this is the SaaS platform, not the plugin itself
-- Central licensing engine — owned by license.devsroom.com, only integrated here
+- External licensing engines — all licensing managed internally in v3.0
 - CMS integration — content managed via data files and MDX in the repository
 - Mobile app — web-only platform
 - Redesigning existing marketing pages — all v1.x pages preserved as-is
 - Redesigning dashboard UI — use backenddashboard/ folder design as-is
+- Multi-tenant support — single-instance platform for Devsroom only
 
 ## Context
 
 - **Product state**: ConversionFlow plugin is live and serving 500+ active WooCommerce stores in Bangladesh
-- **Design reference**: Marketing site design from `woobooster-v2.html`. Dashboard design from `backenddashboard/` folder (Next.js admin template with ecommerce metrics, charts, sidebar layout, auth pages)
+- **Design reference**: Marketing site design from `woobooster-v2.html`. Dashboard design from `backenddashboard/` folder
 - **Company**: Built by Devsroom/WPMHS team based in Dhaka, Bangladesh (contact: mhs@wpmhs.com, WhatsApp: +880 1721-328992)
 - **Target audience**: Bangladeshi WooCommerce store owners (customers) + Devsroom operators (admins)
-- **Central licensing**: license.devsroom.com — all license generation, activation, validation happens there. This app only syncs and caches.
 - **Products**: ConversionFlow WP Plugin, ConversionFlow Laravel Module
-- **Existing codebase**: v1.x marketing site with 10 phases complete — Next.js 16, TypeScript, TailwindCSS v4, Framer Motion, next-intl, MDX blog/docs
+- **Existing codebase**: v2.1 complete — Next.js 16, TypeScript, TailwindCSS v4, Framer Motion, next-intl, MDX blog/docs
 - **Pricing**: Starter $29/3,499BDT, Professional $69/8,299BDT (most popular), Agency $129/15,499BDT — all one-time payments
 - **Design feel**: Premium SaaS quality with Bangladeshi local personality
 
@@ -139,9 +130,9 @@ A production-grade SaaS platform where Bangladeshi WooCommerce store owners purc
 - **Components**: Server components by default; client components only when needed
 - **Styling**: TailwindCSS v4 CSS-first config — no tailwind.config.js file
 - **Design Fidelity**: Dashboard UI ported from `backenddashboard/` folder — no redesign
-- **Preservation**: All existing marketing pages preserved as-is
+- **Preservation**: All existing marketing pages and v2.x functionality preserved as-is
 - **Deployment**: Self-hosted (not Vercel) — must work on custom server/VPS
-- **Licensing Rule**: NEVER generate licenses locally — always use central API
+- **Architecture**: Modular Monolith with Service Layer, Repository Pattern, DDD
 
 ## Key Decisions
 
@@ -150,23 +141,26 @@ A production-grade SaaS platform where Bangladeshi WooCommerce store owners purc
 | Faithful but polished marketing design | HTML is a prototype, not production | Shipped v1.0 |
 | Data files for content (not CMS) | Small team, developer-managed | Shipped v1.1 |
 | MDX for blog/docs | Developer-friendly, supports React components | Shipped v1.1 |
-| Better Auth for dual auth | Supports multi-role, session management, social login, 2FA | Pending |
-| PostgreSQL + Drizzle ORM | Type-safe ORM, migrations, good Next.js ecosystem | Pending |
-| Central licensing only (never local) | Single source of truth, prevents license drift | Pending |
-| Redis for caching/queues | Fast in-memory store for sessions, rate limiting, background jobs | Pending |
-| Dashboard design from backenddashboard/ | Saves design time, proven admin template | Pending |
-| BD payment methods (bKash/Nagad/Rocket/SSL) | Matches how BD customers actually pay | Pending |
+| Better Auth for dual auth | Supports multi-role, session management, social login, 2FA | Shipped v2.0 |
+| PostgreSQL + Drizzle ORM | Type-safe ORM, migrations, good Next.js ecosystem | Shipped v2.0 |
+| Redis for caching/queues | Fast in-memory store for sessions, rate limiting, background jobs | Shipped v2.0 |
+| Dashboard design from backenddashboard/ | Saves design time, proven admin template | Shipped v2.0 |
+| BD payment methods (bKash/Nagad/Rocket/SSL) | Matches how BD customers actually pay | Shipped v2.0 |
+| Self-contained licensing (v3.0) | Complete control, no external dependencies, future-proof | Pending |
+| Modular Monolith + DDD | Scalable architecture, clear domain boundaries | Pending |
+| Service Layer Pattern | Business logic abstraction, testability | Pending |
+| Repository Pattern | Data access abstraction, easier testing | Pending |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? -> Move to Out of Scope with reason
-2. Requirements validated? -> Move to Validated with phase reference
-3. New requirements emerged? -> Add to Active
-4. Decisions to log? -> Add to Key Decisions
-5. "What This Is" still accurate? -> Update if drifted
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -175,4 +169,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-20 — Phase 9 Settings Foundation complete, v2.1 in progress*
+*Last updated: 2026-05-29 — v3.0 Self-Contained Licensing Architecture milestone started*
