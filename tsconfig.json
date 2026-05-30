@@ -20,6 +20,21 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@licensing/*": [
+        "./src/modules/licensing/*"
+      ],
+      "@billing/*": [
+        "./src/modules/billing/*"
+      ],
+      "@products/*": [
+        "./src/modules/products/*"
+      ],
+      "@customers/*": [
+        "./src/modules/customers/*"
+      ],
+      "@analytics/*": [
+        "./src/modules/analytics/*"
       ]
     },
     "plugins": [
