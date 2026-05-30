@@ -1,623 +1,116 @@
-# Requirements: ConversionFlow Platform
-
-**Defined:** 2026-05-11
-**Core Value:** A production-grade SaaS platform where Bangladeshi WooCommerce store owners purchase and manage ConversionFlow licenses, while Devsroom operators gain real-time business intelligence and revenue analytics.
-
-## v1 Requirements
-
-### Foundation
-
-- [x] **FOUND-01**: Build compiles without errors — Footer component, cn() utility, and CSS button classes created
-- [x] **FOUND-02**: TailwindCSS v4 design token system is complete and consistent — all CSS variables registered in @theme block
-- [x] **FOUND-03**: Syne font loads weight 900 (used throughout headings) — fix font configuration in layout.tsx
-- [x] **FOUND-04**: Dark/light theme switches without flash — suppressHydrationWarning and next-themes configured correctly
-- [x] **FOUND-05**: All pages are fully responsive — mobile, tablet, and desktop layouts work correctly
-- [x] **FOUND-06**: Custom 404 page matches site design
-- [x] **FOUND-07**: Self-hosted deployment configured — output: 'standalone' in next.config.ts
-- [x] **FOUND-08**: Custom cursor effect renders on desktop — floating dot following mouse with blend mode, disabled on touch devices
-- [x] **FOUND-09**: Enhanced Framer Motion animations — page transitions, stagger effects, scroll reveals work smoothly without layout shift
-- [x] **FOUND-10**: Shared layout components work — Navbar, Footer, ThemeProvider render on all pages
-
-### Homepage
-
-- [x] **HOME-01**: Hero section displays with dashboard mockup, word-by-word title animation, CTAs, and trust pills
-- [x] **HOME-02**: Trust bar shows key stats (500+ stores, 3 couriers, 6 platforms, 100% CAPI, BDT pricing)
-- [x] **HOME-03**: Bento features grid displays 6 modules with icons, descriptions, and tags — 2-column card spans correctly
-- [x] **HOME-04**: Video section shows mock player with pulsing play button and opens lightbox on click
-- [x] **HOME-05**: BD couriers section displays Steadfast, Pathao, RedX cards with live status chips and order flow diagram
-- [x] **HOME-06**: How It Works section shows 3 step cards with numbered badges
-- [x] **HOME-07**: Testimonials grid displays 3 review cards with star ratings, quotes, and author info
-- [x] **HOME-08**: CTA banner displays with BD tag, headline, and pricing link
-- [x] **HOME-09**: Dashboard mockup component renders with revenue/orders/blocked stats, chart bars, and order list
-- [x] **HOME-10**: Count-up animations trigger on scroll for trust bar stats and dashboard numbers
-
-### Features Page
-
-- [x] **FEAT-01**: Page hero with eyebrow, title, and subtitle matching design reference
-- [x] **FEAT-02**: Video walkthrough section with mock player and lightbox
-- [x] **FEAT-03**: Feature filter tabs (All Modules, Courier Sync, Tracking, Fraud Shield, Analytics, Lead Recovery)
-- [x] **FEAT-04**: Feature rows display module details with alternating layout — Courier Sync, Meta CAPI, Fraud Shield
-- [x] **FEAT-05**: Tracking panel component shows active status for Meta Pixel, GA4, TikTok, Pinterest, GTM
-- [x] **FEAT-06**: Fraud box component displays order table with block buttons and fraud stats
-- [x] **FEAT-07**: Courier cards component reusable across Features and Homepage
-
-### Pricing Page
-
-- [x] **PRIC-01**: Three pricing tiers display (Starter $29, Professional $69, Agency $129) with feature checklists
-- [x] **PRIC-02**: USD/BDT currency toggle switches all prices between dollar and taka
-- [x] **PRIC-03**: "Most Popular" badge on Professional tier with accent border glow
-- [x] **PRIC-04**: FAQ accordion expands/collapses with rotate animation on icon
-- [x] **PRIC-05**: Trust strip displays secure checkout, payment methods, refund, delivery, and BD support
-- [x] **PRIC-06**: "Buy Now" buttons link to external checkout; "WhatsApp" option shown for BD payment methods
-
-### Changelog Page
-
-- [x] **CHLOG-01**: Version entries display with version badge, date, release name, and tagged changes
-- [x] **CHLOG-02**: Change tags differentiate New, Improved, and Fixed entries with color coding
-- [x] **CHLOG-03**: Changelog data sourced from TypeScript data file, not hardcoded in component
-
-### Support Page
-
-- [x] **SUPP-01**: Three support cards display (Email, WhatsApp BD, Documentation) with icons and action buttons
-- [x] **SUPP-02**: Contact form collects name, email, license key, subject, and message
-- [x] **SUPP-03**: Contact form sends email via server action using Resend
-- [x] **SUPP-04**: Form validation provides inline error messages for required fields
-- [x] **SUPP-05**: Success/error feedback displayed after form submission
-
-### Content Data Layer
-
-- [x] **DATA-01**: All pricing tiers extracted to src/data/pricing.ts
-- [x] **DATA-02**: All changelog entries extracted to src/data/changelog.ts
-- [x] **DATA-03**: All testimonials extracted to src/data/testimonials.ts
-- [x] **DATA-04**: All feature/module data extracted to src/data/features.ts
-- [x] **DATA-05**: FAQ items extracted to src/data/faq.ts
-- [x] **DATA-06**: Support info extracted to src/data/support.ts
-- [x] **DATA-07**: Navigation links extracted to src/data/navigation.ts
-
-### Blog
-
-- [x] **BLOG-01**: Blog listing page displays posts with title, date, excerpt, and reading time
-- [x] **BLOG-02**: Individual blog posts render from MDX files with frontmatter (title, date, excerpt, author)
-- [x] **BLOG-03**: MDX supports GitHub-flavored markdown (tables, code blocks, etc.)
-- [x] **BLOG-04**: Blog content lives in src/content/blog/*.mdx
-
-### Documentation
-
-- [x] **DOCS-01**: Documentation section displays guides organized by topic
-- [x] **DOCS-02**: Individual doc pages render from MDX with table of contents
-
-### Legal Pages
-
-- [x] **LEGL-01**: Privacy Policy page with full legal content
-- [x] **LEGL-02**: Terms of Service page with full legal content
-- [x] **LEGL-03**: Refund Policy page with full legal content
-- [x] **LEGL-04**: License Agreement page with full legal content
-
-### SEO & Analytics
-
-- [x] **SEO-01**: Each page has unique metadata (title, description) via Next.js Metadata API
-- [x] **SEO-02**: Open Graph and Twitter Card tags configured for social sharing
-- [x] **SEO-03**: sitemap.xml generated at build time
-- [x] **SEO-04**: robots.txt configured
-- [x] **SEO-05**: Analytics script loaded (Plausible or equivalent)
-
-### Internationalization
-
-- [x] **I18N-01**: Site structure supports English (en) and Bengali (bn) via next-intl
-- [x] **I18N-02**: Bengali-capable font loaded (Noto Sans Bengali or equivalent) as fallback
-- [x] **I18N-03**: Language switcher available in Navbar
-- [x] **I18N-04**: Translatable strings extracted to message files (en.json, bn.json)
-
-## v2 Requirements (Milestone: Dual Portal SaaS Platform)
-
-### Authentication
-
-- [x] **AUTH-01**: Better Auth integration with dual auth (customer login + admin login)
-- [x] **AUTH-02**: 4-role RBAC system (customer, admin, support_staff, super_admin) with server-side checks
-- [x] **AUTH-03**: Email verification on registration
-- [x] **AUTH-04**: Password reset flow via email link
-- [x] **AUTH-05**: Session management with Redis-backed storage (optional in dev)
-- [x] **AUTH-06**: Admin 2FA-ready (TOTP support via Better Auth plugin)
-- [x] **AUTH-07**: Audit logging for all admin mutations (actor, action, target, IP, timestamp)
-
-### Database & Infrastructure
-
-- [x] **DB-01**: PostgreSQL + Drizzle ORM setup with migration system
-- [x] **DB-02**: Redis client for caching, sessions, and job queues
-- [x] **DB-03**: Background job system (BullMQ) for async tasks
-- [x] **DB-04**: Database schema: users, orders, licenses, downloads, tickets, notifications, audit_logs, coupons
-
-### Central Licensing
-
-- [ ] **LIC-01**: POST to license.devsroom.com/api/orders/import on purchase completion
-- [ ] **LIC-02**: Store central_user_id + central_license_id mappings locally
-- [x] **LIC-03**: Webhook handlers for license-created/updated/expired/payment-refunded events
-- [x] **LIC-04**: Scheduled fallback sync (every 15 minutes) when webhooks fail
-- [x] **LIC-05**: HMAC signature verification on all incoming webhooks
-
-### Customer Portal
-
-- [x] **PORT-01**: Dashboard overview (active licenses, expiring soon, recent downloads, open tickets)
-- [x] **PORT-02**: License management (list, detail, copy key, deactivate domain, sync status)
-- [x] **PORT-03**: Billing section (invoices, payment history, refund status)
-- [x] **PORT-04**: Downloads section (latest + old plugin versions with changelogs)
-- [x] **PORT-05**: Support tickets (create, list, reply with attachments)
-- [x] **PORT-06**: Notification center (list, mark read, preferences)
-
-### Checkout & Payments
-
-- [ ] **PAY-01**: BD manual payments (bKash, Nagad, Rocket, Bank Transfer) with admin verification workflow
-- [ ] **PAY-02**: SSL Commerce gateway integration (session creation, redirect, IPN handler, validation)
-- [ ] **PAY-03**: Coupon code system (percentage/flat, usage limits, expiry)
-- [ ] **PAY-04**: Tax/VAT calculation with configurable rates
-- [ ] **PAY-05**: Invoice generation (HTML view + PDF download)
-- [ ] **PAY-06**: Complete purchase flow: payment -> central API -> store mapping -> confirmation
-
-### Admin BI Dashboard
-
-- [ ] **ADMN-01**: Executive overview (total revenue, MRR, ARR, active customers, CLV, CAC with trend indicators)
-- [ ] **ADMN-02**: Sales performance (total sales, conversion rate, refund rate, average order value)
-- [ ] **ADMN-03**: User growth tracking (daily/weekly/monthly signups, activation rate)
-- [ ] **ADMN-04**: Revenue trend charts (daily/weekly/monthly/yearly via ApexCharts with date range selector)
-- [ ] **ADMN-05**: Invoice management (list/filter by status: paid/pending/failed/overdue, mark paid, send reminders)
-- [ ] **ADMN-06**: User management (list, detail, role assignment, ban/activate)
-- [ ] **ADMN-07**: Activity feed (real-time chronological events: purchase, license, refund, ticket)
-- [ ] **ADMN-08**: Date range + product/plan/channel filters across all BI widgets
-- [ ] **ADMN-09**: Data export (CSV, Excel, PDF) for all report types
-- [ ] **ADMN-10**: Admin notifications (failed payment alerts, expiring licenses, churn alerts, fraud alerts)
-
-### License Intelligence
-
-- [x] **LINT-01**: License status dashboard (total/active/expired/revoked/renewal rate by product/plan)
-- [x] **LINT-02**: Domain tracking (activation domains per license, timestamps, multisite usage)
-- [x] **LINT-03**: Piracy detection flagging (suspicious activation patterns for admin review)
-
-### Dashboard UI
-
-- [x] **DASH-01**: Port dashboard layout from backenddashboard/ (AppSidebar, AppHeader, Backdrop, SidebarContext)
-- [x] **DASH-02**: Separate CSS for dashboard routes (prevent CSS token conflict with marketing site)
-- [x] **DASH-03**: Unified next-themes across marketing + dashboard (delete dashboard's ThemeContext)
-- [x] **DASH-04**: Route group architecture: (auth)/, (portal)/, (admin)/ separate from [locale]/
-
-### Notification Engine
-
-- [ ] **NOTIF-01**: Core notification service with channel router — `sendNotification(userId, event, data, channels)` dispatches to email, in-app, and/or WhatsApp
-- [ ] **NOTIF-02**: Email channel via generic SMTP — configurable transport, HTML templates for transactional/support/system events, no vendor lock-in
-- [ ] **NOTIF-03**: In-app notification bell — unread count badge, dropdown with notification list, mark-as-read, per-type grouping, extends existing notifications table
-- [ ] **NOTIF-04**: WhatsApp channel for BD customers — concise messages for order confirmations, license delivery, ticket updates via Meta Business API or BD provider
-- [ ] **NOTIF-05**: Complete event catalog — order (created/confirmed/payment_failed/refunded), license (generated/delivered/expiring_soon/expired), ticket (created/reply/status_changed/resolved), system (blog_published/security_alert)
-- [ ] **NOTIF-06**: Admin notification management — view delivery logs, manage templates, test notifications
-- [ ] **NOTIF-07**: User notification preferences — per-channel opt-in/out per event category
-
-### Affiliate Network
-
-- [ ] **AFF-01**: Affiliate registration and approval — customers apply, admin approves/rejects/suspends affiliate accounts
-- [ ] **AFF-02**: Unique referral links — each affiliate gets a code, `?ref=CODE` sets 30-day cookie on visitor
-- [ ] **AFF-03**: Click tracking — records referral link visits with timestamp, landing page, visitor metadata
-- [ ] **AFF-04**: Commission auto-calculation — percentage-based (configurable per affiliate) on completed referred orders
-- [ ] **AFF-05**: Affiliate dashboard — clicks, conversions, earnings, referral link copy, payout history
-- [ ] **AFF-06**: Payout management — affiliates request payouts, admin approves and marks paid after manual bKash/Nagad/bank transfer
-- [ ] **AFF-07**: Admin affiliate management — list affiliates, set commission rates, view performance, process payouts
-- [ ] **AFF-08**: DB schema — affiliates, affiliate_clicks, affiliate_commissions, affiliate_payouts tables linked to users and orders
-
-## v3 Requirements (Milestone: v2.1 Marketing & SEO Settings Dashboard)
-
-### Settings Navigation
-
-- [ ] **NAV-01**: Admin can access a settings landing page at /admin/settings with category cards linking to Payment Gateway, SMTP/Email, and SEO Settings
-- [ ] **NAV-02**: Each settings category has its own sub-route (/admin/settings/payment, /admin/settings/smtp, /admin/settings/seo)
-- [ ] **NAV-03**: SEO Settings has nested sub-routes for each SEO section (/admin/settings/seo/general, /admin/settings/seo/verification, etc.)
-- [ ] **NAV-04**: Existing Payment, Email, and Tracking forms are migrated from the flat settings page to their respective sub-routes without losing functionality
-- [ ] **NAV-05**: Settings sub-navigation uses a consistent tabbed or sidebar layout across all categories
-
-### General SEO
-
-- [x] **GSEO-01**: Admin can configure website title, default meta title, meta description, meta keywords, and canonical URL
-- [x] **GSEO-02**: Admin can set default robots meta directive, SEO separator character, and default Open Graph image
-- [x] **GSEO-03**: Admin can toggle URL formatting options: lowercase URLs, trailing slash handling
-- [x] **GSEO-04**: Admin can toggle auto meta generation (auto-generate meta titles and descriptions from content)
-- [x] **GSEO-05**: Admin sees a real-time SERP preview snippet showing how the page will appear in Google search results
-- [x] **GSEO-06**: Admin sees character count indicators for meta title (recommended 50-60) and meta description (recommended 150-160)
-- [x] **GSEO-07**: Admin sees an SEO score indicator based on configured settings completeness
-
-### Search Engine Verification
-
-- [x] **VERF-01**: Admin can enter and save Google Search Console verification meta tag
-- [x] **VERF-02**: Admin can enter and save Bing Webmaster verification code
-- [x] **VERF-03**: Admin can enter and save Yandex, Baidu, and Pinterest verification codes
-- [x] **VERF-04**: Admin sees verification status indicators (connected/disconnected) for each search engine
-- [x] **VERF-05**: Admin can copy verification codes to clipboard using a helper button
-
-### XML Sitemaps
-
-- [x] **SITM-01**: Admin can enable/disable XML sitemap generation
-- [x] **SITM-02**: Admin can enable/disable individual sitemap types: product sitemap, blog sitemap, image sitemap
-- [x] **SITM-03**: Admin can toggle auto-regeneration of sitemaps when content changes
-- [x] **SITM-04**: Admin sees the sitemap URL preview and last-generated timestamp
-- [x] **SITM-05**: Admin can manually trigger sitemap regeneration and ping search engines
-
-### Robots.txt Manager
-
-- [x] **ROBT-01**: Admin can edit robots.txt using a visual rule builder (user-agent, allow, disallow, sitemap)
-- [x] **ROBT-02**: Admin can edit robots.txt using a raw code editor with syntax highlighting
-- [x] **ROBT-03**: Admin can toggle AI bot access controls for GPTBot, ClaudeBot, and PerplexityBot (allow/block)
-- [x] **ROBT-04**: Admin can apply crawl rule presets (allow all, block AI bots, block all, custom)
-- [x] **ROBT-05**: Admin sees a live preview of the generated robots.txt content
-
-### Open Graph & Social SEO
-
-- [x] **SOCL-01**: Admin can configure Facebook App ID, default share title, description, and image
-- [x] **SOCL-02**: Admin can configure Twitter/X handle, card type (summary/summary_large_image), and default share image
-- [x] **SOCL-03**: Admin can configure LinkedIn share image override
-- [x] **SOCL-04**: Admin sees a social share preview simulator showing how links appear on Facebook, Twitter/X, and LinkedIn
-- [x] **SOCL-05**: Admin can toggle between mobile and desktop preview modes
-
-### Meta Pixel & Conversion API
-
-- [x] **META-01**: Admin can configure Meta Pixel ID and Conversion API token
-- [x] **META-02**: Admin can configure Dataset ID and Test Event Code for debugging
-- [x] **META-03**: Admin can toggle Advanced Matching and Event Deduplication
-- [x] **META-04**: Admin can select which standard events to track: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, Lead
-- [x] **META-05**: Admin sees connection status indicator for Pixel and CAPI
-- [x] **META-06**: Admin sees recent event firing logs for diagnostics
-
-### TikTok Tracking
-
-- [ ] **TIKT-01**: Admin can configure TikTok Pixel ID and Events API token
-- [ ] **TIKT-02**: Admin can toggle Advanced Matching and server-side tracking
-- [ ] **TIKT-03**: Admin sees tracking status indicator and recent event logs
-
-### Google Analytics & Ads
-
-- [ ] **GOOG-01**: Admin can configure GA4 Measurement ID, Google Ads Conversion ID, and Conversion Label
-- [ ] **GOOG-02**: Admin can configure Google Tag Manager Container ID
-- [ ] **GOOG-03**: Admin can toggle server-side tracking and enhanced ecommerce
-- [ ] **GOOG-04**: Admin sees connection status and a connection tester
-- [ ] **GOOG-05**: Admin sees analytics summary cards (integrated with existing dashboard metrics)
-
-### Schema Markup
-
-- [ ] **SCHM-01**: Admin can configure global schema: Organization, Website, and Breadcrumb
-- [ ] **SCHM-02**: Admin can enable/configure content schemas: Product, Article, FAQ, HowTo, Review
-- [ ] **SCHM-03**: Admin sees a JSON-LD preview of the generated schema markup
-- [ ] **SCHM-04**: Admin can validate schema markup against Google structured data requirements
-- [ ] **SCHM-05**: Admin can toggle auto schema generation based on content type
-
-### Redirect Manager
-
-- [ ] **RDIR-01**: Admin can create 301 (permanent) and 302 (temporary) redirects with from/to URL fields
-- [ ] **RDIR-02**: Admin can create regex-based redirects for pattern matching
-- [ ] **RDIR-03**: Admin sees a redirect table with search/filter, status tracking, and hit counter
-- [ ] **RDIR-04**: Admin can bulk import and export redirects via CSV
-- [ ] **RDIR-05**: Admin can delete individual redirects or bulk delete selected redirects
-
-### AI SEO & LLM Controls
-
-- [ ] **AISE-01**: Admin can allow or block GPTBot from crawling the site
-- [ ] **AISE-02**: Admin can allow or block ClaudeBot from crawling the site
-- [ ] **AISE-03**: Admin can allow or block PerplexityBot from crawling the site
-- [ ] **AISE-04**: Admin can generate an llms.txt file for AI crawler consumption
-- [ ] **AISE-05**: Admin can configure AI content usage rules (how AI models may use site content)
-
-### Image SEO
-
-- [ ] **IMGS-01**: Admin can toggle auto ALT text generation for images
-- [ ] **IMGS-02**: Admin can toggle WebP conversion for uploaded images
-- [ ] **IMGS-03**: Admin can toggle lazy loading for images across the site
-- [ ] **IMGS-04**: Admin can toggle image compression and see optimization savings stats
-- [ ] **IMGS-05**: Admin sees image performance statistics (total images, optimized count, savings)
-
-### Performance SEO
-
-- [ ] **PERF-01**: Admin can toggle Critical CSS extraction and injection
-- [ ] **PERF-02**: Admin can toggle JS defer loading strategy
-- [ ] **PERF-03**: Admin can toggle HTML and CSS minification
-- [ ] **PERF-04**: Admin can configure CDN integration URL
-- [ ] **PERF-05**: Admin can configure cache control settings (max-age, stale-while-revalidate)
-- [ ] **PERF-06**: Admin sees Core Web Vitals monitor cards: LCP, CLS, INP, TTFB, and overall performance score
-
-### SEO Analytics
-
-- [x] **ANLT-01**: Admin sees an SEO analytics overview dashboard with indexed pages count and trend
-- [x] **ANLT-02**: Admin sees top performing pages ranked by organic traffic metrics
-- [x] **ANLT-03**: Admin sees keyword rankings with position tracking and trend indicators
-- [x] **ANLT-04**: Admin sees CTR and impressions data with trend charts
-- [ ] **ANLT-05**: Admin sees 404 error and broken link reports
-- [ ] **ANLT-06**: Admin sees sitemap health status and crawl issue reports
-- [x] **ANLT-07**: Analytics data is displayed using charts, tables, status badges, and trend indicators
-
-### Page-Level SEO
-
-- [ ] **PLVL-01**: Each page, product, and blog post has editable SEO title, meta description, and canonical URL
-- [ ] **PLVL-02**: Each content item has a focus keyword field with density analysis
-- [ ] **PLVL-03**: Each content item has per-page robots indexing control (index/noindex, follow/nofollow)
-- [ ] **PLVL-04**: Each content item has a custom OG image override
-- [ ] **PLVL-05**: Each content item has a schema type selector and social preview
-
-## v4 Requirements (Future)
-
-Deferred to future release.
-
-### Advanced Analytics Integration
-
-- **ANLT-08**: Real-time Google Search Console API integration for live keyword data
-- **ANLT-09**: Automated weekly SEO audit reports with email delivery
-- **ANLT-10**: Competitor analysis dashboard
-
-### Advanced Redirect Features
-
-- **RDIR-06**: Auto-slug redirect creation when URLs change
-- **RDIR-07**: Redirect chain detection and warning
-
-### Advanced Schema
-
-- **SCHM-06**: LocalBusiness schema with geo coordinates
-- **SCHM-07**: Video schema markup
-- **SCHM-08**: Custom schema builder for arbitrary JSON-LD
-
-### Marketing Automation
-
-- **MKTG-01**: A/B testing for meta titles and descriptions
-- **MKTG-02**: Automated internal linking suggestions
-- **MKTG-03**: Content optimization scoring
+# Requirements: v3.0 Self-Contained Licensing Architecture
+
+**Status:** Active
+**Last Updated:** 2026-05-29
+
+## Product & Plan Management (PROD)
+
+- [ ] **PROD-01**: Admin can create products with name, slug, description, and current version
+- [ ] **PROD-02**: Admin can manage product versions with download URLs and changelogs
+- [ ] **PROD-03**: Admin can create plans for each product with pricing, activation limits, and feature flags
+- [ ] **PROD-04**: Plans support lifetime licenses (no expiration) and subscription licenses (duration-based)
+- [ ] **PROD-05**: Plans define maximum activation limits (1, 3, 5, unlimited)
+- [ ] **PROD-06**: Plan pricing supports multiple currencies (BDT, USD)
+- [ ] **PROD-07**: Product and plan data is accessible via admin dashboard UI
+
+## License Generation & Validation (LGEN)
+
+- [ ] **LGEN-01**: System generates unique license keys using Node.js `crypto.randomBytes()` (25-32 characters, segmented format)
+- [ ] **LGEN-02**: License keys are case-insensitive with no ambiguous characters (exclude: 0, O, 1, l, I)
+- [ ] **LGEN-03**: License keys have UNIQUE database constraint to prevent duplicates
+- [ ] **LGEN-04**: License generation happens locally (no external API calls to license.devsroom.com)
+- [ ] **LGEN-05**: Public API endpoint `/api/v1/license/validate` validates license keys and returns status, expiry, plan details
+- [ ] **LGEN-06**: Validation API uses Redis caching with 5-15 minute TTL
+- [ ] **LGEN-07**: Validation API cache invalidates immediately on license status changes (revoke, suspend, expire)
+- [ ] **LGEN-08**: Public API has rate limiting (100 requests/minute per IP)
+- [ ] **LGEN-09**: Validation API returns identical error for all failures (no information leakage about expired vs revoked vs not found)
+
+## Activation & Domain Tracking (ACT)
+
+- [ ] **ACT-01**: System tracks domain activations per license with timestamps, IP addresses, and geo-location
+- [ ] **ACT-02**: Domain normalization strips protocol (https://), www prefix, and trailing slashes
+- [ ] **ACT-03**: Activation limit enforcement uses atomic database operations to prevent race conditions
+- [ ] **ACT-04**: System enforces max activations per plan (rejects activation if limit reached)
+- [ ] **ACT-05**: Domain activation requires verification (DNS TXT record, file upload, or meta tag)
+- [ ] **ACT-06**: Public API endpoints `/api/v1/license/activate` and `/api/v1/license/deactivate` for plugin integration
+- [ ] **ACT-07**: Customers can view and manage their active domains in customer portal
+- [ ] **ACT-08**: Admin can view activation history and detect suspicious patterns
+
+## License Status & Subscriptions (LSTAT)
+
+- [ ] **LSTAT-01**: License status supports: active, expired, revoked, suspended, grace_period
+- [ ] **LSTAT-02**: Subscription licenses have `expires_at` timestamp in UTC
+- [ ] **LSTAT-03**: Grace period of 7-30 days after expiration (license remains valid during grace period)
+- [ ] **LSTAT-04**: Lifetime licenses have null or far-future `expires_at` (never expire)
+- [ ] **LSTAT-05**: Admin can manually revoke or suspend licenses with reason
+- [ ] **LSTAT-06**: License status changes trigger audit log entries and customer notifications
+- [ ] **LSTAT-07**: Background job checks for expiring licenses daily and sends reminder emails (30, 14, 7, 3, 1 days before)
+
+## Architecture & Migration (ARCH)
+
+- [ ] **ARCH-01**: Codebase organized into modular monolith with DDD bounded contexts (Licensing, Billing, Customers, Products, Analytics)
+- [ ] **ARCH-02**: Service Layer Pattern abstracts business logic from API routes and controllers
+- [ ] **ARCH-03**: Repository Pattern abstracts data access from services
+- [ ] **ARCH-04**: Domain events enable loose coupling between bounded contexts (OrderCompleted → LicenseCreated)
+- [ ] **ARCH-05**: Event bus implemented with EventEmitter (in-process) and Redis Pub/Sub (cross-process)
+- [ ] **ARCH-06**: Remove `src/lib/central-api.ts` file (external license API client)
+- [ ] **ARCH-07**: Remove database fields: `centralOrderId`, `centralLicenseId`, `centralUserId`
+- [ ] **ARCH-08**: Remove webhook handlers for central license API events
+- [ ] **ARCH-09**: Data migration strategy includes verification, rollback plan, and gradual feature flag rollout
+- [ ] **ARCH-10**: Migration preserves all existing license data without loss
+
+## Analytics Dashboard (ANLT)
+
+- [ ] **ANLT-01**: Admin dashboard shows license analytics overview (total, active, expired, revoked counts)
+- [ ] **ANLT-02**: Revenue analytics display total revenue, MRR, ARR, and trend indicators
+- [ ] **ANLT-03**: Product performance metrics show sales by product and plan
+- [ ] **ANLT-04**: Customer growth tracking displays daily/weekly/monthly signups
+- [ ] **ANLT-05**: Activation statistics show current activations, activation rate, geographic distribution
+
+## Public API Endpoints (API)
+
+- [ ] **API-01**: `/api/v1/license/validate` endpoint accepts license_key and domain, returns validation result
+- [ ] **API-02**: `/api/v1/license/activate` endpoint binds license to domain after verification
+- [ ] **API-03**: `/api/v1/license/deactivate` endpoint removes domain from license
+- [ ] **API-04**: API uses API token authentication for external requests
+- [ ] **API-05**: API responses follow consistent JSON format with error handling
+
+## Background Jobs (JOBS)
+
+- [ ] **JOB-01**: BullMQ worker processes license expiration checks daily
+- [ ] **JOB-02**: BullMQ worker sends renewal reminder emails based on expiration date
+- [ ] **JOB-03**: BullMQ worker handles analytics aggregation for dashboard
+- [ ] **JOB-04**: Jobs use Redis for queue management and retry logic with exponential backoff
+
+## License Transfer System (XFER)
+
+- [ ] **XFER-01**: Customers can transfer license ownership to another account via transfer code
+- [ ] **XFER-02**: Customers can deactivate old domain and activate new domain (within transfer limits)
+- [ ] **XFER-03**: Transfer operations are logged in audit trail with timestamp and actor
+- [ ] **XFER-04**: Admin can configure maximum transfers per month per license
+
+## Deferred (Post-MVP)
+
+- [ ] **DEFER-01**: Cryptographic offline validation (public key embedded in plugin)
+- [ ] **DEFER-02**: Hardware fingerprinting for advanced anti-piracy
+- [ ] **DEFER-03**: Real-time analytics dashboard with live updates
+- [ ] **DEFER-04**: Automated compliance enforcement
+- [ ] **DEFER-05**: Advanced reporting with scheduled PDF exports
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| WordPress plugin development | This is the SaaS platform, not the plugin itself |
-| Central licensing engine | Owned by license.devsroom.com, only integrated here |
-| CMS integration | Content managed via data files and MDX in the repository |
-| Mobile app | Web-only platform |
-| Redesigning existing marketing pages | All v1.x pages preserved as-is |
-| Redesigning dashboard UI | Use backenddashboard/ folder design as-is |
-| Real-time Google Search Console API | Requires OAuth setup, API quotas, complex auth flow — defer to v4 |
-| Competitor analysis | Needs third-party data providers (Ahrefs/Semrush API) — out of budget scope |
-| A/B testing for meta tags | Requires traffic splitting infrastructure — complex for v1 |
-| WordPress plugin SEO integration | Plugin manages its own SEO; this dashboard controls the marketing site |
-| Multi-tenant SEO settings | Current platform is single-tenant; multi-tenant requires architecture changes |
-| Actual server-side image processing | Image SEO toggles save intent; actual WebP/compression is a deployment pipeline concern |
-| Actual CSS/JS minification at runtime | Performance toggles save preferences; optimization is a build-time/deployment concern |
+- **WordPress plugin development** — v3.0 is the SaaS platform, not the plugin itself
+- **Multi-tenant support** — single-instance platform for Devsroom only
+- **Redesigning existing marketing pages** — all v1.x/v2.x pages preserved as-is
+- **Redesigning dashboard UI** — use existing backenddashboard/ template design
 
 ## Traceability
 
-### v1 Requirements
+Requirements traceability will be populated after roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 1 | Complete |
-| FOUND-03 | Phase 10 | Complete |
-| FOUND-04 | Phase 1 | Complete |
-| FOUND-05 | Phase 10 | Complete |
-| FOUND-06 | Phase 4 | Complete |
-| FOUND-07 | Phase 5 | Complete |
-| FOUND-08 | Phase 10 | Complete |
-| FOUND-09 | Phase 10 | Complete |
-| FOUND-10 | Phase 1 | Complete |
-| HOME-01 | Phase 2 | Complete |
-| HOME-02 | Phase 2 | Complete |
-| HOME-03 | Phase 2 | Complete |
-| HOME-04 | Phase 2 | Complete |
-| HOME-05 | Phase 2 | Complete |
-| HOME-06 | Phase 2 | Complete |
-| HOME-07 | Phase 2 | Complete |
-| HOME-08 | Phase 2 | Complete |
-| HOME-09 | Phase 2 | Complete |
-| HOME-10 | Phase 6 | Complete |
-| FEAT-01 | Phase 3 | Complete |
-| FEAT-02 | Phase 3 | Complete |
-| FEAT-03 | Phase 3 | Complete |
-| FEAT-04 | Phase 3 | Complete |
-| FEAT-05 | Phase 3 | Complete |
-| FEAT-06 | Phase 3 | Complete |
-| FEAT-07 | Phase 3 | Complete |
-| PRIC-01 | Phase 3 | Complete |
-| PRIC-02 | Phase 6 | Complete |
-| PRIC-03 | Phase 3 | Complete |
-| PRIC-04 | Phase 3 | Complete |
-| PRIC-05 | Phase 3 | Complete |
-| PRIC-06 | Phase 6 | Complete |
-| CHLOG-01 | Phase 3 | Complete |
-| CHLOG-02 | Phase 3 | Complete |
-| CHLOG-03 | Phase 5 | Complete |
-| SUPP-01 | Phase 3 | Complete |
-| SUPP-02 | Phase 3 | Complete |
-| SUPP-03 | Phase 6 | Complete |
-| SUPP-04 | Phase 6 | Complete |
-| SUPP-05 | Phase 6 | Complete |
-| DATA-01 | Phase 5 | Complete |
-| DATA-02 | Phase 5 | Complete |
-| DATA-03 | Phase 5 | Complete |
-| DATA-04 | Phase 5 | Complete |
-| DATA-05 | Phase 5 | Complete |
-| DATA-06 | Phase 5 | Complete |
-| DATA-07 | Phase 5 | Complete |
-| BLOG-01 | Phase 7 | Complete |
-| BLOG-02 | Phase 7 | Complete |
-| BLOG-03 | Phase 7 | Complete |
-| BLOG-04 | Phase 7 | Complete |
-| DOCS-01 | Phase 7 | Complete |
-| DOCS-02 | Phase 7 | Complete |
-| LEGL-01 | Phase 7 | Complete |
-| LEGL-02 | Phase 7 | Complete |
-| LEGL-03 | Phase 7 | Complete |
-| LEGL-04 | Phase 7 | Complete |
-| SEO-01 | Phase 4 | Complete |
-| SEO-02 | Phase 4 | Complete |
-| SEO-03 | Phase 8 | Complete |
-| SEO-04 | Phase 8 | Complete |
-| SEO-05 | Phase 8 | Complete |
-| I18N-01 | Phase 9 | Complete |
-| I18N-02 | Phase 9 | Complete |
-| I18N-03 | Phase 9 | Complete |
-| I18N-04 | Phase 9 | Complete |
-
-### v2 Requirements (Milestone: Dual Portal SaaS Platform)
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Complete |
-| AUTH-04 | Phase 1 | Complete |
-| AUTH-05 | Phase 1 | Complete |
-| AUTH-06 | Phase 1 | Complete |
-| AUTH-07 | Phase 1 | Complete |
-| DB-01 | Phase 1 | Complete |
-| DB-02 | Phase 1 | Complete |
-| DB-03 | Phase 1 | Complete |
-| DB-04 | Phase 1 | Complete |
-| DASH-02 | Phase 1 | Complete |
-| DASH-03 | Phase 1 | Complete |
-| DASH-04 | Phase 1 | Complete |
-| DASH-01 | Phase 2 | Complete |
-| PORT-01 | Phase 3 | Complete |
-| PORT-02 | Phase 3 | Complete |
-| PORT-03 | Phase 3 | Complete |
-| PORT-04 | Phase 3 | Complete |
-| PORT-05 | Phase 3 | Complete |
-| PORT-06 | Phase 3 | Complete |
-| LIC-01 | Phase 4 | Pending |
-| LIC-02 | Phase 4 | Pending |
-| PAY-01 | Phase 4 | Pending |
-| PAY-02 | Phase 4 | Pending |
-| PAY-03 | Phase 4 | Pending |
-| PAY-04 | Phase 4 | Pending |
-| PAY-05 | Phase 4 | Pending |
-| PAY-06 | Phase 4 | Pending |
-| ADMN-01 | Phase 5 | Pending |
-| ADMN-02 | Phase 5 | Pending |
-| ADMN-03 | Phase 5 | Pending |
-| ADMN-04 | Phase 5 | Pending |
-| ADMN-05 | Phase 5 | Pending |
-| ADMN-06 | Phase 5 | Pending |
-| ADMN-07 | Phase 5 | Pending |
-| ADMN-08 | Phase 5 | Pending |
-| ADMN-09 | Phase 5 | Pending |
-| ADMN-10 | Phase 5 | Pending |
-| LIC-03 | Phase 6 | Complete |
-| LIC-04 | Phase 6 | Complete |
-| LIC-05 | Phase 6 | Complete |
-| LINT-01 | Phase 6 | Complete |
-| LINT-02 | Phase 6 | Complete |
-| LINT-03 | Phase 6 | Complete |
-| NOTIF-01 | Phase 7 | Pending |
-| NOTIF-02 | Phase 7 | Pending |
-| NOTIF-03 | Phase 7 | Pending |
-| NOTIF-04 | Phase 7 | Pending |
-| NOTIF-05 | Phase 7 | Pending |
-| NOTIF-06 | Phase 7 | Pending |
-| NOTIF-07 | Phase 7 | Pending |
-| AFF-01 | Phase 8 | Pending |
-| AFF-02 | Phase 8 | Pending |
-| AFF-03 | Phase 8 | Pending |
-| AFF-04 | Phase 8 | Pending |
-| AFF-05 | Phase 8 | Pending |
-| AFF-06 | Phase 8 | Pending |
-| AFF-07 | Phase 8 | Pending |
-| AFF-08 | Phase 8 | Pending |
-
-### v3 Requirements (Milestone: v2.1 Marketing & SEO Settings Dashboard)
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| NAV-01 | Phase 9 | Pending |
-| NAV-02 | Phase 9 | Pending |
-| NAV-03 | Phase 9 | Pending |
-| NAV-04 | Phase 9 | Pending |
-| NAV-05 | Phase 9 | Pending |
-| GSEO-01 | Phase 10 | Complete |
-| GSEO-02 | Phase 10 | Complete |
-| GSEO-03 | Phase 10 | Complete |
-| GSEO-04 | Phase 10 | Complete |
-| GSEO-05 | Phase 10 | Complete |
-| GSEO-06 | Phase 10 | Complete |
-| GSEO-07 | Phase 10 | Complete |
-| VERF-01 | Phase 10 | Complete |
-| VERF-02 | Phase 10 | Complete |
-| VERF-03 | Phase 10 | Complete |
-| VERF-04 | Phase 10 | Complete |
-| VERF-05 | Phase 10 | Complete |
-| SITM-01 | Phase 10 | Complete |
-| SITM-02 | Phase 10 | Complete |
-| SITM-03 | Phase 10 | Complete |
-| SITM-04 | Phase 10 | Complete |
-| SITM-05 | Phase 10 | Complete |
-| ROBT-01 | Phase 10 | Complete |
-| ROBT-02 | Phase 10 | Complete |
-| ROBT-03 | Phase 10 | Complete |
-| ROBT-04 | Phase 10 | Complete |
-| ROBT-05 | Phase 10 | Complete |
-| SOCL-01 | Phase 11 | Complete |
-| SOCL-02 | Phase 11 | Complete |
-| SOCL-03 | Phase 11 | Complete |
-| SOCL-04 | Phase 11 | Complete |
-| SOCL-05 | Phase 11 | Complete |
-| META-01 | Phase 11 | Complete |
-| META-02 | Phase 11 | Complete |
-| META-03 | Phase 11 | Complete |
-| META-04 | Phase 11 | Complete |
-| META-05 | Phase 11 | Complete |
-| META-06 | Phase 11 | Complete |
-| TIKT-01 | Phase 11 | Pending |
-| TIKT-02 | Phase 11 | Pending |
-| TIKT-03 | Phase 11 | Pending |
-| GOOG-01 | Phase 11 | Pending |
-| GOOG-02 | Phase 11 | Pending |
-| GOOG-03 | Phase 11 | Pending |
-| GOOG-04 | Phase 11 | Pending |
-| GOOG-05 | Phase 11 | Pending |
-| SCHM-01 | Phase 11 | Pending |
-| SCHM-02 | Phase 11 | Pending |
-| SCHM-03 | Phase 11 | Pending |
-| SCHM-04 | Phase 11 | Pending |
-| SCHM-05 | Phase 11 | Pending |
-| RDIR-01 | Phase 12 | Pending |
-| RDIR-02 | Phase 12 | Pending |
-| RDIR-03 | Phase 12 | Pending |
-| RDIR-04 | Phase 12 | Pending |
-| RDIR-05 | Phase 12 | Pending |
-| AISE-01 | Phase 12 | Pending |
-| AISE-02 | Phase 12 | Pending |
-| AISE-03 | Phase 12 | Pending |
-| AISE-04 | Phase 12 | Pending |
-| AISE-05 | Phase 12 | Pending |
-| IMGS-01 | Phase 12 | Pending |
-| IMGS-02 | Phase 12 | Pending |
-| IMGS-03 | Phase 12 | Pending |
-| IMGS-04 | Phase 12 | Pending |
-| IMGS-05 | Phase 12 | Pending |
-| PERF-01 | Phase 12 | Pending |
-| PERF-02 | Phase 12 | Pending |
-| PERF-03 | Phase 12 | Pending |
-| PERF-04 | Phase 12 | Pending |
-| PERF-05 | Phase 12 | Pending |
-| PERF-06 | Phase 12 | Pending |
-| PLVL-01 | Phase 12 | Pending |
-| PLVL-02 | Phase 12 | Pending |
-| PLVL-03 | Phase 12 | Pending |
-| PLVL-04 | Phase 12 | Pending |
-| PLVL-05 | Phase 12 | Pending |
-| ANLT-01 | Phase 13 | Complete |
-| ANLT-02 | Phase 13 | Complete |
-| ANLT-03 | Phase 13 | Complete |
-| ANLT-04 | Phase 13 | Complete |
-| ANLT-05 | Phase 13 | Pending |
-| ANLT-06 | Phase 13 | Pending |
-| ANLT-07 | Phase 13 | Complete |
-
-**Coverage:**
-- v1 requirements: 67 total (all Complete)
-- v2 requirements: 60 total (mapped to v2.0 Phases 1-8)
-- v3 requirements: 84 total (mapped to v2.1 Phases 9-13)
-- Phase 9: NAV-01 to NAV-05 (5 requirements)
-- Phase 10: GSEO-01 to GSEO-07, VERF-01 to VERF-05, SITM-01 to SITM-05, ROBT-01 to ROBT-05 (22 requirements)
-- Phase 11: SOCL-01 to SOCL-05, META-01 to META-06, TIKT-01 to TIKT-03, GOOG-01 to GOOG-05, SCHM-01 to SCHM-05 (24 requirements)
-- Phase 12: RDIR-01 to RDIR-05, AISE-01 to AISE-05, IMGS-01 to IMGS-05, PERF-01 to PERF-06, PLVL-01 to PLVL-05 (26 requirements)
-- Phase 13: ANLT-01 to ANLT-07 (7 requirements)
-- Orphaned: 0 -- all v3 requirements mapped
+| (To be populated after roadmap) | | |
 
 ---
-*Requirements defined: 2026-05-11*
-*Last updated: 2026-05-20 -- v2.1 roadmap created, 89 v3 requirements mapped to Phases 9-13*
+*Last updated: 2026-05-29*
