@@ -1,7 +1,7 @@
 # Requirements: v3.0 Self-Contained Licensing Architecture
 
 **Status:** Active
-**Last Updated:** 2026-05-29
+**Last Updated:** 2026-05-30
 
 ## Product & Plan Management (PROD)
 
@@ -106,11 +106,67 @@
 
 ## Traceability
 
-Requirements traceability will be populated after roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be populated after roadmap) | | |
+| PROD-01 | Phase 15 | Pending |
+| PROD-02 | Phase 15 | Pending |
+| PROD-03 | Phase 15 | Pending |
+| PROD-04 | Phase 15 | Pending |
+| PROD-05 | Phase 15 | Pending |
+| PROD-06 | Phase 15 | Pending |
+| PROD-07 | Phase 15 | Pending |
+| LGEN-01 | Phase 16 | Pending |
+| LGEN-02 | Phase 16 | Pending |
+| LGEN-03 | Phase 16 | Pending |
+| LGEN-04 | Phase 16 | Pending |
+| LGEN-05 | Phase 16 | Pending |
+| LGEN-06 | Phase 16 | Pending |
+| LGEN-07 | Phase 16 | Pending |
+| LGEN-08 | Phase 16 | Pending |
+| LGEN-09 | Phase 16 | Pending |
+| ACT-01 | Phase 16 | Pending |
+| ACT-02 | Phase 16 | Pending |
+| ACT-03 | Phase 16 | Pending |
+| ACT-04 | Phase 16 | Pending |
+| ACT-05 | Phase 16 | Pending |
+| ACT-06 | Phase 16 | Pending |
+| ACT-07 | Phase 16 | Pending |
+| ACT-08 | Phase 16 | Pending |
+| LSTAT-01 | Phase 18 | Pending |
+| LSTAT-02 | Phase 18 | Pending |
+| LSTAT-03 | Phase 18 | Pending |
+| LSTAT-04 | Phase 18 | Pending |
+| LSTAT-05 | Phase 17 | Pending |
+| LSTAT-06 | Phase 17 | Pending |
+| LSTAT-07 | Phase 18 | Pending |
+| ARCH-01 | Phase 14 | Pending |
+| ARCH-02 | Phase 14 | Pending |
+| ARCH-03 | Phase 14 | Pending |
+| ARCH-04 | Phase 14 | Pending |
+| ARCH-05 | Phase 14 | Pending |
+| ARCH-06 | Phase 17 | Pending |
+| ARCH-07 | Phase 20 | Pending |
+| ARCH-08 | Phase 17 | Pending |
+| ARCH-09 | Phase 20 | Pending |
+| ARCH-10 | Phase 20 | Pending |
+| ANLT-01 | Phase 19 | Pending |
+| ANLT-02 | Phase 19 | Pending |
+| ANLT-03 | Phase 19 | Pending |
+| ANLT-04 | Phase 19 | Pending |
+| ANLT-05 | Phase 19 | Pending |
+| API-01 | Phase 16 | Pending |
+| API-02 | Phase 16 | Pending |
+| API-03 | Phase 16 | Pending |
+| API-04 | Phase 16 | Pending |
+| API-05 | Phase 16 | Pending |
+| JOB-01 | Phase 18 | Pending |
+| JOB-02 | Phase 18 | Pending |
+| JOB-03 | Phase 19 | Pending |
+| JOB-04 | Phase 18 | Pending |
+| XFER-01 | Phase 19 | Pending |
+| XFER-02 | Phase 19 | Pending |
+| XFER-03 | Phase 19 | Pending |
+| XFER-04 | Phase 19 | Pending |
 
 ---
-*Last updated: 2026-05-29*
+*Last updated: 2026-05-30*
