@@ -288,7 +288,12 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   3. Repository base classes and interfaces provide CRUD operations, transaction support, and query building for all bounded contexts
   4. Shared value objects (LicenseKey, Money, Email, Domain) implement validation, equality, and serialization logic
   5. Module boundaries are enforced via import rules and dependency direction (customers → products is allowed, products → customers is not)
-**Plans**: TBD
+**Plans**: 4 plans (14-01, 14-02, 14-03, 14-04)
+Plans:
+- [ ] 14-01-PLAN.md — Module structure and TypeScript path aliases
+- [ ] 14-02-PLAN.md — Event bus implementation (EventEmitter + Redis Pub/Sub)
+- [ ] 14-03-PLAN.md — Repository base classes and interfaces
+- [ ] 14-04-PLAN.md — Shared value objects (LicenseKey, Money, Email, Domain)
 
 ### Phase 15: Products Bounded Context
 **Directory**: `15-products-context`
