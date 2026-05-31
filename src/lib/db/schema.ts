@@ -437,6 +437,41 @@ export const blogPosts = pgTable(
 );
 
 // ──────────────────────────────────────────────
+// Event Bus Tables
+// ──────────────────────────────────────────────
+
+/**
+ * Events table for event persistence (D-14, D-18, D-19)
+ *
+ * Stores all domain events for replay, debugging, analytics, and state rebuilding.
+ * Single table for all event types with key fields as columns and full payload in JSONB.
+ *
+ * Schema design (D-19: hybrid columns):
+ * - Key fields (id, type, aggregate_id, timestamp) as columns for queryability
+ * - Full payload in JSONB for flexibility
+ * - Indexes on type, aggregateId, timestamp for common queries
+ * - Single table for all event types (D-18)
+ */
+export const events = pgTable(
+  "events",
+  {
+    id: text("id").primaryKey(),
+    type: text("type").notNull().index(),
+    aggregateId: text("aggregate_id").notNull().index(),
+    payload: jsonb("payload").notNull(),
+    timestamp: timestamp("timestamp").defaultNow().notNull(),
+    correlationId: text("correlation_id"),
+    metadata: jsonb("metadata"),
+  },
+  (table) => ({
+    typeIdx: index("events_type_idx").on(table.type),
+    aggregateIdx: index("events_aggregate_id_idx").on(table.aggregateId),
+    timestampIdx: index("events_timestamp_idx").on(table.timestamp),
+    correlationIdx: index("events_correlation_id_idx").on(table.correlationId),
+  })
+);
+
+// ──────────────────────────────────────────────
 // Relations
 // ──────────────────────────────────────────────
 
