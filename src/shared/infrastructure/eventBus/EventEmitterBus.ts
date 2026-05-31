@@ -80,7 +80,8 @@ export class EventEmitterBus extends EventEmitter implements EventBus {
    * @returns Array of event type names
    */
   getEventTypes(): string[] {
-    return this.eventNames();
+    const names = this.eventNames();
+    return Array.from(names).filter((name): name is string => typeof name === "string");
   }
 
   /**
