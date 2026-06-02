@@ -293,7 +293,7 @@ Plans:
 - [x] 14-01-PLAN.md — Module structure and TypeScript path aliases
 - [x] 14-02-PLAN.md — Event bus implementation (EventEmitter + Redis Pub/Sub)
 - [x] 14-03-PLAN.md — Repository base classes and interfaces
-- [ ] 14-04-PLAN.md — Shared value objects (LicenseKey, Money, Email, Domain)
+- [x] 14-04-PLAN.md — Shared value objects (LicenseKey, Money, Email, Domain)
 
 ### Phase 15: Products Bounded Context
 **Directory**: `15-products-context`
