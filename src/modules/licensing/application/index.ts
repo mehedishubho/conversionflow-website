@@ -13,7 +13,7 @@ export { ActivateLicenseHandler } from "./commands/ActivateLicenseHandler";
 export type { ActivateInput, ActivateResult } from "./commands/ActivateLicenseHandler";
 
 export { DeactivateLicenseHandler } from "./commands/DeactivateLicenseHandler";
-export type { DeactivateInput, DeactivateHandlerResult } from "./commands/DeactivateLicenseHandler";
+export type { DeactivateInput, DeactivateResult } from "./commands/DeactivateLicenseHandler";
 
 export { GenerateLicenseHandler } from "./commands/GenerateLicenseHandler";
 export type { GenerateInput, GenerateResult } from "./commands/GenerateLicenseHandler";
