@@ -31,6 +31,7 @@ interface VersionRow {
 
 interface ProductVersionsTableProps {
   versions: VersionRow[];
+  productId: string;
   onRelease: (id: string) => Promise<{ success?: boolean; error?: string }>;
 }
 
@@ -63,6 +64,7 @@ function formatDate(date: Date): string {
 
 export default function ProductVersionsTable({
   versions,
+  productId,
   onRelease,
 }: ProductVersionsTableProps) {
   const [isPending, startTransition] = useTransition();
@@ -123,7 +125,7 @@ export default function ProductVersionsTable({
                   <div className="flex flex-col items-center gap-2">
                     <span>No versions yet.</span>
                     <Link
-                      href="versions/new"
+                      href={`/admin/products/${productId}/versions/new`}
                       className="inline-flex items-center gap-1 text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium"
                     >
                       Create a version

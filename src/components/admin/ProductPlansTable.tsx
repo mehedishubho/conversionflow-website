@@ -147,7 +147,7 @@ export default function ProductPlansTable({
                   <div className="flex flex-col items-center gap-2">
                     <span>No plans yet.</span>
                     <Link
-                      href="plans/new"
+                      href={`/admin/products/${productId}/plans/new`}
                       className="inline-flex items-center gap-1 text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium"
                     >
                       Create a plan

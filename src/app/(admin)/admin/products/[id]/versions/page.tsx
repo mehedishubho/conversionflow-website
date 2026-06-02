@@ -56,7 +56,7 @@ export default async function ProductVersionsPage({
     >
       <div className="flex justify-end mb-4">
         <Link
-          href="versions/new"
+          href={`/admin/products/${id}/versions/new`}
           className="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -64,6 +64,7 @@ export default async function ProductVersionsPage({
         </Link>
       </div>
       <ProductVersionsTable
+        productId={id}
         versions={versionRows.map((row) => ({
           id: row.id,
           version: row.version,
