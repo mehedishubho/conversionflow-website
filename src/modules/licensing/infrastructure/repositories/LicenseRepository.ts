@@ -90,7 +90,7 @@ export class LicenseRepository extends BaseRepository<License, typeof licenses.$
       .update(licenses)
       .set({
         currentActivations: sql`GREATEST(${licenses.currentActivations} - 1, 0)`,
-        activationDomains: sql`(SELECT jsonb_agg(elem) FROM jsonb_array_elements(COALESCE(${licenses.activationDomains}, '[]'::jsonb)) elem WHERE elem #>> '{}' != ${domain})`,
+        activationDomains: sql`COALESCE((SELECT jsonb_agg(elem) FROM jsonb_array_elements(COALESCE(${licenses.activationDomains}, '[]'::jsonb)) elem WHERE elem #>> '{}' != ${domain}), '[]'::jsonb)`,
         updatedAt: new Date(),
       })
       .where(
