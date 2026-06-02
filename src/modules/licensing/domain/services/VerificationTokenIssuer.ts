@@ -55,7 +55,12 @@ export class VerificationTokenIssuer {
       // Atomic GETDEL prevents replay attacks
       const value = await redis.getdel(key);
       if (!value) return false;
-      const parsed = JSON.parse(value);
+      let parsed: { licenseId: string; domain: string };
+      try {
+        parsed = JSON.parse(value);
+      } catch {
+        return false;
+      }
       return (
         parsed.licenseId === expectedLicenseId && parsed.domain === expectedDomain
       );
@@ -65,7 +70,12 @@ export class VerificationTokenIssuer {
     const value = await kvGet(key);
     if (!value) return false;
     await kvDelete(key);
-    const parsed = JSON.parse(value);
+    let parsed: { licenseId: string; domain: string };
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      return false;
+    }
     return (
       parsed.licenseId === expectedLicenseId && parsed.domain === expectedDomain
     );
