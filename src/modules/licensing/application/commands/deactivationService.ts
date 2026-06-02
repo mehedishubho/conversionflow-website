@@ -25,6 +25,10 @@ export interface DeactivateResult {
   maxActivations?: number;
 }
 
+// Shared repository instances (matching handler pattern)
+const licenseRepo = new LicenseRepository();
+const activationRepo = new ActivationRepository();
+
 /**
  * Perform deactivation of a domain from a license.
  *
@@ -48,9 +52,6 @@ export async function performDeactivation(
   ipAddress: string | null = null,
   userAgent: string | null = null,
 ): Promise<DeactivateResult> {
-  const licenseRepo = new LicenseRepository();
-  const activationRepo = new ActivationRepository();
-
   // 1. Atomic decrement + JSONB domain removal (D-16 inverse)
   const updated = await licenseRepo.atomicDecrement(licenseId, domain);
   if (!updated) {
