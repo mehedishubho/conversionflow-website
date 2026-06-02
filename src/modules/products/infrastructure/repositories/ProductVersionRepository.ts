@@ -10,7 +10,6 @@ import { ProductVersion } from "@/modules/products/domain/entities/ProductVersio
 import { productVersions } from "@/lib/db/schema";
 import { ProductVersionMapper } from "./mappers/ProductVersionMapper";
 import { eq, and, desc } from "drizzle-orm";
-import { versionStatusEnum } from "@/lib/db/schema";
 
 export class ProductVersionRepository extends BaseRepository<ProductVersion, typeof productVersions.$inferSelect> {
   constructor() {
@@ -46,7 +45,7 @@ export class ProductVersionRepository extends BaseRepository<ProductVersion, typ
       .where(
         and(
           eq(this.table.productId, productId),
-          eq(this.table.status, versionStatusEnum.enumValues[0]) // "stable"
+          eq(this.table.status, "stable")
         )
       )
       .orderBy(desc(this.table.releasedAt))
