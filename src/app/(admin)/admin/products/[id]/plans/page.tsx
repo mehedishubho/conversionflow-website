@@ -61,7 +61,7 @@ export default async function ProductPlansPage({
     >
       <div className="flex justify-end mb-4">
         <Link
-          href="plans/new"
+          href={`/admin/products/${id}/plans/new`}
           className="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
