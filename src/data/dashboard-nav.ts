@@ -16,6 +16,7 @@ import {
   Bell,
   Webhook,
   ScrollText,
+  Package,
 } from "lucide-react";
 
 export type NavItem = {
@@ -37,6 +38,7 @@ export const customerNavItems: NavItem[] = [
 export const adminNavItems: NavItem[] = [
   { name: "Overview", icon: BarChart3, path: "/admin/dashboard" },
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
+  { name: "Products", icon: Package, path: "/admin/products" },
   { name: "Licenses", icon: Key, path: "/admin/licenses" },
   { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Invoices", icon: FileText, path: "/admin/invoices" },
