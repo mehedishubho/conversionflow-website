@@ -727,17 +727,15 @@ export function createProductEvent(
 | A4 | Products module barrel exports follow the same pattern as eventBus barrel export (types first, then implementations) | Module Structure | Minor — just code organization consistency |
 | A5 | The `ProductDetailShell` should follow the `SettingsShell` pattern with client-side tab navigation, not Next.js parallel routes | Admin UI | If parallel routes are preferred, more layout files needed |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **USD price storage format**
+1. **USD price storage format** — RESOLVED: Store as integer dollars (18, 28, 75).
    - What we know: BDT prices in existing `orders.amount` are stored as integers (2150, 3000, 8000). `pricing.ts` shows USD as "$18", "$28", "$75".
-   - What's unclear: Should `priceUSD` be stored as integer dollars (18, 28, 75) or integer cents (1800, 2800, 7500)?
-   - Recommendation: Store as integer dollars matching the existing pattern. The Money value object handles formatting. If cents precision is needed later, a migration can multiply by 100.
+   - Resolution: `priceUSD` stored as integer dollars matching existing pattern. Money value object handles formatting. Plan 01 Task 1 implements this.
 
-2. **Custom billing duration granularity**
+2. **Custom billing duration granularity** — RESOLVED: `billingDurationMonths` integer field covers all SaaS periods.
    - What we know: D-04 says "custom duration" is a billing cycle option. Current tiers use yearly (12mo, 24mo).
-   - What's unclear: Does "custom" mean arbitrary months, or could it be days?
-   - Recommendation: `billingDurationMonths` (integer) covers all realistic SaaS subscription periods. If days are needed, add a separate field in a future phase.
+   - Resolution: `billingDurationMonths` (integer) covers all realistic SaaS subscription periods. If days are needed, add a separate field in a future phase. Plan 01 Task 1 implements this.
 
 ## Environment Availability
 
