@@ -327,7 +327,13 @@ Plans:
   6. Activation limit enforcement uses atomic database operations to prevent race conditions and rejects activation if limit reached
   7. Validation API has rate limiting (100 requests/minute per IP) and returns identical error for all failures (no information leakage)
   8. Customers can view and manage their active domains in customer portal, and admin can view activation history and detect suspicious patterns
-**Plans**: TBD
+Plans: 5 plans
+Plans:
+- [ ] 16-01-PLAN.md -- Schema, domain entities, key generation, and domain services
+- [ ] 16-02-PLAN.md -- Repositories, mappers, and infrastructure adapters
+- [ ] 16-03-PLAN.md -- Application handlers, cache invalidation, and API routes
+- [ ] 16-04-PLAN.md -- Customer portal and admin activation history UI
+- [ ] 16-05-PLAN.md -- Schema push, module initialization, and final wiring
 **UI hint**: yes
 
 ### Phase 17: Customer & Billing Integration
@@ -405,7 +411,7 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 9-13 | v2.1 | v2.1 | - | Complete | 2026-05-30 |
 | 14. Shared DDD Infrastructure | 14-ddd-infrastructure | v3.0 | 0/TBD | Not started | - |
 | 15. Products Bounded Context | 15-products-context | v3.0 | 0/4 | Not started | - |
-| 16. Licensing Core | 16-licensing-core | v3.0 | 0/TBD | Not started | - |
+| 16. Licensing Core | 16-licensing-core | v3.0 | 0/5 | Planned | - |
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/TBD | Not started | - |
 | 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 0/TBD | Not started | - |
