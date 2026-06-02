@@ -583,8 +583,8 @@ export const events = pgTable(
   "events",
   {
     id: text("id").primaryKey(),
-    type: text("type").notNull().index(),
-    aggregateId: text("aggregate_id").notNull().index(),
+    type: text("type").notNull(),
+    aggregateId: text("aggregate_id").notNull(),
     payload: jsonb("payload").notNull(),
     timestamp: timestamp("timestamp").defaultNow().notNull(),
     correlationId: text("correlation_id"),
