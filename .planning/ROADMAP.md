@@ -308,10 +308,10 @@ Plans:
   5. Product and plan data is persisted in database and accessible via admin dashboard UI with edit/delete operations
 **Plans**: 4 plans
 Plans:
-- [ ] 15-01-PLAN.md -- Database schema, domain entities, and repositories
-- [ ] 15-02-PLAN.md -- Server actions, seed script, and schema push
-- [ ] 15-03-PLAN.md -- Admin UI: product list, create, detail shell
-- [ ] 15-04-PLAN.md -- Admin UI: version and plan management
+- [x] 15-01-PLAN.md -- Database schema, domain entities, and repositories
+- [x] 15-02-PLAN.md -- Server actions, seed script, and schema push
+- [x] 15-03-PLAN.md -- Admin UI: product list, create, detail shell
+- [x] 15-04-PLAN.md -- Admin UI: version and plan management
 
 ### Phase 16: Licensing Core (Generation & Validation)
 **Directory**: `16-licensing-core`
