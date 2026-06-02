@@ -62,6 +62,7 @@ export class OrderCompletedHandler {
       .limit(1);
 
     let licenseKey: string | undefined;
+    let apiToken: string | undefined;
 
     if (existingLicenses.length > 0) {
       // License already exists for this order — skip generation
@@ -88,6 +89,7 @@ export class OrderCompletedHandler {
 
       if (result.success && result.license) {
         licenseKey = result.license.licenseKey;
+        apiToken = result.apiToken;
 
         // 5. Create audit log
         try {
@@ -133,6 +135,7 @@ export class OrderCompletedHandler {
           currency: order.currency,
           paymentMethod: order.paymentMethod ?? "unknown",
           licenseKey,
+          apiToken,
           status: "completed",
         });
       } else {
