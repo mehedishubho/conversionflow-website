@@ -171,6 +171,11 @@ export async function createVersion(productId: string, formData: FormData) {
     return { error: "Version string is required." };
   }
 
+  const SEMVER_PATTERN = /^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$/;
+  if (!SEMVER_PATTERN.test(version.trim())) {
+    return { error: "Version must follow semver format (e.g., 1.2.0)." };
+  }
+
   try {
     const [versionRecord] = await db
       .insert(productVersions)
