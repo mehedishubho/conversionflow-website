@@ -5,10 +5,13 @@ import { db } from "@/lib/db";
 import { licenses } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { format } from "date-fns";
+import { revalidatePath } from "next/cache";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Badge from "@/components/ui/badge/Badge";
 import { LicenseKeyCopy } from "@/components/portal/LicenseKeyCopy";
+import ActivateDomainForm from "@/components/portal/ActivateDomainForm";
+import { deactivateDomain } from "@/app/(portal)/actions/portal-licenses";
 
 type LicenseStatus = "active" | "expired" | "revoked" | "suspended";
 
@@ -126,18 +129,39 @@ export default async function LicenseDetailPage({
             </p>
           ) : (
             <ul className="space-y-2">
-              {domains.map((domain: string) => (
+              {domains.map((domainName: string) => (
                 <li
-                  key={domain}
+                  key={domainName}
                   className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3"
                 >
                   <span className="text-sm text-gray-800 dark:text-white/90">
-                    {domain}
+                    {domainName}
                   </span>
+                  <form
+                    action={async () => {
+                      "use server";
+                      await deactivateDomain(license.id, domainName);
+                      revalidatePath(`/dashboard/licenses/${license.id}`);
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="text-xs px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
+                    >
+                      Deactivate
+                    </button>
+                  </form>
                 </li>
               ))}
             </ul>
           )}
+
+          {/* Activate New Domain */}
+          <ActivateDomainForm
+            licenseId={license.id}
+            maxActivations={license.maxActivations ?? 1}
+            currentActivations={license.currentActivations ?? 0}
+          />
         </div>
       </ComponentCard>
     </div>
