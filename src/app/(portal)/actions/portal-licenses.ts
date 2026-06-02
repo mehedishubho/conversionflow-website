@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { licenses } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { VerificationTokenIssuer } from "@/modules/licensing/domain/services/VerificationTokenIssuer";
+import { Domain } from "@/shared/domain/valueObjects/Domain";
 import { performDeactivation } from "@/modules/licensing/application/commands/deactivationService";
 
 async function requireCustomer() {
@@ -35,7 +36,12 @@ export async function deactivateDomain(licenseId: string, domain: string) {
 
   if (!license) return { success: false, error: "License not found" };
 
-  const normalizedDomain = domain.toLowerCase().trim();
+  let normalizedDomain: string;
+  try {
+    normalizedDomain = Domain.create(domain).value;
+  } catch {
+    return { success: false, error: "Invalid domain format" };
+  }
   const domains = (license.activationDomains ?? []) as string[];
 
   if (!domains.includes(normalizedDomain)) {
@@ -71,7 +77,12 @@ export async function issueVerificationToken(
 
   if (!license) return { success: false, error: "License not found" };
 
-  const normalizedDomain = domain.toLowerCase().trim();
+  let normalizedDomain: string;
+  try {
+    normalizedDomain = Domain.create(domain).value;
+  } catch {
+    return { success: false, error: "Invalid domain format" };
+  }
   const token = await VerificationTokenIssuer.issue(licenseId, normalizedDomain);
 
   return { success: true, token };
