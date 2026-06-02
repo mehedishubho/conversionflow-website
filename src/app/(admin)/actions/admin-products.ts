@@ -510,6 +510,12 @@ export async function updatePlan(planId: string, formData: FormData) {
       return { error: "Lifetime plans must not have a billing cycle." };
     }
   }
+  if (finalLicenseType === "subscription") {
+    // If billingCycle is being explicitly cleared, subscription plans must reject it
+    if ("billingCycle" in updateData && updateData.billingCycle === null) {
+      return { error: "Subscription plans must have a billing cycle." };
+    }
+  }
 
   try {
     await db
