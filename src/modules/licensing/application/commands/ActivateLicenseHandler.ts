@@ -89,6 +89,9 @@ export class ActivateLicenseHandler {
     }
 
     // 7. Consume verification token (single-use per D-13)
+    // Note: Token is consumed before proof verification. If proof fails,
+    // the customer must request a new token. This prevents token replay
+    // at the cost of requiring re-issuance on verification failure.
     const tokenValid = await VerificationTokenIssuer.consume(
       input.verificationToken,
       license.id,
