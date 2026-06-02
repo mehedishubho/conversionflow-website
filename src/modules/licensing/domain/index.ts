@@ -1,8 +1,18 @@
 /**
- * Licensing Domain Layer
+ * Licensing Domain - Barrel Export
  *
- * Exports domain models, value objects, and domain services
- * for the Licensing bounded context.
+ * Exports all entities, events, and services from the licensing domain layer.
  */
 
-export {};
+// Entities
+export { License } from "./entities/License";
+export { Activation } from "./entities/Activation";
+export type { ActivationAction, VerificationMethod } from "./entities/Activation";
+
+// Events
+export { LICENSE_EVENTS, createLicenseEvent } from "./events/LicenseEvents";
+
+// Services
+export { LicenseKeyGenerator } from "./services/LicenseKeyGenerator";
+export { ApiTokenGenerator } from "./services/ApiTokenGenerator";
+export { VerificationTokenIssuer } from "./services/VerificationTokenIssuer";

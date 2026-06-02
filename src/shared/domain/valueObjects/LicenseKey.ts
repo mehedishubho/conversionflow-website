@@ -33,9 +33,9 @@ export class LicenseKey {
     // Strip hyphens and spaces, normalize to uppercase
     const cleaned = input.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-    if (cleaned.length < 16 || cleaned.length > 32) {
+    if (cleaned.length < 12 || cleaned.length > 32) {
       throw new Error(
-        `Invalid license key length: ${cleaned.length}. Must be 16-32 characters.`
+        `Invalid license key length: ${cleaned.length}. Must be 12-32 characters.`
       );
     }
 
@@ -47,6 +47,25 @@ export class LicenseKey {
       );
     }
 
+    return new LicenseKey(cleaned);
+  }
+
+  /**
+   * Create a LicenseKey from a database value without minimum length validation.
+   * Used for loading existing v2.x keys that may be shorter than 12 characters.
+   * @param value - Raw license key string from database
+   * @returns Frozen LicenseKey instance
+   * @throws Error if value is empty or contains invalid characters
+   */
+  static fromDatabase(value: string): LicenseKey {
+    if (typeof value !== "string" || value.trim().length === 0) {
+      throw new Error("License key cannot be empty");
+    }
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const ambiguous = /[01OIL]/;
+    if (ambiguous.test(cleaned)) {
+      throw new Error("License key contains invalid characters");
+    }
     return new LicenseKey(cleaned);
   }
 
