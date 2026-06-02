@@ -221,6 +221,10 @@ export async function updateVersion(versionId: string, formData: FormData) {
   if (downloadUrl !== null) updateData.downloadUrl = downloadUrl.trim() || null;
   if (changelog !== null) updateData.changelog = changelog.trim() || null;
   if (status !== null) {
+    const validStatuses = ["stable", "beta", "draft"] as const;
+    if (!validStatuses.includes(status as any)) {
+      return { error: "Status must be 'stable', 'beta', or 'draft'." };
+    }
     updateData.status = status;
     // When status changes to "stable", set releasedAt
     if (status === "stable") {
