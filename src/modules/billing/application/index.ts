@@ -5,4 +5,5 @@
  * for the Billing bounded context.
  */
 
-export {};
+export { OrderService } from "./services/OrderService";
+export { OrderCompletedHandler, registerBillingHandlers } from "./handlers/OrderCompletedHandler";
