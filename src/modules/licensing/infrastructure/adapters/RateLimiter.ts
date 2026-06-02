@@ -40,7 +40,14 @@ export class RateLimiter {
     pipeline.pexpire(key, WINDOW_SECONDS * 1000 + 10000);
 
     const results = await pipeline.exec();
-    const count = (results?.[2]?.[1] as number) ?? 0;
+    if (!results) return { allowed: true, retryAfter: 0 };
+    for (const [err] of results) {
+      if (err) {
+        console.error("[RateLimiter] Pipeline error:", err);
+        return { allowed: true, retryAfter: 0 }; // Fail open
+      }
+    }
+    const count = (results[2][1] as number) ?? 0;
 
     if (count > MAX_REQUESTS) {
       // Find oldest entry to calculate retry-after
