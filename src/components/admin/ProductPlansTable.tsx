@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Table,
@@ -77,6 +78,7 @@ export default function ProductPlansTable({
   productId,
   onDelete,
 }: ProductPlansTableProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
@@ -93,7 +95,7 @@ export default function ProductPlansTable({
         setActionError(result.error);
       } else {
         setDeleteModal({ open: false, planId: "", planName: "" });
-        window.location.reload();
+        router.refresh();
       }
     });
   };
