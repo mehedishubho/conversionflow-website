@@ -148,6 +148,8 @@ export async function suspendLicense(licenseId: string): Promise<{ success?: boo
       .limit(1);
 
     if (!existing) return { error: "License not found" };
+    if (existing.status === "suspended") return { error: "License already suspended" };
+    if (existing.status === "revoked") return { error: "Cannot suspend a revoked license" };
 
     await db
       .update(licenses)
