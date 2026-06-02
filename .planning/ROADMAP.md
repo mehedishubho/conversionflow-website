@@ -287,17 +287,17 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   2. Event bus implements EventEmitter for in-process events and Redis Pub/Sub for cross-process events, with a unified publish/subscribe interface
   3. Repository base classes and interfaces provide CRUD operations, transaction support, and query building for all bounded contexts
   4. Shared value objects (LicenseKey, Money, Email, Domain) implement validation, equality, and serialization logic
-  5. Module boundaries are enforced via import rules and dependency direction (customers → products is allowed, products → customers is not)
+  5. Module boundaries are enforced via import rules and dependency direction (customers -> products is allowed, products -> customers is not)
 **Plans**: 4 plans (14-01, 14-02, 14-03, 14-04)
 Plans:
-- [x] 14-01-PLAN.md — Module structure and TypeScript path aliases
-- [x] 14-02-PLAN.md — Event bus implementation (EventEmitter + Redis Pub/Sub)
-- [x] 14-03-PLAN.md — Repository base classes and interfaces
-- [x] 14-04-PLAN.md — Shared value objects (LicenseKey, Money, Email, Domain)
+- [x] 14-01-PLAN.md -- Module structure and TypeScript path aliases
+- [x] 14-02-PLAN.md -- Event bus implementation (EventEmitter + Redis Pub/Sub)
+- [x] 14-03-PLAN.md -- Repository base classes and interfaces
+- [x] 14-04-PLAN.md -- Shared value objects (LicenseKey, Money, Email, Domain)
 
 ### Phase 15: Products Bounded Context
 **Directory**: `15-products-context`
-**Goal**: Admin can create and manage products with versions and plans, defining pricing, activation limits, licensing rules, and feature flags — serving as the foundation for license generation.
+**Goal**: Admin can create and manage products with versions and plans, defining pricing, activation limits, licensing rules, and feature flags -- serving as the foundation for license generation.
 **Depends on**: Phase 14
 **Requirements**: PROD-01, PROD-02, PROD-03, PROD-04, PROD-05, PROD-06, PROD-07
 **Success Criteria** (what must be TRUE):
@@ -306,12 +306,16 @@ Plans:
   3. Admin can create plans for each product with pricing (BDT, USD), activation limits (1, 3, 5, unlimited), and feature flags
   4. Plans support both lifetime licenses (no expiration) and subscription licenses (duration-based with billing cycle)
   5. Product and plan data is persisted in database and accessible via admin dashboard UI with edit/delete operations
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 4 plans
+Plans:
+- [ ] 15-01-PLAN.md -- Database schema, domain entities, and repositories
+- [ ] 15-02-PLAN.md -- Server actions, seed script, and schema push
+- [ ] 15-03-PLAN.md -- Admin UI: product list, create, detail shell
+- [ ] 15-04-PLAN.md -- Admin UI: version and plan management
 
 ### Phase 16: Licensing Core (Generation & Validation)
 **Directory**: `16-licensing-core`
-**Goal**: The platform generates unique, secure license keys locally and provides a public API for validation, activation, and deactivation — completely replacing external licensing dependency.
+**Goal**: The platform generates unique, secure license keys locally and provides a public API for validation, activation, and deactivation -- completely replacing external licensing dependency.
 **Depends on**: Phase 14, Phase 15
 **Requirements**: LGEN-01, LGEN-02, LGEN-03, LGEN-04, LGEN-05, LGEN-06, LGEN-07, LGEN-08, LGEN-09, ACT-01, ACT-02, ACT-03, ACT-04, ACT-05, ACT-06, ACT-07, ACT-08, API-01, API-02, API-03, API-04, API-05
 **Success Criteria** (what must be TRUE):
@@ -328,7 +332,7 @@ Plans:
 
 ### Phase 17: Customer & Billing Integration
 **Directory**: `17-billing-integration`
-**Goal**: Checkout and billing processes are refactored into the Billing Bounded Context, generating licenses locally via domain events when orders complete — removing centralOrderId dependency.
+**Goal**: Checkout and billing processes are refactored into the Billing Bounded Context, generating licenses locally via domain events when orders complete -- removing centralOrderId dependency.
 **Depends on**: Phase 15, Phase 16
 **Requirements**: LSTAT-05, LSTAT-06, ARCH-06, ARCH-08
 **Success Criteria** (what must be TRUE):
@@ -342,7 +346,7 @@ Plans:
 
 ### Phase 18: Subscription & Status Management
 **Directory**: `18-subscription-status`
-**Goal**: The platform manages subscription lifecycle with expiration tracking, grace periods, renewal processing, and lifetime license support — ensuring continuous license validity.
+**Goal**: The platform manages subscription lifecycle with expiration tracking, grace periods, renewal processing, and lifetime license support -- ensuring continuous license validity.
 **Depends on**: Phase 17
 **Requirements**: LSTAT-01, LSTAT-02, LSTAT-03, LSTAT-04, LSTAT-07, JOB-01, JOB-02, JOB-04
 **Success Criteria** (what must be TRUE):
@@ -400,7 +404,7 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 1-8 | v2.0 | v2.0 | - | Complete | 2026-05-19 |
 | 9-13 | v2.1 | v2.1 | - | Complete | 2026-05-30 |
 | 14. Shared DDD Infrastructure | 14-ddd-infrastructure | v3.0 | 0/TBD | Not started | - |
-| 15. Products Bounded Context | 15-products-context | v3.0 | 0/TBD | Not started | - |
+| 15. Products Bounded Context | 15-products-context | v3.0 | 0/4 | Not started | - |
 | 16. Licensing Core | 16-licensing-core | v3.0 | 0/TBD | Not started | - |
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/TBD | Not started | - |
@@ -408,4 +412,4 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-05-30*
+*Last updated: 2026-06-02*
