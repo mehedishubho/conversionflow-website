@@ -380,7 +380,14 @@ Plans:
   4. BullMQ worker handles analytics aggregation for dashboard with scheduled processing
   5. Customers can transfer license ownership to another account via transfer code and deactivate old domain to activate new domain (within transfer limits)
   6. Admin can configure maximum transfers per month per license and all transfer operations are logged in audit trail with timestamp and actor
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [x] 19-01-PLAN.md -- Analytics data layer (schema, services, geo-IP, queue)
+- [x] 19-02-PLAN.md -- Analytics worker and transfer backend
+- [x] 19-03-PLAN.md -- Admin license analytics page (KPIs, charts, geo table)
+- [x] 19-04-PLAN.md -- Portal subscription, transfer UI, email templates
+- [ ] 19-05-PLAN.md -- Gap closure: customer growth tracking (ANLT-04)
+- [ ] 19-06-PLAN.md -- Gap closure: admin transfer settings UI (XFER-04)
 **UI hint**: yes
 
 ### Phase 20: Migration & External API Removal
@@ -419,8 +426,8 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 16. Licensing Core | 16-licensing-core | v3.0 | 0/5 | Planned | - |
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
-| 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 4/4 | Complete | 2026-06-03 |
+| 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 4/6 | Gap closure | - |
 | 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-06-03*
+*Last updated: 2026-06-04*
