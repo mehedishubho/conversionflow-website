@@ -245,10 +245,6 @@ export async function getPaymentSettings() {
       storePasswordConfigured: !!sslDbPassword || (!!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password"),
       sandbox: sslDbSandbox !== "false" || process.env.SSL_COMMERZ_SANDBOX !== "false",
     },
-    centralApi: {
-      urlConfigured: !!process.env.CENTRAL_API_URL,
-      keyConfigured: !!process.env.CENTRAL_API_KEY && process.env.CENTRAL_API_KEY !== "your_central_api_key",
-    },
   };
 }
 

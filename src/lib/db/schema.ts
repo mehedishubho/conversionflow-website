@@ -121,7 +121,6 @@ export const user = pgTable("user", {
   banExpires: timestamp("ban_expires"),
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
   phone: text("phone").notNull(),
-  centralUserId: text("central_user_id"),
 });
 
 export const account = pgTable(
@@ -188,7 +187,6 @@ export const twoFactor = pgTable(
 export const orders = pgTable("orders", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id").notNull(),
-  centralOrderId: text("central_order_id"),
   productId: text("product_id").notNull(),
   plan: text("plan").notNull(),
   amount: integer("amount").notNull(),
@@ -211,7 +209,6 @@ export const licenses = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull(),
-    centralLicenseId: text("central_license_id"),
     orderId: uuid("order_id").references(() => orders.id),
     productId: text("product_id").notNull(),
     plan: text("plan").notNull(),

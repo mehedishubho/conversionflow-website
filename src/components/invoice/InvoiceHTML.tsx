@@ -6,7 +6,6 @@ import ComponentCard from "@/components/common/ComponentCard";
 export type OrderWithUser = {
   id: string;
   userId: string;
-  centralOrderId: string | null;
   productId: string;
   plan: string;
   amount: number;

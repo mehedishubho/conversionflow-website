@@ -106,11 +106,6 @@ export const auth = betterAuth({
         type: "string",
         required: true, // D-05: phone required at registration
       },
-      centralUserId: {
-        type: "string",
-        required: false,
-        input: false, // Set by central API integration, not by users
-      },
     },
   },
   plugins: [

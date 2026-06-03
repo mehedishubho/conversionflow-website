@@ -43,10 +43,6 @@ interface PaymentSettingsFormProps {
       storePassword: string;
       dbSandbox: string;
     };
-    centralApi: {
-      urlConfigured: boolean;
-      keyConfigured: boolean;
-    };
   };
 }
 
@@ -462,31 +458,6 @@ export default function PaymentSettingsForm({
           </ComponentCard>
         );
       })}
-
-      {/* Central Licensing API Status */}
-      <ComponentCard title="Central Licensing API" desc="Connection status for the central license management service.">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className={`inline-block h-2 w-2 rounded-full ${initialData.centralApi.urlConfigured ? "bg-success-500" : "bg-error-500"}`} />
-            <span className="text-sm text-gray-600 dark:text-gray-400">API URL</span>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${initialData.centralApi.urlConfigured ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-error-50 text-error-600 dark:bg-error-500/10 dark:text-error-400"}`}>
-              {initialData.centralApi.urlConfigured ? "Configured" : "Not Set"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`inline-block h-2 w-2 rounded-full ${initialData.centralApi.keyConfigured ? "bg-success-500" : "bg-error-500"}`} />
-            <span className="text-sm text-gray-600 dark:text-gray-400">API Key</span>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${initialData.centralApi.keyConfigured ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-error-50 text-error-600 dark:bg-error-500/10 dark:text-error-400"}`}>
-              {initialData.centralApi.keyConfigured ? "Configured" : "Not Set"}
-            </span>
-          </div>
-          {(!initialData.centralApi.urlConfigured || !initialData.centralApi.keyConfigured) && (
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Set <code className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">CENTRAL_API_URL</code> and <code className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">CENTRAL_API_KEY</code> in your <code className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">.env.local</code> file.
-            </p>
-          )}
-        </div>
-      </ComponentCard>
 
       {/* Save button */}
       <div className="flex justify-end">

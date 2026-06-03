@@ -28,7 +28,6 @@ export default async function PaymentSettingsPage() {
           vatEnabled: settings.vatEnabled,
           sslCommerzEnabled: settings.sslCommerzEnabled,
           sslCommerz: settings.sslCommerz,
-          centralApi: settings.centralApi,
         }}
       />
     </div>

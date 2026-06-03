@@ -36,7 +36,6 @@ export default async function InvoiceDetailPage({
     .select({
       id: orders.id,
       userId: orders.userId,
-      centralOrderId: orders.centralOrderId,
       productId: orders.productId,
       plan: orders.plan,
       amount: orders.amount,
@@ -94,7 +93,6 @@ export default async function InvoiceDetailPage({
   const order: OrderWithUser = {
     id: orderRow.id,
     userId: orderRow.userId,
-    centralOrderId: orderRow.centralOrderId,
     productId: orderRow.productId,
     plan: orderRow.plan,
     amount: orderRow.amount,
