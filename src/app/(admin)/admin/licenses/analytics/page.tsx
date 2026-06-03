@@ -6,6 +6,7 @@ import LicenseAnalyticsClient from "@/components/admin/analytics/LicenseAnalytic
 import {
   getLicenseAnalyticsData,
   getLicenseChartData,
+  getCustomerGrowthData,
 } from "@/app/(admin)/actions/admin-license-analytics";
 
 export const dynamic = "force-dynamic";
@@ -29,9 +30,10 @@ export default async function LicenseAnalyticsPage() {
   }
 
   // Fetch initial data in parallel
-  const [analyticsData, chartData] = await Promise.all([
+  const [analyticsData, chartData, growthData] = await Promise.all([
     getLicenseAnalyticsData(),
     getLicenseChartData("30d"),
+    getCustomerGrowthData("30d"),
   ]);
 
   return (
@@ -43,6 +45,7 @@ export default async function LicenseAnalyticsPage() {
         initialGeo={analyticsData.geo}
         initialRange="30d"
         cacheEmpty={analyticsData.cacheEmpty}
+        initialGrowth={growthData}
       />
     </div>
   );

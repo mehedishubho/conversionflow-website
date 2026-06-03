@@ -5,12 +5,14 @@ import DateRangeSelector from "../DateRangeSelector";
 import LicenseKPIs from "../LicenseKPIs";
 import LicenseTrendChart from "../LicenseTrendChart";
 import ProductBreakdownChart from "../ProductBreakdownChart";
+import CustomerGrowthChart from "../CustomerGrowthChart";
 import ActivationGeoTable from "../ActivationGeoTable";
 import ComponentCard from "@/components/common/ComponentCard";
 import {
   getLicenseChartData,
+  getCustomerGrowthData,
 } from "@/app/(admin)/actions/admin-license-analytics";
-import type { LicenseKPIData, GeoRow } from "@/app/(admin)/actions/admin-license-analytics";
+import type { LicenseKPIData, GeoRow, CustomerGrowthData } from "@/app/(admin)/actions/admin-license-analytics";
 
 interface LicenseAnalyticsClientProps {
   initialKPIs: LicenseKPIData;
@@ -23,6 +25,7 @@ interface LicenseAnalyticsClientProps {
   initialGeo: GeoRow[];
   initialRange: string;
   cacheEmpty: boolean;
+  initialGrowth: CustomerGrowthData;
 }
 
 export default function LicenseAnalyticsClient({
@@ -31,18 +34,26 @@ export default function LicenseAnalyticsClient({
   initialGeo,
   initialRange,
   cacheEmpty,
+  initialGrowth,
 }: LicenseAnalyticsClientProps) {
   const [range, setRange] = useState(initialRange);
   const [chartData, setChartData] = useState(initialCharts);
+  const [growthData, setGrowthData] = useState(initialGrowth);
   const [isPending, startTransition] = useTransition();
 
   const handleRangeChange = (newRange: string) => {
     setRange(newRange);
     startTransition(async () => {
-      const data = await getLicenseChartData(
-        newRange as "7d" | "30d" | "90d" | "year"
-      );
-      setChartData(data);
+      const [chartResult, growthResult] = await Promise.all([
+        getLicenseChartData(
+          newRange as "7d" | "30d" | "90d" | "year"
+        ),
+        getCustomerGrowthData(
+          newRange as "7d" | "30d" | "90d" | "year"
+        ),
+      ]);
+      setChartData(chartResult);
+      setGrowthData(growthResult);
     });
   };
 
@@ -89,6 +100,19 @@ export default function LicenseAnalyticsClient({
             <ProductBreakdownChart
               productCategories={chartData.productCategories}
               productSeries={chartData.productSeries}
+            />
+          </ComponentCard>
+        </div>
+
+        <div className="mb-6">
+          <ComponentCard title="Customer Growth">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Customer signup trends and cumulative growth over time
+            </p>
+            <CustomerGrowthChart
+              categories={growthData.categories}
+              newSignups={growthData.newSignups}
+              cumulativeTotal={growthData.cumulativeTotal}
             />
           </ComponentCard>
         </div>

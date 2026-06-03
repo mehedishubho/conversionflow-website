@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { licenses, licenseActivations, products, productPlans } from "@/lib/db/schema";
+import { licenses, licenseActivations, products, productPlans, user } from "@/lib/db/schema";
 import { eq, and, gte, lte, sql, count, desc } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -287,5 +287,91 @@ export async function getLicenseChartData(range: DateRange = "30d"): Promise<Lic
     trendSeries,
     productSeries,
     productCategories,
+  };
+}
+
+// ──────────────────────────────────────────────
+// 3. Get Customer Growth Data
+// ──────────────────────────────────────────────
+
+export interface CustomerGrowthData {
+  categories: string[];
+  newSignups: number[];
+  cumulativeTotal: number[];
+}
+
+export async function getCustomerGrowthData(range: DateRange = "30d"): Promise<CustomerGrowthData> {
+  await requireAdmin();
+
+  // Validate range parameter (T-19-50: mitigate tampering)
+  if (!allowedRanges.includes(range)) {
+    range = "30d";
+  }
+
+  const days = getDateRangeDays(range);
+  const now = new Date();
+  const startDate = new Date(now);
+  startDate.setDate(startDate.getDate() - days);
+
+  // Get cumulative count of users before the start date
+  const beforeStart = await db
+    .select({ total: count() })
+    .from(user)
+    .where(lte(user.createdAt, startDate));
+
+  const startingCount = beforeStart[0]?.total ?? 0;
+
+  // Query signups grouped by date within range
+  const signupRows = await db
+    .select({
+      date: sql<string>`DATE(${user.createdAt})`,
+      count: count(),
+    })
+    .from(user)
+    .where(gte(user.createdAt, startDate))
+    .groupBy(sql`DATE(${user.createdAt})`)
+    .orderBy(sql`DATE(${user.createdAt})`);
+
+  // Build date buckets
+  const dateMap = new Map<string, number>();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split("T")[0];
+    dateMap.set(key, 0);
+  }
+
+  for (const row of signupRows) {
+    const existing = dateMap.get(row.date);
+    if (existing !== undefined) {
+      dateMap.set(row.date, row.count);
+    }
+  }
+
+  const categories: string[] = [];
+  const newSignups: number[] = [];
+  const cumulativeTotal: number[] = [];
+  let runningTotal = startingCount;
+
+  for (const [date, signups] of dateMap) {
+    if (days <= 7) {
+      const d = new Date(date);
+      categories.push(d.toLocaleDateString("en-US", { weekday: "short" }));
+    } else if (days <= 30) {
+      const d = new Date(date);
+      categories.push(d.toLocaleDateString("en-US", { day: "numeric", month: "short" }));
+    } else {
+      const d = new Date(date);
+      categories.push(d.toLocaleDateString("en-US", { day: "numeric", month: "short" }));
+    }
+    newSignups.push(signups);
+    runningTotal += signups;
+    cumulativeTotal.push(runningTotal);
+  }
+
+  return {
+    categories,
+    newSignups,
+    cumulativeTotal,
   };
 }
