@@ -23,6 +23,7 @@ interface TransferSectionProps {
   licenseStatus: string;
   transferHistory: TransferRecord[];
   monthlyLimit: number;
+  currentUserId: string;
 }
 
 const STATUS_BADGE_MAP: Record<string, "success" | "warning" | "error" | "light"> = {
@@ -36,6 +37,7 @@ export default function TransferSection({
   licenseStatus,
   transferHistory,
   monthlyLimit,
+  currentUserId,
 }: TransferSectionProps) {
   const [transferCode, setTransferCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -197,7 +199,7 @@ export default function TransferSection({
               <tbody>
                 {history.map((record) => {
                   const date = new Date(record.createdAt);
-                  const isSent = record.fromUserId !== "";
+                  const isSent = record.fromUserId === currentUserId;
                   return (
                     <tr
                       key={record.id}

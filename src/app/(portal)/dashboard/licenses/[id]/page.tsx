@@ -208,6 +208,7 @@ export default async function LicenseDetailPage({
             licenseStatus={license.status}
             transferHistory={transferHistory as any[]}
             monthlyLimit={monthlyLimit}
+            currentUserId={userId}
           />
         </ComponentCard>
       )}
