@@ -20,6 +20,7 @@ export const LICENSE_EVENTS = {
   LICENSE_DEACTIVATED: "license.deactivated",
   LICENSE_GRACE_PERIOD_STARTED: "license.grace_period_started",
   LICENSE_EXPIRED: "license.expired",
+  LICENSE_TRANSFERRED: "license.transferred",
 } as const;
 
 /**
