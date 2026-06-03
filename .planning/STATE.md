@@ -4,7 +4,7 @@ milestone: v3.0
 milestone_name: Self-Contained Licensing Architecture
 status: completed
 stopped_at: Phase 20 context gathered
-last_updated: "2026-06-03T19:51:10.480Z"
+last_updated: "2026-06-03T21:09:36.342Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 13
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-29)
 
 Phase: 19 (portal-analytics) — COMPLETE
 Plan: 4 of 4
-**Phase:** 19
+**Phase:** 20
 **Plan:** Not started
 **Status:** Milestone complete
 **Last activity:** 2026-06-03
@@ -48,7 +48,7 @@ v3.0 Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 73 (v1.0/v1.1/v2.0/v2.1 milestones)
+- Total plans completed: 76 (v1.0/v1.1/v2.0/v2.1 milestones)
 - v3.0 plans completed: 0
 - Average duration: -
 - Total execution time: -
@@ -77,8 +77,13 @@ v3.0 Progress: [░░░░░░░░░░] 0%
 | v3.0 Phase 18 | 0/TBD | Not Started | Subscription & Status Management |
 | v3.0 Phase 19 | 0/TBD | Complete | Portal & Analytics Enhancements |
 | v3.0 Phase 20 | 0/TBD | Not Started | Migration & External API Removal |
+| v3.0 Phase 21 | 0/TBD | Not Planned | Backup & Restore System |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 21 added: Backup & Restore System — admin dashboard backup/restore UI, scheduled backups via BullMQ, rotation policy, and restore functionality for self-hosted deployments
 
 ### Decisions
 
@@ -161,6 +166,7 @@ src/
 - [ ] Plan Phase 18: Subscription & Status Management
 - [ ] Plan Phase 19: Portal & Analytics Enhancements
 - [ ] Plan Phase 20: Migration & External API Removal
+- [ ] Plan Phase 21: Backup & Restore System
 
 ### Technical Debt Accumulated
 

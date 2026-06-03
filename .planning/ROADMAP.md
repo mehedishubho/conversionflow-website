@@ -17,11 +17,11 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 - **v1.1 Functional Site** - Phases 5-10 (shipped 2026-05-14)
 - **v2.0 Dual Portal SaaS Platform** - Phases 1-8 (shipped 2026-05-19)
 - **v2.1 Marketing & SEO Settings Dashboard** - Phases 9-13 (shipped 2026-05-30)
-- **v3.0 Self-Contained Licensing Architecture** - Phases 14-20 (active)
+- **v3.0 Self-Contained Licensing Architecture** - Phases 14-21 (active)
 
 ## Current Milestone
 
-- **v3.0 Self-Contained Licensing Architecture** - Phases 14-20
+- **v3.0 Self-Contained Licensing Architecture** - Phases 14-21
 
 **Milestone Goal:** Refactor ConversionFlow into a completely self-contained licensing platform where all licensing, subscriptions, customers, products, activations, domains, orders, and analytics are managed directly within ConversionFlow — no external licensing dependencies. Build a modular monolith with Domain-Driven Design, Service Layer Pattern, Repository Pattern, and event-driven internal actions.
 
@@ -85,6 +85,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 - [ ] **Phase 18: Subscription & Status Management** -- Expiry tracking, grace periods, renewal reminders
 - [ ] **Phase 19: Portal & Analytics Enhancements** -- License management UI, analytics dashboard, transfer system
 - [ ] **Phase 20: Migration & External API Removal** -- Data migration, feature flags, remove central API deps
+- [ ] **Phase 21: Backup & Restore System** -- Admin backup/restore UI, scheduled backups, rotation policy, restore from backup
 
 ## Phase Details
 
@@ -409,6 +410,23 @@ Plans:
 - [ ] 20-02-PLAN.md -- Migration script: key regeneration, API token backfill, FK validation, backup, logging
 - [ ] 20-03-PLAN.md -- UI replacement: Local License Engine status card, env var cleanup
 
+### Phase 21: Backup & Restore System
+**Directory**: `21-backup-restore`
+**Goal**: Admin can create, schedule, and restore database backups entirely from the admin dashboard — with pg_dump-based backups, configurable retention/rotation, scheduled BullMQ jobs, and one-click restore — ensuring data protection on self-hosted deployments.
+**Depends on**: Phase 20
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. Admin navigates to /admin/backup and sees a backup dashboard with list of all backups (timestamp, size, status), a "Create Backup" button, and backup schedule configuration
+  2. Admin can trigger an immediate full database backup via pg_dump with progress indication and receives a success/failure notification
+  3. Admin can download any backup file and delete individual backups from the history list
+  4. Admin can restore the database from any backup file with a confirmation dialog, progress indication, and automatic pre-restore backup
+  5. A BullMQ scheduled job automatically creates backups at configurable intervals (daily, weekly, monthly) with rotation policy (keep last N backups)
+  6. Backup settings (frequency, retention count, storage path) are configurable from /admin/settings/backup
+  7. Backup rotation automatically removes oldest backups when retention limit is exceeded, with audit log entries for all backup/restore/rotation operations
+**Plans**: TBD
+Plans:
+- [ ] TBD (run /gsd-plan-phase 21 to break down)
+
 ## Progress
 
 **Execution Order:**
@@ -417,9 +435,9 @@ v1.0: 1 -> 2 -> 3 -> 4
 v1.1: 5 -> 6 -> 7 -> 8 -> 9 -> 10
 v2.0: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 v2.1: 9 -> 10 -> 11 -> 12 -> 13
-v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
+v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20 -> 21
 
-(Phase 14 depends on v2.1 Phases 9-13. Phase 15 depends on Phase 14. Phase 16 depends on Phase 14, 15. Phase 17 depends on Phase 15, 16. Phase 18 depends on Phase 17. Phase 19 depends on Phase 16, 18. Phase 20 depends on Phase 19.)
+(Phase 14 depends on v2.1 Phases 9-13. Phase 15 depends on Phase 14. Phase 16 depends on Phase 14, 15. Phase 17 depends on Phase 15, 16. Phase 18 depends on Phase 17. Phase 19 depends on Phase 16, 18. Phase 20 depends on Phase 19. Phase 21 depends on Phase 20.)
 
 | Phase | Directory | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|-----------|----------------|--------|-----------|
@@ -434,6 +452,7 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
 | 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 4/6 | Gap closure | - |
 | 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/3 | Planned | - |
+| 21. Backup & Restore System | 21-backup-restore | v3.0 | 0/TBD | Not planned | - |
 
 ---
 *Last updated: 2026-06-04*
