@@ -86,9 +86,12 @@ export default async function InvoiceDetailPage({
     .limit(1);
 
   // Get VAT rate from settings
-  const settingsRows = await db.select().from(settings);
-  const vatRateRow = settingsRows.find((s) => s.key === "vat_rate");
-  const vatRate = vatRateRow ? parseInt(vatRateRow.value, 10) : 15;
+  const [vatRateRow] = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "vat_rate"))
+    .limit(1);
+  const vatRate = vatRateRow ? parseFloat(vatRateRow.value) : 15;
 
   const order: OrderWithUser = {
     id: orderRow.id,
