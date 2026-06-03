@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { orders, licenses, user } from "@/lib/db/schema";
+import { orders } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { validateSSLPayment } from "@/lib/ssl-commerz";
-import {
-  importOrderToCentral,
-  mockImportOrderToCentral,
-} from "@/lib/central-api";
 import { createAuditLog } from "@/lib/audit";
-import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
+import { OrderService } from "@/modules/billing/application/services/OrderService";
 
 /**
  * SSL Commerz IPN (Instant Payment Notification) handler.
@@ -70,16 +66,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, message: "Already processed" });
     }
 
-    // 5. Update order: mark completed, set paymentRef
-    await db
-      .update(orders)
-      .set({
-        status: "completed",
-        paymentRef: bankTranId || null,
-      })
-      .where(eq(orders.id, order.id));
-
-    // 6. Audit log: order status changed (T-04-09)
+    // 5. Audit log: record the IPN-triggered status transition
     await createAuditLog({
       actorId: "system",
       actorRole: "system",
@@ -96,107 +83,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 7. Fetch user data for central API payload
-    const userResults = await db
-      .select()
-      .from(user)
-      .where(eq(user.id, order.userId))
-      .limit(1);
-
-    const orderUser = userResults[0];
-
-    // 8. Sync to central API (D-13, LIC-01, LIC-02)
-    const centralPayload = {
-      orderId: order.id,
-      userId: order.userId,
-      userEmail: orderUser?.email || "",
-      userName: orderUser?.name || "",
-      userPhone: orderUser?.phone || "",
-      productId: order.productId,
-      plan: order.plan,
-      amount: order.amount,
-      currency: order.currency,
-      paymentMethod: "ssl_commerz",
-      paymentRef: bankTranId || null,
-    };
-
-    const CENTRAL_API_KEY = process.env.CENTRAL_API_KEY;
-    const centralResult = CENTRAL_API_KEY
-      ? await importOrderToCentral(centralPayload)
-      : await mockImportOrderToCentral(centralPayload);
-
-    if (centralResult.success && centralResult.data) {
-      const centralData = centralResult.data;
-
-      // 9a. Update order with centralOrderId
-      await db
-        .update(orders)
-        .set({ centralOrderId: centralData.centralOrderId })
-        .where(eq(orders.id, order.id));
-
-      // 9b. Update user with centralUserId
-      if (orderUser && centralData.centralUserId) {
-        await db
-          .update(user)
-          .set({ centralUserId: centralData.centralUserId })
-          .where(eq(user.id, order.userId));
-      }
-
-      // 9c. Insert license record
-      await db.insert(licenses).values({
-        userId: order.userId,
-        orderId: order.id,
-        productId: order.productId,
-        plan: order.plan,
-        licenseKey: centralData.licenseKey,
-        status: "active",
-        centralLicenseId: centralData.centralLicenseId,
-      });
-
-      // 9d. Audit log: license created
-      await createAuditLog({
-        actorId: "system",
-        actorRole: "system",
-        action: "license.created",
-        targetType: "license",
-        targetId: order.id,
-        details: {
-          licenseKey: centralData.licenseKey,
-          centralLicenseId: centralData.centralLicenseId,
-          centralOrderId: centralData.centralOrderId,
-        },
-      });
-    } else {
-      // 10. Central API failed: order stays completed but no central mapping
-      // This is the "pending_sync" state (D-14)
-      console.error(
-        `[IPN] Central API sync failed for order ${order.id}: ${centralResult.error}`
-      );
-      // Order is completed, centralOrderId remains null
-      // Admin can retry sync later via admin dashboard
-    }
-
-    // 11. Send confirmation email (T-04-23: wrapped in try/catch, email failure does not block)
+    // 6. Trigger order completion via Billing Context
+    // OrderService.completeOrder() updates status + publishes OrderCompleted event.
+    // The OrderCompletedHandler generates the license, creates audit log, and sends email.
+    // SSL Commerce will retry the IPN on failure — idempotency handles retries.
     try {
-      if (orderUser?.email) {
-        const licenseResult = await db
-          .select({ licenseKey: licenses.licenseKey })
-          .from(licenses)
-          .where(eq(licenses.orderId, order.id))
-          .limit(1);
-        await sendOrderConfirmationEmail({
-          to: orderUser.email,
-          orderNumber: order.id.slice(0, 8),
-          planName: order.plan,
-          amount: order.amount,
-          currency: order.currency,
-          paymentMethod: order.paymentMethod ?? "ssl_commerz",
-          licenseKey: licenseResult[0]?.licenseKey,
-          status: "completed",
-        });
-      }
-    } catch (emailError) {
-      console.error(`[IPN] Failed to send confirmation email for order ${order.id}:`, emailError);
+      const orderService = new OrderService();
+      await orderService.completeOrder(order.id, order.userId);
+    } catch (completionError) {
+      console.error(
+        `[IPN] Order completion failed for ${order.id}:`,
+        completionError
+      );
+      // Order status update failed — SSL Commerce will retry
     }
 
     return NextResponse.json({ ok: true });

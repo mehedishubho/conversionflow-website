@@ -10,6 +10,7 @@ interface OrderConfirmationParams {
   currency: string;
   paymentMethod: string;
   licenseKey?: string;
+  apiToken?: string;
   status: string;
 }
 
@@ -33,6 +34,7 @@ export async function sendOrderConfirmationEmail(
     currency,
     paymentMethod,
     licenseKey,
+    apiToken,
     status,
   } = params;
 
@@ -91,6 +93,19 @@ export async function sendOrderConfirmationEmail(
         <div style="background: #f0fdf4; border: 2px solid #12b76a; border-radius: 8px; padding: 20px; margin-bottom: 24px; text-align: center;">
           <p style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">Your License Key</p>
           <p style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 16px; font-weight: 600; color: #1a1a2e; margin: 0; word-break: break-all;">${licenseKey}</p>
+        </div>
+        `
+            : ""
+        }
+
+        ${
+          apiToken
+            ? `
+        <!-- API Token -->
+        <div style="background: #fffaf5; border: 2px solid #fb6514; border-radius: 8px; padding: 20px; margin-bottom: 24px; text-align: center;">
+          <p style="color: #fb6514; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0;">⚠️ Your API Token</p>
+          <p style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 16px; font-weight: 600; color: #1a1a2e; margin: 0 0 12px 0; word-break: break-all;">${apiToken}</p>
+          <p style="color: #666; font-size: 12px; margin: 0;">Save this API token — it will not be shown again in email.</p>
         </div>
         `
             : ""

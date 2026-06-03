@@ -7,6 +7,7 @@ import {
   CreditCard,
   Mail,
   Search,
+  ArrowRightLeft,
 } from "lucide-react";
 
 interface SettingsOverviewCardsProps {
@@ -44,6 +45,12 @@ const CARDS: CardConfig[] = [
     description: "SEO, meta tags, schema, and more",
     href: "/admin/settings/seo",
     icon: Search,
+  },
+  {
+    label: "License Transfer",
+    description: "Transfer limits and ownership settings",
+    href: "/admin/settings/transfer",
+    icon: ArrowRightLeft,
   },
 ];
 

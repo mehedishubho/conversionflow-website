@@ -7,6 +7,7 @@ import {
   paymentAccounts,
   settings,
   paymentMethodEnum,
+  licenses,
 } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
@@ -306,6 +307,7 @@ export async function getPaymentAccounts() {
 /**
  * Get order details by ID for the success page.
  * Only returns orders belonging to the authenticated user.
+ * Includes the license key when order status is completed.
  */
 export async function getOrderDetails(orderId: string) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -316,5 +318,18 @@ export async function getOrderDetails(orderId: string) {
     .from(orders)
     .where(and(eq(orders.id, orderId), eq(orders.userId, session.user.id)));
 
-  return order ?? null;
+  if (!order) return null;
+
+  // Fetch license key for completed orders
+  let licenseKey: string | null = null;
+  if (order.status === "completed") {
+    const [license] = await db
+      .select({ licenseKey: licenses.licenseKey })
+      .from(licenses)
+      .where(eq(licenses.orderId, orderId))
+      .limit(1);
+    licenseKey = license?.licenseKey ?? null;
+  }
+
+  return { ...order, licenseKey };
 }

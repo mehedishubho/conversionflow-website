@@ -5,4 +5,5 @@
  * for the Billing bounded context.
  */
 
-export {};
+export { ORDER_EVENTS, createOrderEvent } from "./events/OrderEvents";
+export type { OrderCompletedPayload } from "./events/OrderEvents";

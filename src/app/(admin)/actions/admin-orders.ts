@@ -4,16 +4,10 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { orders, licenses, user } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { orders, licenses } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
-import {
-  importOrderToCentral,
-  mockImportOrderToCentral,
-  type ImportOrderPayload,
-} from "@/lib/central-api";
-import { nanoid } from "nanoid";
-import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
+import { OrderService } from "@/modules/billing/application/services/OrderService";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -62,13 +56,7 @@ export async function verifyOrder(orderId: string) {
     return { error: "Only pending orders can be verified." };
   }
 
-  // Update status to completed
-  await db
-    .update(orders)
-    .set({ status: "completed", updatedAt: new Date() })
-    .where(eq(orders.id, orderId));
-
-  // Audit log
+  // Audit log: record the admin-triggered status transition
   await createAuditLog({
     actorId: userId,
     actorRole: role,
@@ -78,104 +66,20 @@ export async function verifyOrder(orderId: string) {
     details: { from: "pending", to: "completed" },
   });
 
-  // Sync to central API
-  const [orderUser] = order.userId
-    ? await db
-        .select()
-        .from(user)
-        .where(eq(user.id, order.userId))
-        .limit(1)
-    : [];
-
-  const payload: ImportOrderPayload = {
-    orderId: orderId,
-    userId: order.userId,
-    userEmail: orderUser?.email ?? "",
-    userName: orderUser?.name ?? "",
-    userPhone: orderUser?.phone ?? "",
-    productId: order.productId,
-    plan: order.plan,
-    amount: order.amount,
-    currency: order.currency,
-    paymentMethod: order.paymentMethod ?? "unknown",
-    paymentRef: order.paymentRef ?? null,
-  };
-
-  // Use mock if CENTRAL_API_KEY is not set
-  const centralResult = process.env.CENTRAL_API_KEY
-    ? await importOrderToCentral(payload)
-    : await mockImportOrderToCentral(payload);
-
-  if (centralResult.success && centralResult.data) {
-    // Update order with central ID
-    await db
-      .update(orders)
-      .set({
-        centralOrderId: centralResult.data.centralOrderId,
-        updatedAt: new Date(),
-      })
-      .where(eq(orders.id, orderId));
-
-    // Update user central ID
-    if (order.userId && centralResult.data.centralUserId) {
-      await db
-        .update(user)
-        .set({ centralUserId: centralResult.data.centralUserId })
-        .where(eq(user.id, order.userId));
-    }
-
-    // Create license record
-    await db.insert(licenses).values({
-      userId: order.userId,
-      centralLicenseId: centralResult.data.centralLicenseId,
-      orderId: orderId,
-      productId: order.productId,
-      plan: order.plan,
-      licenseKey: centralResult.data.licenseKey,
-      status: "active",
-      activationDomains: [],
-      maxActivations: order.plan === "starter" ? 1 : order.plan === "professional" ? 3 : 10,
-      currentActivations: 0,
-      expiresAt: null,
-    });
-
-    // Audit license creation
-    await createAuditLog({
-      actorId: userId,
-      actorRole: role,
-      action: "license.created",
-      targetType: "license",
-      targetId: centralResult.data.centralLicenseId,
-      details: {
-        orderId,
-        licenseKey: centralResult.data.licenseKey,
-        source: "admin_verify",
-      },
-    });
-  }
-  // If central API fails, order stays completed but no central mapping (pending_sync per D-14)
-
-  // Send confirmation email (T-04-23: wrapped in try/catch)
+  // Trigger order completion via Billing Context
+  // OrderService.completeOrder() updates status + publishes OrderCompleted event.
+  // The OrderCompletedHandler generates the license, creates audit log, and sends email.
   try {
-    if (orderUser?.email) {
-      const licenseResult = await db
-        .select({ licenseKey: licenses.licenseKey })
-        .from(licenses)
-        .where(eq(licenses.orderId, orderId))
-        .limit(1);
-      await sendOrderConfirmationEmail({
-        to: orderUser.email,
-        orderNumber: orderId.slice(0, 8),
-        planName: order.plan,
-        amount: order.amount,
-        currency: order.currency,
-        paymentMethod: order.paymentMethod ?? "manual",
-        licenseKey: licenseResult[0]?.licenseKey,
-        status: "completed",
-      });
-    }
-  } catch (emailError) {
-    console.error(`[Admin] Failed to send confirmation email for order ${orderId}:`, emailError);
+    const orderService = new OrderService();
+    await orderService.completeOrder(orderId, order.userId);
+  } catch (completionError) {
+    console.error(
+      `[Admin] Order completion failed for ${orderId}:`,
+      completionError
+    );
+    return {
+      error: "Order completed but license generation failed. Check logs.",
+    };
   }
 
   return { success: true };

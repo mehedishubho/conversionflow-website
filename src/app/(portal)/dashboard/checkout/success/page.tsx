@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Copy, Check } from "lucide-react";
 import { getOrderDetails } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Badge from "@/components/ui/badge/Badge";
@@ -18,6 +18,7 @@ type OrderDetails = {
   discountAmount: number | null;
   taxAmount: number | null;
   createdAt: Date;
+  licenseKey: string | null;
 };
 
 function formatBDT(amount: number): string {
@@ -37,6 +38,41 @@ const statusLabelMap: Record<string, string> = {
   failed: "Failed",
   refunded: "Refunded",
 };
+
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      aria-label={label}
+    >
+      {copied ? (
+        <span className="flex items-center gap-1 text-green-600 text-xs">
+          <Check className="h-4 w-4" />
+          Copied!
+        </span>
+      ) : (
+        <Copy className="h-4 w-4 text-gray-400" />
+      )}
+    </button>
+  );
+}
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
@@ -121,7 +157,7 @@ function CheckoutSuccessContent() {
 
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             {isCompleted
-              ? "Your payment was successful! Your license key has been generated."
+              ? "Your payment was successful! Your license is ready."
               : "Your payment is being verified. We will email your license key within 24 hours once confirmed."}
           </p>
 
@@ -162,6 +198,42 @@ function CheckoutSuccessContent() {
               </Badge>
             </div>
           </div>
+
+          {isCompleted && order.licenseKey && (
+            <div
+              role="region"
+              aria-label="License credentials"
+              className="space-y-3 mb-6"
+            >
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 text-left">
+                Your Credentials
+              </h3>
+              {/* License Key */}
+              <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 px-4 py-3">
+                <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                  License Key
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <code className="font-mono text-sm font-semibold text-gray-800 dark:text-white/90 break-all">
+                    {order.licenseKey}
+                  </code>
+                  <CopyButton text={order.licenseKey} label="Copy license key to clipboard" />
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Use this key to activate ConversionFlow on your WooCommerce store.
+                </p>
+              </div>
+              {/* API Token notice */}
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 px-4 py-3 text-left">
+                <p className="text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">
+                  API Token
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Your API token has been sent to your email. Check your inbox for the token — it will not be shown here for security.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link

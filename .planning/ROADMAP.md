@@ -201,6 +201,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   7. Admin can manage affiliates and set commission rates
   8. DB schema supports affiliates, clicks, commissions, payouts tables linked to users and orders
 **Plans**: TBD
+Plans:
 **Status**: Deferred to post-MVP
 
 </details>
@@ -287,17 +288,17 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   2. Event bus implements EventEmitter for in-process events and Redis Pub/Sub for cross-process events, with a unified publish/subscribe interface
   3. Repository base classes and interfaces provide CRUD operations, transaction support, and query building for all bounded contexts
   4. Shared value objects (LicenseKey, Money, Email, Domain) implement validation, equality, and serialization logic
-  5. Module boundaries are enforced via import rules and dependency direction (customers → products is allowed, products → customers is not)
+  5. Module boundaries are enforced via import rules and dependency direction (customers -> products is allowed, products -> customers is not)
 **Plans**: 4 plans (14-01, 14-02, 14-03, 14-04)
 Plans:
-- [x] 14-01-PLAN.md — Module structure and TypeScript path aliases
-- [x] 14-02-PLAN.md — Event bus implementation (EventEmitter + Redis Pub/Sub)
-- [x] 14-03-PLAN.md — Repository base classes and interfaces
-- [ ] 14-04-PLAN.md — Shared value objects (LicenseKey, Money, Email, Domain)
+- [x] 14-01-PLAN.md -- Module structure and TypeScript path aliases
+- [x] 14-02-PLAN.md -- Event bus implementation (EventEmitter + Redis Pub/Sub)
+- [x] 14-03-PLAN.md -- Repository base classes and interfaces
+- [x] 14-04-PLAN.md -- Shared value objects (LicenseKey, Money, Email, Domain)
 
 ### Phase 15: Products Bounded Context
 **Directory**: `15-products-context`
-**Goal**: Admin can create and manage products with versions and plans, defining pricing, activation limits, licensing rules, and feature flags — serving as the foundation for license generation.
+**Goal**: Admin can create and manage products with versions and plans, defining pricing, activation limits, licensing rules, and feature flags -- serving as the foundation for license generation.
 **Depends on**: Phase 14
 **Requirements**: PROD-01, PROD-02, PROD-03, PROD-04, PROD-05, PROD-06, PROD-07
 **Success Criteria** (what must be TRUE):
@@ -306,12 +307,16 @@ Plans:
   3. Admin can create plans for each product with pricing (BDT, USD), activation limits (1, 3, 5, unlimited), and feature flags
   4. Plans support both lifetime licenses (no expiration) and subscription licenses (duration-based with billing cycle)
   5. Product and plan data is persisted in database and accessible via admin dashboard UI with edit/delete operations
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 4 plans
+Plans:
+- [x] 15-01-PLAN.md -- Database schema, domain entities, and repositories
+- [x] 15-02-PLAN.md -- Server actions, seed script, and schema push
+- [x] 15-03-PLAN.md -- Admin UI: product list, create, detail shell
+- [x] 15-04-PLAN.md -- Admin UI: version and plan management
 
 ### Phase 16: Licensing Core (Generation & Validation)
 **Directory**: `16-licensing-core`
-**Goal**: The platform generates unique, secure license keys locally and provides a public API for validation, activation, and deactivation — completely replacing external licensing dependency.
+**Goal**: The platform generates unique, secure license keys locally and provides a public API for validation, activation, and deactivation -- completely replacing external licensing dependency.
 **Depends on**: Phase 14, Phase 15
 **Requirements**: LGEN-01, LGEN-02, LGEN-03, LGEN-04, LGEN-05, LGEN-06, LGEN-07, LGEN-08, LGEN-09, ACT-01, ACT-02, ACT-03, ACT-04, ACT-05, ACT-06, ACT-07, ACT-08, API-01, API-02, API-03, API-04, API-05
 **Success Criteria** (what must be TRUE):
@@ -323,12 +328,18 @@ Plans:
   6. Activation limit enforcement uses atomic database operations to prevent race conditions and rejects activation if limit reached
   7. Validation API has rate limiting (100 requests/minute per IP) and returns identical error for all failures (no information leakage)
   8. Customers can view and manage their active domains in customer portal, and admin can view activation history and detect suspicious patterns
-**Plans**: TBD
+Plans: 5 plans
+Plans:
+- [ ] 16-01-PLAN.md -- Schema, domain entities, key generation, and domain services
+- [ ] 16-02-PLAN.md -- Repositories, mappers, and infrastructure adapters
+- [ ] 16-03-PLAN.md -- Application handlers, cache invalidation, and API routes
+- [ ] 16-04-PLAN.md -- Customer portal and admin activation history UI
+- [ ] 16-05-PLAN.md -- Schema push, module initialization, and final wiring
 **UI hint**: yes
 
 ### Phase 17: Customer & Billing Integration
 **Directory**: `17-billing-integration`
-**Goal**: Checkout and billing processes are refactored into the Billing Bounded Context, generating licenses locally via domain events when orders complete — removing centralOrderId dependency.
+**Goal**: Checkout and billing processes are refactored into the Billing Bounded Context, generating licenses locally via domain events when orders complete -- removing centralOrderId dependency.
 **Depends on**: Phase 15, Phase 16
 **Requirements**: LSTAT-05, LSTAT-06, ARCH-06, ARCH-08
 **Success Criteria** (what must be TRUE):
@@ -338,11 +349,12 @@ Plans:
   4. License status changes (revoke, suspend) trigger audit log entries and customer notifications via domain events
   5. Webhook handlers for central license API events are removed and replaced with local event handlers
 **Plans**: TBD
+Plans:
 **UI hint**: yes
 
 ### Phase 18: Subscription & Status Management
 **Directory**: `18-subscription-status`
-**Goal**: The platform manages subscription lifecycle with expiration tracking, grace periods, renewal processing, and lifetime license support — ensuring continuous license validity.
+**Goal**: The platform manages subscription lifecycle with expiration tracking, grace periods, renewal processing, and lifetime license support -- ensuring continuous license validity.
 **Depends on**: Phase 17
 **Requirements**: LSTAT-01, LSTAT-02, LSTAT-03, LSTAT-04, LSTAT-07, JOB-01, JOB-02, JOB-04
 **Success Criteria** (what must be TRUE):
@@ -351,7 +363,12 @@ Plans:
   3. Grace period of 7-30 days after expiration keeps license valid during grace period
   4. Background job checks for expiring licenses daily and sends reminder emails (30, 14, 7, 3, 1 days before expiration)
   5. BullMQ worker processes license expiration checks daily with Redis queue management and retry logic with exponential backoff
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [x] 18-01-PLAN.md -- Schema, state machine, expiry calculator, domain events, OrderCompletedHandler update
+- [x] 18-02-PLAN.md -- Validation API grace period update, email templates (3 templates)
+- [ ] 18-03-PLAN.md -- BullMQ worker, admin subscription settings, module-init wiring, schema push
+**UI hint**: yes
 
 ### Phase 19: Portal & Analytics Enhancements
 **Directory**: `19-portal-analytics`
@@ -365,21 +382,32 @@ Plans:
   4. BullMQ worker handles analytics aggregation for dashboard with scheduled processing
   5. Customers can transfer license ownership to another account via transfer code and deactivate old domain to activate new domain (within transfer limits)
   6. Admin can configure maximum transfers per month per license and all transfer operations are logged in audit trail with timestamp and actor
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [x] 19-01-PLAN.md -- Analytics data layer (schema, services, geo-IP, queue)
+- [x] 19-02-PLAN.md -- Analytics worker and transfer backend
+- [x] 19-03-PLAN.md -- Admin license analytics page (KPIs, charts, geo table)
+- [x] 19-04-PLAN.md -- Portal subscription, transfer UI, email templates
+- [x] 19-05-PLAN.md -- Gap closure: customer growth tracking (ANLT-04)
+- [x] 19-06-PLAN.md -- Gap closure: admin transfer settings UI (XFER-04)
 **UI hint**: yes
 
 ### Phase 20: Migration & External API Removal
 **Directory**: `20-migration-cleanup`
-**Goal**: All existing license data is migrated from external API to local storage, feature flags control gradual rollout, and central API dependencies are completely removed.
+**Goal**: All external central API dependencies are removed from the codebase, existing license data is migrated to local-only storage with standardized keys and API tokens, and FK constraints enforce referential integrity -- completing the self-contained licensing architecture.
 **Depends on**: Phase 19
 **Requirements**: ARCH-07, ARCH-09, ARCH-10
 **Success Criteria** (what must be TRUE):
-  1. Data migration strategy includes verification (counts match between source and target), rollback plan, and gradual feature flag rollout (10% -> 25% -> 50% -> 100%)
-  2. Migration preserves all existing license data without loss and creates mapping table for central_id to local_id references
-  3. Feature flag system controls traffic migration between old and new license generation systems
+  1. Migration CLI script includes dry-run mode, pg_dump backup, data verification counts, and phased execution (verification -> data transforms -> completion flag) per D-02/D-09/D-10
+  2. Migration preserves all existing license data without loss; v2.x license keys regenerated to 5-segment CF-XXXX format, API tokens backfilled for licenses with NULL api_token_hash, central columns dropped entirely per D-01/D-07
+  3. FK constraints convert orders.productId, licenses.productId, and licenses.plan from text fields to proper foreign key references in a single atomic PostgreSQL transaction per D-03/D-04
   4. Database fields centralOrderId, centralLicenseId, and centralUserId are removed from schema
   5. src/lib/central-api.ts file is removed and all imports/references are replaced with local Licensing Context services
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 20-01-PLAN.md -- Code cleanup: delete central-api.ts, remove all central field references from schema/auth/types/UI
+- [ ] 20-02-PLAN.md -- Migration script: key regeneration, API token backfill, FK validation, backup, logging
+- [ ] 20-03-PLAN.md -- UI replacement: Local License Engine status card, env var cleanup
 
 ## Progress
 
@@ -400,12 +428,12 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 1-8 | v2.0 | v2.0 | - | Complete | 2026-05-19 |
 | 9-13 | v2.1 | v2.1 | - | Complete | 2026-05-30 |
 | 14. Shared DDD Infrastructure | 14-ddd-infrastructure | v3.0 | 0/TBD | Not started | - |
-| 15. Products Bounded Context | 15-products-context | v3.0 | 0/TBD | Not started | - |
-| 16. Licensing Core | 16-licensing-core | v3.0 | 0/TBD | Not started | - |
+| 15. Products Bounded Context | 15-products-context | v3.0 | 0/4 | Not started | - |
+| 16. Licensing Core | 16-licensing-core | v3.0 | 0/5 | Planned | - |
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
-| 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/TBD | Not started | - |
-| 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 0/TBD | Not started | - |
-| 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/TBD | Not started | - |
+| 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
+| 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 4/6 | Gap closure | - |
+| 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/3 | Planned | - |
 
 ---
-*Last updated: 2026-05-30*
+*Last updated: 2026-06-04*

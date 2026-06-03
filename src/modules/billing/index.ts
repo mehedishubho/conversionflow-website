@@ -5,6 +5,6 @@
  * This is the only entry point for other modules to import Billing functionality.
  */
 
-export * from './domain';
-export * from './infrastructure';
-export * from './application';
+export { registerBillingHandlers } from "./application/handlers/OrderCompletedHandler";
+export * from "./domain";
+export * from "./infrastructure";

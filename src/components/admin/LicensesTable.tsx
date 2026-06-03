@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Table,
   TableHeader,
@@ -144,6 +145,12 @@ export default function LicensesTable({ licenses }: { licenses: LicenseRow[] }) 
                     </TableCell>
                     <TableCell className="px-5 py-3 text-sm">
                       <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/licenses/${lic.id}/activations`}
+                          className="text-xs px-3 py-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+                        >
+                          Activations
+                        </Link>
                         {lic.status !== "active" && (
                           <Button
                             size="sm"
