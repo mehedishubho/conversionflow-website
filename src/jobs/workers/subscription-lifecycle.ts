@@ -202,7 +202,8 @@ async function processDailySubscriptionCheck(): Promise<void> {
           (license.status === "active" && now > graceEnd)
         ) {
           // D-23: grace_period -> expired OR active -> expired (past grace, validated by state machine)
-          const fromStatus = license.status as "active" | "grace_period";
+          const fromStatus = license.status;
+          if (fromStatus !== "active" && fromStatus !== "grace_period") continue;
           LicenseStateMachine.transition(fromStatus, "expired");
           const transitioned = await licenseRepo.updateStatus(
             license.id,

@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     license_id: result.licenseId,
     plan: result.plan,
     expires_at: result.expiresAt?.toISOString() ?? null,
-    grace_period_expires_at: result.gracePeriodExpiresAt?.toISOString() ?? null,
+    grace_period_expires_at: result.grace_period_expires_at?.toISOString() ?? null,
     max_activations: result.maxActivations,
     current_activations: result.currentActivations,
     error: null,

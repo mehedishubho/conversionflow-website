@@ -146,6 +146,7 @@ export class ValidateLicenseHandler {
               expiresAt: license.expiresAt,
               maxActivations: license.maxActivations,
               currentActivations: license.currentActivations,
+              grace_period_expires_at: graceEnd,
             }),
           );
         } catch {

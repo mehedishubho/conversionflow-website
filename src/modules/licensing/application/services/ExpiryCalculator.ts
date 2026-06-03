@@ -22,7 +22,10 @@ export class ExpiryCalculator {
     startDate: Date,
     billingCycle: "monthly" | "yearly" | "custom" | null,
     billingDurationMonths: number | null,
-  ): Date {
+  ): Date | null {
+    // Per D-16: lifetime licenses have no billing cycle → no expiry
+    if (!billingCycle) return null;
+
     const months =
       billingCycle === "monthly"
         ? 1
