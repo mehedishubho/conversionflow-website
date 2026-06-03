@@ -1,11 +1,14 @@
-import { getPaymentSettings } from "@/app/(admin)/actions/admin-settings";
+import { getPaymentSettings, getLicenseEngineStatus } from "@/app/(admin)/actions/admin-settings";
 import PaymentSettingsForm from "@/components/admin/PaymentSettingsForm";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
 export const dynamic = "force-dynamic";
 
 export default async function PaymentSettingsPage() {
-  const settings = await getPaymentSettings();
+  const [settings, licenseEngine] = await Promise.all([
+    getPaymentSettings(),
+    getLicenseEngineStatus(),
+  ]);
 
   return (
     <div>
@@ -28,6 +31,7 @@ export default async function PaymentSettingsPage() {
           vatEnabled: settings.vatEnabled,
           sslCommerzEnabled: settings.sslCommerzEnabled,
           sslCommerz: settings.sslCommerz,
+          licenseEngine,
         }}
       />
     </div>

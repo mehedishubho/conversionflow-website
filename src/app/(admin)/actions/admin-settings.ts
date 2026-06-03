@@ -4,8 +4,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { paymentAccounts, settings } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { paymentAccounts, settings, licenses } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 
 // ──────────────────────────────────────────────
@@ -495,4 +495,24 @@ export async function saveTransferSettings(data: { maxTransfersPerMonth: number 
   });
 
   return { success: true };
+}
+
+// ──────────────────────────────────────────────
+// 10. Get License Engine Status (Phase 20, D-14)
+// ──────────────────────────────────────────────
+
+export async function getLicenseEngineStatus() {
+  await requireAdmin();
+
+  const [totalResult, activeResult, migrationRow] = await Promise.all([
+    db.select({ count: sql<number>`count(*)::int` }).from(licenses),
+    db.select({ count: sql<number>`count(*)::int` }).from(licenses).where(eq(licenses.status, "active")),
+    db.select().from(settings).where(eq(settings.key, "phase20_migration_complete")).limit(1),
+  ]);
+
+  return {
+    totalLicenses: totalResult[0]?.count ?? 0,
+    activeLicenses: activeResult[0]?.count ?? 0,
+    migrationComplete: migrationRow.length > 0 && migrationRow[0].value === "true",
+  };
 }

@@ -43,6 +43,11 @@ interface PaymentSettingsFormProps {
       storePassword: string;
       dbSandbox: string;
     };
+    licenseEngine: {
+      totalLicenses: number;
+      activeLicenses: number;
+      migrationComplete: boolean;
+    };
   };
 }
 
@@ -270,6 +275,40 @@ export default function PaymentSettingsForm({
             </span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${vatEnabled ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
               {vatEnabled ? "Active" : "Off"}
+            </span>
+          </div>
+        </div>
+      </ComponentCard>
+
+      {/* Local License Engine Status */}
+      <ComponentCard title="Local License Engine" desc="Self-contained licensing engine — all license operations are managed locally.">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-3 w-3 rounded-full bg-success-500 animate-pulse" />
+            <span className="text-sm font-medium text-success-600 dark:text-success-400">
+              Active
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Total Licenses</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {initialData.licenseEngine.totalLicenses}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Active Licenses</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {initialData.licenseEngine.activeLicenses}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${initialData.licenseEngine.migrationComplete ? "bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400" : "bg-warning-50 text-warning-600 dark:bg-warning-500/10 dark:text-warning-400"}`}>
+              {initialData.licenseEngine.migrationComplete ? "Migration Complete" : "Migration Pending"}
+            </span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              v3.0 Self-Contained Licensing
             </span>
           </div>
         </div>
