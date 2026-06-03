@@ -7,7 +7,7 @@ import {
   CreditCard,
   Mail,
   Search,
-  Clock,
+  ArrowRightLeft,
 } from "lucide-react";
 
 interface SettingsOverviewCardsProps {
@@ -47,10 +47,10 @@ const CARDS: CardConfig[] = [
     icon: Search,
   },
   {
-    label: "Subscription",
-    description: "License expiry, grace periods, and reminders",
-    href: "/admin/settings/subscription",
-    icon: Clock,
+    label: "License Transfer",
+    description: "Transfer limits and ownership settings",
+    href: "/admin/settings/transfer",
+    icon: ArrowRightLeft,
   },
 ];
 
