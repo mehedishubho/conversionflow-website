@@ -11,6 +11,18 @@ interface ApiTokenNotificationParams {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS in email templates.
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
  * Send API token notification email to customer after token backfill.
  * Per D-06: Bulk email notification to each affected customer.
  *
@@ -19,7 +31,14 @@ interface ApiTokenNotificationParams {
 export async function sendApiTokenNotificationEmail(
   params: ApiTokenNotificationParams
 ): Promise<void> {
-  const { to, customerName, licenseKey, apiToken, portalUrl } = params;
+  const { to, licenseKey, apiToken } = params;
+  const customerName = escapeHtml(params.customerName);
+  const licenseKeySafe = escapeHtml(licenseKey);
+  const apiTokenSafe = escapeHtml(apiToken);
+  // Validate portalUrl starts with https:// to prevent javascript: URL injection
+  const portalUrl = params.portalUrl.startsWith("https://")
+    ? params.portalUrl
+    : "#";
 
   const html = `
     <div style="font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden;">
@@ -38,14 +57,14 @@ export async function sendApiTokenNotificationEmail(
           Hi ${customerName},
         </p>
         <p style="color: #3B4480; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
-          Your API token for license <strong style="color: #1a1a2e;">${licenseKey}</strong> has been generated. You'll need this token to authenticate API requests from your WooCommerce store.
+          Your API token for license <strong style="color: #1a1a2e;">${licenseKeySafe}</strong> has been generated. You'll need this token to authenticate API requests from your WooCommerce store.
         </p>
 
         <!-- API Token Display -->
         <div style="margin-bottom: 24px;">
           <p style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">Your API Token</p>
           <div style="font-family: 'JetBrains Mono', 'Courier New', monospace; background: #f3f4f6; padding: 12px 16px; border-radius: 8px; font-size: 14px; word-break: break-all; border: 1px solid #e5e7eb;">
-            ${apiToken}
+            ${apiTokenSafe}
           </div>
         </div>
 
