@@ -9,7 +9,7 @@ import { BaseRepository } from "@/shared/infrastructure/repositories";
 import { License } from "@/modules/licensing/domain/entities/License";
 import { licenses } from "@/lib/db/schema";
 import { LicenseMapper } from "./mappers/LicenseMapper";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, gte, lte, isNotNull } from "drizzle-orm";
 
 export class LicenseRepository extends BaseRepository<License, typeof licenses.$inferSelect> {
   constructor() {
@@ -119,5 +119,62 @@ export class LicenseRepository extends BaseRepository<License, typeof licenses.$
         updatedAt: new Date(),
       })
       .where(eq(licenses.id, licenseId));
+  }
+
+  /**
+   * Find all licenses eligible for expiration processing.
+   * Returns licenses where:
+   * - expires_at IS NOT NULL (skip lifetime, D-16)
+   * - status is 'active' or 'grace_period'
+   * - expires_at is within the maxMilestonesDays range or already past
+   */
+  async findExpiringLicenses(maxMilestonesDays: number): Promise<License[]> {
+    const now = new Date();
+    const futureCutoff = new Date(
+      now.getTime() + maxMilestonesDays * 24 * 60 * 60 * 1000,
+    );
+
+    const results = await this.db
+      .select()
+      .from(this.table)
+      .where(
+        and(
+          isNotNull(licenses.expiresAt),
+          sql`${licenses.status} IN ('active', 'grace_period')`,
+          lte(licenses.expiresAt, futureCutoff),
+        ),
+      );
+
+    return results.map((row) =>
+      this.mapper.toDomain(row as typeof licenses.$inferSelect),
+    );
+  }
+
+  /**
+   * Update a license's status with optimistic concurrency on current status.
+   * Per D-24: Does NOT modify activation_domains or current_activations.
+   *
+   * @returns true if the update matched a row (status was currentStatus), false otherwise
+   */
+  async updateStatus(
+    licenseId: string,
+    currentStatus: string,
+    newStatus: string,
+  ): Promise<boolean> {
+    const result = await this.db
+      .update(licenses)
+      .set({
+        status: sql`${newStatus}`,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(licenses.id, licenseId),
+          eq(licenses.status, currentStatus),
+        ),
+      )
+      .returning();
+
+    return result.length > 0;
   }
 }
