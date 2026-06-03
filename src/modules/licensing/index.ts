@@ -12,6 +12,8 @@ export { LICENSE_EVENTS, createLicenseEvent } from "./domain/events/LicenseEvent
 export { LicenseKeyGenerator } from "./domain/services/LicenseKeyGenerator";
 export { ApiTokenGenerator } from "./domain/services/ApiTokenGenerator";
 export { VerificationTokenIssuer } from "./domain/services/VerificationTokenIssuer";
+export { LicenseStateMachine } from "./domain/services/LicenseStateMachine";
+export { ExpiryCalculator } from "./application/services/ExpiryCalculator";
 
 // Application exports
 export { ValidateLicenseHandler } from "./application/commands/ValidateLicenseHandler";

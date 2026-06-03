@@ -17,6 +17,7 @@
 import type { BaseEvent } from "@/shared/infrastructure/eventBus/types";
 import { GenerateLicenseHandler } from "@/modules/licensing/application/commands/GenerateLicenseHandler";
 import { ProductPlanRepository } from "@/modules/products/infrastructure/repositories/ProductPlanRepository";
+import { ExpiryCalculator } from "@/modules/licensing/application/services/ExpiryCalculator";
 import { db } from "@/lib/db";
 import { orders, user, licenses } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -175,17 +176,14 @@ export class OrderCompletedHandler {
     }
 
     const maxActivations = plan.maxActivations ?? 1;
+    // Per D-14, D-17: Exact calendar date calculation instead of approximate 30-day months
     const expiresAt =
       plan.licenseType === "lifetime"
         ? null
-        : new Date(
-            Date.now() +
-              (plan.billingDurationMonths ?? 12) *
-                30 *
-                24 *
-                60 *
-                60 *
-                1000,
+        : ExpiryCalculator.calculateExpiry(
+            new Date(),
+            plan.billingCycle ?? "yearly",
+            plan.billingDurationMonths,
           );
 
     return { maxActivations, expiresAt };
