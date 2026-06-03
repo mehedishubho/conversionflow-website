@@ -386,8 +386,8 @@ Plans:
 - [x] 19-02-PLAN.md -- Analytics worker and transfer backend
 - [x] 19-03-PLAN.md -- Admin license analytics page (KPIs, charts, geo table)
 - [x] 19-04-PLAN.md -- Portal subscription, transfer UI, email templates
-- [ ] 19-05-PLAN.md -- Gap closure: customer growth tracking (ANLT-04)
-- [ ] 19-06-PLAN.md -- Gap closure: admin transfer settings UI (XFER-04)
+- [x] 19-05-PLAN.md -- Gap closure: customer growth tracking (ANLT-04)
+- [x] 19-06-PLAN.md -- Gap closure: admin transfer settings UI (XFER-04)
 **UI hint**: yes
 
 ### Phase 20: Migration & External API Removal
