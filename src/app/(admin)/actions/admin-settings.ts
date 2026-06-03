@@ -436,3 +436,68 @@ export async function saveSubscriptionSettings(data: {
 
   return { success: true };
 }
+
+// ──────────────────────────────────────────────
+// 8. Get Transfer Settings
+// ──────────────────────────────────────────────
+
+export async function getTransferSettings() {
+  const { userId, role } = await requireAdmin();
+
+  const row = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "max_transfers_per_month"))
+    .limit(1);
+
+  return { maxTransfersPerMonth: row.length > 0 ? parseInt(row[0].value, 10) : 1 };
+}
+
+// ──────────────────────────────────────────────
+// 9. Save Transfer Settings
+// ──────────────────────────────────────────────
+
+export async function saveTransferSettings(data: { maxTransfersPerMonth: number }) {
+  const { userId, role } = await requireAdmin();
+
+  if (
+    typeof data.maxTransfersPerMonth !== "number" ||
+    isNaN(data.maxTransfersPerMonth) ||
+    data.maxTransfersPerMonth < 1 ||
+    data.maxTransfersPerMonth > 12
+  ) {
+    return { error: "Transfer limit must be between 1 and 12 per month." };
+  }
+
+  // Upsert pattern following existing saveSubscriptionSettings
+  const existing = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "max_transfers_per_month"))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .update(settings)
+      .set({ value: String(data.maxTransfersPerMonth), updatedAt: new Date() })
+      .where(eq(settings.key, "max_transfers_per_month"));
+  } else {
+    await db
+      .insert(settings)
+      .values({ key: "max_transfers_per_month", value: String(data.maxTransfersPerMonth) });
+  }
+
+  await createAuditLog({
+    actorId: userId,
+    actorRole: role,
+    action: "admin.settings_updated",
+    targetType: "settings",
+    targetId: "transfer",
+    details: {
+      action: "transfer_settings_updated",
+      maxTransfersPerMonth: data.maxTransfersPerMonth,
+    },
+  });
+
+  return { success: true };
+}
