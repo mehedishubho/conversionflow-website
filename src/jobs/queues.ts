@@ -9,8 +9,17 @@ export const QUEUE_NAMES = {
   ANALYTICS_AGGREGATION: "analytics-aggregation",
 } as const;
 
+function parseRedisUrl(url: string) {
+  const parsed = new URL(url);
+  return {
+    host: parsed.hostname,
+    port: parseInt(parsed.port, 10) || 6379,
+    password: parsed.password || undefined,
+  };
+}
+
 const connectionOptions = process.env.REDIS_URL
-  ? { connection: { host: "localhost", port: 6381 } }
+  ? { connection: parseRedisUrl(process.env.REDIS_URL) }
   : undefined;
 
 // Only create queues if Redis is available
