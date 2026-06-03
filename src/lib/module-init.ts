@@ -7,6 +7,7 @@
  */
 
 import { initializeLicensingModule } from "@/modules/licensing";
+import { registerBillingHandlers } from "@/modules/billing";
 
 /**
  * Initialize all application modules.
@@ -19,4 +20,5 @@ import { initializeLicensingModule } from "@/modules/licensing";
  */
 export function initializeModules(): void {
   initializeLicensingModule();
+  registerBillingHandlers();
 }

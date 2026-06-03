@@ -198,12 +198,12 @@ export class OrderCompletedHandler {
  * Call once at application startup to wire up the OrderCompleted handler.
  */
 export function registerBillingHandlers(): void {
-  // Import here to avoid circular dependency at module load time
-  const { eventRegistry } = require("@/shared/infrastructure/eventBus/EventBus");
+  // Use inProcessSubscriber to match OrderService's inProcessPublisher (same pattern as licensing module)
+  const { inProcessSubscriber } = require("@/shared/infrastructure/eventBus/EventBus");
   const { ORDER_EVENTS } = require("../../domain/events/OrderEvents");
 
   const handler = new OrderCompletedHandler();
-  eventRegistry.subscribe(ORDER_EVENTS.ORDER_COMPLETED, (event: BaseEvent) =>
+  inProcessSubscriber.subscribe(ORDER_EVENTS.ORDER_COMPLETED, (event: BaseEvent) =>
     handler.handle(event),
   );
 
