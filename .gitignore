@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Backend dashboard reference (static HTML, not part of Next.js build)
 backenddashboard/
+
+# GeoIP database files (large binary, download separately)
+data/geoip/*.mmdb

@@ -6,6 +6,7 @@ export const QUEUE_NAMES = {
   LICENSE_SYNC: "license-sync",
   NOTIFICATION: "notification",
   SUBSCRIPTION_LIFECYCLE: "subscription-lifecycle",
+  ANALYTICS_AGGREGATION: "analytics-aggregation",
 } as const;
 
 const connectionOptions = process.env.REDIS_URL
@@ -27,4 +28,8 @@ export const notificationQueue = connectionOptions
 
 export const subscriptionQueue = connectionOptions
   ? new Queue(QUEUE_NAMES.SUBSCRIPTION_LIFECYCLE, connectionOptions)
+  : null;
+
+export const analyticsQueue = connectionOptions
+  ? new Queue(QUEUE_NAMES.ANALYTICS_AGGREGATION, connectionOptions)
   : null;
