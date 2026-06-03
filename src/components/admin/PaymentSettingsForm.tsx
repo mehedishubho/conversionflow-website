@@ -195,12 +195,17 @@ export default function PaymentSettingsForm({
         }
 
         // Save SSL Commerce settings
-        await saveSSLSettings({
+        const sslResult = await saveSSLSettings({
           storeId: sslStoreId,
           storePassword: sslStorePassword,
           sandbox: sslSandbox,
           enabled: sslEnabled,
         });
+
+        if (sslResult.error) {
+          setSaveMessage({ type: "error", text: `Error saving SSL Commerce settings: ${sslResult.error}` });
+          return;
+        }
 
         setSaveMessage({ type: "success", text: "All settings saved successfully." });
       } catch {
