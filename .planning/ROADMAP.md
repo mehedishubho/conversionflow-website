@@ -201,6 +201,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   7. Admin can manage affiliates and set commission rates
   8. DB schema supports affiliates, clicks, commissions, payouts tables linked to users and orders
 **Plans**: TBD
+Plans:
 **Status**: Deferred to post-MVP
 
 </details>
@@ -348,6 +349,7 @@ Plans:
   4. License status changes (revoke, suspend) trigger audit log entries and customer notifications via domain events
   5. Webhook handlers for central license API events are removed and replaced with local event handlers
 **Plans**: TBD
+Plans:
 **UI hint**: yes
 
 ### Phase 18: Subscription & Status Management
@@ -392,16 +394,20 @@ Plans:
 
 ### Phase 20: Migration & External API Removal
 **Directory**: `20-migration-cleanup`
-**Goal**: All existing license data is migrated from external API to local storage, feature flags control gradual rollout, and central API dependencies are completely removed.
+**Goal**: All external central API dependencies are removed from the codebase, existing license data is migrated to local-only storage with standardized keys and API tokens, and FK constraints enforce referential integrity -- completing the self-contained licensing architecture.
 **Depends on**: Phase 19
 **Requirements**: ARCH-07, ARCH-09, ARCH-10
 **Success Criteria** (what must be TRUE):
-  1. Data migration strategy includes verification (counts match between source and target), rollback plan, and gradual feature flag rollout (10% -> 25% -> 50% -> 100%)
-  2. Migration preserves all existing license data without loss and creates mapping table for central_id to local_id references
-  3. Feature flag system controls traffic migration between old and new license generation systems
+  1. Migration CLI script includes dry-run mode, pg_dump backup, data verification counts, and phased execution (verification -> data transforms -> completion flag) per D-02/D-09/D-10
+  2. Migration preserves all existing license data without loss; v2.x license keys regenerated to 5-segment CF-XXXX format, API tokens backfilled for licenses with NULL api_token_hash, central columns dropped entirely per D-01/D-07
+  3. FK constraints convert orders.productId, licenses.productId, and licenses.plan from text fields to proper foreign key references in a single atomic PostgreSQL transaction per D-03/D-04
   4. Database fields centralOrderId, centralLicenseId, and centralUserId are removed from schema
   5. src/lib/central-api.ts file is removed and all imports/references are replaced with local Licensing Context services
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 20-01-PLAN.md -- Code cleanup: delete central-api.ts, remove all central field references from schema/auth/types/UI
+- [ ] 20-02-PLAN.md -- Migration script: key regeneration, API token backfill, FK validation, backup, logging
+- [ ] 20-03-PLAN.md -- UI replacement: Local License Engine status card, env var cleanup
 
 ## Progress
 
@@ -427,7 +433,7 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
 | 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 4/6 | Gap closure | - |
-| 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/TBD | Not started | - |
+| 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/3 | Planned | - |
 
 ---
 *Last updated: 2026-06-04*
