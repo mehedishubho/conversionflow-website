@@ -419,7 +419,7 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 16. Licensing Core | 16-licensing-core | v3.0 | 0/5 | Planned | - |
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
-| 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 0/TBD | Not started | - |
+| 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 0/4 | Planned | - |
 | 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/TBD | Not started | - |
 
 ---
