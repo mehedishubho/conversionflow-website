@@ -65,7 +65,7 @@ export class TransferLicenseHandler {
       action: "license.transferred",
       targetType: "license",
       targetId: licenseId,
-      details: { direction: "initiated", fromUserId: userId, licenseId, transferCode: code },
+      details: { direction: "initiated", fromUserId: userId, licenseId },
     });
 
     return { code };
@@ -137,7 +137,7 @@ export class TransferLicenseHandler {
         action: "license.transferred",
         targetType: "license",
         targetId: result.licenseId,
-        details: { direction: "completed", toUserId: recipientUserId, licenseId: result.licenseId, transferCode },
+        details: { direction: "completed", toUserId: recipientUserId, licenseId: result.licenseId },
       });
 
       try {
@@ -147,7 +147,9 @@ export class TransferLicenseHandler {
             transferCode,
           }),
         );
-      } catch {}
+      } catch (eventError) {
+        console.error("[TransferHandler] Failed to publish transfer event:", eventError);
+      }
     }
 
     return result;
