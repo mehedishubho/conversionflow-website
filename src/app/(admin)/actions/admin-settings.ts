@@ -200,7 +200,7 @@ export async function saveVATSettings(data: { rate: number; mode: "inclusive" | 
 // ──────────────────────────────────────────────
 
 export async function getPaymentSettings() {
-  const { userId, role } = await requireAdmin();
+  await requireAdmin();
 
   // Query all payment accounts
   const accounts = await db.select().from(paymentAccounts);
