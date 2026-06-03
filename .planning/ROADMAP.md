@@ -363,8 +363,8 @@ Plans:
   5. BullMQ worker processes license expiration checks daily with Redis queue management and retry logic with exponential backoff
 **Plans**: 3 plans
 Plans:
-- [ ] 18-01-PLAN.md -- Schema, state machine, expiry calculator, domain events, OrderCompletedHandler update
-- [ ] 18-02-PLAN.md -- Validation API grace period update, email templates (3 templates)
+- [x] 18-01-PLAN.md -- Schema, state machine, expiry calculator, domain events, OrderCompletedHandler update
+- [x] 18-02-PLAN.md -- Validation API grace period update, email templates (3 templates)
 - [ ] 18-03-PLAN.md -- BullMQ worker, admin subscription settings, module-init wiring, schema push
 **UI hint**: yes
 
