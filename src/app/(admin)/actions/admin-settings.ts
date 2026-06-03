@@ -331,3 +331,108 @@ export async function getSSLSettings() {
     sandbox: sandboxRows[0]?.value !== "false" && (sandboxRows.length === 0 ? process.env.SSL_COMMERZ_SANDBOX !== "false" : true),
   };
 }
+
+// ──────────────────────────────────────────────
+// 6. Get Subscription Settings (D-26)
+// ──────────────────────────────────────────────
+
+export async function getSubscriptionSettings() {
+  const { userId, role } = await requireAdmin();
+
+  const [graceRow, milestonesRow] = await Promise.all([
+    db.select().from(settings).where(eq(settings.key, "grace_period_days")).limit(1),
+    db.select().from(settings).where(eq(settings.key, "reminder_milestones")).limit(1),
+  ]);
+
+  return {
+    gracePeriodDays: graceRow.length > 0 ? parseInt(graceRow[0].value, 10) : 7,
+    reminderMilestones: milestonesRow.length > 0 ? milestonesRow[0].value : "30,14,7,3,1",
+  };
+}
+
+// ──────────────────────────────────────────────
+// 7. Save Subscription Settings (D-26, D-27)
+// ──────────────────────────────────────────────
+
+export async function saveSubscriptionSettings(data: {
+  gracePeriodDays: number;
+  reminderMilestones: string;
+}) {
+  const { userId, role } = await requireAdmin();
+
+  // Validate grace period days (D-01: 7-30 range)
+  if (
+    typeof data.gracePeriodDays !== "number" ||
+    isNaN(data.gracePeriodDays) ||
+    data.gracePeriodDays < 7 ||
+    data.gracePeriodDays > 30
+  ) {
+    return { error: "Grace period must be between 7 and 30 days." };
+  }
+
+  // Validate reminder milestones format
+  const milestones = data.reminderMilestones
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  const invalidMilestones = milestones.filter(
+    (s) => isNaN(parseInt(s, 10)) || parseInt(s, 10) <= 0,
+  );
+  if (invalidMilestones.length > 0) {
+    return {
+      error:
+        "Reminder milestones must be comma-separated positive numbers (e.g., 30,14,7,3,1).",
+    };
+  }
+
+  // Upsert grace_period_days
+  const existingGrace = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "grace_period_days"))
+    .limit(1);
+  if (existingGrace.length > 0) {
+    await db
+      .update(settings)
+      .set({ value: String(data.gracePeriodDays), updatedAt: new Date() })
+      .where(eq(settings.key, "grace_period_days"));
+  } else {
+    await db
+      .insert(settings)
+      .values({ key: "grace_period_days", value: String(data.gracePeriodDays) });
+  }
+
+  // Upsert reminder_milestones
+  const existingMilestones = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "reminder_milestones"))
+    .limit(1);
+  const milestonesValue = milestones.join(",");
+  if (existingMilestones.length > 0) {
+    await db
+      .update(settings)
+      .set({ value: milestonesValue, updatedAt: new Date() })
+      .where(eq(settings.key, "reminder_milestones"));
+  } else {
+    await db
+      .insert(settings)
+      .values({ key: "reminder_milestones", value: milestonesValue });
+  }
+
+  // Audit log
+  await createAuditLog({
+    actorId: userId,
+    actorRole: role,
+    action: "admin.settings_updated",
+    targetType: "settings",
+    targetId: "subscription",
+    details: {
+      action: "subscription_settings_updated",
+      gracePeriodDays: data.gracePeriodDays,
+      reminderMilestones: milestonesValue,
+    },
+  });
+
+  return { success: true };
+}

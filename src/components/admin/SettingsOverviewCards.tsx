@@ -7,6 +7,7 @@ import {
   CreditCard,
   Mail,
   Search,
+  Clock,
 } from "lucide-react";
 
 interface SettingsOverviewCardsProps {
@@ -44,6 +45,12 @@ const CARDS: CardConfig[] = [
     description: "SEO, meta tags, schema, and more",
     href: "/admin/settings/seo",
     icon: Search,
+  },
+  {
+    label: "Subscription",
+    description: "License expiry, grace periods, and reminders",
+    href: "/admin/settings/subscription",
+    icon: Clock,
   },
 ];
 

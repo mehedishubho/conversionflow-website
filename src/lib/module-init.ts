@@ -8,6 +8,7 @@
 
 import { initializeLicensingModule } from "@/modules/licensing";
 import { registerBillingHandlers } from "@/modules/billing";
+import { startSubscriptionWorker, scheduleSubscriptionJob } from "@/jobs/workers/subscription-lifecycle";
 
 /**
  * Initialize all application modules.
@@ -21,4 +22,10 @@ import { registerBillingHandlers } from "@/modules/billing";
 export function initializeModules(): void {
   initializeLicensingModule();
   registerBillingHandlers();
+
+  // Register subscription lifecycle worker (D-10: BullMQ in same process)
+  startSubscriptionWorker();
+  scheduleSubscriptionJob().catch((err) => {
+    console.error("[ModuleInit] Failed to schedule subscription job:", err);
+  });
 }
