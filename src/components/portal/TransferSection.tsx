@@ -52,7 +52,7 @@ export default function TransferSection({
   }
 
   const pendingCount = history.filter(
-    (t) => t.status === "pending"
+    (t) => t.status === "pending" || t.status === "completed"
   ).length;
 
   const handleGenerateCode = () => {
