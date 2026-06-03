@@ -58,7 +58,10 @@ export async function claimTransferCode(code: string) {
 
 /**
  * Get transfer history for a specific license.
- * IDOR protection: verifies the user owns the license or is a transfer party.
+ * IDOR protection: only current license owners can view transfer history.
+ * Note: Former owners who transferred the license away will not have access
+ * to the history. If access for transfer parties (not just current owner) is
+ * needed in the future, also check licenseTransfers.fromUserId/toUserId.
  */
 export async function getTransferHistory(licenseId: string) {
   const session = await requireCustomer();
