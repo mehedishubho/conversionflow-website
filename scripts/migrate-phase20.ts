@@ -30,7 +30,7 @@ import { eq, isNull, sql, and } from "drizzle-orm";
 import { LicenseKeyGenerator } from "../src/modules/licensing/domain/services/LicenseKeyGenerator.js";
 import { ApiTokenGenerator } from "../src/modules/licensing/domain/services/ApiTokenGenerator.js";
 import { sendApiTokenNotificationEmail } from "../src/lib/emails/api-token-notification.js";
-import { execSync } from "child_process";
+import { execSync, execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
@@ -124,10 +124,9 @@ async function main(): Promise<void> {
       fs.mkdirSync("backups", { recursive: true });
       const backupFile = path.join("backups", `pre-phase20-${timestamp}.sql`);
       try {
-        execSync(
-          `pg_dump "${process.env.DATABASE_URL}" -f "${backupFile}"`,
-          { stdio: "pipe" }
-        );
+        execFileSync("pg_dump", [process.env.DATABASE_URL!, "-f", backupFile], {
+          stdio: "pipe",
+        });
         summary.backupPath = backupFile;
         log("Backup saved to " + backupFile);
       } catch (error) {
