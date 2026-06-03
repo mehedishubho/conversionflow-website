@@ -15,6 +15,7 @@ import { db } from "@/lib/db";
 import { settings, licenseReminders, licenses, user } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { LicenseRepository } from "@/modules/licensing/infrastructure/repositories/LicenseRepository";
+import { LicenseStateMachine } from "@/modules/licensing/domain/services/LicenseStateMachine";
 import { LICENSE_EVENTS, createLicenseEvent } from "@/modules/licensing/domain/events/LicenseEvents";
 import { inProcessPublisher } from "@/shared/infrastructure/eventBus/EventBus";
 import { ValidationCache } from "@/modules/licensing/infrastructure/adapters/ValidationCache";
@@ -140,7 +141,8 @@ async function processDailySubscriptionCheck(): Promise<void> {
       if (license.expiresAt <= now) {
         // License is past its expires_at timestamp
         if (license.status === "active" && now <= graceEnd) {
-          // D-23: active -> grace_period
+          // D-23: active -> grace_period (validated by state machine)
+          LicenseStateMachine.transition("active", "grace_period");
           const transitioned = await licenseRepo.updateStatus(
             license.id,
             "active",
@@ -199,8 +201,9 @@ async function processDailySubscriptionCheck(): Promise<void> {
           (license.status === "grace_period" && now > graceEnd) ||
           (license.status === "active" && now > graceEnd)
         ) {
-          // D-23: grace_period -> expired OR active -> expired (past grace)
+          // D-23: grace_period -> expired OR active -> expired (past grace, validated by state machine)
           const fromStatus = license.status as "active" | "grace_period";
+          LicenseStateMachine.transition(fromStatus, "expired");
           const transitioned = await licenseRepo.updateStatus(
             license.id,
             fromStatus,

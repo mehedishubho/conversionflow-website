@@ -4,7 +4,7 @@
  * License validation endpoint per D-22, D-23, LGEN-09.
  *
  * Accepts: { license_key, domain, api_token }
- * Returns: { valid, license_id, plan, expires_at, max_activations, current_activations, error }
+ * Returns: { valid, license_id, plan, expires_at, grace_period_expires_at, max_activations, current_activations, error }
  *
  * Security:
  * - Rate limited (100 req/min per IP) per D-08
@@ -79,12 +79,13 @@ export async function POST(request: NextRequest) {
 
   if (!result.valid) return INVALID_RESPONSE();
 
-  // 4. Success response per D-23
+  // 4. Success response per D-02, D-03
   return NextResponse.json({
     valid: true,
     license_id: result.licenseId,
     plan: result.plan,
     expires_at: result.expiresAt?.toISOString() ?? null,
+    grace_period_expires_at: result.gracePeriodExpiresAt?.toISOString() ?? null,
     max_activations: result.maxActivations,
     current_activations: result.currentActivations,
     error: null,

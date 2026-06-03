@@ -361,7 +361,12 @@ Plans:
   3. Grace period of 7-30 days after expiration keeps license valid during grace period
   4. Background job checks for expiring licenses daily and sends reminder emails (30, 14, 7, 3, 1 days before expiration)
   5. BullMQ worker processes license expiration checks daily with Redis queue management and retry logic with exponential backoff
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 18-01-PLAN.md -- Schema, state machine, expiry calculator, domain events, OrderCompletedHandler update
+- [ ] 18-02-PLAN.md -- Validation API grace period update, email templates (3 templates)
+- [ ] 18-03-PLAN.md -- BullMQ worker, admin subscription settings, module-init wiring, schema push
+**UI hint**: yes
 
 ### Phase 19: Portal & Analytics Enhancements
 **Directory**: `19-portal-analytics`
@@ -413,9 +418,9 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Products Bounded Context | 15-products-context | v3.0 | 0/4 | Not started | - |
 | 16. Licensing Core | 16-licensing-core | v3.0 | 0/5 | Planned | - |
 | 17. Customer & Billing Integration | 17-billing-integration | v3.0 | 0/TBD | Not started | - |
-| 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/TBD | Not started | - |
+| 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
 | 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 0/TBD | Not started | - |
 | 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-06-02*
+*Last updated: 2026-06-03*
