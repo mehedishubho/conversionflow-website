@@ -57,8 +57,8 @@ async function enrichGeoIPs(): Promise<void> {
           .where(sql`${licenseActivations.id} = ${row.id}`);
         enrichedCount++;
       }
-    } catch {
-      // Skip individual IP failures
+    } catch (enrichError) {
+      console.warn(`[Analytics] Failed to enrich IP ${row.ipAddress}:`, enrichError);
     }
   }
 
