@@ -2,29 +2,21 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { licenses, settings } from "@/lib/db/schema";
+import { licenses } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { format } from "date-fns";
-import { revalidatePath } from "next/cache";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Badge from "@/components/ui/badge/Badge";
 import { LicenseKeyCopy } from "@/components/portal/LicenseKeyCopy";
-import ActivateDomainForm from "@/components/portal/ActivateDomainForm";
-import SubscriptionStatus from "@/components/portal/SubscriptionStatus";
-import TransferSection from "@/components/portal/TransferSection";
-import TransferCodeInput from "@/components/portal/TransferCodeInput";
-import { deactivateDomain } from "@/app/(portal)/actions/portal-licenses";
-import { getTransferHistory } from "@/app/(portal)/actions/portal-transfers";
 
-type LicenseStatus = "active" | "expired" | "revoked" | "suspended" | "grace_period";
+type LicenseStatus = "active" | "expired" | "revoked" | "suspended";
 
-const statusBadgeMap: Record<LicenseStatus, "success" | "warning" | "error" | "light" | "info"> = {
+const statusBadgeMap: Record<LicenseStatus, "success" | "warning" | "error" | "light"> = {
   active: "success",
   expired: "warning",
   revoked: "error",
   suspended: "light",
-  grace_period: "info",
 };
 
 export default async function LicenseDetailPage({
@@ -69,31 +61,9 @@ export default async function LicenseDetailPage({
       ? `${license.licenseKey.slice(0, 8)}...`
       : license.licenseKey;
 
-  // Fetch transfer history (server-side, license-ownership-verified in action)
-  const transferHistoryResult = await getTransferHistory(id);
-  const transferHistory = Array.isArray(transferHistoryResult)
-    ? transferHistoryResult
-    : [];
-
-  // Fetch monthly transfer limit from settings
-  const settingsRow = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, "max_transfers_per_month"))
-    .limit(1);
-  const monthlyLimit =
-    settingsRow.length > 0
-      ? parseInt(settingsRow[0].value, 10) || 1
-      : 1;
-
   return (
-    <div className="space-y-6">
+    <div>
       <PageBreadcrumb pageTitle={maskedBreadcrumbKey} basePath="/dashboard" />
-
-      {/* Claim a transfer code (standalone section) */}
-      <ComponentCard title="Claim a License">
-        <TransferCodeInput onClaimSuccess={() => {}} />
-      </ComponentCard>
 
       <ComponentCard title="License Details">
         {/* Header: license key + status */}
@@ -156,62 +126,20 @@ export default async function LicenseDetailPage({
             </p>
           ) : (
             <ul className="space-y-2">
-              {domains.map((domainName: string) => (
+              {domains.map((domain: string) => (
                 <li
-                  key={domainName}
+                  key={domain}
                   className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3"
                 >
                   <span className="text-sm text-gray-800 dark:text-white/90">
-                    {domainName}
+                    {domain}
                   </span>
-                  <form
-                    action={async () => {
-                      "use server";
-                      await deactivateDomain(license.id, domainName);
-                      revalidatePath(`/dashboard/licenses/${license.id}`);
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      className="text-xs px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
-                    >
-                      Deactivate
-                    </button>
-                  </form>
                 </li>
               ))}
             </ul>
           )}
-
-          {/* Activate New Domain */}
-          <ActivateDomainForm
-            licenseId={license.id}
-            maxActivations={license.maxActivations ?? 1}
-            currentActivations={license.currentActivations ?? 0}
-          />
         </div>
       </ComponentCard>
-
-      {/* Subscription Status */}
-      <ComponentCard title="Subscription Status">
-        <SubscriptionStatus
-          expiresAt={license.expiresAt}
-          status={license.status}
-        />
-      </ComponentCard>
-
-      {/* Transfer License (only for active licenses) */}
-      {license.status === "active" && (
-        <ComponentCard title="Transfer License">
-          <TransferSection
-            licenseId={license.id}
-            licenseStatus={license.status}
-            transferHistory={transferHistory as any[]}
-            monthlyLimit={monthlyLimit}
-            currentUserId={userId}
-          />
-        </ComponentCard>
-      )}
     </div>
   );
 }

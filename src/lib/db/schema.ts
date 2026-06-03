@@ -37,7 +37,6 @@ export const licenseStatusEnum = pgEnum("license_status", [
   "expired",
   "revoked",
   "suspended",
-  "grace_period",
 ]);
 
 export const ticketStatusEnum = pgEnum("ticket_status", [
@@ -64,40 +63,6 @@ export const redirectTypeEnum = pgEnum("redirect_type", ["301", "302"]);
 export const redirectStatusEnum = pgEnum("redirect_status", [
   "active",
   "inactive",
-]);
-
-export const versionStatusEnum = pgEnum("version_status", [
-  "stable",
-  "beta",
-  "draft",
-]);
-
-export const licenseTypeEnum = pgEnum("license_type", [
-  "lifetime",
-  "subscription",
-]);
-
-export const billingCycleEnum = pgEnum("billing_cycle", [
-  "monthly",
-  "yearly",
-  "custom",
-]);
-
-export const activationActionEnum = pgEnum("activation_action", [
-  "activate",
-  "deactivate",
-]);
-
-export const verificationMethodEnum = pgEnum("verification_method", [
-  "dns",
-  "file",
-  "meta",
-]);
-
-export const transferStatusEnum = pgEnum("transfer_status", [
-  "pending",
-  "completed",
-  "expired",
 ]);
 
 // ──────────────────────────────────────────────
@@ -220,7 +185,6 @@ export const licenses = pgTable(
     activationDomains: jsonb("activation_domains").default([]),
     maxActivations: integer("max_activations").default(1),
     currentActivations: integer("current_activations").default(0),
-    apiTokenHash: text("api_token_hash"),
     expiresAt: timestamp("expires_at"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
@@ -229,91 +193,6 @@ export const licenses = pgTable(
       .$onUpdate(() => new Date()),
   },
   (t) => [unique("licenses_license_key_unique").on(t.licenseKey)],
-);
-
-export const licenseActivations = pgTable(
-  "license_activations",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    licenseId: uuid("license_id")
-      .notNull()
-      .references(() => licenses.id, { onDelete: "cascade" }),
-    domain: text("domain").notNull(),
-    action: activationActionEnum("action").notNull(),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    verificationMethod: verificationMethodEnum("verification_method"),
-    suspiciousFlags: jsonb("suspicious_flags").$type<string[]>().default([]),
-    geo: jsonb("geo").$type<{ country_code: string; country_name?: string }>(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-  },
-  (table) => [
-    index("license_activations_license_id_idx").on(table.licenseId),
-    index("license_activations_created_at_idx").on(table.createdAt),
-    index("license_activations_domain_idx").on(table.domain),
-  ]
-);
-
-export const licenseReminders = pgTable(
-  "license_reminders",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    licenseId: uuid("license_id")
-      .notNull()
-      .references(() => licenses.id, { onDelete: "cascade" }),
-    milestone: text("milestone").notNull(),
-    sentAt: timestamp("sent_at").notNull().defaultNow(),
-  },
-  (table) => [
-    unique("license_reminders_license_id_milestone_unique").on(
-      table.licenseId,
-      table.milestone
-    ),
-    index("license_reminders_license_id_idx").on(table.licenseId),
-  ]
-);
-
-export const licenseTransfers = pgTable(
-  "license_transfers",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    licenseId: uuid("license_id")
-      .notNull()
-      .references(() => licenses.id, { onDelete: "cascade" }),
-    transferCode: text("transfer_code").notNull().unique(),
-    fromUserId: text("from_user_id").notNull(),
-    toUserId: text("to_user_id"),
-    status: transferStatusEnum("status").notNull().default("pending"),
-    expiresAt: timestamp("expires_at").notNull(),
-    completedAt: timestamp("completed_at"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-  },
-  (table) => [
-    index("license_transfers_license_id_idx").on(table.licenseId),
-    index("license_transfers_from_user_id_idx").on(table.fromUserId),
-    index("license_transfers_transfer_code_idx").on(table.transferCode),
-  ]
-);
-
-export const licenseAnalyticsCache = pgTable(
-  "license_analytics_cache",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    snapshotDate: timestamp("snapshot_date").notNull(),
-    totalLicenses: integer("total_licenses").notNull().default(0),
-    activeLicenses: integer("active_licenses").notNull().default(0),
-    expiredLicenses: integer("expired_licenses").notNull().default(0),
-    revokedLicenses: integer("revoked_licenses").notNull().default(0),
-    suspendedLicenses: integer("suspended_licenses").notNull().default(0),
-    gracePeriodLicenses: integer("grace_period_licenses").notNull().default(0),
-    activationRate: integer("activation_rate").notNull().default(0),
-    productBreakdown: jsonb("product_breakdown").$type<Record<string, Record<string, number>>>().default({}),
-    geoDistribution: jsonb("geo_distribution").$type<Record<string, number>>().default({}),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-  },
-  (table) => [
-    index("license_analytics_cache_snapshot_date_idx").on(table.snapshotDate),
-  ]
 );
 
 export const downloads = pgTable("downloads", {
@@ -458,82 +337,6 @@ export const webhookDeliveries = pgTable("webhook_deliveries", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// ──────────────────────────────────────────────
-// Products Tables (D-01 through D-07)
-// ──────────────────────────────────────────────
-
-export const products = pgTable("products", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  description: text("description"),
-  currentVersion: text("current_version"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
-
-export const productVersions = pgTable(
-  "product_versions",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    version: text("version").notNull(),
-    downloadUrl: text("download_url"),
-    changelog: text("changelog"),
-    status: versionStatusEnum("status").notNull().default("draft"),
-    releasedAt: timestamp("released_at"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at")
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [
-    unique("product_versions_product_id_version_unique").on(
-      table.productId,
-      table.version
-    ),
-  ]
-);
-
-export const productPlans = pgTable(
-  "product_plans",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    slug: text("slug").notNull(),
-    description: text("description"),
-    priceBDT: integer("price_bdt").notNull().default(0),
-    priceUSD: integer("price_usd").notNull().default(0),
-    licenseType: licenseTypeEnum("license_type").notNull().default("subscription"),
-    billingCycle: billingCycleEnum("billing_cycle"),
-    billingDurationMonths: integer("billing_duration_months"),
-    maxActivations: integer("max_activations").default(1),
-    features: jsonb("features").$type<Record<string, boolean>>().default({}),
-    sortOrder: integer("sort_order").default(0),
-    active: boolean("active").default(true),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at")
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [
-    unique("product_plans_product_id_slug_unique").on(
-      table.productId,
-      table.slug
-    ),
-  ]
-);
-
 export const redirects = pgTable(
   "redirects",
   {
@@ -653,8 +456,8 @@ export const events = pgTable(
   "events",
   {
     id: text("id").primaryKey(),
-    type: text("type").notNull(),
-    aggregateId: text("aggregate_id").notNull(),
+    type: text("type").notNull().index(),
+    aggregateId: text("aggregate_id").notNull().index(),
     payload: jsonb("payload").notNull(),
     timestamp: timestamp("timestamp").defaultNow().notNull(),
     correlationId: text("correlation_id"),
@@ -705,7 +508,7 @@ export const ordersRelations = relations(orders, ({ one }) => ({
   }),
 }));
 
-export const licensesRelations = relations(licenses, ({ one, many }) => ({
+export const licensesRelations = relations(licenses, ({ one }) => ({
   order: one(orders, {
     fields: [licenses.orderId],
     references: [orders.id],
@@ -713,30 +516,6 @@ export const licensesRelations = relations(licenses, ({ one, many }) => ({
   user: one(user, {
     fields: [licenses.userId],
     references: [user.id],
-  }),
-  activations: many(licenseActivations),
-  reminders: many(licenseReminders),
-  transfers: many(licenseTransfers),
-}));
-
-export const licenseActivationsRelations = relations(licenseActivations, ({ one }) => ({
-  license: one(licenses, {
-    fields: [licenseActivations.licenseId],
-    references: [licenses.id],
-  }),
-}));
-
-export const licenseRemindersRelations = relations(licenseReminders, ({ one }) => ({
-  license: one(licenses, {
-    fields: [licenseReminders.licenseId],
-    references: [licenses.id],
-  }),
-}));
-
-export const licenseTransfersRelations = relations(licenseTransfers, ({ one }) => ({
-  license: one(licenses, {
-    fields: [licenseTransfers.licenseId],
-    references: [licenses.id],
   }),
 }));
 
@@ -777,25 +556,5 @@ export const webhookDeliveriesRelations = relations(webhookDeliveries, ({ one })
   webhook: one(webhooks, {
     fields: [webhookDeliveries.webhookId],
     references: [webhooks.id],
-  }),
-}));
-
-// Products relations
-export const productsRelations = relations(products, ({ many }) => ({
-  versions: many(productVersions),
-  plans: many(productPlans),
-}));
-
-export const productVersionsRelations = relations(productVersions, ({ one }) => ({
-  product: one(products, {
-    fields: [productVersions.productId],
-    references: [products.id],
-  }),
-}));
-
-export const productPlansRelations = relations(productPlans, ({ one }) => ({
-  product: one(products, {
-    fields: [productPlans.productId],
-    references: [products.id],
   }),
 }));

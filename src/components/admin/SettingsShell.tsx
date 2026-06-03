@@ -19,7 +19,6 @@ import {
   BarChart3,
   Code,
   ArrowRightLeft,
-  Clock,
   Bot,
   Image as ImageIcon,
   Zap,
@@ -57,8 +56,6 @@ const SETTINGS_NAV = [
       { label: "Page-Level SEO", href: "/admin/settings/seo/page-level", icon: Layers },
     ],
   },
-  { label: "Subscription", href: "/admin/settings/subscription", icon: Clock },
-  { label: "License Transfer", href: "/admin/settings/transfer", icon: ArrowRightLeft },
 ];
 
 export function SettingsShell({ children }: { children: React.ReactNode }) {

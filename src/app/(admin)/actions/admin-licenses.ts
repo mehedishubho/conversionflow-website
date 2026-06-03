@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { licenses, licenseActivations, user } from "@/lib/db/schema";
+import { licenses, user } from "@/lib/db/schema";
 import { eq, desc, ilike, and, or } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 
@@ -148,8 +148,6 @@ export async function suspendLicense(licenseId: string): Promise<{ success?: boo
       .limit(1);
 
     if (!existing) return { error: "License not found" };
-    if (existing.status === "suspended") return { error: "License already suspended" };
-    if (existing.status === "revoked") return { error: "Cannot suspend a revoked license" };
 
     await db
       .update(licenses)
@@ -169,40 +167,4 @@ export async function suspendLicense(licenseId: string): Promise<{ success?: boo
   } catch {
     return { error: "Failed to suspend license" };
   }
-}
-
-/**
- * Get activation history for a specific license (D-30).
- * Returns chronological rows from license_activations.
- */
-export async function getActivationHistory(
-  licenseId: string,
-  limit: number = 50,
-  offset: number = 0,
-) {
-  await requireAdmin();
-
-  const rows = await db
-    .select()
-    .from(licenseActivations)
-    .where(eq(licenseActivations.licenseId, licenseId))
-    .orderBy(desc(licenseActivations.createdAt))
-    .limit(limit)
-    .offset(offset);
-
-  return rows;
-}
-
-/**
- * Get license details for admin view.
- */
-export async function getLicenseForAdmin(licenseId: string) {
-  await requireAdmin();
-
-  const [license] = await db
-    .select()
-    .from(licenses)
-    .where(eq(licenses.id, licenseId));
-
-  return license ?? null;
 }

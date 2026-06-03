@@ -200,7 +200,7 @@ export async function saveVATSettings(data: { rate: number; mode: "inclusive" | 
 // ──────────────────────────────────────────────
 
 export async function getPaymentSettings() {
-  await requireAdmin();
+  const { userId, role } = await requireAdmin();
 
   // Query all payment accounts
   const accounts = await db.select().from(paymentAccounts);
@@ -241,9 +241,12 @@ export async function getPaymentSettings() {
     vatEnabled: vatEnabledRow.length > 0 ? vatEnabledRow[0].value !== "false" : true,
     sslCommerzEnabled: sslEnabledRow.length > 0 ? sslEnabledRow[0].value !== "false" : true,
     sslCommerz: {
-      storeIdConfigured: !!sslDbStoreId || (!!process.env.SSL_COMMERZ_STORE_ID && process.env.SSL_COMMERZ_STORE_ID !== "your_store_id"),
-      storePasswordConfigured: !!sslDbPassword || (!!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password"),
-      sandbox: sslDbSandbox !== "false" || process.env.SSL_COMMERZ_SANDBOX !== "false",
+      storeIdConfigured: !!process.env.SSL_COMMERZ_STORE_ID && process.env.SSL_COMMERZ_STORE_ID !== "your_store_id",
+      storePasswordConfigured: !!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password",
+      sandbox: process.env.SSL_COMMERZ_SANDBOX !== "false",
+      storeId: sslDbStoreId,
+      storePassword: sslDbPassword,
+      dbSandbox: sslDbSandbox,
     },
     centralApi: {
       urlConfigured: !!process.env.CENTRAL_API_URL,
@@ -305,8 +308,6 @@ export async function saveSSLSettings(data: {
 // ──────────────────────────────────────────────
 
 export async function getSSLSettings() {
-  await requireAdmin();
-
   const rows = await db
     .select()
     .from(settings)
@@ -329,174 +330,4 @@ export async function getSSLSettings() {
     storePassword: passwordRows[0]?.value || process.env.SSL_COMMERZ_STORE_PASSWORD || "",
     sandbox: sandboxRows[0]?.value !== "false" && (sandboxRows.length === 0 ? process.env.SSL_COMMERZ_SANDBOX !== "false" : true),
   };
-}
-
-// ──────────────────────────────────────────────
-// 6. Get Subscription Settings (D-26)
-// ──────────────────────────────────────────────
-
-export async function getSubscriptionSettings() {
-  const { userId, role } = await requireAdmin();
-
-  const [graceRow, milestonesRow] = await Promise.all([
-    db.select().from(settings).where(eq(settings.key, "grace_period_days")).limit(1),
-    db.select().from(settings).where(eq(settings.key, "reminder_milestones")).limit(1),
-  ]);
-
-  return {
-    gracePeriodDays: graceRow.length > 0 ? parseInt(graceRow[0].value, 10) : 7,
-    reminderMilestones: milestonesRow.length > 0 ? milestonesRow[0].value : "30,14,7,3,1",
-  };
-}
-
-// ──────────────────────────────────────────────
-// 7. Save Subscription Settings (D-26, D-27)
-// ──────────────────────────────────────────────
-
-export async function saveSubscriptionSettings(data: {
-  gracePeriodDays: number;
-  reminderMilestones: string;
-}) {
-  const { userId, role } = await requireAdmin();
-
-  // Validate grace period days (D-01: 7-30 range)
-  if (
-    typeof data.gracePeriodDays !== "number" ||
-    isNaN(data.gracePeriodDays) ||
-    data.gracePeriodDays < 7 ||
-    data.gracePeriodDays > 30
-  ) {
-    return { error: "Grace period must be between 7 and 30 days." };
-  }
-
-  // Validate reminder milestones format
-  const milestones = data.reminderMilestones
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-  const invalidMilestones = milestones.filter(
-    (s) => isNaN(parseInt(s, 10)) || parseInt(s, 10) <= 0,
-  );
-  if (invalidMilestones.length > 0) {
-    return {
-      error:
-        "Reminder milestones must be comma-separated positive numbers (e.g., 30,14,7,3,1).",
-    };
-  }
-
-  // Upsert grace_period_days
-  const existingGrace = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, "grace_period_days"))
-    .limit(1);
-  if (existingGrace.length > 0) {
-    await db
-      .update(settings)
-      .set({ value: String(data.gracePeriodDays), updatedAt: new Date() })
-      .where(eq(settings.key, "grace_period_days"));
-  } else {
-    await db
-      .insert(settings)
-      .values({ key: "grace_period_days", value: String(data.gracePeriodDays) });
-  }
-
-  // Upsert reminder_milestones
-  const existingMilestones = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, "reminder_milestones"))
-    .limit(1);
-  const milestonesValue = milestones.join(",");
-  if (existingMilestones.length > 0) {
-    await db
-      .update(settings)
-      .set({ value: milestonesValue, updatedAt: new Date() })
-      .where(eq(settings.key, "reminder_milestones"));
-  } else {
-    await db
-      .insert(settings)
-      .values({ key: "reminder_milestones", value: milestonesValue });
-  }
-
-  // Audit log
-  await createAuditLog({
-    actorId: userId,
-    actorRole: role,
-    action: "admin.settings_updated",
-    targetType: "settings",
-    targetId: "subscription",
-    details: {
-      action: "subscription_settings_updated",
-      gracePeriodDays: data.gracePeriodDays,
-      reminderMilestones: milestonesValue,
-    },
-  });
-
-  return { success: true };
-}
-
-// ──────────────────────────────────────────────
-// 8. Get Transfer Settings
-// ──────────────────────────────────────────────
-
-export async function getTransferSettings() {
-  const { userId, role } = await requireAdmin();
-
-  const row = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, "max_transfers_per_month"))
-    .limit(1);
-
-  return { maxTransfersPerMonth: row.length > 0 ? parseInt(row[0].value, 10) : 1 };
-}
-
-// ──────────────────────────────────────────────
-// 9. Save Transfer Settings
-// ──────────────────────────────────────────────
-
-export async function saveTransferSettings(data: { maxTransfersPerMonth: number }) {
-  const { userId, role } = await requireAdmin();
-
-  if (
-    typeof data.maxTransfersPerMonth !== "number" ||
-    isNaN(data.maxTransfersPerMonth) ||
-    data.maxTransfersPerMonth < 1 ||
-    data.maxTransfersPerMonth > 12
-  ) {
-    return { error: "Transfer limit must be between 1 and 12 per month." };
-  }
-
-  // Upsert pattern following existing saveSubscriptionSettings
-  const existing = await db
-    .select()
-    .from(settings)
-    .where(eq(settings.key, "max_transfers_per_month"))
-    .limit(1);
-
-  if (existing.length > 0) {
-    await db
-      .update(settings)
-      .set({ value: String(data.maxTransfersPerMonth), updatedAt: new Date() })
-      .where(eq(settings.key, "max_transfers_per_month"));
-  } else {
-    await db
-      .insert(settings)
-      .values({ key: "max_transfers_per_month", value: String(data.maxTransfersPerMonth) });
-  }
-
-  await createAuditLog({
-    actorId: userId,
-    actorRole: role,
-    action: "admin.settings_updated",
-    targetType: "settings",
-    targetId: "transfer",
-    details: {
-      action: "transfer_settings_updated",
-      maxTransfersPerMonth: data.maxTransfersPerMonth,
-    },
-  });
-
-  return { success: true };
 }
