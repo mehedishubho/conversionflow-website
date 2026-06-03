@@ -241,12 +241,9 @@ export async function getPaymentSettings() {
     vatEnabled: vatEnabledRow.length > 0 ? vatEnabledRow[0].value !== "false" : true,
     sslCommerzEnabled: sslEnabledRow.length > 0 ? sslEnabledRow[0].value !== "false" : true,
     sslCommerz: {
-      storeIdConfigured: !!process.env.SSL_COMMERZ_STORE_ID && process.env.SSL_COMMERZ_STORE_ID !== "your_store_id",
-      storePasswordConfigured: !!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password",
-      sandbox: process.env.SSL_COMMERZ_SANDBOX !== "false",
-      storeId: sslDbStoreId,
-      storePassword: sslDbPassword,
-      dbSandbox: sslDbSandbox,
+      storeIdConfigured: !!sslDbStoreId || (!!process.env.SSL_COMMERZ_STORE_ID && process.env.SSL_COMMERZ_STORE_ID !== "your_store_id"),
+      storePasswordConfigured: !!sslDbPassword || (!!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password"),
+      sandbox: sslDbSandbox !== "false" || process.env.SSL_COMMERZ_SANDBOX !== "false",
     },
     centralApi: {
       urlConfigured: !!process.env.CENTRAL_API_URL,
@@ -308,6 +305,8 @@ export async function saveSSLSettings(data: {
 // ──────────────────────────────────────────────
 
 export async function getSSLSettings() {
+  await requireAdmin();
+
   const rows = await db
     .select()
     .from(settings)
