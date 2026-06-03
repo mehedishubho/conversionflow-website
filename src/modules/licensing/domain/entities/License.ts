@@ -55,6 +55,24 @@ export class License {
   }
 
   /**
+   * Whether the license is in grace_period status.
+   */
+  get isInGracePeriod(): boolean {
+    return this.status === "grace_period";
+  }
+
+  /**
+   * Number of days until the license expires.
+   * Returns Infinity if no expiry is set (lifetime licenses).
+   * Returns 0 or negative if already expired.
+   */
+  get daysUntilExpiry(): number {
+    if (!this.expiresAt) return Infinity;
+    const msPerDay = 24 * 60 * 60 * 1000;
+    return Math.ceil((this.expiresAt.getTime() - Date.now()) / msPerDay);
+  }
+
+  /**
    * Factory method to create a new License with auto-generated timestamps.
    */
   static create(data: Omit<License, "id" | "createdAt" | "updatedAt">): License {

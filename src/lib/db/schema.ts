@@ -37,6 +37,7 @@ export const licenseStatusEnum = pgEnum("license_status", [
   "expired",
   "revoked",
   "suspended",
+  "grace_period",
 ]);
 
 export const ticketStatusEnum = pgEnum("ticket_status", [
@@ -243,6 +244,25 @@ export const licenseActivations = pgTable(
     index("license_activations_license_id_idx").on(table.licenseId),
     index("license_activations_created_at_idx").on(table.createdAt),
     index("license_activations_domain_idx").on(table.domain),
+  ]
+);
+
+export const licenseReminders = pgTable(
+  "license_reminders",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    licenseId: uuid("license_id")
+      .notNull()
+      .references(() => licenses.id, { onDelete: "cascade" }),
+    milestone: text("milestone").notNull(),
+    sentAt: timestamp("sent_at").notNull().defaultNow(),
+  },
+  (table) => [
+    unique("license_reminders_license_id_milestone_unique").on(
+      table.licenseId,
+      table.milestone
+    ),
+    index("license_reminders_license_id_idx").on(table.licenseId),
   ]
 );
 
@@ -645,11 +665,19 @@ export const licensesRelations = relations(licenses, ({ one, many }) => ({
     references: [user.id],
   }),
   activations: many(licenseActivations),
+  reminders: many(licenseReminders),
 }));
 
 export const licenseActivationsRelations = relations(licenseActivations, ({ one }) => ({
   license: one(licenses, {
     fields: [licenseActivations.licenseId],
+    references: [licenses.id],
+  }),
+}));
+
+export const licenseRemindersRelations = relations(licenseReminders, ({ one }) => ({
+  license: one(licenses, {
+    fields: [licenseReminders.licenseId],
     references: [licenses.id],
   }),
 }));
