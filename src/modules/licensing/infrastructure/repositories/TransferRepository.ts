@@ -59,8 +59,11 @@ export class TransferRepository extends BaseRepository<any, any> {
       .where(
         and(
           eq(licenseTransfers.licenseId, licenseId),
-          eq(licenseTransfers.status, "completed"),
-          gte(licenseTransfers.completedAt, startOfMonth),
+          or(
+            eq(licenseTransfers.status, "completed"),
+            eq(licenseTransfers.status, "pending"),
+          ),
+          gte(licenseTransfers.createdAt, startOfMonth),
         )
       );
     return result[0]?.count ?? 0;
