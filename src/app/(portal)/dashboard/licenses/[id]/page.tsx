@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { licenses } from "@/lib/db/schema";
+import { licenses, settings } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { format } from "date-fns";
 import { revalidatePath } from "next/cache";
@@ -11,15 +11,20 @@ import ComponentCard from "@/components/common/ComponentCard";
 import Badge from "@/components/ui/badge/Badge";
 import { LicenseKeyCopy } from "@/components/portal/LicenseKeyCopy";
 import ActivateDomainForm from "@/components/portal/ActivateDomainForm";
+import SubscriptionStatus from "@/components/portal/SubscriptionStatus";
+import TransferSection from "@/components/portal/TransferSection";
+import TransferCodeInput from "@/components/portal/TransferCodeInput";
 import { deactivateDomain } from "@/app/(portal)/actions/portal-licenses";
+import { getTransferHistory } from "@/app/(portal)/actions/portal-transfers";
 
-type LicenseStatus = "active" | "expired" | "revoked" | "suspended";
+type LicenseStatus = "active" | "expired" | "revoked" | "suspended" | "grace_period";
 
-const statusBadgeMap: Record<LicenseStatus, "success" | "warning" | "error" | "light"> = {
+const statusBadgeMap: Record<LicenseStatus, "success" | "warning" | "error" | "light" | "info"> = {
   active: "success",
   expired: "warning",
   revoked: "error",
   suspended: "light",
+  grace_period: "info",
 };
 
 export default async function LicenseDetailPage({
@@ -64,9 +69,31 @@ export default async function LicenseDetailPage({
       ? `${license.licenseKey.slice(0, 8)}...`
       : license.licenseKey;
 
+  // Fetch transfer history (server-side, license-ownership-verified in action)
+  const transferHistoryResult = await getTransferHistory(id);
+  const transferHistory = Array.isArray(transferHistoryResult)
+    ? transferHistoryResult
+    : [];
+
+  // Fetch monthly transfer limit from settings
+  const settingsRow = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, "max_transfers_per_month"))
+    .limit(1);
+  const monthlyLimit =
+    settingsRow.length > 0
+      ? parseInt(settingsRow[0].value, 10) || 1
+      : 1;
+
   return (
-    <div>
+    <div className="space-y-6">
       <PageBreadcrumb pageTitle={maskedBreadcrumbKey} basePath="/dashboard" />
+
+      {/* Claim a transfer code (standalone section) */}
+      <ComponentCard title="Claim a License">
+        <TransferCodeInput onClaimSuccess={() => {}} />
+      </ComponentCard>
 
       <ComponentCard title="License Details">
         {/* Header: license key + status */}
@@ -164,6 +191,26 @@ export default async function LicenseDetailPage({
           />
         </div>
       </ComponentCard>
+
+      {/* Subscription Status */}
+      <ComponentCard title="Subscription Status">
+        <SubscriptionStatus
+          expiresAt={license.expiresAt}
+          status={license.status}
+        />
+      </ComponentCard>
+
+      {/* Transfer License (only for active licenses) */}
+      {license.status === "active" && (
+        <ComponentCard title="Transfer License">
+          <TransferSection
+            licenseId={license.id}
+            licenseStatus={license.status}
+            transferHistory={transferHistory as any[]}
+            monthlyLimit={monthlyLimit}
+          />
+        </ComponentCard>
+      )}
     </div>
   );
 }
