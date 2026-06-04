@@ -1,12 +1,10 @@
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { redirects, settings } from '@/lib/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
 
-const handleI18nRouting = createMiddleware(routing);
 
 // ──────────────────────────────────────────────
 // Regex rules cache (60 second TTL)
@@ -87,7 +85,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // ──────────────────────────────────────────────
-  // Redirect matching (before auth/i18n checks)
+  // Redirect matching (before auth checks)
   // ──────────────────────────────────────────────
   try {
     // Exact match lookup
@@ -187,8 +185,25 @@ export async function proxy(request: NextRequest) {
 
   const sessionCookie = request.cookies.get('better-auth.session_token');
 
-  // Protected routes (portal + admin, excluding setup): redirect to login if no session
-  if ((portalRoute || adminRoute) && !setupPage && !sessionCookie) {
+  // Validate session server-side when a cookie exists.
+  // better-auth with cookieCache leaves cookies around for expired/invalid sessions,
+  // so checking only cookie existence causes redirect loops:
+  //   /dashboard → page redirects to /login → proxy sees cookie → redirects to /dashboard → ∞
+  let hasValidSession = false;
+  if (sessionCookie) {
+    try {
+      const session = await auth.api.getSession({
+        headers: request.headers,
+      });
+      hasValidSession = !!session;
+    } catch {
+      // Session validation failed (expired, tampered, DB error) — treat as unauthenticated
+      hasValidSession = false;
+    }
+  }
+
+  // Protected routes (portal + admin, excluding setup): redirect to login if no valid session
+  if ((portalRoute || adminRoute) && !setupPage && !hasValidSession) {
     const loginUrl = new URL('/login', request.url);
     const fullUrl = request.nextUrl.search
       ? pathname + request.nextUrl.search
@@ -198,29 +213,26 @@ export async function proxy(request: NextRequest) {
   }
 
   // Auth pages: redirect logged-in users to their appropriate dashboard
-  if (authPage && sessionCookie) {
+  if (authPage && hasValidSession) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Non-marketing routes: pass through without i18n
+  // Non-marketing routes: pass through
   if (nonMarketingRoute) {
     return NextResponse.next();
   }
 
-  // Marketing routes: apply i18n routing
-  return handleI18nRouting(request);
+  // Marketing routes: pass through
+  return NextResponse.next();
 }
 
 // Config for the proxy (equivalent to middleware matcher)
 export const config = {
   matcher: [
-    // Enable a redirect to a matching locale at the root
+    // Match root path
     '/',
 
-    // Set a cookie to remember the last locale for all requests that use to be locale-prefixed
-    '/(bn|en)/:path*',
-
-    // Enable redirects for pathnames without a locale
+    // Match all non-static, non-api routes
     '/((?!api|_next|_vercel|.*\\..*).*)'
   ]
 };

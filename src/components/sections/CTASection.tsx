@@ -1,20 +1,20 @@
 "use client";
 
-import { Link } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function CTASection() {
-  const t = useTranslations("cta");
+  const { t } = useLanguage();
 
   return (
     <section className="sec">
       <div className="max-w-[1280px] mx-auto px-7">
         <div className="cta-wrap">
-          <div className="cta-bd-tag">{t("bdTag")}</div>
-          <h2>{t("title")}</h2>
-          <p>{t("subtitle")}</p>
-          <Link href="/pricing" className="btn btn-white">{t("button")}</Link>
-          <div className="cta-note">{t("note")}</div>
+          <div className="cta-bd-tag">{t("cta.bdTag")}</div>
+          <h2>{t("cta.title")}</h2>
+          <p>{t("cta.subtitle")}</p>
+          <Link href="/pricing" className="btn btn-white">{t("cta.button")}</Link>
+          <div className="cta-note">{t("cta.note")}</div>
         </div>
       </div>
     </section>

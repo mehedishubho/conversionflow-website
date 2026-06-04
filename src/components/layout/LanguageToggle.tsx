@@ -1,32 +1,27 @@
 "use client";
 
-import { usePathname, useRouter } from '@/i18n/routing';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 
 export function LanguageToggle({ className }: { className?: string }) {
-  const locale = useLocale();
-  const pathname = usePathname();
-  const router = useRouter();
-  const t = useTranslations('nav');
+  const { locale, setLocale } = useLanguage();
 
   const toggleLang = () => {
-    const nextLocale = locale === 'en' ? 'bn' : 'en';
-    router.replace(pathname, { locale: nextLocale });
+    setLocale(locale === "en" ? "bn" : "en");
   };
 
   return (
     <button
       onClick={toggleLang}
       className={cn(
-        "h-9 px-2 border border-border rounded-[9px] flex items-center justify-center text-[12px] font-bold hover:border-accent hover:bg-accent-light transition-all text-text2 gap-1",
+        "h-8 md:h-9 px-2 md:px-2.5 border border-border rounded-[9px] flex items-center justify-center text-[11px] md:text-[12px] font-bold hover:border-accent hover:bg-accent-light transition-all text-text2 gap-1",
         className
       )}
       aria-label="Switch Language"
     >
-      <span className={cn(locale === "en" && "text-accent")}>{t("langEn")}</span>
+      <span className={cn(locale === "en" && "text-accent")}>EN</span>
       <span className="text-border">/</span>
-      <span className={cn(locale === "bn" && "text-accent")}>{t("langBn")}</span>
+      <span className={cn(locale === "bn" && "text-accent")}>বাং</span>
     </button>
   );
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link, usePathname } from "@/i18n/routing";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon, Menu, X, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
-import { LanguageToggle } from "./LanguageToggle";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,15 +16,15 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const t = useTranslations("nav");
+  const { t } = useLanguage();
 
   const navLinks = [
-    { name: t("home"), href: "/" },
-    { name: t("features"), href: "/features" },
-    { name: t("pricing"), href: "/pricing" },
-    { name: t("changelog"), href: "/changelog" },
-    { name: t("support"), href: "/support" },
-    { name: t("docs"), href: "/docs" },
+    { name: t("nav.home"), href: "/" },
+    { name: t("nav.features"), href: "/features" },
+    { name: t("nav.pricing"), href: "/pricing" },
+    { name: t("nav.changelog"), href: "/changelog" },
+    { name: t("nav.support"), href: "/support" },
+    { name: t("nav.docs"), href: "/docs" },
   ];
 
   useEffect(() => {
@@ -88,6 +89,8 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+          <LanguageToggle />
+
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="w-8 h-8 md:w-9 md:h-9 border border-border rounded-[9px] flex items-center justify-center text-lg hover:border-accent hover:bg-accent-light transition-all text-text2"
@@ -96,10 +99,8 @@ export function Navbar() {
             {theme === "dark" ? <Sun size={16} className="md:w-[18px] md:h-[18px]" /> : <Moon size={16} className="md:w-[18px] md:h-[18px]" />}
           </button>
 
-          <LanguageToggle />
-
           <Link href="/pricing" className="hidden sm:flex btn btn-primary text-[13px] px-4 py-2">
-            {t("buyNow")} <ArrowRight size={14} className="ml-1" />
+            {t("nav.buyNow")} <ArrowRight size={14} className="ml-1" />
           </Link>
 
           <button
@@ -139,7 +140,6 @@ export function Navbar() {
             ))}
             <div className="h-px bg-border my-2" />
             <div className="p-3 flex items-center justify-between">
-              <span className="text-sm font-medium text-text2">{t("language")}</span>
               <LanguageToggle />
             </div>
             <div className="h-px bg-border my-2" />
@@ -148,7 +148,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="btn btn-primary w-full justify-center py-3"
             >
-              {t("buyNow")}
+              {t("nav.buyNow")}
             </Link>
           </motion.div>
         )}

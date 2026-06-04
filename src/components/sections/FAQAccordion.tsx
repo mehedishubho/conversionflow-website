@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { faqItems } from "@/data/faq";
-import { useTranslations } from "next-intl";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function FAQAccordion() {
   const [openIndex, setOpenIndex] = useState(0);
-  const t = useTranslations("pricingPage");
+  const { t } = useLanguage();
 
   return (
     <div className="faq-list">
@@ -16,11 +16,11 @@ export function FAQAccordion() {
             className="fi-q"
             onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
           >
-            {t(`faqItems.${index}.question`)}
+            {t(`faq.q${index}`)}
             <span className="fi-ic">+</span>
           </div>
           <div className="fi-a">
-            <div className="fi-a-in">{t(`faqItems.${index}.answer`)}</div>
+            <div className="fi-a-in">{t(`faq.a${index}`)}</div>
           </div>
         </div>
       ))}

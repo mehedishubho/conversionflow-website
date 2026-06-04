@@ -1,8 +1,11 @@
-import { Link } from "@/i18n/routing";
+"use client";
+
+import Link from "next/link";
 import { featureCategories } from "@/data/features";
 import { platformPricing } from "@/data/pricing";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const painPoints = [
+const painPointsEn = [
   "Fake COD orders burn courier cost before revenue is real",
   "Browser-only pixels miss purchase signals after iOS and ad blockers",
   "Courier teams waste hours checking Steadfast, Pathao, and RedX manually",
@@ -10,22 +13,41 @@ const painPoints = [
   "Scattered plugins create weak operational visibility",
 ];
 
-const comparisons = [
+const painPointsBn = [
+  "ফেক COD অর্ডার রেভিনিউ আসার আগেই কুরিয়ার খরচ পোড়ায়",
+  "ব্রাউজার-অনলি পিক্সেল iOS এবং অ্যাড ব্লকারের পরে পারচেজ সিগন্যাল মিস করে",
+  "কুরিয়ার টিম Steadfast, Pathao এবং RedX ম্যানুয়ালি চেক করে ঘণ্টা নষ্ট করে",
+  "চেকআউট লিড সেলস টিম ফলো-আপ করার আগেই হারিয়ে যায়",
+  "ছড়িয়ে থাকা প্লাগইন দুর্বল পরিচালনাগত দৃশ্যমানতা তৈরি করে",
+];
+
+const comparisonsEn = [
   ["Scattered plugins", "Separate tracking, courier, fraud, payment, and reporting tools with inconsistent data."],
   ["Manual operations", "Courier dashboards, spreadsheets, missed follow-ups, and no reliable customer delivery history."],
   ["ConversionFlow", "One commerce layer for tracking reliability, courier intelligence, COD protection, recovery, and analytics."],
 ];
 
+const comparisonsBn = [
+  ["ছড়িয়ে থাকা প্লাগইন", "আলাদা ট্র্যাকিং, কুরিয়ার, ফ্রড, পেমেন্ট এবং রিপোর্টিং টুল অসঙ্গত ডেটা সহ।"],
+  ["ম্যানুয়াল অপারেশন", "কুরিয়ার ড্যাশবোর্ড, স্প্রেডশিট, মিসড ফলো-আপ এবং নির্ভরযোগ্য গ্রাহক ডেলিভারি ইতিহাস নেই।"],
+  ["ConversionFlow", "ট্র্যাকিং নির্ভরযোগ্যতা, কুরিয়ার ইন্টেলিজেন্স, COD সুরক্ষা, রিকভারি এবং অ্যানালিটিক্সের জন্য একটি কমার্স লেয়ার।"],
+];
+
 export function RepositioningSections() {
+  const { t, locale } = useLanguage();
+
+  const painPoints = locale === "bn" ? painPointsBn : painPointsEn;
+  const comparisons = locale === "bn" ? comparisonsBn : comparisonsEn;
+
   return (
     <>
       <section className="sec">
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="sh center">
-            <div className="eyebrow">The Operational Gap</div>
-            <h2 className="sec-title">The problem is not only checkout. It is the full order signal chain.</h2>
+            <div className="eyebrow">{t("repositioning.painEyebrow")}</div>
+            <h2 className="sec-title">{t("repositioning.painTitle")}</h2>
             <p className="sec-sub">
-              ConversionFlow is built for stores where ads, COD orders, courier outcomes, payment commitment, and customer delivery history all affect profit.
+              {t("repositioning.painSub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
@@ -42,9 +64,9 @@ export function RepositioningSections() {
       <section className="sec sec-bg">
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="sh center">
-            <div className="eyebrow">Platform Editions</div>
-            <h2 className="sec-title">One commerce operations ecosystem, three implementation paths.</h2>
-            <p className="sec-sub">Start where your stack lives today and keep the same operational philosophy as your business matures.</p>
+            <div className="eyebrow">{t("repositioning.platformEyebrow")}</div>
+            <h2 className="sec-title">{t("repositioning.platformTitle")}</h2>
+            <p className="sec-sub">{t("repositioning.platformSub")}</p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {platformPricing.map((platform) => (
@@ -66,8 +88,8 @@ export function RepositioningSections() {
       <section className="sec">
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="sh center">
-            <div className="eyebrow">Feature Hierarchy</div>
-            <h2 className="sec-title">From ad signal to delivery outcome, every module supports conversion quality.</h2>
+            <div className="eyebrow">{t("repositioning.featureEyebrow")}</div>
+            <h2 className="sec-title">{t("repositioning.featureTitle")}</h2>
           </div>
           <div className="bento">
             {featureCategories.map((category, index) => (
@@ -88,27 +110,27 @@ export function RepositioningSections() {
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
             <div>
-              <div className="eyebrow">Ads Infrastructure</div>
-              <h2 className="sec-title">Give Meta and Google cleaner commerce events.</h2>
+              <div className="eyebrow">{t("repositioning.adsEyebrow")}</div>
+              <h2 className="sec-title">{t("repositioning.adsTitle")}</h2>
               <p className="sec-sub" style={{ margin: "0 0 22px" }}>
-                ConversionFlow supports server-side purchase signals, browser event backup, GA4 visibility, GTM routing, and campaign diagnostics that match operational reality.
+                {t("repositioning.adsSub")}
               </p>
               <ul className="checks">
-                <li><div className="ck">✓</div>Meta CAPI + Pixel for purchase and checkout reliability</li>
-                <li><div className="ck">✓</div>Google Ads, GA4, GTM, TikTok, Pinterest, and Bing UET coverage</li>
-                <li><div className="ck">✓</div>Delivery and return outcomes for better ROAS interpretation</li>
+                <li><div className="ck">✓</div>{t("repositioning.adsCheck1")}</li>
+                <li><div className="ck">✓</div>{t("repositioning.adsCheck2")}</li>
+                <li><div className="ck">✓</div>{t("repositioning.adsCheck3")}</li>
               </ul>
             </div>
             <div>
-              <div className="eyebrow">Bangladesh COD Operations</div>
-              <h2 className="sec-title">Control risk before the courier cost is spent.</h2>
+              <div className="eyebrow">{t("repositioning.codEyebrow")}</div>
+              <h2 className="sec-title">{t("repositioning.codTitle")}</h2>
               <p className="sec-sub" style={{ margin: "0 0 22px" }}>
-                Courier history, partial payments, booking money, fraud rules, and order activity logs help COD-heavy teams dispatch with better context.
+                {t("repositioning.codSub")}
               </p>
               <ul className="checks">
-                <li><div className="ck">✓</div>Steadfast, Pathao, and RedX operational positioning</li>
-                <li><div className="ck">✓</div>Advance payment and COD booking money workflows</li>
-                <li><div className="ck">✓</div>Delivery success analytics and customer courier history</li>
+                <li><div className="ck">✓</div>{t("repositioning.codCheck1")}</li>
+                <li><div className="ck">✓</div>{t("repositioning.codCheck2")}</li>
+                <li><div className="ck">✓</div>{t("repositioning.codCheck3")}</li>
               </ul>
             </div>
           </div>
@@ -118,8 +140,8 @@ export function RepositioningSections() {
       <section className="sec">
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="sh center">
-            <div className="eyebrow">Operational Comparison</div>
-            <h2 className="sec-title">Replace fragile workflows with one commerce intelligence layer.</h2>
+            <div className="eyebrow">{t("repositioning.comparisonEyebrow")}</div>
+            <h2 className="sec-title">{t("repositioning.comparisonTitle")}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {comparisons.map(([title, body]) => (

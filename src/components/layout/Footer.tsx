@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+
 import { footerProductLinks } from "@/data/navigation";
-import { LanguageToggle } from "./LanguageToggle";
+
 
 const socialLinks = [
   {
@@ -50,17 +51,17 @@ const socialLinks = [
 ];
 
 export function Footer() {
-  const t = useTranslations("footer");
-  const tn = useTranslations("nav");
+  const { t } = useLanguage();
+
   const [email, setEmail] = useState("");
 
   const achievements = [
-    { icon: "🏪", num: t("badge1Num"), label: t("badge1Label") },
-    { icon: "🇧🇩", num: "3", label: t("bdCouriers") },
-    { icon: "📊", num: "6", label: t("trackingPlatforms") },
-    { icon: "🛡️", num: "100%", label: t("capiAccuracy") },
-    { icon: "🔄", num: t("badge2Num"), label: t("badge2Label") },
-    { icon: "⚡", num: t("badge3Num"), label: t("badge3Label") },
+    { icon: "🏪", num: "500+", label: t("footer.activeStores") },
+    { icon: "🇧🇩", num: "3", label: t("footer.bdCouriers") },
+    { icon: "📊", num: "6", label: t("footer.trackingPlatforms") },
+    { icon: "🛡️", num: "100%", label: t("footer.capiAccuracy") },
+    { icon: "🔄", num: "30-Day", label: t("footer.moneyBack") },
+    { icon: "⚡", num: "v0.0.14", label: t("footer.latestVersion") },
   ];
 
   return (
@@ -77,23 +78,19 @@ export function Footer() {
                 <div className="ft-logo-icon">🚀</div>
                 <span className="ft-logo-text">Conversion<span>Flow</span></span>
               </Link>
-              <p className="ft-tagline">{t("tagline")}</p>
+              <p className="ft-tagline">{t("footer.tagline")}</p>
             </div>
 
             {/* Product */}
             <div className="ft-col">
-              <h4 className="ft-col-heading">{t("product")}</h4>
+              <h4 className="ft-col-heading">{t("footer.product")}</h4>
               {footerProductLinks.map((link) => {
-                const navKey = link.name.toLowerCase().includes("doc") ? "docs" : link.name.toLowerCase();
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const label = tn.has(navKey as any) ? tn(navKey as any) : link.name;
                 return (
                   <Link key={link.href}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    href={link.href as any}
+                    href={link.href}
                     className="ft-link"
                   >
-                    {label}
+                    {link.name}
                   </Link>
                 );
               })}
@@ -101,17 +98,17 @@ export function Footer() {
 
             {/* Resources */}
             <div className="ft-col">
-              <h4 className="ft-col-heading">{t("resources")}</h4>
-              <Link href="/blog" className="ft-link">{t("blog")}</Link>
-              <Link href="/privacy" className="ft-link">{t("privacyPolicy")}</Link>
-              <Link href="/terms" className="ft-link">{t("termsOfService")}</Link>
-              <Link href="/refund" className="ft-link">{t("refundPolicy")}</Link>
-              <Link href="/license" className="ft-link">{t("licenseAgreement")}</Link>
+              <h4 className="ft-col-heading">{t("footer.resources")}</h4>
+              <Link href="/blog" className="ft-link">{t("footer.blog")}</Link>
+              <Link href="/privacy" className="ft-link">{t("footer.privacyPolicy")}</Link>
+              <Link href="/terms" className="ft-link">{t("footer.termsOfService")}</Link>
+              <Link href="/refund" className="ft-link">{t("footer.refundPolicy")}</Link>
+              <Link href="/license" className="ft-link">{t("footer.licenseAgreement")}</Link>
             </div>
 
             {/* Contact */}
             <div className="ft-col">
-              <h4 className="ft-col-heading">{t("connectLabel")}</h4>
+              <h4 className="ft-col-heading">{t("footer.connectLabel")}</h4>
               <a href="mailto:mhs@wpmhs.com" className="ft-link">
                 mhs@wpmhs.com
               </a>
@@ -127,16 +124,16 @@ export function Footer() {
                 ))}
               </div>
               <div style={{ marginTop: "16px" }}>
-                <p className="ft-newsletter-heading">{t("newsletterLabel")}</p>
+                <p className="ft-newsletter-heading">{t("footer.newsletterLabel")}</p>
                 <div className="ft-subscribe-row">
                   <input
                     type="email"
                     className="ft-subscribe-input"
-                    placeholder={t("newsletterPlaceholder")}
+                    placeholder={t("footer.newsletterPlaceholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                  <button className="ft-subscribe-btn">{t("newsletterBtn")}</button>
+                  <button className="ft-subscribe-btn">{t("footer.newsletterBtn")}</button>
                 </div>
               </div>
             </div>
@@ -165,16 +162,14 @@ export function Footer() {
       <div className="ft-bottom">
         <div className="max-w-[1280px] mx-auto px-7 ft-bottom-inner flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <p className="ft-copyright">{t("copyright")}</p>
-            <LanguageToggle className="h-7 px-1.5 rounded-md border-opacity-30" />
-          </div>
-          <span className="ft-made-in">{t("madeIn")}</span>
+            <p className="ft-copyright">{t("footer.copyright")}</p></div>
+          <span className="ft-made-in">{t("footer.madeIn")}</span>
         </div>
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className="ft-back-top ft-back-top--fixed"
         >
-          {t("backToTop")}
+          {t("footer.backToTop")}
         </button>
       </div>
 

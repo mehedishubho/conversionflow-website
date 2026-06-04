@@ -3,11 +3,16 @@
 import { useState } from "react";
 import { pricingTiers } from "@/data/pricing";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function PricingGrid() {
+  const { t } = useLanguage();
   const [currency, setCurrency] = useState<"USD" | "BDT">("USD");
-  const t = useTranslations("pricingPage");
+
+  const getTier = (index: number) => {
+    const keys = ["starter", "professional", "agency"] as const;
+    return keys[index];
+  };
 
   return (
     <>
@@ -27,55 +32,57 @@ export function PricingGrid() {
       </div>
 
       <div className="price-grid">
-        {pricingTiers.map((tier, i) => (
-          <div key={tier.plan} className={`pc${tier.popular ? " pop" : ""}`}>
-            {tier.popular && <div className="pop-tag">{t("mostPopular")}</div>}
-            <div className="p-plan">{t(`tiers.${i}.plan`)}</div>
-            <div className="p-price">
-              {currency === "USD" ? tier.priceUSD : tier.priceBDT}
-              <span>{t(`tiers.${i}.period`)}</span>
+        {pricingTiers.map((tier, i) => {
+          const tierKey = getTier(i);
+          return (
+            <div key={tier.plan} className={`pc${tier.popular ? " pop" : ""}`}>
+              {tier.popular && <div className="pop-tag">{t("pricing.mostPopular")}</div>}
+              <div className="p-plan">{t(`pricing.${tierKey}.plan`)}</div>
+              <div className="p-price">
+                {currency === "USD" ? tier.priceUSD : tier.priceBDT}
+                <span>{t(`pricing.${tierKey}.period`)}</span>
+              </div>
+              <div className="p-bdt">{currency === "USD" ? tier.priceBDT : tier.priceUSD}</div>
+              <div className="p-desc">{t(`pricing.${tierKey}.desc`)}</div>
+              <ul className="p-features">
+                {tier.features.map((f, j) => {
+                  const localizedText = t(`pricing.${tierKey}.feature${j}`);
+                  return (
+                    <li key={j}>
+                      <span className={f.included ? "p-ck" : "p-no"}>{f.included ? "✓" : "✗"}</span>
+                      {localizedText}
+                    </li>
+                  );
+                })}
+              </ul>
+              <a
+                href={tier.checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`btn ${tier.buttonStyle}`}
+                style={{ width: "100%", justifyContent: "center", padding: "13px", cursor: "pointer" }}
+              >
+                {t(`pricing.${tierKey}.buttonText`)}
+              </a>
+              <a
+                href={`https://wa.me/8801721328992?text=${encodeURIComponent(tier.whatsappMessage)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center text-[11px] text-muted mt-2 hover:text-accent transition-colors"
+              >
+                {t("pricing.whatsappPay")}
+              </a>
             </div>
-            <div className="p-bdt">{currency === "USD" ? tier.priceBDT : tier.priceUSD}</div>
-            <div className="p-desc">{t(`tiers.${i}.desc`)}</div>
-            <ul className="p-features">
-              {tier.features.map((f, j) => {
-                const localizedFeatures = t.raw(`tiers.${i}.features`);
-                const localizedText = Array.isArray(localizedFeatures) ? localizedFeatures[j] : f.text;
-                return (
-                  <li key={j}>
-                    <span className={f.included ? "p-ck" : "p-no"}>{f.included ? "✓" : "✗"}</span>
-                    {localizedText}
-                  </li>
-                );
-              })}
-            </ul>
-            <a
-              href={tier.checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`btn ${tier.buttonStyle}`}
-              style={{ width: "100%", justifyContent: "center", padding: "13px", cursor: "pointer" }}
-            >
-              {t(`tiers.${i}.buttonText`)}
-            </a>
-            <a
-              href={`https://wa.me/8801721328992?text=${encodeURIComponent(tier.whatsappMessage)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center text-[11px] text-muted mt-2 hover:text-accent transition-colors"
-            >
-              {t("whatsappPay")}
-            </a>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="trust-strip">
-        <div className="ts-it">{t("trustSecure")}</div>
-        <div className="ts-it">{t("trustPayment")}</div>
-        <div className="ts-it">{t("trustRefund")}</div>
-        <div className="ts-it">{t("trustDelivery")}</div>
-        <div className="ts-it">{t("trustSupport")}</div>
+        <div className="ts-it">{t("pricing.trustSecure")}</div>
+        <div className="ts-it">{t("pricing.trustPayment")}</div>
+        <div className="ts-it">{t("pricing.trustRefund")}</div>
+        <div className="ts-it">{t("pricing.trustDelivery")}</div>
+        <div className="ts-it">{t("pricing.trustSupport")}</div>
       </div>
     </>
   );

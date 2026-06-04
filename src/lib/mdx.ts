@@ -11,7 +11,7 @@ export interface DocPostMeta {
   order: number;
 }
 
-export function getDocPosts(locale: string = "en"): DocPostMeta[] {
+export function getDocPosts(locale: string = "bn"): DocPostMeta[] {
   if (!fs.existsSync(DOCS_DIR)) return [];
   const files = fs.readdirSync(DOCS_DIR).filter((file) => file.endsWith(".mdx"));
 
@@ -48,7 +48,7 @@ export function getDocPosts(locale: string = "en"): DocPostMeta[] {
     .sort((a, b) => a.order - b.order);
 }
 
-export function getMdxBySlug(slug: string, locale: string = "en") {
+export function getMdxBySlug(slug: string, locale: string = "bn") {
   const bnPath = path.join(DOCS_DIR, `${slug}.bn.mdx`);
   const enPath = path.join(DOCS_DIR, `${slug}.mdx`);
 
