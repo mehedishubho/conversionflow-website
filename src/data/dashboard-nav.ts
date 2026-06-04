@@ -17,6 +17,7 @@ import {
   Webhook,
   ScrollText,
   Package,
+  HardDrive,
 } from "lucide-react";
 
 export type NavItem = {
@@ -53,6 +54,7 @@ export const adminNavItems: NavItem[] = [
   { name: "Activity", icon: Activity, path: "/admin/activity" },
   { name: "Notifications", icon: Bell, path: "/admin/notifications" },
   { name: "Webhooks", icon: Webhook, path: "/admin/webhooks" },
+  { name: "Backups", icon: HardDrive, path: "/admin/backup" },
   { name: "Blog", icon: PenTool, path: "/admin/blog" },
   { name: "Settings", icon: Settings, path: "/admin/settings" },
 ];

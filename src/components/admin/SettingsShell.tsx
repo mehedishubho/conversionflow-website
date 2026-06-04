@@ -20,6 +20,7 @@ import {
   Code,
   ArrowRightLeft,
   Clock,
+  Database,
   Bot,
   Image as ImageIcon,
   Zap,
@@ -59,6 +60,7 @@ const SETTINGS_NAV = [
   },
   { label: "Subscription", href: "/admin/settings/subscription", icon: Clock },
   { label: "License Transfer", href: "/admin/settings/transfer", icon: ArrowRightLeft },
+  { label: "Backup", href: "/admin/settings/backup", icon: Database },
 ];
 
 export function SettingsShell({ children }: { children: React.ReactNode }) {
