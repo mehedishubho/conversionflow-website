@@ -3,7 +3,7 @@ import { routing } from './i18n/routing';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { redirects } from '@/lib/db/schema';
+import { redirects, settings } from '@/lib/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
 const handleI18nRouting = createMiddleware(routing);
@@ -165,6 +165,25 @@ export async function proxy(request: NextRequest) {
   const adminRoute = isAdminRoute(pathname);
   const setupPage = isSetupPage(pathname);
   const nonMarketingRoute = authPage || portalRoute || adminRoute || setupPage;
+
+  // ──────────────────────────────────────────────
+  // Maintenance mode check (Phase 21, D-07)
+  // ──────────────────────────────────────────────
+  if (nonMarketingRoute && !adminRoute) {
+    try {
+      const maintenanceRow = await db
+        .select({ value: settings.value })
+        .from(settings)
+        .where(eq(settings.key, "maintenance_mode"))
+        .limit(1);
+
+      if (maintenanceRow.length > 0 && maintenanceRow[0].value === "true") {
+        return NextResponse.rewrite(new URL("/maintenance", request.url));
+      }
+    } catch {
+      // DB unavailability gracefully falls through
+    }
+  }
 
   const sessionCookie = request.cookies.get('better-auth.session_token');
 
