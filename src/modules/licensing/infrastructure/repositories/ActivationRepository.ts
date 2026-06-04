@@ -11,7 +11,7 @@ import { licenseActivations } from "@/lib/db/schema";
 import { ActivationMapper } from "./mappers/ActivationMapper";
 import { eq, sql, desc } from "drizzle-orm";
 
-export class ActivationRepository extends BaseRepository<Activation, typeof licenseActivations.$inferSelect> {
+export class ActivationRepository extends BaseRepository<Activation, typeof licenseActivations.$inferInsert> {
   constructor() {
     super(licenseActivations, new ActivationMapper());
   }

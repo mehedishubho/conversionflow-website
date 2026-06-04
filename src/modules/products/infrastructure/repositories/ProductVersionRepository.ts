@@ -11,7 +11,7 @@ import { productVersions } from "@/lib/db/schema";
 import { ProductVersionMapper } from "./mappers/ProductVersionMapper";
 import { eq, and, desc } from "drizzle-orm";
 
-export class ProductVersionRepository extends BaseRepository<ProductVersion, typeof productVersions.$inferSelect> {
+export class ProductVersionRepository extends BaseRepository<ProductVersion, typeof productVersions.$inferInsert> {
   constructor() {
     super(productVersions, new ProductVersionMapper());
   }

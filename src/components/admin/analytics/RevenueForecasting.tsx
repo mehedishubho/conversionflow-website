@@ -12,6 +12,7 @@ import {
   Info,
 } from "lucide-react";
 import ApexChart from "react-apexcharts";
+import type { ApexOptions } from "apexcharts";
 
 interface ForecastData {
   month: string;
@@ -35,7 +36,7 @@ export default function RevenueForecasting({
   confidence,
   nextQuarterPrediction,
 }: RevenueForecastingProps) {
-  const chartOptions = {
+  const chartOptions: ApexOptions = {
     chart: {
       type: "line",
       height: 350,
@@ -87,8 +88,8 @@ export default function RevenueForecasting({
     },
     tooltip: {
       y: {
-        formatter: (value: number, { seriesIndex }) => {
-          return seriesIndex === 1
+        formatter: (value: number, opts) => {
+          return opts?.seriesIndex === 1
             ? `Predicted: ৳${value.toLocaleString()}`
             : `Actual: ৳${value.toLocaleString()}`;
         },

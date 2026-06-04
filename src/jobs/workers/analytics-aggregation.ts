@@ -8,7 +8,7 @@
  */
 
 import { Worker } from "bullmq";
-import { redis } from "@/lib/redis";
+import { bullRedis } from "@/lib/redis";
 import { analyticsQueue } from "@/jobs/queues";
 import { db } from "@/lib/db";
 import { licenseActivations } from "@/lib/db/schema";
@@ -133,7 +133,7 @@ export async function scheduleAnalyticsJob(): Promise<void> {
 /** Start the worker to process analytics jobs */
 export function startAnalyticsWorker(): void {
   if (workerStarted) return;
-  if (!redis) {
+  if (!bullRedis) {
     console.warn("[Analytics] Redis not available, worker not started");
     return;
   }
@@ -144,7 +144,7 @@ export function startAnalyticsWorker(): void {
       await processDailyAnalyticsAggregation();
     },
     {
-      connection: redis,
+      connection: bullRedis,
       concurrency: 1,
     },
   );

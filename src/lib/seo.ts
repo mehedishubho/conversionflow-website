@@ -6,6 +6,7 @@ import { inArray, eq } from "drizzle-orm";
 
 // Re-export pageSeo from the client-safe config file
 export { pageSeo, type PageSeo } from "@/lib/page-seo-config";
+import { pageSeo } from "@/lib/page-seo-config";
 
 export interface SeoOverrides {
   title?: string;

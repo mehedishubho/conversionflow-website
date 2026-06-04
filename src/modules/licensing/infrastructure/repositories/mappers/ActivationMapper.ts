@@ -9,7 +9,7 @@ import type { IMapper } from "@/shared/infrastructure/repositories";
 import { Activation } from "@/modules/licensing/domain/entities/Activation";
 import type { licenseActivations } from "@/lib/db/schema";
 
-export class ActivationMapper implements IMapper<Activation, typeof licenseActivations.$inferSelect> {
+export class ActivationMapper implements IMapper<Activation, typeof licenseActivations.$inferInsert> {
   /**
    * Convert database row to Activation domain entity.
    * Handles JSONB deserialization for suspiciousFlags (defaults to []).

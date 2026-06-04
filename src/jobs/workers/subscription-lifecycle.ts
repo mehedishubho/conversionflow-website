@@ -9,7 +9,7 @@
  */
 
 import { Worker } from "bullmq";
-import { redis } from "@/lib/redis";
+import { redis, bullRedis } from "@/lib/redis";
 import { subscriptionQueue } from "@/jobs/queues";
 import { db } from "@/lib/db";
 import { settings, licenseReminders, licenses, user } from "@/lib/db/schema";
@@ -320,7 +320,7 @@ export async function scheduleSubscriptionJob(): Promise<void> {
 /** Start the worker to process subscription jobs */
 export function startSubscriptionWorker(): void {
   if (workerStarted) return;
-  if (!redis) {
+  if (!bullRedis) {
     console.warn("[Subscription] Redis not available, worker not started");
     return;
   }
@@ -331,7 +331,7 @@ export function startSubscriptionWorker(): void {
       await processDailySubscriptionCheck();
     },
     {
-      connection: redis,
+      connection: bullRedis,
       concurrency: 1,
     },
   );

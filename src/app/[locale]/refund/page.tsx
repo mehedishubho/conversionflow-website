@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { LegalLayout } from "@/components/legal/LegalLayout";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
@@ -7,7 +8,13 @@ export const metadata: Metadata = {
   description: "ConversionFlow Refund Policy -- 30-day money-back guarantee.",
 };
 
-export default function RefundPage() {
+export default async function RefundPage({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <ScrollReveal>
       <LegalLayout title="Refund Policy" lastUpdated="June 1, 2025">

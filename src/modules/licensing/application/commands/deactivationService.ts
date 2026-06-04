@@ -85,7 +85,7 @@ export async function performDeactivation(
 
   return {
     success: true,
-    currentActivations: updated.currentActivations,
-    maxActivations: updated.maxActivations,
+    currentActivations: updated.currentActivations ?? undefined,
+    maxActivations: updated.maxActivations ?? undefined,
   };
 }

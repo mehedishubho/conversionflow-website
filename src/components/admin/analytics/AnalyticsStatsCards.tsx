@@ -34,12 +34,12 @@ interface AnalyticsStatsCardsProps {
     customerLifetimeValue: number;
     revenueGrowthRate: number;
   };
-  previousPeriod?: {
+  previousPeriod?: Partial<{
     sessions: number;
     pageViews: number;
     avgOrderValue: number;
     conversionRate: number;
-  };
+  }>;
 }
 
 export default function AnalyticsStatsCards({
@@ -73,17 +73,17 @@ export default function AnalyticsStatsCards({
     {
       title: "Sessions",
       value: stats.sessions,
-      change: previousPeriod ? calculateChange(stats.sessions, previousPeriod.sessions) : 0,
+      change: previousPeriod ? calculateChange(stats.sessions, previousPeriod.sessions ?? 0) : 0,
       icon: <Users className="w-5 h-5" />,
-      trend: previousPeriod ? calculateTrend(stats.sessions, previousPeriod.sessions) : "flat",
+      trend: previousPeriod ? calculateTrend(stats.sessions, previousPeriod.sessions ?? 0) : "flat",
       description: "Total user sessions",
     },
     {
       title: "Page Views",
       value: stats.pageViews,
-      change: previousPeriod ? calculateChange(stats.pageViews, previousPeriod.pageViews) : 0,
+      change: previousPeriod ? calculateChange(stats.pageViews, previousPeriod.pageViews ?? 0) : 0,
       icon: <Eye className="w-5 h-5" />,
-      trend: previousPeriod ? calculateTrend(stats.pageViews, previousPeriod.pageViews) : "flat",
+      trend: previousPeriod ? calculateTrend(stats.pageViews, previousPeriod.pageViews ?? 0) : "flat",
       description: "Total pages viewed",
     },
     {
@@ -97,17 +97,17 @@ export default function AnalyticsStatsCards({
     {
       title: "Avg. Order Value",
       value: formatCurrency(stats.avgOrderValue),
-      change: previousPeriod ? calculateChange(stats.avgOrderValue, previousPeriod.avgOrderValue) : 0,
+      change: previousPeriod ? calculateChange(stats.avgOrderValue, previousPeriod.avgOrderValue ?? 0) : 0,
       icon: <ShoppingCart className="w-5 h-5" />,
-      trend: previousPeriod ? calculateTrend(stats.avgOrderValue, previousPeriod.avgOrderValue) : "flat",
+      trend: previousPeriod ? calculateTrend(stats.avgOrderValue, previousPeriod.avgOrderValue ?? 0) : "flat",
       description: "Per order average",
     },
     {
       title: "Conversion Rate",
       value: `${stats.conversionRate.toFixed(2)}%`,
-      change: previousPeriod ? calculateChange(stats.conversionRate, previousPeriod.conversionRate) : 0,
+      change: previousPeriod ? calculateChange(stats.conversionRate, previousPeriod.conversionRate ?? 0) : 0,
       icon: <Percent className="w-5 h-5" />,
-      trend: previousPeriod ? calculateTrend(stats.conversionRate, previousPeriod.conversionRate) : "flat",
+      trend: previousPeriod ? calculateTrend(stats.conversionRate, previousPeriod.conversionRate ?? 0) : "flat",
       description: "Visitors to customers",
     },
     {

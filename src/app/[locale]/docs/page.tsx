@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import DocsClient from "@/components/docs/DocsClient";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
@@ -13,6 +14,8 @@ export default async function DocsPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <ScrollReveal>
       <DocsClient params={params} />

@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { getPublishedPosts } from "@/lib/blog";
 import { BlogPageClient } from "@/components/blog/BlogPageClient";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
@@ -15,6 +16,7 @@ export default async function BlogPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const { posts } = await getPublishedPosts(locale, 1, 12);
 
   return (

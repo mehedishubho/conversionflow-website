@@ -7,6 +7,7 @@ import { HowItWorks } from "@/components/sections/HowItWorks";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { CTASection } from "@/components/sections/CTASection";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
+import { setRequestLocale } from "next-intl/server";
 
 export async function generateStaticParams() {
   return [
@@ -20,8 +21,9 @@ export default async function Home({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  await params;
-  
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <HeroSection />

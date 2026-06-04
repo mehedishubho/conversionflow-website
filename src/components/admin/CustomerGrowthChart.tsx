@@ -79,7 +79,7 @@ export default function CustomerGrowthChart({
     },
   };
 
-  const series: ApexAxisChartSeries = [
+  const series = [
     { name: "New Signups", type: "column", data: newSignups },
     { name: "Total Customers", type: "line", data: cumulativeTotal },
   ];

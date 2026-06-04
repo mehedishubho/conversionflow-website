@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { headers } from "next/navigation";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import AnalyticsDashboardClient from "@/components/portal/analytics/AnalyticsDashboardClient";
 

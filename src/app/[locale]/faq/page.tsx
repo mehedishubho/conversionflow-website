@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { faqItems } from "@/data/faq";
@@ -35,7 +36,13 @@ function faqSchema() {
   };
 }
 
-export default function FAQPage() {
+export default async function FAQPage({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <JsonLd data={[faqSchema(), breadcrumbSchema([{ name: "Home", path: "/" }, { name: "FAQ", path: "/faq" }])]} />

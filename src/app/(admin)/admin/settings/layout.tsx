@@ -3,8 +3,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SettingsShell } from "@/components/admin/SettingsShell";
 
-export const dynamic = "force-dynamic";
-
 export default async function SettingsLayout({
   children,
 }: {

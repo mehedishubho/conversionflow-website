@@ -6,7 +6,7 @@
  */
 
 import { Worker } from "bullmq";
-import { redis } from "@/lib/redis";
+import { bullRedis } from "@/lib/redis";
 import { backupQueue } from "@/jobs/queues";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
@@ -107,7 +107,7 @@ export async function scheduleBackupJob(): Promise<void> {
 /** Start the worker to process backup jobs */
 export function startBackupWorker(): void {
   if (workerStarted) return;
-  if (!redis) {
+  if (!bullRedis) {
     console.warn("[Backup] Redis not available, worker not started");
     return;
   }
@@ -118,7 +118,7 @@ export function startBackupWorker(): void {
       await processScheduledBackup();
     },
     {
-      connection: redis,
+      connection: bullRedis,
       concurrency: 1,
     }
   );

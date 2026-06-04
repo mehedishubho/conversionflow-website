@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import ApexChart from "react-apexcharts";
+import type { ApexOptions } from "apexcharts";
 
 interface CLVCohort {
   period: string;
@@ -30,7 +31,7 @@ export default function CustomerLifetimeValue({
   overallLTV,
   ltvGrowth,
 }: CustomerLifetimeValueProps) {
-  const chartOptions = {
+  const chartOptions: ApexOptions = {
     chart: {
       type: "line",
       height: 350,
@@ -96,8 +97,9 @@ export default function CustomerLifetimeValue({
     },
     tooltip: {
       y: {
-        formatter: (value: number, { series }) => {
-          return series.name === "LTV"
+        formatter: (value: number, opts) => {
+          const seriesName = opts?.series?.name;
+          return seriesName === "LTV"
             ? `LTV: ৳${value.toLocaleString()}`
             : `Revenue: ৳${value.toLocaleString()}`;
         },

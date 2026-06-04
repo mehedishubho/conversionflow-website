@@ -44,6 +44,7 @@ export interface TrafficSource {
   percentage: number;
   change: number;
   color: string;
+  icon: React.ReactNode;
 }
 
 export interface DeviceData {
@@ -406,7 +407,7 @@ export async function getTrafficData(
         )
       );
 
-    const orderCount = dayOrders[0]?.count || 0;
+    const orderCount = dayOrders?.count || 0;
 
     // Format date label
     if (days <= 7) {
@@ -511,13 +512,6 @@ export async function getTopPages(limit: number = 10): Promise<PageData[]> {
 
 // Get traffic sources data
 export async function getTrafficSources(): Promise<TrafficSource[]> {
-  // Import icons for traffic sources
-  const { Globe } = await import("lucide-react");
-  const { Search } = await import("lucide-react");
-  const { Share2 } = await import("lucide-react");
-  const { Link } = await import("lucide-react");
-  const { Mail } = await import("lucide-react");
-
   // Mock data - in production would come from analytics tracking
   const sources: TrafficSource[] = [
     {
@@ -526,7 +520,7 @@ export async function getTrafficSources(): Promise<TrafficSource[]> {
       percentage: 35.2,
       change: 8.5,
       color: "bg-blue-600",
-      icon: <Globe className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Organic Search",
@@ -534,7 +528,7 @@ export async function getTrafficSources(): Promise<TrafficSource[]> {
       percentage: 30.2,
       change: 12.3,
       color: "bg-green-600",
-      icon: <Search className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Social Media",
@@ -542,7 +536,7 @@ export async function getTrafficSources(): Promise<TrafficSource[]> {
       percentage: 19.8,
       change: -3.2,
       color: "bg-purple-600",
-      icon: <Share2 className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Referral",
@@ -550,7 +544,7 @@ export async function getTrafficSources(): Promise<TrafficSource[]> {
       percentage: 14.3,
       change: 5.7,
       color: "bg-orange-600",
-      icon: <Link className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Email",
@@ -558,7 +552,7 @@ export async function getTrafficSources(): Promise<TrafficSource[]> {
       percentage: 4.4,
       change: 15.2,
       color: "bg-red-600",
-      icon: <Mail className="w-5 h-5" />,
+      icon: null,
     },
   ];
 
@@ -570,11 +564,6 @@ export async function getDeviceUsage(): Promise<{
   devices: DeviceData[];
   totalUsers: number;
 }> {
-  // Import icons for devices
-  const { Monitor } = await import("lucide-react");
-  const { Smartphone } = await import("lucide-react");
-  const { Tablet } = await import("lucide-react");
-
   // Mock data - in production would come from analytics tracking
   const devices: DeviceData[] = [
     {
@@ -582,21 +571,21 @@ export async function getDeviceUsage(): Promise<{
       users: 8934,
       percentage: 58.2,
       change: 5.3,
-      icon: <Monitor className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Mobile",
       users: 5421,
       percentage: 35.3,
       change: 12.8,
-      icon: <Smartphone className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Tablet",
       users: 1023,
       percentage: 6.5,
       change: -2.1,
-      icon: <Tablet className="w-5 h-5" />,
+      icon: null,
     },
   ];
 
@@ -672,13 +661,6 @@ export async function getConversionFunnel(): Promise<{
   steps: FunnelStep[];
   totalConversionRate: number;
 }> {
-  // Import icons for funnel steps
-  const { Eye } = await import("lucide-react");
-  const { MousePointer2 } = await import("lucide-react");
-  const { ShoppingCart } = await import("lucide-react");
-  const { CreditCard } = await import("lucide-react");
-  const { CheckCircle } = await import("lucide-react");
-
   // Mock conversion funnel data
   const visitors = 50000;
   const pageViews = 35000;
@@ -694,7 +676,7 @@ export async function getConversionFunnel(): Promise<{
       dropOff: 0,
       conversionRate: 100,
       color: "blue",
-      icon: <Eye className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Page Views",
@@ -703,7 +685,7 @@ export async function getConversionFunnel(): Promise<{
       dropOff: ((visitors - pageViews) / visitors) * 100,
       conversionRate: ((pageViews / visitors) * 100),
       color: "green",
-      icon: <MousePointer2 className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Add to Cart",
@@ -712,7 +694,7 @@ export async function getConversionFunnel(): Promise<{
       dropOff: ((pageViews - addToCart) / pageViews) * 100,
       conversionRate: ((addToCart / visitors) * 100),
       color: "purple",
-      icon: <ShoppingCart className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Checkout",
@@ -721,7 +703,7 @@ export async function getConversionFunnel(): Promise<{
       dropOff: ((addToCart - checkout) / addToCart) * 100,
       conversionRate: ((checkout / visitors) * 100),
       color: "orange",
-      icon: <CreditCard className="w-5 h-5" />,
+      icon: null,
     },
     {
       name: "Purchase",
@@ -730,7 +712,7 @@ export async function getConversionFunnel(): Promise<{
       dropOff: ((checkout - purchase) / checkout) * 100,
       conversionRate: ((purchase / visitors) * 100),
       color: "blue",
-      icon: <CheckCircle className="w-5 h-5" />,
+      icon: null,
     },
   ];
 
@@ -936,12 +918,6 @@ export async function getPurchaseFrequency(): Promise<{
 export async function getCustomerSegmentation(): Promise<{
   segments: CustomerSegment[];
 }> {
-  // Import icons for segments
-  const { Diamond } = await import("lucide-react");
-  const { Star } = await import("lucide-react");
-  const { Award } = await import("lucide-react");
-  const { Heart } = await import("lucide-react");
-
   // Mock customer segments
   const segments: CustomerSegment[] = [
     {
@@ -952,7 +928,7 @@ export async function getCustomerSegmentation(): Promise<{
       avgOrders: 12,
       avgOrderValue: 7500,
       color: "diamond",
-      icon: <Diamond className="w-5 h-5" />,
+      icon: null,
       description: "Highest value customers",
     },
     {
@@ -963,7 +939,7 @@ export async function getCustomerSegmentation(): Promise<{
       avgOrders: 8,
       avgOrderValue: 5600,
       color: "platinum",
-      icon: <Star className="w-5 h-5" />,
+      icon: null,
       description: "Premium customers",
     },
     {
@@ -974,7 +950,7 @@ export async function getCustomerSegmentation(): Promise<{
       avgOrders: 5,
       avgOrderValue: 4200,
       color: "gold",
-      icon: <Award className="w-5 h-5" />,
+      icon: null,
       description: "Loyal customers",
     },
     {
@@ -985,7 +961,7 @@ export async function getCustomerSegmentation(): Promise<{
       avgOrders: 3,
       avgOrderValue: 3200,
       color: "silver",
-      icon: <Heart className="w-5 h-5" />,
+      icon: null,
       description: "Regular customers",
     },
     {
@@ -996,7 +972,7 @@ export async function getCustomerSegmentation(): Promise<{
       avgOrders: 1,
       avgOrderValue: 2500,
       color: "bronze",
-      icon: <Heart className="w-5 h-5" />,
+      icon: null,
       description: "New customers",
     },
   ];

@@ -118,3 +118,10 @@ export const featureModules: FeatureModule[] = [
     tags: [{ label: "Dark Mode" }, { label: "Animations" }],
   },
 ];
+
+export const featureCategories = featureModules.map((m, i) => ({
+  slug: m.title.toLowerCase().replace(/\s+/g, "-"),
+  eyebrow: m.eyebrow || m.title,
+  summary: m.description,
+  items: (m.tags || []).map((t) => ({ title: t.label })),
+}));

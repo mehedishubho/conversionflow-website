@@ -11,7 +11,7 @@ import { productPlans } from "@/lib/db/schema";
 import { ProductPlanMapper } from "./mappers/ProductPlanMapper";
 import { eq, and, asc } from "drizzle-orm";
 
-export class ProductPlanRepository extends BaseRepository<ProductPlan, typeof productPlans.$inferSelect> {
+export class ProductPlanRepository extends BaseRepository<ProductPlan, typeof productPlans.$inferInsert> {
   constructor() {
     super(productPlans, new ProductPlanMapper());
   }

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
+import { setRequestLocale } from "next-intl/server";
 import { log404Error } from "@/app/(admin)/actions/admin-seo";
 
 export default async function CatchAllPage({
@@ -8,6 +9,7 @@ export default async function CatchAllPage({
   params: Promise<{ locale: string; slug: string[] }>;
 }) {
   const { locale, slug } = await params;
+  setRequestLocale(locale);
   const url = `/${locale}/${slug.join("/")}`;
 
   // Log 404 error for SEO analytics (fire-and-forget)

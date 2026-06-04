@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { LegalLayout } from "@/components/legal/LegalLayout";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
@@ -7,7 +8,13 @@ export const metadata: Metadata = {
   description: "ConversionFlow License Agreement -- terms of use for the WooCommerce automation plugin.",
 };
 
-export default function LicensePage() {
+export default async function LicensePage({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <ScrollReveal>
       <LegalLayout title="License Agreement" lastUpdated="June 1, 2025">

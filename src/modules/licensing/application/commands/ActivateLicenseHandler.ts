@@ -143,8 +143,8 @@ export class ActivateLicenseHandler {
       licenseId: license.id,
       plan: license.plan,
       expiresAt: license.expiresAt,
-      maxActivations: updated.maxActivations,
-      currentActivations: updated.currentActivations,
+      maxActivations: updated.maxActivations ?? undefined,
+      currentActivations: updated.currentActivations ?? undefined,
     };
   }
 

@@ -116,7 +116,7 @@ export async function seedProducts() {
   ];
 
   for (const plan of plans) {
-    await db.insert(productPlans).values(plan);
+    await db.insert(productPlans).values(plan as unknown as typeof productPlans.$inferInsert);
   }
 
   console.log(

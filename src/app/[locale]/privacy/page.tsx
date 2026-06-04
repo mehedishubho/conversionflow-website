@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { LegalLayout } from "@/components/legal/LegalLayout";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
@@ -13,7 +14,8 @@ export default async function PrivacyPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  await params;
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <ScrollReveal>
       <LegalLayout title="Privacy Policy" lastUpdated="June 1, 2025">

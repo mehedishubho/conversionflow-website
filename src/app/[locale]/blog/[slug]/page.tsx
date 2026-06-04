@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { getPostBySlug, getPublishedPosts } from "@/lib/blog";
@@ -23,10 +24,10 @@ export async function generateMetadata({
 
   return {
     title: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
+    description: post.seoDescription || post.excerpt || undefined,
     openGraph: {
       title: post.seoTitle || post.title,
-      description: post.seoDescription || post.excerpt,
+      description: post.seoDescription || post.excerpt || undefined,
       images: post.ogImage ? [post.ogImage] : undefined,
     },
   };
@@ -38,6 +39,7 @@ export default async function BlogPostPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { slug, locale } = await params;
+  setRequestLocale(locale);
   const post = await getPostBySlug(slug, locale);
 
   if (!post) notFound();

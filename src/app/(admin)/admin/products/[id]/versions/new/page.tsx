@@ -40,7 +40,7 @@ export default async function NewVersionPage({
         title="Create Version"
         desc="Add a new version to this product. Versions start as draft and can be released later."
       >
-        <form action={createAction} className="space-y-5">
+        <form action={async (formData: FormData) => { await createAction(formData); }} className="space-y-5">
           {/* Version string (semver) */}
           <div>
             <label

@@ -14,7 +14,7 @@ type LicenseRow = {
   id: string;
   licenseKey: string;
   plan: string;
-  status: "active" | "expired" | "revoked" | "suspended";
+  status: "active" | "expired" | "revoked" | "suspended" | "grace_period";
   currentActivations: number | null;
   maxActivations: number | null;
   expiresAt: Date | null;
@@ -33,6 +33,7 @@ const statusBadgeMap: Record<
   expired: "warning",
   revoked: "error",
   suspended: "light",
+  grace_period: "warning",
 };
 
 export function LicenseTable({

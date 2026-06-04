@@ -62,13 +62,13 @@ export class GenerateLicenseHandler {
         plan: input.plan,
         licenseKey: key.value,
         status: "active",
-        activationDomains: [],
+        activationDomains: [] as string[],
         maxActivations: input.maxActivations,
         currentActivations: 0,
         apiTokenHash,
-        expiresAt: input.expiresAt,
+        expiresAt: input.expiresAt ?? null,
         orderId: input.orderId ?? null,
-      });
+      } as Omit<License, "id" | "createdAt" | "updatedAt">);
 
       // 4. Persist via repository
       const saved = await this.licenseRepo.create(license);

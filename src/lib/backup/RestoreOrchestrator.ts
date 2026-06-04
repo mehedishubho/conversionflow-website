@@ -10,7 +10,7 @@
 import { execFile } from "child_process";
 import { db } from "@/lib/db";
 import { backups, settings } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { kvGet, kvSet, kvDelete } from "@/lib/redis";
 import { BackupService } from "@/lib/backup/BackupService";
 import { createAuditLog } from "@/lib/audit";
@@ -45,8 +45,8 @@ function execFileAsync(
     execFile(
       command,
       args,
-      { stdio: "pipe", timeout: options.timeout ?? 30000 },
-      (err, stdout, stderr) => {
+      { timeout: options.timeout ?? 30000 },
+      (err: Error | null, stdout: string, stderr: string) => {
         if (err) {
           reject(err);
         } else {
@@ -168,7 +168,7 @@ export class RestoreOrchestrator {
       await kvSet(RESTORE_STATUS_KEY, JSON.stringify(status), RESTORE_STATUS_TTL);
 
       // Step 5: Verify database connectivity
-      await db.execute({ sql: "SELECT 1" });
+      await db.execute(sql`SELECT 1`);
 
       // Step 6: Disable maintenance mode
       await setSetting("maintenance_mode", "false");

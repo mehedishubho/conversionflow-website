@@ -202,8 +202,8 @@ export default function PaymentSettingsForm({
           enabled: sslEnabled,
         });
 
-        if (sslResult.error) {
-          setSaveMessage({ type: "error", text: `Error saving SSL Commerce settings: ${sslResult.error}` });
+        if (!sslResult.success) {
+          setSaveMessage({ type: "error", text: "Error saving SSL Commerce settings." });
           return;
         }
 

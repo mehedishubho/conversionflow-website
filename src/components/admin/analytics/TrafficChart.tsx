@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { TrendingUp, Users, Eye } from "lucide-react";
+import type { ApexOptions } from "apexcharts";
 
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -19,7 +20,7 @@ export default function TrafficChart({
   pageViewsData,
   range,
 }: TrafficChartProps) {
-  const chartOptions = useMemo(() => {
+  const chartOptions = useMemo((): ApexOptions => {
     const isShortPeriod = range === "7d" || range === "90d";
 
     return {
@@ -38,7 +39,7 @@ export default function TrafficChart({
             bar: {
               horizontal: false,
               columnWidth: "55%",
-              endingShape: "rounded",
+              borderRadius: 4,
             },
           }
         : {
@@ -111,7 +112,7 @@ export default function TrafficChart({
         fontFamily: "DM Sans, sans-serif",
         fontWeight: 500,
         markers: {
-          radius: 12,
+          size: 12,
         },
         itemMargin: {
           horizontal: 10,

@@ -28,10 +28,10 @@ interface PlanRow {
   licenseType: string;
   billingCycle: string | null;
   billingDurationMonths: number | null;
-  maxActivations: number;
+  maxActivations: number | null;
   features: Record<string, boolean>;
-  active: boolean;
-  sortOrder: number;
+  active: boolean | null;
+  sortOrder: number | null;
 }
 
 interface ProductPlansTableProps {

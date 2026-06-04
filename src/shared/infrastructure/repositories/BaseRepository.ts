@@ -80,7 +80,7 @@ export class BaseRepository<T, Data> implements IRepository<T> {
         ? and(...filters.where)
         : filters.where;
       if (whereClause) {
-        query = query.where(whereClause);
+        query = (query as any).where(whereClause);
       }
     }
 
@@ -89,17 +89,17 @@ export class BaseRepository<T, Data> implements IRepository<T> {
       const orderDirection =
         filters.orderBy.direction === 'asc' ? asc : desc;
       // @ts-ignore - dynamic column access
-      query = query.orderBy(orderDirection(this.table[filters.orderBy.column]));
+      query = (query as any).orderBy(orderDirection(this.table[filters.orderBy.column]));
     }
 
     // Apply LIMIT if provided
     if (filters?.limit !== undefined) {
-      query = query.limit(filters.limit);
+      query = (query as any).limit(filters.limit);
     }
 
     // Apply OFFSET if provided
     if (filters?.offset !== undefined) {
-      query = query.offset(filters.offset);
+      query = (query as any).offset(filters.offset);
     }
 
     const results = await query;
@@ -188,7 +188,7 @@ export class BaseRepository<T, Data> implements IRepository<T> {
   async transaction<R>(
     callback: (trx: typeof db) => Promise<R>
   ): Promise<R> {
-    return this.db.transaction(callback);
+    return (this.db as any).transaction(callback);
   }
 }
 

@@ -9,7 +9,7 @@ import { PageTransition } from "@/components/layout/PageTransition";
 import { TrackingScripts } from "@/components/layout/TrackingScripts";
 import { getTrackingSettings } from "@/lib/tracking";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import "../globals.css";
@@ -41,6 +41,11 @@ const plausibleDomain =
 const plausibleScriptSrc =
   process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC ??
   "https://plausible.conversionflow.com/js/script.js";
+
+// Force dynamic rendering for all locale pages.
+// React 19 + next-intl + Turbopack static generation causes "Expected a suspended thenable"
+// during prerendering. Rendering at request time avoids this issue entirely.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}): Promise<Metadata> {
   const {locale} = await params;
@@ -88,12 +93,24 @@ export default async function LocaleLayout({
     notFound();
   }
 
+  // Enable static rendering & avoid headers() fallback that causes
+  // "Expected a suspended thenable" in React 19 / Next.js 16
+  setRequestLocale(locale);
+
   // Providing all messages to the client
   // side is the easiest way to get started
-  const messages = await getMessages();
+  // Pass locale explicitly to avoid implicit headers() call during static generation
+  const messages = await getMessages({ locale });
 
-  // Read tracking settings server-side for script injection
-  const trackingSettings = await getTrackingSettings();
+  // Read tracking settings server-side for script injection.
+  // Wrapped in try/catch so static generation during `next build` doesn't
+  // crash when the DB is unavailable or overwhelmed by concurrent workers.
+  let trackingSettings: Record<string, string> = {};
+  try {
+    trackingSettings = await getTrackingSettings();
+  } catch {
+    // Graceful fallback — tracking scripts simply won't render during build
+  }
 
   return (
     <html

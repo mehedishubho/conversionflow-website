@@ -85,3 +85,10 @@ export const pricingTiers: PricingTier[] = [
     whatsappMessage: "Hi, I'd like to purchase ConversionFlow Agency. I want to pay via bKash/Nagad.",
   },
 ];
+
+export const platformPricing = pricingTiers.map((t) => ({
+  key: t.plan.toLowerCase(),
+  name: t.plan,
+  positioning: t.desc,
+  features: t.features.filter((f) => f.included).map((f) => f.text),
+}));

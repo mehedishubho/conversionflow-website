@@ -1,9 +1,37 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { getDocPosts } from "@/lib/mdx";
 
-export const dynamicParams = false;
+// Static imports for MDX content — avoids dynamic import() which causes
+// "Expected a suspended thenable" during static generation with Turbopack + React 19.
+import GettingStartedEn from "@/content/docs/getting-started.mdx";
+import CourierSyncEn from "@/content/docs/courier-sync.mdx";
+import MetaCapiEn from "@/content/docs/meta-capi.mdx";
+import FraudShieldEn from "@/content/docs/fraud-shield.mdx";
+import AnalyticsEn from "@/content/docs/analytics.mdx";
+import GettingStartedBn from "@/content/docs/getting-started.bn.mdx";
+
+const docComponents: Record<string, Record<string, React.ComponentType>> = {
+  en: {
+    "getting-started": GettingStartedEn,
+    "courier-sync": CourierSyncEn,
+    "meta-capi": MetaCapiEn,
+    "fraud-shield": FraudShieldEn,
+    "analytics": AnalyticsEn,
+  },
+  bn: {
+    "getting-started": GettingStartedBn,
+    // Bengali docs that don't have a .bn.mdx file fall back to English
+    "courier-sync": CourierSyncEn,
+    "meta-capi": MetaCapiEn,
+    "fraud-shield": FraudShieldEn,
+    "analytics": AnalyticsEn,
+  },
+};
+
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return [
@@ -42,21 +70,13 @@ export default async function DocPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
+  setRequestLocale(locale);
   const doc = getDocPosts(locale).find((item) => item.slug === slug);
 
   if (!doc) notFound();
 
-  // Determine if we have a localized MDX file
-  let Doc;
-  try {
-    if (locale === 'bn') {
-      Doc = (await import(`@/content/docs/${slug}.bn.mdx`)).default;
-    } else {
-      throw new Error('Fallback to English');
-    }
-  } catch (e) {
-    Doc = (await import(`@/content/docs/${slug}.mdx`)).default;
-  }
+  const Doc = docComponents[locale]?.[slug];
+  if (!Doc) notFound();
 
   return (
     <>

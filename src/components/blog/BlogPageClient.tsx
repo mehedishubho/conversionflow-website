@@ -10,7 +10,7 @@ export interface DatabaseBlogPost {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt: string | null;
   coverImage: string | null;
   authorName: string | null;
   locale: string;

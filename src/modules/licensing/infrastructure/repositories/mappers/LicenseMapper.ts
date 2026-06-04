@@ -9,7 +9,7 @@ import type { IMapper } from "@/shared/infrastructure/repositories";
 import { License } from "@/modules/licensing/domain/entities/License";
 import type { licenses } from "@/lib/db/schema";
 
-export class LicenseMapper implements IMapper<License, typeof licenses.$inferSelect> {
+export class LicenseMapper implements IMapper<License, typeof licenses.$inferInsert> {
   /**
    * Convert database row to License domain entity.
    * Handles JSONB deserialization for activationDomains (defaults to []).
@@ -44,7 +44,7 @@ export class LicenseMapper implements IMapper<License, typeof licenses.$inferSel
       productId: domain.productId,
       plan: domain.plan,
       licenseKey: domain.licenseKey,
-      status: domain.status,
+      status: domain.status as "active" | "expired" | "revoked" | "suspended" | "grace_period",
       activationDomains: domain.activationDomains,
       maxActivations: domain.maxActivations,
       currentActivations: domain.currentActivations,

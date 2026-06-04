@@ -11,7 +11,7 @@ import { licenses } from "@/lib/db/schema";
 import { LicenseMapper } from "./mappers/LicenseMapper";
 import { eq, and, sql, gte, lte, isNotNull } from "drizzle-orm";
 
-export class LicenseRepository extends BaseRepository<License, typeof licenses.$inferSelect> {
+export class LicenseRepository extends BaseRepository<License, typeof licenses.$inferInsert> {
   constructor() {
     super(licenses, new LicenseMapper());
   }
@@ -170,7 +170,7 @@ export class LicenseRepository extends BaseRepository<License, typeof licenses.$
       .where(
         and(
           eq(licenses.id, licenseId),
-          eq(licenses.status, currentStatus),
+          eq(licenses.status, currentStatus as typeof licenses.status.enumValues[number]),
         ),
       )
       .returning();

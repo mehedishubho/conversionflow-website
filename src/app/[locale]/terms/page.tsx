@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { LegalLayout } from "@/components/legal/LegalLayout";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
@@ -7,7 +8,13 @@ export const metadata: Metadata = {
   description: "Terms of Service for ConversionFlow WooCommerce automation plugin.",
 };
 
-export default function TermsPage() {
+export default async function TermsPage({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <ScrollReveal>
       <LegalLayout title="Terms of Service" lastUpdated="June 1, 2025">

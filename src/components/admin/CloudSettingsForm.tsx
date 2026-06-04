@@ -63,8 +63,8 @@ export default function CloudSettingsForm({ initialData }: CloudSettingsFormProp
           gdriveFolderId,
         });
 
-        if (result.error) {
-          setMessage({ type: "error", text: result.error });
+        if (!result.success) {
+          setMessage({ type: "error", text: "Failed to save cloud settings." });
         } else {
           setMessage({
             type: "success",

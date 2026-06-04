@@ -9,7 +9,7 @@ import type { IMapper } from "@/shared/infrastructure/repositories";
 import { ProductVersion } from "@/modules/products/domain/entities/ProductVersion";
 import type { productVersions } from "@/lib/db/schema";
 
-export class ProductVersionMapper implements IMapper<ProductVersion, typeof productVersions.$inferSelect> {
+export class ProductVersionMapper implements IMapper<ProductVersion, typeof productVersions.$inferInsert> {
   /**
    * Convert database row to ProductVersion domain entity.
    */

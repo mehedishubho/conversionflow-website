@@ -16,6 +16,7 @@ function parseRedisUrl(url: string) {
     host: parsed.hostname,
     port: parseInt(parsed.port, 10) || 6379,
     password: parsed.password || undefined,
+    maxRetriesPerRequest: null,
   };
 }
 

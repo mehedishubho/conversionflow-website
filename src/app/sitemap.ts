@@ -13,12 +13,10 @@ function getUrl(locale: string, path: string) {
   return `${siteUrl}${prefixStr}${path}`;
 }
 
-// Revalidation controlled by auto-regenerate setting
-// When auto-regenerate is ON, revalidate = 0 (no caching, fresh on every request)
-// When OFF or not set, use 1 hour caching
-let revalidateSeconds = 3600;
-
-export const revalidate = revalidateSeconds;
+// Revalidate every hour (3600 seconds).
+// NOTE: `export const revalidate` must be a static literal — Next.js parses it at build time.
+// For on-demand revalidation, use `revalidateTag('sitemap')` from a server action instead.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Read DB settings for sitemap configuration
@@ -43,11 +41,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     /* fallback to defaults */
   }
 
-  // Handle auto-regeneration: when enabled, force no caching
-  if (sitemapOverrides.seo_sitemap_auto_regenerate === "true") {
-    revalidateSeconds = 0;
-  }
-
   // If sitemap is explicitly disabled, return empty
   if (sitemapOverrides.seo_sitemap_enabled === "false") {
     return [];
@@ -66,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return excludePatterns.some((pattern) => path.startsWith(pattern));
   };
 
-  locales.forEach((locale) => {
+  for (const locale of locales) {
     // Static Routes (always included as part of pages)
     const includePages = sitemapOverrides.seo_sitemap_pages !== "false";
     if (includePages) {
@@ -152,7 +145,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (includeLanding) {
       // Landing pages will be added when landing page data source is available
     }
-  });
+  }
 
   return routes;
 }

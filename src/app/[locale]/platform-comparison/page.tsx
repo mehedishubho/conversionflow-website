@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pricingTiers } from "@/data/pricing";
 import { Link } from "@/i18n/routing";
@@ -27,7 +28,13 @@ const matrix = [
   ["Operations focus", "Courier, COD, recovery", "Custom courier/payment logic", "Analytics/event data layer"],
 ];
 
-export default function PlatformComparisonPage() {
+export default async function PlatformComparisonPage({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <JsonLd data={[productSchema(), breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Platform Comparison", path: "/platform-comparison" }])]} />

@@ -11,6 +11,7 @@ import {
   Star,
 } from "lucide-react";
 import ApexChart from "react-apexcharts";
+import type { ApexOptions } from "apexcharts";
 
 interface PurchaseFrequencyData {
   frequency: string;
@@ -40,7 +41,7 @@ export default function PurchaseFrequency({
   overallRepeatRate,
   avgTimeBetweenPurchases,
 }: PurchaseFrequencyProps) {
-  const chartOptions = {
+  const chartOptions: ApexOptions = {
     chart: {
       type: "bar",
       height: 300,
@@ -52,7 +53,7 @@ export default function PurchaseFrequency({
       bar: {
         horizontal: false,
         columnWidth: "55%",
-        endingShape: "rounded",
+        borderRadius: 4,
       },
     },
     colors: ["#465FFF", "#00D4AA"],

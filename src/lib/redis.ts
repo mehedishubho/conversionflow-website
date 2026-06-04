@@ -121,13 +121,13 @@ export async function cacheSet(
   ttlSeconds?: number
 ): Promise<void> {
   // Default TTLs based on cache type
-  const defaultTTLs = {
-    session: 86400, // 24 hours
-    blog: 3600,     // 1 hour
-    seo: 7200,      // 2 hours
-    api: 1800,      // 30 minutes
-    user: 3600,     // 1 hour
-    license: 300,   // 5 minutes
+  const defaultTTLs: Record<string, number> = {
+    SESSION: 86400, // 24 hours
+    BLOG: 3600,     // 1 hour
+    SEO: 7200,      // 2 hours
+    API: 1800,      // 30 minutes
+    USER: 3600,     // 1 hour
+    LICENSE: 300,   // 5 minutes
   };
 
   const ttl = ttlSeconds ?? defaultTTLs[type];
@@ -148,7 +148,7 @@ export async function cacheGetMany(
 ): Promise<string[]> {
   if (redis) {
     const prefixedKeys = keys.map(key => `${CACHE_PREFIX[type]}${key}`);
-    return redis.mget(...prefixedKeys);
+    return redis.mget(...prefixedKeys).then(vals => vals.map(v => v ?? ''));
   }
 
   // Memory store fallback
@@ -207,4 +207,29 @@ export async function getCacheSize(type: keyof typeof CACHE_PREFIX): Promise<num
   return count;
 }
 
-export { redis, memoryStore, CACHE_PREFIX };
+// BullMQ requires maxRetriesPerRequest to be null — it handles retries at the job level.
+// Create a dedicated connection for BullMQ workers/queues.
+let bullRedis: Redis | null = null;
+if (process.env.REDIS_URL) {
+  const globalForBull = globalThis as unknown as { bullRedis: Redis | undefined };
+  bullRedis =
+    globalForBull.bullRedis ??
+    new Redis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      host: process.env.REDIS_HOST || "localhost",
+      port: parseInt(process.env.REDIS_PORT || "6379"),
+      password: process.env.REDIS_PASSWORD,
+      db: parseInt(process.env.REDIS_DB || "0"),
+      keepAlive: 30,
+      connectTimeout: 10000,
+      lazyConnect: false,
+    });
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForBull.bullRedis = bullRedis;
+  }
+}
+
+export { redis, bullRedis, memoryStore, CACHE_PREFIX };

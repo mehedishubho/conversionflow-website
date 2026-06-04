@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { landingPages } from "@/data/landing-pages";
 import { Link } from "@/i18n/routing";
@@ -39,9 +40,10 @@ export async function generateMetadata({
 export default async function LandingPage({
   params,
 }: {
-  params: Promise<{ landing: string }>;
+  params: Promise<{ locale: string; landing: string }>;
 }) {
-  const { landing } = await params;
+  const { locale, landing } = await params;
+  setRequestLocale(locale);
   const page = landingPages.find((item) => item.slug === landing);
 
   if (!page) notFound();

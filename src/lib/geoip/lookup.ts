@@ -1,19 +1,17 @@
-import maxmind, { type Reader } from "maxmind";
+import maxmind, { type Reader, type CountryResponse } from "maxmind";
 import path from "path";
 
-type GeoResult = { country: { iso_code: string } };
-
-let reader: Reader<GeoResult> | null = null;
+let reader: Reader<CountryResponse> | null = null;
 let initAttempted = false;
 
-async function getReader(): Promise<Reader<GeoResult> | null> {
+async function getReader(): Promise<Reader<CountryResponse> | null> {
   if (reader) return reader;
   if (initAttempted) return null; // Don't retry after first failure
   initAttempted = true;
 
   const dbPath = path.join(process.cwd(), "data", "geoip", "dbip-country-lite.mmdb");
   try {
-    reader = await maxmind.open<GeoResult>(dbPath);
+    reader = await maxmind.open<CountryResponse>(dbPath);
     console.log("[GeoIP] MMDB loaded successfully from", dbPath);
     return reader;
   } catch {

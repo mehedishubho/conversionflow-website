@@ -10,6 +10,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import type { ApexOptions } from "apexcharts";
 
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -27,7 +28,7 @@ interface DeviceUsageProps {
 }
 
 export default function DeviceUsage({ devices, totalUsers }: DeviceUsageProps) {
-  const chartOptions = {
+  const chartOptions: ApexOptions = {
     chart: {
       type: "donut",
       height: 350,
@@ -53,7 +54,7 @@ export default function DeviceUsage({ devices, totalUsers }: DeviceUsageProps) {
       fontFamily: "DM Sans, sans-serif",
       fontWeight: 500,
       markers: {
-        radius: 12,
+        size: 12,
       },
       itemMargin: {
         horizontal: 10,

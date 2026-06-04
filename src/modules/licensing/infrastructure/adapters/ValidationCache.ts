@@ -41,7 +41,7 @@ export class ValidationCache {
    * @returns Cached value string or null if not cached/expired
    */
   static async get(licenseKey: string, domain: string): Promise<string | null> {
-    return cacheGet("license", this.buildKey(licenseKey, domain));
+    return cacheGet("LICENSE", this.buildKey(licenseKey, domain));
   }
 
   /**
@@ -52,7 +52,7 @@ export class ValidationCache {
    * @param value - The validation response JSON string to cache
    */
   static async set(licenseKey: string, domain: string, value: string): Promise<void> {
-    return cacheSet("license", this.buildKey(licenseKey, domain), value, DEFAULT_TTL);
+    return cacheSet("LICENSE", this.buildKey(licenseKey, domain), value, DEFAULT_TTL);
   }
 
   /**
@@ -62,7 +62,7 @@ export class ValidationCache {
    * @param domain - The domain to invalidate
    */
   static async invalidate(licenseKey: string, domain: string): Promise<void> {
-    return cacheDelete("license", this.buildKey(licenseKey, domain));
+    return cacheDelete("LICENSE", this.buildKey(licenseKey, domain));
   }
 
   /**
@@ -76,6 +76,6 @@ export class ValidationCache {
    */
   static async invalidateAll(licenseKey: string): Promise<void> {
     const keyHash = crypto.createHash("sha256").update(licenseKey).digest("hex");
-    return cacheDeletePattern("license", `${VALIDATE_PREFIX}${keyHash}:*`);
+    return cacheDeletePattern("LICENSE", `${VALIDATE_PREFIX}${keyHash}:*`);
   }
 }

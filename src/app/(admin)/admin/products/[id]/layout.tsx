@@ -6,8 +6,6 @@ import { products } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import ProductDetailShell from "@/components/admin/ProductDetailShell";
 
-export const dynamic = "force-dynamic";
-
 export default async function ProductDetailLayout({
   children,
   params,
