@@ -12,14 +12,14 @@ export class BackupService {
    * Uses cross-platform detection (which on Unix, where on Windows).
    */
   static checkBinaryAvailability(): { pg_dump: boolean; psql: boolean } {
-    let pg_dump = false;
-    let psql = false;
+    let pgDumpAvailable = false;
+    let psqlAvailable = false;
 
     try {
       execSync("which pg_dump 2>/dev/null || where pg_dump 2>nul", {
         stdio: "pipe",
       });
-      pg_dump = true;
+      pgDumpAvailable = true;
     } catch {
       // Binary not found
     }
@@ -28,17 +28,18 @@ export class BackupService {
       execSync("which psql 2>/dev/null || where psql 2>nul", {
         stdio: "pipe",
       });
-      psql = true;
+      psqlAvailable = true;
     } catch {
       // Binary not found
     }
 
-    return { pg_dump, psql };
+    return { pg_dump: pgDumpAvailable, psql: psqlAvailable };
   }
 
   /**
    * Create a full database backup using pg_dump.
    * Uses execFileSync with array args to prevent command injection (T-21-01).
+   * Inserts a metadata record, runs pg_dump, updates record on completion.
    */
   async createBackup(
     type: "manual" | "scheduled" | "pre_restore",
@@ -63,7 +64,7 @@ export class BackupService {
       );
     }
 
-    // Create backups directory
+    // Ensure backups directory exists
     fs.mkdirSync("backups", { recursive: true });
 
     // Generate filename and path
@@ -73,7 +74,7 @@ export class BackupService {
     const filePath = path.resolve("backups", filename);
 
     // Insert backup record with in_progress status
-    const [backupRecord] = await db
+    const [inserted] = await db
       .insert(backups)
       .values({
         filename,
@@ -82,20 +83,20 @@ export class BackupService {
         status: "in_progress",
         triggeredBy: triggeredBy ?? null,
       })
-      .returning();
+      .returning({ id: backups.id });
 
-    const backupId = backupRecord.id;
+    const backupId = inserted.id;
 
     try {
-      // Run pg_dump with execFileSync (array args, no shell injection)
-      execFileSync("pg_dump", [process.env.DATABASE_URL, "-f", filePath], {
+      // Run pg_dump with array args (no shell injection)
+      execFileSync("pg_dump", [process.env.DATABASE_URL!, "-f", filePath], {
         stdio: "pipe",
         timeout: 300000, // 5 minute timeout
       });
 
       // Get file size
-      const stats = fs.statSync(filePath);
-      const fileSizeBytes = stats.size;
+      const stat = fs.statSync(filePath);
+      const fileSizeBytes = stat.size;
 
       // Update backup record as completed
       await db
@@ -145,22 +146,22 @@ export class BackupService {
   }
 
   /**
-   * Delete a backup by ID. Removes the local file and database record.
+   * Delete a backup record and its local file.
    */
   async deleteBackup(backupId: string): Promise<void> {
-    const [backupRecord] = await db
+    const [record] = await db
       .select()
       .from(backups)
       .where(eq(backups.id, backupId))
       .limit(1);
 
-    if (!backupRecord) {
+    if (!record) {
       throw new Error("Backup not found");
     }
 
     // Delete local file if it exists
-    if (fs.existsSync(backupRecord.filePath)) {
-      fs.unlinkSync(backupRecord.filePath);
+    if (record.filePath && fs.existsSync(record.filePath)) {
+      fs.unlinkSync(record.filePath);
     }
 
     // Delete database record
@@ -239,13 +240,13 @@ export class BackupService {
   async getBackupById(
     id: string
   ): Promise<typeof backups.$inferSelect | null> {
-    const results = await db
+    const [record] = await db
       .select()
       .from(backups)
       .where(eq(backups.id, id))
       .limit(1);
 
-    return results[0] ?? null;
+    return record ?? null;
   }
 
   /**
@@ -260,21 +261,22 @@ export class BackupService {
       .select({ count: sql<number>`count(*)::int` })
       .from(backups);
 
-    const [lastBackupResult] = await db
+    const [lastResult] = await db
       .select({ createdAt: backups.createdAt })
       .from(backups)
       .where(eq(backups.status, "completed"))
       .orderBy(desc(backups.createdAt))
       .limit(1);
 
-    const [diskUsageResult] = await db
+    const [sizeResult] = await db
       .select({ total: sql<number>`coalesce(sum(file_size_bytes), 0)::int` })
-      .from(backups);
+      .from(backups)
+      .where(eq(backups.status, "completed"));
 
     return {
       totalBackups: countResult?.count ?? 0,
-      lastBackupAt: lastBackupResult?.createdAt ?? null,
-      totalDiskUsageBytes: diskUsageResult?.total ?? 0,
+      lastBackupAt: lastResult?.createdAt ?? null,
+      totalDiskUsageBytes: sizeResult?.total ?? 0,
     };
   }
 }

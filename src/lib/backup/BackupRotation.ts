@@ -1,7 +1,7 @@
+import fs from "fs";
 import { db } from "@/lib/db";
 import { backups, settings } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
-import fs from "fs";
 import { createAuditLog } from "@/lib/audit";
 
 export class BackupRotation {
@@ -34,7 +34,7 @@ export class BackupRotation {
     for (const backup of toDelete) {
       try {
         // Delete local file if it exists
-        if (fs.existsSync(backup.filePath)) {
+        if (backup.filePath && fs.existsSync(backup.filePath)) {
           fs.unlinkSync(backup.filePath);
         }
 
@@ -94,10 +94,12 @@ export class BackupRotation {
   async saveRetentionSettings(data: {
     retentionCount: number;
   }): Promise<{ success: true }> {
+    // Validate retention count range
     if (data.retentionCount < 1 || data.retentionCount > 50) {
       throw new Error("Retention count must be between 1 and 50");
     }
 
+    // Upsert the setting
     await db
       .insert(settings)
       .values({

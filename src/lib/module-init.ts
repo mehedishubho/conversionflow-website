@@ -9,6 +9,7 @@
 import { initializeLicensingModule } from "@/modules/licensing";
 import { registerBillingHandlers } from "@/modules/billing";
 import { startSubscriptionWorker, scheduleSubscriptionJob } from "@/jobs/workers/subscription-lifecycle";
+import { startBackupWorker, scheduleBackupJob } from "@/jobs/workers/backup-worker";
 
 /**
  * Initialize all application modules.
@@ -27,5 +28,11 @@ export function initializeModules(): void {
   startSubscriptionWorker();
   scheduleSubscriptionJob().catch((err) => {
     console.error("[ModuleInit] Failed to schedule subscription job:", err);
+  });
+
+  // Register backup worker (Phase 21)
+  startBackupWorker();
+  scheduleBackupJob().catch((err) => {
+    console.error("[ModuleInit] Failed to schedule backup job:", err);
   });
 }
