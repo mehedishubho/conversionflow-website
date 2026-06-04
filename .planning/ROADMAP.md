@@ -201,7 +201,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
   6. Affiliates can request payouts; admin processes them
   7. Admin can manage affiliates and set commission rates
   8. DB schema supports affiliates, clicks, commissions, payouts tables linked to users and orders
-**Plans**: TBD
+**Plans**: 5 plans
 Plans:
 **Status**: Deferred to post-MVP
 
@@ -349,7 +349,7 @@ Plans:
   3. License generation is triggered by OrderCompleted domain event instead of external webhook
   4. License status changes (revoke, suspend) trigger audit log entries and customer notifications via domain events
   5. Webhook handlers for central license API events are removed and replaced with local event handlers
-**Plans**: TBD
+**Plans**: 5 plans
 Plans:
 **UI hint**: yes
 
@@ -423,9 +423,13 @@ Plans:
   5. A BullMQ scheduled job automatically creates backups at configurable intervals (daily, weekly, monthly) with rotation policy (keep last N backups)
   6. Backup settings (frequency, retention count, storage path) are configurable from /admin/settings/backup
   7. Backup rotation automatically removes oldest backups when retention limit is exceeded, with audit log entries for all backup/restore/rotation operations
-**Plans**: TBD
+**Plans**: 5 plans
 Plans:
-- [ ] TBD (run /gsd-plan-phase 21 to break down)
+- [ ] 21-01-PLAN.md -- Schema, BackupService, BackupRotation, schema push
+- [ ] 21-02-PLAN.md -- BullMQ backup worker, RestoreOrchestrator, maintenance mode
+- [ ] 21-03-PLAN.md -- Server actions, API routes, navigation integration
+- [ ] 21-04-PLAN.md -- Backup dashboard UI (KPIs, table, restore dialog)
+- [ ] 21-05-PLAN.md -- Backup settings UI, cloud storage form
 
 ## Progress
 
@@ -452,7 +456,7 @@ v3.0: 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20 -> 21
 | 18. Subscription & Status Management | 18-subscription-status | v3.0 | 0/3 | Planned | - |
 | 19. Portal & Analytics Enhancements | 19-portal-analytics | v3.0 | 4/6 | Gap closure | - |
 | 20. Migration & External API Removal | 20-migration-cleanup | v3.0 | 0/3 | Planned | - |
-| 21. Backup & Restore System | 21-backup-restore | v3.0 | 0/TBD | Not planned | - |
+| 21. Backup | 21. Backup & Restore System | 21-backup-restore | v3.0 | 0/TBD | Not planned | Restore System | 21-backup-restore | v3.0 | 0/5 | Planned | - |
 
 ---
 *Last updated: 2026-06-04*
