@@ -425,11 +425,11 @@ Plans:
   7. Backup rotation automatically removes oldest backups when retention limit is exceeded, with audit log entries for all backup/restore/rotation operations
 **Plans**: 5 plans
 Plans:
-- [ ] 21-01-PLAN.md -- Schema, BackupService, BackupRotation, schema push
-- [ ] 21-02-PLAN.md -- BullMQ backup worker, RestoreOrchestrator, maintenance mode
-- [ ] 21-03-PLAN.md -- Server actions, API routes, navigation integration
-- [ ] 21-04-PLAN.md -- Backup dashboard UI (KPIs, table, restore dialog)
-- [ ] 21-05-PLAN.md -- Backup settings UI, cloud storage form
+- [x] 21-01-PLAN.md -- Schema, BackupService, BackupRotation, schema push
+- [x] 21-02-PLAN.md -- BullMQ backup worker, RestoreOrchestrator, maintenance mode
+- [x] 21-03-PLAN.md -- Server actions, API routes, navigation integration
+- [x] 21-04-PLAN.md -- Backup dashboard UI (KPIs, table, restore dialog)
+- [x] 21-05-PLAN.md -- Backup settings UI, cloud storage form
 
 ## Progress
 
