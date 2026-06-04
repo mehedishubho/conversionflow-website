@@ -7,6 +7,7 @@ export const QUEUE_NAMES = {
   NOTIFICATION: "notification",
   SUBSCRIPTION_LIFECYCLE: "subscription-lifecycle",
   ANALYTICS_AGGREGATION: "analytics-aggregation",
+  BACKUP: "backup",
 } as const;
 
 function parseRedisUrl(url: string) {
@@ -41,4 +42,8 @@ export const subscriptionQueue = connectionOptions
 
 export const analyticsQueue = connectionOptions
   ? new Queue(QUEUE_NAMES.ANALYTICS_AGGREGATION, connectionOptions)
+  : null;
+
+export const backupQueue = connectionOptions
+  ? new Queue(QUEUE_NAMES.BACKUP, connectionOptions)
   : null;
