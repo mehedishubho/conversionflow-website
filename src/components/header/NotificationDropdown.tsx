@@ -75,6 +75,27 @@ export function NotificationDropdown() {
 
   useEffect(() => {
     fetchNotifications();
+
+    const POLL_INTERVAL = 30_000; // 30 seconds
+
+    const intervalId = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchNotifications();
+      }
+    }, POLL_INTERVAL);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchNotifications(); // Immediate refresh on tab focus
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [fetchNotifications]);
 
   function toggleDropdown() {
