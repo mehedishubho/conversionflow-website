@@ -102,6 +102,9 @@ export default function NotificationsTable({ notifications }: { notifications: N
                 Status
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
+                Delivery
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
                 Date
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
@@ -112,7 +115,7 @@ export default function NotificationsTable({ notifications }: { notifications: N
           <TableBody>
             {notifications.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
+                <TableCell colSpan={8} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
                   No notifications found.
                 </TableCell>
               </TableRow>
@@ -144,6 +147,24 @@ export default function NotificationsTable({ notifications }: { notifications: N
                     >
                       {notif.read ? "Read" : "Unread"}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="px-5 py-3 text-sm">
+                    <div className="flex flex-wrap gap-1">
+                      {(notif.deliveries ?? []).length === 0 ? (
+                        <Badge variant="light" color="light" size="sm">N/A</Badge>
+                      ) : (
+                        (notif.deliveries ?? []).map((delivery, i) => (
+                          <Badge
+                            key={i}
+                            variant="light"
+                            color={delivery.status === "sent" || delivery.status === "delivered" ? "success" : delivery.status === "failed" ? "error" : "warning"}
+                            size="sm"
+                          >
+                            {delivery.channel === "email" ? "Email" : "In-App"}: {delivery.status}
+                          </Badge>
+                        ))
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="px-5 py-3 text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(notif.createdAt)}

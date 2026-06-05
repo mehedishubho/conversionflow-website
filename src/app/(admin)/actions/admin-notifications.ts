@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { notifications, user } from "@/lib/db/schema";
+import { notifications, user, notificationDeliveries } from "@/lib/db/schema";
 import { eq, desc, ilike, and, or } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 
@@ -16,6 +16,12 @@ async function requireAdmin() {
   return { session, userId: session.user.id, role };
 }
 
+export interface DeliveryInfo {
+  channel: string;
+  status: string;
+  error: string | null;
+}
+
 export interface NotificationRow {
   id: string;
   userId: string;
@@ -25,6 +31,7 @@ export interface NotificationRow {
   message: string;
   read: boolean | null;
   createdAt: Date;
+  deliveries: DeliveryInfo[];
 }
 
 export async function getAdminNotifications(search?: string, type?: string): Promise<NotificationRow[]> {
@@ -59,7 +66,30 @@ export async function getAdminNotifications(search?: string, type?: string): Pro
     .orderBy(desc(notifications.createdAt))
     .limit(100);
 
-  return rows;
+  // Fetch deliveries for each notification
+  const rowsWithDeliveries = await Promise.all(
+    rows.map(async (row) => {
+      const deliveryRows = await db
+        .select({
+          channel: notificationDeliveries.channel,
+          status: notificationDeliveries.status,
+          error: notificationDeliveries.error,
+        })
+        .from(notificationDeliveries)
+        .where(eq(notificationDeliveries.notificationId, row.id));
+
+      return {
+        ...row,
+        deliveries: deliveryRows.map((d) => ({
+          channel: d.channel,
+          status: d.status,
+          error: d.error,
+        })),
+      };
+    })
+  );
+
+  return rowsWithDeliveries;
 }
 
 export async function sendNotification(
