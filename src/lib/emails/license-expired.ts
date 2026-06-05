@@ -1,6 +1,4 @@
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { getEmailSender } from "@/modules/notifications/infrastructure/adapters/EmailSender";
 
 interface LicenseExpiredEmailParams {
   to: string;
@@ -110,10 +108,14 @@ export async function sendLicenseExpiredEmail(
     </div>
   `;
 
-  await resend.emails.send({
-    from: process.env.EMAIL_FROM || "noreply@conversionflow.com",
+  const sender = await getEmailSender();
+  const result = await sender.send({
     to,
     subject: "Your ConversionFlow License Has Expired",
     html,
+    from: process.env.EMAIL_FROM || "noreply@conversionflow.com",
   });
+  if (result.error) {
+    throw new Error(`Email send failed: ${result.error}`);
+  }
 }

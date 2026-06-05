@@ -1,9 +1,8 @@
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { getEmailSender } from "@/modules/notifications/infrastructure/adapters/EmailSender";
 
 export async function sendResetPasswordEmail(email: string, url: string) {
-  await resend.emails.send({
+  const sender = await getEmailSender();
+  const result = await sender.send({
     from: process.env.EMAIL_FROM || "noreply@conversionflow.com",
     to: email,
     subject: "Reset your password - ConversionFlow",
@@ -26,4 +25,7 @@ export async function sendResetPasswordEmail(email: string, url: string) {
       </div>
     `,
   });
+  if (result.error) {
+    throw new Error(`Email send failed: ${result.error}`);
+  }
 }

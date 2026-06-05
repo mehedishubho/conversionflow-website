@@ -1,6 +1,4 @@
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { getEmailSender } from "@/modules/notifications/infrastructure/adapters/EmailSender";
 
 interface ApiTokenNotificationParams {
   to: string;
@@ -99,12 +97,19 @@ export async function sendApiTokenNotificationEmail(
   `;
 
   try {
-    await resend.emails.send({
+    const sender = await getEmailSender();
+    const result = await sender.send({
       from: "ConversionFlow <noreply@conversionflow.dev>",
       to,
       subject: "Your ConversionFlow API Token is Ready",
       html,
     });
+    if (result.error) {
+      console.error(
+        `Failed to send API token notification to ${to}:`,
+        result.error
+      );
+    }
   } catch (error) {
     console.error(
       `Failed to send API token notification to ${to}:`,
