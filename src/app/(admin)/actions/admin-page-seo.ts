@@ -7,9 +7,16 @@ import { db } from "@/lib/db";
 import { settings, blogPosts } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
-import type { SeoOverrides } from "@/lib/seo";
 
-export type { SeoOverrides };
+export interface SeoOverrides {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  focusKeyword?: string;
+  robots?: { index: boolean; follow: boolean };
+  ogImage?: string;
+  schemaType?: string;
+}
 
 // ──────────────────────────────────────────────
 // Auth Guard
