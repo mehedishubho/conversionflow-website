@@ -13,7 +13,7 @@ async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
   const role = (session.user as Record<string, unknown>).role as string;
-  if (role !== "admin" && role !== "super_admin") redirect("/admin/dashboard");
+  if (role !== "admin" && role !== "super_admin") redirect("/dashboard");
   return { session, userId: session.user.id, role };
 }
 

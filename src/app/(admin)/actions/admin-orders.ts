@@ -24,7 +24,7 @@ async function requireAdmin() {
 
   const role = (session.user as Record<string, unknown>).role as string;
   if (role !== "admin" && role !== "super_admin") {
-    redirect("/admin/dashboard");
+    redirect("/dashboard");
   }
 
   return { session, userId: session.user.id, role };
