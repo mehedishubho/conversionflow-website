@@ -1,6 +1,4 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-guard";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { orders, user } from "@/lib/db/schema";
@@ -15,18 +13,7 @@ function formatBDT(amount: number): string {
 }
 
 export default async function AdminInvoicesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const userRole = (session.user as Record<string, unknown>).role as string;
-  if (userRole !== "admin" && userRole !== "super_admin") {
-    redirect("/dashboard");
-  }
+  await requireAdmin();
 
   const invoiceOrders = await db
     .select({

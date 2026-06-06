@@ -1,6 +1,4 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { orders, user } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
@@ -12,19 +10,7 @@ import { verifyOrder, rejectOrder, issueRefund } from "@//app/(admin)/actions/ad
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
-  // Auth check + admin role check
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const userRole = (session.user as Record<string, unknown>).role as string;
-  if (userRole !== "admin" && userRole !== "super_admin") {
-    redirect("/admin/dashboard");
-  }
+  await requireAdmin();
 
   // Query all orders with user join
   const orderRows = await db

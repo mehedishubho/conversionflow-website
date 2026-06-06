@@ -23,7 +23,7 @@ export default async function ActivationHistoryPage({
   if (!session) redirect("/login");
   const userRole = (session.user as Record<string, unknown>).role as string;
   if (userRole !== "admin" && userRole !== "super_admin")
-    redirect("/admin/dashboard");
+    redirect("/dashboard");
 
   const { id } = await params;
 

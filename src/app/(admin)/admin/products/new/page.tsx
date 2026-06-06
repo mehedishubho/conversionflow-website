@@ -20,7 +20,7 @@ export default async function NewProductPage() {
 
   const userRole = (session.user as Record<string, unknown>).role as string;
   if (userRole !== "admin" && userRole !== "super_admin") {
-    redirect("/admin/dashboard");
+    redirect("/dashboard");
   }
 
   return (

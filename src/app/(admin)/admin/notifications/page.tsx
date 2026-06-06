@@ -1,6 +1,4 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-guard";
 import { getAdminNotifications } from "@/app/(admin)/actions/admin-notifications";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
@@ -13,11 +11,7 @@ export default async function AdminNotificationsPage({
 }: {
   searchParams: Promise<{ search?: string; type?: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
-
-  const userRole = (session.user as Record<string, unknown>).role as string;
-  if (userRole !== "admin" && userRole !== "super_admin") redirect("/admin/dashboard");
+  await requireAdmin();
 
   const params = await searchParams;
   const notifications = await getAdminNotifications(params.search, params.type);

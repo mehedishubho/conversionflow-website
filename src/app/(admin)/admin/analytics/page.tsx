@@ -1,6 +1,4 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-guard";
 import AnalyticsDashboardClient from "@/components/admin/analytics/AnalyticsDashboardClient";
 import {
   getAnalyticsStats,
@@ -24,22 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsDashboard() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const userRole = (session.user as Record<string, unknown>).role as string;
-  if (
-    userRole !== "admin" &&
-    userRole !== "super_admin" &&
-    userRole !== "support_staff"
-  ) {
-    redirect("/dashboard");
-  }
+  await requireAdmin(["super_admin", "admin", "support_staff"]);
 
   // Fetch initial data
   const [stats, ecommerceStats, trafficData, topPages, trafficSources, deviceUsage, geographicDistribution, conversionFunnel, customerLifetimeValue, customerRetention, purchaseFrequency, customerSegmentation, realTimeAnalytics, revenueForecasting, goalTracking, anomalyDetection] = await Promise.all([

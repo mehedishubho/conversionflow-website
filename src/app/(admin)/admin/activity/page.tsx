@@ -1,6 +1,4 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { auditLogs, user } from "@/lib/db/schema";
 import { desc, eq, ilike, and, or } from "drizzle-orm";
@@ -28,11 +26,7 @@ export default async function AdminActivityPage({
 }: {
   searchParams: Promise<{ search?: string; action?: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
-
-  const userRole = (session.user as Record<string, unknown>).role as string;
-  if (userRole !== "admin" && userRole !== "super_admin") redirect("/admin/dashboard");
+  await requireAdmin();
 
   const params = await searchParams;
 

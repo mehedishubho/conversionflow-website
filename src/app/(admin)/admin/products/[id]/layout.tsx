@@ -24,7 +24,7 @@ export default async function ProductDetailLayout({
 
   const userRole = (session.user as Record<string, unknown>).role as string;
   if (userRole !== "admin" && userRole !== "super_admin") {
-    redirect("/admin/dashboard");
+    redirect("/dashboard");
   }
 
   // Resolve params (Next.js 16: params is a Promise)
