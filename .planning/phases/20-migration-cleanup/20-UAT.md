@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 20-core-seo-configuration
 source: Phase 20 roadmap success criteria + codebase analysis
 started: 2026-06-06T19:45:00Z
-updated: 2026-06-06T20:30:00Z
+updated: 2026-06-06T21:00:00Z
 ---
 
 ## Current Test
@@ -28,10 +28,7 @@ note: "Ping search engines" is integrated into the "Regenerate Sitemap" button w
 
 ### 4. robots.txt Management
 expected: Navigate to /admin/settings/seo/robots. Code editor loads with current robots.txt content. Can edit and save. Changes reflect at /robots.txt public route.
-result: issue
-reported: "after refresh the page data removed"
-severity: minor
-note: Save shows success message but data does not persist on page refresh. Save flow (upsert) and load flow (getSeoSettings) both appear structurally correct. Needs deeper investigation — possible DB write issue or page cache.
+result: pass
 
 ### 5. SEO Sidebar Navigation
 expected: In the settings sidebar, "SEO Settings" item expands to reveal sub-items (General, Verification, Sitemaps, Robots.txt, Schema, Social/OG). Each sub-item navigates correctly. Active item is highlighted.
@@ -44,8 +41,8 @@ result: pass
 ## Summary
 
 total: 6
-passed: 5
-issues: 1
+passed: 6
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -53,11 +50,12 @@ blocked: 0
 ## Gaps
 
 - truth: "robots.txt settings persist after page refresh"
-  status: diagnosed
-  reason: "User reported: after saving robots.txt settings and refreshing the page, the data is removed/lost. Save shows green success message but data doesn't persist."
+  status: resolved
+  reason: "User reported: after saving robots.txt settings and refreshing the page, the data is removed/lost."
   severity: minor
   test: 4
-  artifacts: ["src/components/admin/seo/RobotsEditor.tsx", "src/app/(admin)/actions/admin-seo.ts", "src/lib/seo-keys.ts"]
+  artifacts: ["src/components/admin/seo/RobotsEditor.tsx"]
   missing: []
-  root_cause: "Under investigation. saveSeoSettings upsert pattern looks correct. getSeoSettings fetches ROBOTS_SEO_KEYS correctly. Possible: DB write not committing, Next.js page cache ignoring force-dynamic, or initialData not reflecting saved state."
-  fix: "Debug the save/load cycle: add console logging to saveSeoSettings to verify DB write, check if getSeoSettings returns saved data on subsequent load, verify force-dynamic is honored."
+  root_cause: "RobotsEditor deferred initialData parsing to useEffect, but visual mode inputs used defaultValue (uncontrolled) which only applies on first mount. By the time useEffect updated state, DOM inputs had committed with hardcoded defaults."
+  fix: "Moved initialData parsing into useState initializers (synchronous during mount), matching GeneralSeoForm pattern. Commit 9412e90."
+  resolved_in: "9412e90"
