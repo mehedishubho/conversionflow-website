@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect, useCallback } from "react";
+import { useState, useTransition, useCallback } from "react";
 import ComponentCard from "@/components/common/ComponentCard";
 import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
@@ -115,6 +115,25 @@ function highlightRobots(raw: string): string {
 }
 
 export default function RobotsEditor({ initialData }: RobotsEditorProps) {
+  // Parse DB data once during initialization (matches GeneralSeoForm pattern)
+  const robotsTxt = initialData.seo_robots_txt ?? "";
+  const aiBotsRaw = initialData.seo_ai_bots ?? "";
+  const parsed = robotsTxt ? parseRobotsTxt(robotsTxt) : null;
+
+  const initialBots = (() => {
+    if (aiBotsRaw) {
+      try {
+        const parsedBots = JSON.parse(aiBotsRaw);
+        if (typeof parsedBots === "object" && parsedBots !== null) {
+          return { ...DEFAULT_BOTS, ...parsedBots };
+        }
+      } catch {
+        // Keep defaults
+      }
+    }
+    return { ...DEFAULT_BOTS };
+  })();
+
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -122,50 +141,22 @@ export default function RobotsEditor({ initialData }: RobotsEditorProps) {
   } | null>(null);
 
   const [activeTab, setActiveTab] = useState<TabMode>("visual");
-  const [rawContent, setRawContent] = useState<string>("");
-  const [crawlPreset, setCrawlPreset] = useState<CrawlPreset>("allow_all");
-
-  // Visual mode state
-  const [userAgent, setUserAgent] = useState("*");
-  const [allowPaths, setAllowPaths] = useState("/");
-  const [disallowPaths, setDisallowPaths] = useState("/_next/\n/api/");
-  const [crawlDelay, setCrawlDelay] = useState("");
-  const [sitemapUrl, setSitemapUrl] = useState(
-    "https://conversionflow.com/sitemap.xml"
+  const [rawContent, setRawContent] = useState<string>(robotsTxt);
+  const [crawlPreset, setCrawlPreset] = useState<CrawlPreset>(
+    robotsTxt ? "custom" : "allow_all"
   );
-  const [bots, setBots] = useState<Record<string, boolean>>({ ...DEFAULT_BOTS });
 
-  // Initialize from DB data
-  useEffect(() => {
-    const robotsTxt = initialData.seo_robots_txt ?? "";
-    const aiBotsRaw = initialData.seo_ai_bots ?? "";
-
-    // Parse AI bots from DB
-    if (aiBotsRaw) {
-      try {
-        const parsed = JSON.parse(aiBotsRaw);
-        if (typeof parsed === "object" && parsed !== null) {
-          setBots({ ...DEFAULT_BOTS, ...parsed });
-        }
-      } catch {
-        // Keep defaults
-      }
-    }
-
-    // Parse robots.txt content from DB
-    if (robotsTxt) {
-      setRawContent(robotsTxt);
-      const parsed = parseRobotsTxt(robotsTxt);
-      setUserAgent(parsed.userAgent);
-      setAllowPaths(parsed.allowPaths || "/");
-      setDisallowPaths(parsed.disallowPaths || "/_next/\n/api/");
-      setCrawlDelay(parsed.crawlDelay);
-      if (parsed.sitemapUrl) {
-        setSitemapUrl(parsed.sitemapUrl);
-      }
-      setCrawlPreset("custom");
-    }
-  }, [initialData]);
+  // Visual mode state — initialized from DB data
+  const [userAgent, setUserAgent] = useState(parsed?.userAgent ?? "*");
+  const [allowPaths, setAllowPaths] = useState(parsed?.allowPaths || "/");
+  const [disallowPaths, setDisallowPaths] = useState(
+    parsed?.disallowPaths || "/_next/\n/api/"
+  );
+  const [crawlDelay, setCrawlDelay] = useState(parsed?.crawlDelay ?? "");
+  const [sitemapUrl, setSitemapUrl] = useState(
+    parsed?.sitemapUrl ?? "https://conversionflow.com/sitemap.xml"
+  );
+  const [bots, setBots] = useState<Record<string, boolean>>(initialBots);
 
   // Generate robots.txt from visual state
   const generateRobotsTxt = useCallback((): string => {
