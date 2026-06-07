@@ -18,6 +18,7 @@ import { DnsVerifier } from "@/modules/licensing/infrastructure/adapters/DnsVeri
 import { HttpProofFetcher } from "@/modules/licensing/infrastructure/adapters/HttpProofFetcher";
 import { SuspiciousFlagDetector } from "@/modules/licensing/infrastructure/adapters/SuspiciousFlagDetector";
 import { LicenseKey } from "@/shared/domain/valueObjects/LicenseKey";
+import { Domain } from "@/shared/domain/valueObjects/Domain";
 import { Activation } from "@/modules/licensing/domain/entities/Activation";
 import { inProcessPublisher } from "@/shared/infrastructure/eventBus/EventBus";
 import {
@@ -64,7 +65,13 @@ export class ActivateLicenseHandler {
       return { success: false, error: "INVALID_LICENSE" };
     }
 
-    const domain = input.domain.toLowerCase().trim();
+    // Normalize domain (strips protocol, www, trailing slashes)
+    let domain: string;
+    try {
+      domain = Domain.create(input.domain).value;
+    } catch {
+      return { success: false, error: "INVALID_LICENSE" };
+    }
 
     // 2. Look up license
     const license = await this.licenseRepo.findByKey(key.value);

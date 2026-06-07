@@ -16,6 +16,7 @@ import { LicenseRepository } from "@/modules/licensing/infrastructure/repositori
 import { ApiTokenGenerator } from "@/modules/licensing/domain/services/ApiTokenGenerator";
 import { ValidationCache } from "@/modules/licensing/infrastructure/adapters/ValidationCache";
 import { LicenseKey } from "@/shared/domain/valueObjects/LicenseKey";
+import { Domain } from "@/shared/domain/valueObjects/Domain";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -86,8 +87,13 @@ export class ValidateLicenseHandler {
       return INVALID;
     }
 
-    // 2. Normalize domain
-    const domain = input.domain.toLowerCase().trim();
+    // 2. Normalize domain (strips protocol, www, trailing slashes)
+    let domain: string;
+    try {
+      domain = Domain.create(input.domain).value;
+    } catch {
+      return INVALID;
+    }
 
     // 3. Check cache first (D-19)
     const cached = await ValidationCache.get(key.value, domain);

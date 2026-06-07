@@ -4,10 +4,41 @@
  *
  * Usage: pnpm db:seed
  * Requires: ADMIN_EMAIL, ADMIN_PASSWORD, DATABASE_URL in .env.local
+ *
+ * SAFETY: This script will refuse to run in production unless
+ * FORCE_SEED=true is set in the environment.
  */
 import postgres from "postgres";
+import * as readline from "readline";
+
+function promptConfirmation(question: string): Promise<boolean> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.toLowerCase() === "y" || answer.toLowerCase() === "yes");
+    });
+  });
+}
 
 async function seed() {
+  // ── Safety: Block production by default ──
+  const nodeEnv = process.env.NODE_ENV;
+  const forceSeed = process.env.FORCE_SEED === "true";
+
+  if (nodeEnv === "production" && !forceSeed) {
+    console.error(
+      "⛔ BLOCKED: This seed script cannot run in production.\n" +
+        "  The primary admin creation method is the /admin/setup web page.\n" +
+        "  If you absolutely need this, set FORCE_SEED=true in your environment."
+    );
+    process.exit(1);
+  }
+
+  if (forceSeed) {
+    console.warn("⚠️  WARNING: FORCE_SEED is enabled. Running seed in non-standard environment.");
+  }
+
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
@@ -17,6 +48,17 @@ async function seed() {
         "Set ADMIN_EMAIL and ADMIN_PASSWORD in .env.local to use this script."
     );
     process.exit(1);
+  }
+
+  // ── Confirmation prompt (skip in CI/non-TTY) ──
+  if (process.stdin.isTTY && !forceSeed) {
+    const confirmed = await promptConfirmation(
+      `This will create a super admin (${adminEmail}). Continue? [y/N] `
+    );
+    if (!confirmed) {
+      console.log("Seed cancelled.");
+      process.exit(0);
+    }
   }
 
   const connectionString = process.env.DATABASE_URL;

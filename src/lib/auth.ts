@@ -80,7 +80,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: true, // D-06: send verification email on registration
+    sendOnSignUp: process.env.NODE_ENV === "production", // D-06: skip in dev, send in prod
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       const { sendVerificationEmail } = await import("@/lib/emails/verification");

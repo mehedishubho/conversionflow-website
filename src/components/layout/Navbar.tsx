@@ -36,28 +36,28 @@ export function Navbar() {
 
   if (!mounted) {
     return (
-      <div className="fixed top-4 left-0 right-0 z-[900] flex justify-center px-5 pointer-events-none">
-        <div className="max-w-[1280px] w-full h-[56px]" />
+      <div className="fixed top-2 sm:top-4 left-0 right-0 z-900 flex justify-center px-3 sm:px-4 pointer-events-none">
+        <div className="max-w-[1280px] w-full h-13 sm:h-14" />
       </div>
     );
   }
 
   return (
-    <div className="fixed top-4 left-0 right-0 z-[900] flex justify-center px-4 md:px-5 pointer-events-none">
+    <div className="fixed top-2 sm:top-4 left-0 right-0 z-900 flex justify-center px-3 sm:px-4 pointer-events-none">
       <motion.nav
         initial={{ y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "max-w-[1280px] w-full flex items-center justify-between glass rounded-[18px] px-3 md:px-4 py-2 pointer-events-auto transition-shadow duration-300",
+          "max-w-[1280px] w-full flex items-center justify-between glass rounded-2xl sm:rounded-[18px] px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 pointer-events-auto transition-shadow duration-300",
           isScrolled && "shadow-lg border-opacity-50"
         )}
       >
-        <Link href="/" className="flex items-center gap-1.5 md:gap-2.5 flex-shrink-0 group">
-          <div className="w-[30px] h-[30px] md:w-[34px] md:h-[34px] bg-accent rounded-[10px] flex items-center justify-center text-base md:text-lg transition-transform group-hover:rotate-[-8deg] group-hover:scale-110">
+        <Link href="/" className="flex items-center gap-1.5 md:gap-2.5 shrink-0 group">
+          <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 md:w-8.5 md:h-8.5 bg-accent rounded-lg sm:rounded-[10px] flex items-center justify-center text-sm sm:text-base md:text-lg transition-transform group-hover:rotate-[-8deg] group-hover:scale-110">
             🚀
           </div>
-          <div className="font-black text-[14px] md:text-[15px] text-foreground tracking-[-0.3px]">
+          <div className="hidden md:block font-black text-[15px] text-foreground tracking-[-0.3px]">
             Conversion<span className="text-accent">Flow</span>
           </div>
         </Link>
@@ -88,15 +88,15 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
           <LanguageToggle />
 
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-8 h-8 md:w-9 md:h-9 border border-border rounded-[9px] flex items-center justify-center text-lg hover:border-accent hover:bg-accent-light transition-all text-text2"
+            className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 border border-border rounded-lg sm:rounded-[9px] flex items-center justify-center hover:border-accent hover:bg-accent-light transition-all text-text2"
             aria-label="Toggle Theme"
           >
-            {theme === "dark" ? <Sun size={16} className="md:w-[18px] md:h-[18px]" /> : <Moon size={16} className="md:w-[18px] md:h-[18px]" />}
+            {theme === "dark" ? <Sun size={14} className="sm:w-4 sm:h-4 md:w-4.5 md:h-4.5" /> : <Moon size={14} className="sm:w-4 sm:h-4 md:w-4.5 md:h-4.5" />}
           </button>
 
           <Link href="/pricing" className="hidden sm:flex btn btn-primary text-[13px] px-4 py-2">
@@ -105,10 +105,10 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden w-8 h-8 border border-border rounded-[9px] flex items-center justify-center text-text2 hover:bg-accent-light"
+            className="md:hidden w-7 h-7 sm:w-8 sm:h-8 border border-border rounded-lg sm:rounded-[9px] flex items-center justify-center text-text2 hover:bg-accent-light"
             aria-label="Toggle Mobile Menu"
           >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            {mobileMenuOpen ? <X size={16} className="sm:w-4.5 sm:h-4.5" /> : <Menu size={16} className="sm:w-4.5 sm:h-4.5" />}
           </button>
         </div>
       </motion.nav>
@@ -120,7 +120,7 @@ export function Navbar() {
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            className="absolute top-20 left-5 right-5 glass rounded-2xl p-4 md:hidden flex flex-col gap-2 pointer-events-auto shadow-2xl"
+            className="absolute top-15 sm:top-20 left-3 right-3 sm:left-5 sm:right-5 glass rounded-xl sm:rounded-2xl p-3 sm:p-4 md:hidden flex flex-col gap-1.5 sm:gap-2 pointer-events-auto shadow-2xl"
           >
             {navLinks.map((link) => (
               <Link
@@ -129,7 +129,7 @@ export function Navbar() {
                 href={link.href as any}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "p-3 rounded-xl text-sm font-medium transition-colors",
+                  "p-2.5 sm:p-3 rounded-lg sm:rounded-xl text-[13px] sm:text-sm font-medium transition-colors",
                   pathname === link.href
                     ? "bg-accent/10 text-accent"
                     : "text-text2 hover:bg-accent-light"
@@ -138,15 +138,15 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <div className="h-px bg-border my-2" />
-            <div className="p-3 flex items-center justify-between">
+            <div className="h-px bg-border my-1.5 sm:my-2" />
+            <div className="p-2.5 sm:p-3 flex items-center justify-between">
               <LanguageToggle />
             </div>
-            <div className="h-px bg-border my-2" />
+            <div className="h-px bg-border my-1.5 sm:my-2" />
             <Link
               href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
-              className="btn btn-primary w-full justify-center py-3"
+              className="btn btn-primary w-full justify-center py-2.5 sm:py-3 text-[13px] sm:text-sm"
             >
               {t("nav.buyNow")}
             </Link>

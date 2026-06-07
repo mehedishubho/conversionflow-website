@@ -295,9 +295,13 @@ section.sec { padding: 100px 0; }
 
 /* â”€â”€ BENTO â”€â”€ */
 .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.bento-12 { grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .bc { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 24px; transition: border-color 0.25s, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s; cursor: default; will-change: transform; }
 .bc:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); }
 .bc.w2 { grid-column: span 2; }
+.bento-12 .bc-w2 { grid-column: span 2; }
+.bento-12 .bc-featured { background: linear-gradient(135deg, var(--surface) 0%, var(--accent-light) 100%); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.bento-12 .bc-featured .bc-icon { background: var(--accent); border-color: var(--accent); }
 .bc-icon { width: 46px; height: 46px; border-radius: 13px; background: var(--accent-light); border: 1px solid var(--border); display: grid; place-items: center; font-size: 22px; margin-bottom: 18px; transition: transform 0.3s; }
 .bc:hover .bc-icon { transform: scale(1.12) rotate(-5deg); }
 .bc-title { font-family: var(--font-dm-sans); font-size: 16px; font-weight: 800; color: var(--foreground); margin-bottom: 8px; }
@@ -524,6 +528,8 @@ textarea.form-input { resize: vertical; min-height: 120px; }
   .hero-grid { grid-template-columns: 1fr; }
   .dash-mock { display: none; }
   .bento { grid-template-columns: 1fr 1fr; }
+  .bento-12 { grid-template-columns: repeat(2, 1fr); }
+  .bento-12 .bc-w2 { grid-column: span 2; }
   .bc.w2 { grid-column: span 2; }
   .feat-row { grid-template-columns: 1fr; gap: 40px; padding: 60px 0; }
   .feat-row.rev .fc, .feat-row.rev .fv { order: unset; }
@@ -542,6 +548,8 @@ textarea.form-input { resize: vertical; min-height: 120px; }
 @media (max-width: 640px) {
   section.sec { padding: 64px 0; }
   .bento { grid-template-columns: 1fr; }
+  .bento-12 { grid-template-columns: 1fr; }
+  .bento-12 .bc-w2 { grid-column: span 1; }
   .bc.w2 { grid-column: span 1; }
   .steps-grid { grid-template-columns: 1fr; }
   .tgrid { grid-template-columns: 1fr; }

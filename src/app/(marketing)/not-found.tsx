@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import NotFoundLogger from "@/components/common/NotFoundLogger";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function NotFound() {
+  const { t } = useLanguage();
+
   return (
     <div className="page-hero-sm" style={{ minHeight: "70vh", display: "flex", alignItems: "center" }}>
       <NotFoundLogger />
@@ -13,20 +18,20 @@ export default function NotFound() {
           404
         </div>
         <div className="sec-title" style={{ marginTop: "16px" }}>
-          পেজ পাওয়া যায়নি
+          {t("notFound.title")}
         </div>
         <p className="sec-sub" style={{ maxWidth: "460px", margin: "0 auto 32px" }}>
-          আপনি যে পেজটি খুঁজছেন তা নেই বা সরানো হয়েছে।
+          {t("notFound.subtitle")}
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
           <Link href="/" className="btn btn-primary btn-lg">
-            হোমে ফিরুন
+            {t("notFound.back")}
           </Link>
           <Link href="/features" className="btn btn-outline btn-lg">
-            ফিচার
+            {t("nav.features")}
           </Link>
           <Link href="/pricing" className="btn btn-outline btn-lg">
-            মূল্য
+            {t("nav.pricing")}
           </Link>
         </div>
       </div>

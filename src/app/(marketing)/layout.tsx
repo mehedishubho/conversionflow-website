@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Noto_Sans_Bengali, DM_Sans, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
@@ -10,17 +10,17 @@ import { TrackingScriptsLoader } from "@/components/layout/TrackingScriptsLoader
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import "../globals.css";
 
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-syne",
-  display: "swap",
-});
-
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const notoSansBengali = Noto_Sans_Bengali({
+  subsets: ["latin", "bengali"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-bengali",
   display: "swap",
 });
 
@@ -68,7 +68,7 @@ export default function MarketingLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${dmSans.variable} ${dmSansMono.variable} antialiased`}
+      className={`${dmSans.variable} ${notoSansBengali.variable} ${dmSansMono.variable} antialiased`}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >

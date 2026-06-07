@@ -17,6 +17,7 @@
 import type { BaseEvent } from "@/shared/infrastructure/eventBus/types";
 import { GenerateLicenseHandler } from "@/modules/licensing/application/commands/GenerateLicenseHandler";
 import { ProductPlanRepository } from "@/modules/products/infrastructure/repositories/ProductPlanRepository";
+import { ProductRepository } from "@/modules/products/infrastructure/repositories/ProductRepository";
 import { ExpiryCalculator } from "@/modules/licensing/application/services/ExpiryCalculator";
 import { db } from "@/lib/db";
 import { orders, user, licenses } from "@/lib/db/schema";
@@ -26,6 +27,7 @@ import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
 
 export class OrderCompletedHandler {
   private planRepo = new ProductPlanRepository();
+  private productRepo = new ProductRepository();
 
   /**
    * Handle an OrderCompleted event.
@@ -38,6 +40,8 @@ export class OrderCompletedHandler {
       orderId: string;
       userId: string;
     };
+
+    console.log(`[Billing] OrderCompletedHandler: START — orderId=${orderId}, userId=${userId}`);
 
     // 1. Fetch order from DB
     const orderRows = await db
@@ -54,6 +58,7 @@ export class OrderCompletedHandler {
     }
 
     const order = orderRows[0];
+    console.log(`[Billing] OrderCompletedHandler: Found order — productId=${order.productId}, plan=${order.plan}, amount=${order.amount}`);
 
     // 2. Idempotency check — query licenses by orderId
     const existingLicenses = await db
@@ -73,10 +78,12 @@ export class OrderCompletedHandler {
       );
     } else {
       // 3. Resolve plan details
+      console.log(`[Billing] OrderCompletedHandler: Resolving plan — productId=${order.productId}, plan=${order.plan}`);
       const { maxActivations, expiresAt } = await this.resolvePlanDetails(
         order.productId,
         order.plan,
       );
+      console.log(`[Billing] OrderCompletedHandler: Plan resolved — maxActivations=${maxActivations}, expiresAt=${expiresAt}`);
 
       // 4. Generate license
       const result = await GenerateLicenseHandler.execute({
@@ -87,6 +94,8 @@ export class OrderCompletedHandler {
         expiresAt,
         orderId,
       });
+
+      console.log(`[Billing] OrderCompletedHandler: Generate result — success=${result.success}, error=${result.error ?? 'none'}`);
 
       if (result.success && result.license) {
         licenseKey = result.license.licenseKey;
@@ -150,6 +159,8 @@ export class OrderCompletedHandler {
         emailError,
       );
     }
+
+    console.log(`[Billing] OrderCompletedHandler: COMPLETE — orderId=${orderId}, licenseKey=${licenseKey ?? 'NONE'}`);
   }
 
   /**
@@ -160,17 +171,37 @@ export class OrderCompletedHandler {
    * - expiresAt = null (lifetime, no accidental expiration)
    */
   private async resolvePlanDetails(
-    productId: string,
+    productIdOrSlug: string,
+    planName: string,
+  ): Promise<{ maxActivations: number; expiresAt: Date | null }> {
+    // productIdOrSlug may be a slug (e.g., "conversionflow-wp") since orders.productId is text.
+    // ProductPlanRepository.findBySlug expects a UUID for productId.
+    // Resolve: look up product by slug first, then use its UUID for the plan query.
+    const product = await this.productRepo.findBySlug(productIdOrSlug);
+
+    if (!product) {
+      console.warn(
+        `[Billing] OrderCompletedHandler: Product "${productIdOrSlug}" not found by slug, trying as UUID`,
+      );
+      // Fallback: try treating it as a UUID directly (in case it was already a UUID)
+      return this.resolvePlanFromUUID(productIdOrSlug, planName);
+    }
+
+    return this.resolvePlanFromUUID(product.id, planName);
+  }
+
+  private async resolvePlanFromUUID(
+    productUUID: string,
     planName: string,
   ): Promise<{ maxActivations: number; expiresAt: Date | null }> {
     const plan = await this.planRepo.findBySlug(
-      productId,
+      productUUID,
       planName.toLowerCase(),
     );
 
     if (!plan) {
       console.warn(
-        `[Billing] OrderCompletedHandler: Plan "${planName}" not found for product ${productId}, using safe defaults`,
+        `[Billing] OrderCompletedHandler: Plan "${planName}" not found for product ${productUUID}, using safe defaults`,
       );
       return { maxActivations: 1, expiresAt: null };
     }
@@ -201,9 +232,13 @@ export function registerBillingHandlers(): void {
   const { ORDER_EVENTS } = require("../../domain/events/OrderEvents");
 
   const handler = new OrderCompletedHandler();
-  inProcessSubscriber.subscribe(ORDER_EVENTS.ORDER_COMPLETED, (event: BaseEvent) =>
-    handler.handle(event),
-  );
+  inProcessSubscriber.subscribe(ORDER_EVENTS.ORDER_COMPLETED, (event: BaseEvent) => {
+    // Wrap async handler — EventEmitter.emit() doesn't await promises,
+    // so unhandled rejections would be silently lost
+    handler.handle(event).catch((err) => {
+      console.error("[Billing] OrderCompletedHandler UNHANDLED ERROR:", err);
+    });
+  });
 
   console.log("[Billing] Registered OrderCompleted handler");
 }

@@ -5,12 +5,6 @@ import { usePathname } from "next/navigation";
 import { docsNav } from "@/data/docs-nav";
 import { cn } from "@/lib/utils";
 
-const docLabels: Record<string, string> = {"getting-started":"শুরু করুন","courier-sync":"কুরিয়ার সিঙ্ক","meta-capi":"মেটা CAPI","fraud-shield":"ফ্রড শিল্ড","analytics":"অ্যানালিটিক্স"};
-const catLabels: Record<string, string> = {
-  "Getting Started": "শুরু করুন",
-  "Modules": "মডিউলসমূহ",
-};
-
 export function DocsSidebar() {
   const pathname = usePathname();
   return (
@@ -19,7 +13,7 @@ export function DocsSidebar() {
         return (
           <div key={group.category}>
             <h2 className="font-dm-sans text-[11px] font-extrabold uppercase tracking-[1.3px] text-muted mb-3">
-              {catLabels[group.category] || group.category}
+              {group.category}
             </h2>
             <div className="flex flex-col gap-0.5 mb-6">
               {group.items.map((item) => {
@@ -36,7 +30,7 @@ export function DocsSidebar() {
                     )}
                   >
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {docLabels[item.slug] || item.title}
+                    {item.title}
                   </Link>
                 );
               })}

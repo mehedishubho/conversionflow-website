@@ -214,6 +214,15 @@ export async function proxy(request: NextRequest) {
 
   // Auth pages: redirect logged-in users to their appropriate dashboard
   if (authPage && hasValidSession) {
+    try {
+      const session = await auth.api.getSession({ headers: request.headers });
+      const role = (session?.user as Record<string, unknown>)?.role as string;
+      if (role === "super_admin" || role === "admin" || role === "support_staff") {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      }
+    } catch {
+      // Fallback to customer dashboard
+    }
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

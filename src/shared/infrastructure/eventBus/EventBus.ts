@@ -54,7 +54,7 @@ export function createEventBus(useRedis: boolean = false): EventBus {
  * ```
  */
 export function createPublisher(useRedis: boolean = false): Publisher {
-  const eventBus = createEventBus(useRedis);
+  const eventBus = useRedis ? crossProcessEventBus : inProcessEventBus;
   return {
     publish: (event: BaseEvent) => {
       const result = eventBus.publish(event);
@@ -83,7 +83,7 @@ export function createPublisher(useRedis: boolean = false): Publisher {
  * ```
  */
 export function createSubscriber(useRedis: boolean = false): EventSubscriber {
-  const eventBus = createEventBus(useRedis);
+  const eventBus = useRedis ? crossProcessEventBus : inProcessEventBus;
   return {
     subscribe: (eventType: string, handler: EventHandler) => {
       eventBus.subscribe(eventType, handler);

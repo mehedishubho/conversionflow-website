@@ -44,6 +44,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
     if (saved === "en" || saved === "bn") {
       setLocaleState(saved);
+      document.documentElement.lang = saved;
     }
   }, []);
 

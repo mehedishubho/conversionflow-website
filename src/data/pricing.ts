@@ -17,6 +17,47 @@ interface PricingTier {
   whatsappMessage: string;
 }
 
+export type PlatformKey = "wordpress" | "laravel" | "shopify" | "nextjs";
+
+export interface PlatformInfo {
+  key: PlatformKey;
+  name: string;
+  available: boolean;
+  description: string;
+  icon: string;
+}
+
+export const platforms: PlatformInfo[] = [
+  {
+    key: "wordpress",
+    name: "WordPress",
+    available: true,
+    description: "WooCommerce",
+    icon: "🔌",
+  },
+  {
+    key: "laravel",
+    name: "Laravel",
+    available: false,
+    description: "Laravel Commerce",
+    icon: "🔥",
+  },
+  {
+    key: "shopify",
+    name: "Shopify",
+    available: false,
+    description: "Shopify Store",
+    icon: "🛍️",
+  },
+  {
+    key: "nextjs",
+    name: "Next.js",
+    available: false,
+    description: "Next.js Commerce",
+    icon: "▲",
+  },
+];
+
 export const pricingTiers: PricingTier[] = [
   {
     plan: "Starter",

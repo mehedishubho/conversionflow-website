@@ -11,6 +11,7 @@
 import { LicenseRepository } from "@/modules/licensing/infrastructure/repositories/LicenseRepository";
 import { ApiTokenGenerator } from "@/modules/licensing/domain/services/ApiTokenGenerator";
 import { LicenseKey } from "@/shared/domain/valueObjects/LicenseKey";
+import { Domain } from "@/shared/domain/valueObjects/Domain";
 import { performDeactivation } from "./deactivationService";
 
 export interface DeactivateInput {
@@ -48,7 +49,13 @@ export class DeactivateLicenseHandler {
       return { success: false, error: "INVALID_LICENSE" };
     }
 
-    const domain = input.domain.toLowerCase().trim();
+    // Normalize domain (strips protocol, www, trailing slashes)
+    let domain: string;
+    try {
+      domain = Domain.create(input.domain).value;
+    } catch {
+      return { success: false, error: "INVALID_LICENSE" };
+    }
 
     // 2. Look up license
     const license = await this.licenseRepo.findByKey(key.value);
