@@ -27,8 +27,10 @@ export interface EventCatalogEntry {
  * 11 events covering orders, licenses, transfers, password reset, and API tokens.
  */
 export const EVENT_CATALOG: Record<string, EventCatalogEntry> = {
+  // in_app only — the billing OrderCompletedHandler sends the correct email
+  // directly with licenseKey/apiToken. Email channel here would cause a duplicate.
   "order.completed": {
-    channels: ["email", "in_app"],
+    channels: ["in_app"],
     template: "sendOrderConfirmationEmail",
     category: "billing",
     title: "Order Confirmed",

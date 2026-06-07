@@ -148,7 +148,10 @@ export class NotificationService {
         return { emailDeliveryId };
       });
 
-      // Enqueue email job if email channel is enabled
+      // Enqueue email job if email channel is enabled.
+      // NOTE: order.completed is "in_app" only in the catalog because the billing
+      // OrderCompletedHandler already sends the correct email directly. Adding "email"
+      // here would cause a duplicate with undefined subject/html fields.
       if (enabledChannels.includes("email") && emailQueue && emailDeliveryId) {
         await emailQueue.add(
           "send-email",
