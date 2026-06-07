@@ -38,8 +38,8 @@ export class LicenseMapper implements IMapper<License, typeof licenses.$inferIns
    * Omits timestamps with DB defaults (createdAt, updatedAt).
    */
   toData(domain: License): typeof licenses.$inferInsert {
-    return {
-      id: domain.id,
+    // Omit id when empty so DB defaultRandom() generates a UUID
+    const data: typeof licenses.$inferInsert = {
       userId: domain.userId,
       productId: domain.productId,
       plan: domain.plan,
@@ -52,5 +52,9 @@ export class LicenseMapper implements IMapper<License, typeof licenses.$inferIns
       expiresAt: domain.expiresAt,
       orderId: domain.orderId,
     };
+    if (domain.id) {
+      data.id = domain.id;
+    }
+    return data;
   }
 }

@@ -8,6 +8,8 @@ import {
   settings,
   paymentMethodEnum,
   licenses,
+  productPlans,
+  products,
 } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
@@ -16,12 +18,54 @@ import { redirect } from "next/navigation";
 import { createAuditLog } from "@/lib/audit";
 
 // ── Server-side price map (authoritative, never trust client) ──
-// Plan names must match pricingTiers[].plan in @/data/pricing.ts
-const PLAN_PRICES: Record<string, { amount: number; productId: string }> = {
+// Dynamically resolved from product_plans table at first call.
+// Fallback to hardcoded values if DB lookup fails.
+const FALLBACK_PRICES: Record<string, { amount: number; productId: string }> = {
   Starter: { amount: 2150, productId: "conversionflow-wp" },
   Professional: { amount: 3000, productId: "conversionflow-wp" },
   Agency: { amount: 8000, productId: "conversionflow-wp" },
 };
+
+let cachedPlanPrices: Record<string, { amount: number; productId: string }> | null = null;
+
+/**
+ * Resolve plan prices from the database.
+ * JOINs product_plans with products to get the product slug.
+ * Caches result for the process lifetime.
+ */
+async function getPlanPrices(): Promise<Record<string, { amount: number; productId: string }>> {
+  if (cachedPlanPrices) return cachedPlanPrices;
+
+  try {
+    const rows = await db
+      .select({
+        planName: productPlans.name,
+        planSlug: productPlans.slug,
+        priceBDT: productPlans.priceBDT,
+        productSlug: products.slug,
+      })
+      .from(productPlans)
+      .innerJoin(products, eq(productPlans.productId, products.id))
+      .where(eq(productPlans.active, true));
+
+    if (rows.length > 0) {
+      cachedPlanPrices = {};
+      for (const row of rows) {
+        // Key by plan name (matches checkout form values like "Starter", "Professional", "Agency")
+        cachedPlanPrices[row.planName] = {
+          amount: row.priceBDT,
+          productId: row.productSlug,
+        };
+      }
+      console.log("[Checkout] Plan prices resolved from DB:", Object.keys(cachedPlanPrices));
+      return cachedPlanPrices;
+    }
+  } catch (error) {
+    console.error("[Checkout] Failed to resolve plan prices from DB, using fallback:", error);
+  }
+
+  return FALLBACK_PRICES;
+}
 
 // ── Types ──
 
@@ -143,7 +187,8 @@ export async function createManualOrder(
   const clientDiscountAmount = formData.get("discountAmount") as string;
 
   // Validate plan exists and get server-side price (T-04-01)
-  const planPrice = PLAN_PRICES[plan];
+  const planPrices = await getPlanPrices();
+  const planPrice = planPrices[plan];
   if (!planPrice) {
     return { error: "Invalid plan selected" };
   }

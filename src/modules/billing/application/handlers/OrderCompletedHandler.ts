@@ -17,7 +17,6 @@
 import type { BaseEvent } from "@/shared/infrastructure/eventBus/types";
 import { GenerateLicenseHandler } from "@/modules/licensing/application/commands/GenerateLicenseHandler";
 import { ProductPlanRepository } from "@/modules/products/infrastructure/repositories/ProductPlanRepository";
-import { ProductRepository } from "@/modules/products/infrastructure/repositories/ProductRepository";
 import { ExpiryCalculator } from "@/modules/licensing/application/services/ExpiryCalculator";
 import { db } from "@/lib/db";
 import { orders, user, licenses } from "@/lib/db/schema";
@@ -27,7 +26,6 @@ import { sendOrderConfirmationEmail } from "@/lib/emails/order-confirmation";
 
 export class OrderCompletedHandler {
   private planRepo = new ProductPlanRepository();
-  private productRepo = new ProductRepository();
 
   /**
    * Handle an OrderCompleted event.
@@ -166,42 +164,25 @@ export class OrderCompletedHandler {
   /**
    * Resolve maxActivations and expiresAt from the product plan.
    *
+   * Uses JOIN-based lookup to match product slug (from orders.productId)
+   * with product_plans.productId (UUID) — avoids the UUID/slug type mismatch.
+   *
    * Falls back to safe defaults if plan not found (T-17-04):
    * - maxActivations = 1 (minimum, admin can fix)
    * - expiresAt = null (lifetime, no accidental expiration)
    */
   private async resolvePlanDetails(
-    productIdOrSlug: string,
+    productSlug: string,
     planName: string,
   ): Promise<{ maxActivations: number; expiresAt: Date | null }> {
-    // productIdOrSlug may be a slug (e.g., "conversionflow-wp") since orders.productId is text.
-    // ProductPlanRepository.findBySlug expects a UUID for productId.
-    // Resolve: look up product by slug first, then use its UUID for the plan query.
-    const product = await this.productRepo.findBySlug(productIdOrSlug);
-
-    if (!product) {
-      console.warn(
-        `[Billing] OrderCompletedHandler: Product "${productIdOrSlug}" not found by slug, trying as UUID`,
-      );
-      // Fallback: try treating it as a UUID directly (in case it was already a UUID)
-      return this.resolvePlanFromUUID(productIdOrSlug, planName);
-    }
-
-    return this.resolvePlanFromUUID(product.id, planName);
-  }
-
-  private async resolvePlanFromUUID(
-    productUUID: string,
-    planName: string,
-  ): Promise<{ maxActivations: number; expiresAt: Date | null }> {
-    const plan = await this.planRepo.findBySlug(
-      productUUID,
+    const plan = await this.planRepo.findByProductSlugAndPlanSlug(
+      productSlug,
       planName.toLowerCase(),
     );
 
     if (!plan) {
       console.warn(
-        `[Billing] OrderCompletedHandler: Plan "${planName}" not found for product ${productUUID}, using safe defaults`,
+        `[Billing] OrderCompletedHandler: Plan "${planName}" not found for product slug "${productSlug}", using safe defaults`,
       );
       return { maxActivations: 1, expiresAt: null };
     }

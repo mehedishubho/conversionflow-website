@@ -4,7 +4,7 @@ import React, { useState, useTransition } from "react";
 import { claimTransferCode } from "@/app/(portal)/actions/portal-transfers";
 
 interface TransferCodeInputProps {
-  onClaimSuccess: () => void;
+  onClaimSuccess?: () => void;
 }
 
 const CODE_PATTERN = /^CF-XFER-[A-HJ-NP-Z2-9]{6}$/i;
@@ -40,7 +40,7 @@ export default function TransferCodeInput({
       if (result.success) {
         setSuccess(true);
         setCode("");
-        onClaimSuccess();
+        onClaimSuccess?.();
       } else {
         setError(result.error ?? "Failed to claim transfer code.");
       }

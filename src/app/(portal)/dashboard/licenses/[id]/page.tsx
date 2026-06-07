@@ -92,7 +92,7 @@ export default async function LicenseDetailPage({
 
       {/* Claim a transfer code (standalone section) */}
       <ComponentCard title="Claim a License">
-        <TransferCodeInput onClaimSuccess={() => {}} />
+        <TransferCodeInput />
       </ComponentCard>
 
       <ComponentCard title="License Details">
