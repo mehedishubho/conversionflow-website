@@ -68,7 +68,7 @@ export async function getPlanPrices(): Promise<Record<string, { amount: number; 
 }
 
 /** Invalidate cached plan prices. Call after admin plan mutations. */
-export function clearPlanPricesCache(): void {
+export async function clearPlanPricesCache(): Promise<void> {
   cachedPlanPrices = null;
 }
 
