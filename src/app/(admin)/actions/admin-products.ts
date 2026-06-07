@@ -254,6 +254,31 @@ export async function updateVersion(versionId: string, formData: FormData) {
   }
 }
 
+export async function deleteVersion(versionId: string) {
+  const { userId, role } = await requireAdmin();
+
+  if (!versionId) {
+    return { error: "Version ID is required." };
+  }
+
+  try {
+    await db.delete(productVersions).where(eq(productVersions.id, versionId));
+
+    await createAuditLog({
+      actorId: userId,
+      actorRole: role,
+      action: "product.version.deleted",
+      targetType: "product_version",
+      targetId: versionId,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[Admin] Failed to delete version:", error);
+    return { error: "Failed to delete version." };
+  }
+}
+
 export async function releaseVersion(versionId: string) {
   const { userId, role } = await requireAdmin();
 

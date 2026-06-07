@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableHeader,
@@ -10,7 +11,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
-import { Rocket, ExternalLink, Loader2 } from "lucide-react";
+import { Rocket, ExternalLink, Loader2, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ──────────────────────────────────────────────
@@ -33,6 +34,7 @@ interface ProductVersionsTableProps {
   versions: VersionRow[];
   productId: string;
   onRelease: (id: string) => Promise<{ success?: boolean; error?: string }>;
+  onDelete: (id: string) => Promise<{ success?: boolean; error?: string }>;
 }
 
 // ──────────────────────────────────────────────
@@ -66,10 +68,17 @@ export default function ProductVersionsTable({
   versions,
   productId,
   onRelease,
+  onDelete,
 }: ProductVersionsTableProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [releasingId, setReleasingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    versionId: string;
+    versionName: string;
+  }>({ open: false, versionId: "", versionName: "" });
 
   const handleRelease = (id: string) => {
     setActionError(null);
@@ -83,6 +92,19 @@ export default function ProductVersionsTable({
         setReleasingId(null);
         // Force a full page refresh to show updated data
         window.location.reload();
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    setActionError(null);
+    startTransition(async () => {
+      const result = await onDelete(deleteModal.versionId);
+      if (result.error) {
+        setActionError(result.error);
+      } else {
+        setDeleteModal({ open: false, versionId: "", versionName: "" });
+        router.refresh();
       }
     });
   };
@@ -188,21 +210,45 @@ export default function ProductVersionsTable({
 
                     {/* Actions */}
                     <TableCell className="px-5 py-3 text-sm">
-                      {canRelease && (
+                      <div className="flex items-center gap-2">
+                        {canRelease && (
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-success-600 bg-success-50 hover:bg-success-100 dark:text-success-400 dark:bg-success-500/10 dark:hover:bg-success-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleRelease(v.id)}
+                            disabled={isPending}
+                          >
+                            {isReleasing ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Rocket className="w-3.5 h-3.5" />
+                            )}
+                            Release
+                          </button>
+                        )}
+                        <Link
+                          href={`/admin/products/${productId}/versions/${v.id}/edit`}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-success-600 bg-success-50 hover:bg-success-100 dark:text-success-400 dark:bg-success-500/10 dark:hover:bg-success-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          onClick={() => handleRelease(v.id)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-error-500 hover:bg-error-50 dark:hover:bg-error-500/10 transition-colors"
+                          title="Delete"
+                          onClick={() =>
+                            setDeleteModal({
+                              open: true,
+                              versionId: v.id,
+                              versionName: v.version,
+                            })
+                          }
                           disabled={isPending}
                         >
-                          {isReleasing ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Rocket className="w-3.5 h-3.5" />
-                          )}
-                          Release
+                          <Trash2 className="w-4 h-4" />
                         </button>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -211,6 +257,44 @@ export default function ProductVersionsTable({
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+              Delete Version
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to delete version{" "}
+              <code className="px-1 py-0.5 rounded bg-gray-100 dark:bg-white/10 text-xs font-mono font-medium">
+                {deleteModal.versionName}
+              </code>
+              ? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
+                onClick={() =>
+                  setDeleteModal({ open: false, versionId: "", versionName: "" })
+                }
+                disabled={isPending}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 text-sm font-medium text-white bg-error-500 rounded-lg hover:bg-error-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleDelete}
+                disabled={isPending}
+              >
+                {isPending ? "Deleting..." : "Delete Version"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { productVersions } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import ComponentCard from "@/components/common/ComponentCard";
 import ProductVersionsTable from "@/components/admin/ProductVersionsTable";
-import { releaseVersion } from "@/app/(admin)/actions/admin-products";
+import { releaseVersion, deleteVersion } from "@/app/(admin)/actions/admin-products";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -75,6 +75,7 @@ export default async function ProductVersionsPage({
           createdAt: row.createdAt,
         }))}
         onRelease={releaseVersion}
+        onDelete={deleteVersion}
       />
     </ComponentCard>
   );
