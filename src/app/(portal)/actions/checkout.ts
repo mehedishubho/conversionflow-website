@@ -33,7 +33,7 @@ let cachedPlanPrices: Record<string, { amount: number; productId: string }> | nu
  * JOINs product_plans with products to get the product slug.
  * Caches result for the process lifetime.
  */
-async function getPlanPrices(): Promise<Record<string, { amount: number; productId: string }>> {
+export async function getPlanPrices(): Promise<Record<string, { amount: number; productId: string }>> {
   if (cachedPlanPrices) return cachedPlanPrices;
 
   try {
@@ -65,6 +65,24 @@ async function getPlanPrices(): Promise<Record<string, { amount: number; product
   }
 
   return FALLBACK_PRICES;
+}
+
+/** Invalidate cached plan prices. Call after admin plan mutations. */
+export function clearPlanPricesCache(): void {
+  cachedPlanPrices = null;
+}
+
+/**
+ * Get checkout prices as a simple name→amount map for the client.
+ * Used by checkout page to avoid hardcoded price values.
+ */
+export async function getCheckoutPrices(): Promise<Record<string, number>> {
+  const prices = await getPlanPrices();
+  const result: Record<string, number> = {};
+  for (const [name, data] of Object.entries(prices)) {
+    result[name.toLowerCase()] = data.amount;
+  }
+  return result;
 }
 
 // ── Types ──

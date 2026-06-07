@@ -7,6 +7,8 @@ import { db } from "@/lib/db";
 import { products, productVersions, productPlans } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
+import { clearPlanPricesCache } from "@/app/(portal)/actions/checkout";
+import { revalidatePath } from "next/cache";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -426,6 +428,10 @@ export async function createPlan(productId: string, formData: FormData) {
       details: { productId, name: name.trim(), licenseType, priceBDT, priceUSD },
     });
 
+    // Invalidate checkout price cache so new plan prices are visible immediately
+    clearPlanPricesCache();
+    revalidatePath("/dashboard/checkout");
+
     return { success: true, planId: plan.id };
   } catch (error) {
     console.error("[Admin] Failed to create plan:", error);
@@ -557,6 +563,10 @@ export async function updatePlan(planId: string, formData: FormData) {
       details: { updatedFields: Object.keys(updateData) },
     });
 
+    // Invalidate checkout price cache so updated prices are visible immediately
+    clearPlanPricesCache();
+    revalidatePath("/dashboard/checkout");
+
     return { success: true };
   } catch (error) {
     console.error("[Admin] Failed to update plan:", error);
@@ -581,6 +591,10 @@ export async function deletePlan(planId: string) {
       targetType: "product_plan",
       targetId: planId,
     });
+
+    // Invalidate checkout price cache after plan deletion
+    clearPlanPricesCache();
+    revalidatePath("/dashboard/checkout");
 
     return { success: true };
   } catch (error) {

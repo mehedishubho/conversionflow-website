@@ -5,20 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { pricingTiers } from "@/data/pricing";
-import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts } from "@/app/(portal)/actions/checkout";
+import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts, getCheckoutPrices } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import PaymentMethodGrid from "@/components/checkout/PaymentMethodGrid";
 import CouponInput from "@/components/checkout/CouponInput";
 import ManualPaymentForm from "@/components/checkout/ManualPaymentForm";
 import PaymentInstructions from "@/components/checkout/PaymentInstructions";
-
-// Authoritative price map (matches server-side PLAN_PRICES in checkout.ts)
-const planPrices: Record<string, number> = {
-  starter: 2150,
-  professional: 3000,
-  agency: 8000,
-};
 
 type PaymentAccount = {
   accountName: string;
@@ -38,7 +31,10 @@ function CheckoutContent() {
   const tier = pricingTiers.find(
     (t) => t.plan.toLowerCase() === planParam
   );
-  const basePrice = planPrices[planParam] ?? 0;
+
+  // State
+  const [planPriceMap, setPlanPriceMap] = useState<Record<string, number>>({});
+  const basePrice = planPriceMap[planParam] ?? 0;
 
   // State
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -72,17 +68,24 @@ function CheckoutContent() {
     ...(!sslEnabled ? ["ssl_commerz" as const] : []),
   ];
 
-  // Load VAT and payment accounts on mount
+  // Load prices, VAT and payment accounts on mount
   useEffect(() => {
-    if (!tier || !basePrice) return;
+    if (!tier) return;
 
     async function load() {
       try {
-        const [vat, paymentData] = await Promise.all([
-          calculateVAT(basePrice),
+        const [prices, vat, paymentData] = await Promise.all([
+          getCheckoutPrices(),
+          calculateVAT(0), // will recalculate once we have basePrice
           getPaymentAccounts(),
         ]);
-        setVatInfo(vat);
+        setPlanPriceMap(prices);
+        // Recalculate VAT with the actual price now
+        const actualPrice = prices[planParam] ?? 0;
+        if (actualPrice > 0) {
+          const vatResult = await calculateVAT(actualPrice);
+          setVatInfo(vatResult);
+        }
         setPaymentAccounts((paymentData as Record<string, unknown>).accounts as Record<string, PaymentAccount[]>);
         setSslEnabled((paymentData as Record<string, unknown>).sslEnabled as boolean);
       } catch {
@@ -90,7 +93,7 @@ function CheckoutContent() {
       }
     }
     load();
-  }, [tier, basePrice]);
+  }, [tier, planParam]);
 
   // Computed values
   const discountAmount = appliedCoupon?.discount ?? 0;
