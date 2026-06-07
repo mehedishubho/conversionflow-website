@@ -21,7 +21,7 @@ expected: Click View on a product. Overview loads with name, slug, description, 
 result: pass
 
 ### 3. Version Management
-expected: Navigate to Versions tab. Version list loads with status badges. "Add Version" opens create form. Can create version with semver string. Release button works.
+expected: Navigate to Versions tab. Version list loads with status badges. "Add Version" opens create form. Can create version with semver string. Release, Edit, and Delete buttons work.
 result: pass
 
 ### 4. Plan Management
@@ -54,3 +54,9 @@ blocked: 0
   reason: "ProductPlansTable linked to edit route but the page did not exist"
   fix: "Created plan edit page with PlanForm pre-populated from DB. Commit b0e0dda."
   resolved_in: "b0e0dda"
+
+- truth: "Version table has Edit and Delete action buttons"
+  status: resolved
+  reason: "Version table only had Release button. User requested Edit + Delete to match plans table."
+  fix: "Added deleteVersion action, version edit page, and Edit/Delete buttons with modal to ProductVersionsTable. Commit d9d4a3c."
+  resolved_in: "d9d4a3c"
