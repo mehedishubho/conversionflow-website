@@ -1,11 +1,8 @@
-import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { LegalLayout } from "@/components/legal/LegalLayout";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "Terms of Service for ConversionFlow WooCommerce automation plugin.",
-};
+export const generateMetadata = () => createPageMetadata("terms", "en");
 
 export default function TermsPage() {
   return (

@@ -3,7 +3,7 @@ import { pricingTiers } from "@/data/pricing";
 import Link from "next/link";
 import { breadcrumbSchema, createPageMetadata, productSchema } from "@/lib/seo";
 
-export const metadata = createPageMetadata("platformComparison", "bn");
+export const generateMetadata = () => createPageMetadata("platformComparison", "en");
 
 const matrix = [
   ["Primary buyer", "Store owner / marketer", "Developer / agency", "Headless commerce team"],

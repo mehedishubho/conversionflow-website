@@ -85,4 +85,39 @@ export const pageSeo: Record<string, PageSeo> = {
     path: "/support",
     keywords: ["ConversionFlow support", "Meta CAPI setup help", "COD protection support"],
   },
+  blog: {
+    title: "ConversionFlow Blog - WooCommerce Automation Tips & Guides",
+    description:
+      "Tips, guides, and insights on WooCommerce automation for Bangladeshi eCommerce stores from the ConversionFlow team.",
+    path: "/blog",
+    keywords: ["ConversionFlow blog", "WooCommerce automation tips", "eCommerce Bangladesh"],
+  },
+  terms: {
+    title: "Terms of Service - ConversionFlow",
+    description:
+      "Terms of Service for ConversionFlow WooCommerce automation plugin.",
+    path: "/terms",
+    keywords: ["ConversionFlow terms", "terms of service"],
+  },
+  privacy: {
+    title: "Privacy Policy - ConversionFlow",
+    description:
+      "ConversionFlow privacy policy — how we collect, use, and protect your data when you use our WooCommerce automation plugin and services.",
+    path: "/privacy",
+    keywords: ["ConversionFlow privacy", "privacy policy"],
+  },
+  refund: {
+    title: "Refund Policy - ConversionFlow",
+    description:
+      "ConversionFlow Refund Policy — 30-day money-back guarantee.",
+    path: "/refund",
+    keywords: ["ConversionFlow refund", "refund policy"],
+  },
+  license: {
+    title: "License Agreement - ConversionFlow",
+    description:
+      "ConversionFlow License Agreement — terms of use for the WooCommerce automation plugin.",
+    path: "/license",
+    keywords: ["ConversionFlow license", "license agreement"],
+  },
 };

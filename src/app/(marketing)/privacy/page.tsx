@@ -1,5 +1,11 @@
 
+import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/LegalLayout";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "ConversionFlow privacy policy — how we collect, use, and protect your data when you use our WooCommerce automation plugin and services.",
+};
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export default function PrivacyPage() {

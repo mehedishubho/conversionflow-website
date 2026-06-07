@@ -4,7 +4,7 @@ import { faqItems } from "@/data/faq";
 import Link from "next/link";
 import { breadcrumbSchema, createPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata("faq", "bn");
+export const generateMetadata = () => createPageMetadata("faq", "en");
 
 function faqSchema() {
   return {
