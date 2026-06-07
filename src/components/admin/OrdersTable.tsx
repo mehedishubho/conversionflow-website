@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Table,
   TableHeader,
@@ -285,6 +286,12 @@ export default function OrdersTable({
                     </TableCell>
                     <TableCell className="px-5 py-3 text-sm">
                       <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/orders/${order.id}`}
+                          className="text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                        >
+                          View Details
+                        </Link>
                         {order.status === "pending" && (
                           <>
                             <Button
@@ -309,22 +316,20 @@ export default function OrdersTable({
                           </>
                         )}
                         {order.status === "completed" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="!text-error-500 !ring-error-300 hover:!bg-error-50 dark:hover:!bg-error-500/10"
-                            onClick={() =>
-                              setRefundModal({ open: true, orderId: order.id })
-                            }
-                            disabled={isPending}
-                          >
-                            Refund
-                          </Button>
-                        )}
-                        {(order.status === "failed" || order.status === "refunded") && (
-                          <span className="text-gray-400 dark:text-gray-500 text-xs">
-                            No actions
-                          </span>
+                          <>
+                            <Badge variant="light" color="success" size="sm">Verified</Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="!text-error-500 !ring-error-300 hover:!bg-error-50 dark:hover:!bg-error-500/10"
+                              onClick={() =>
+                                setRefundModal({ open: true, orderId: order.id })
+                              }
+                              disabled={isPending}
+                            >
+                              Refund
+                            </Button>
+                          </>
                         )}
                       </div>
                     </TableCell>
