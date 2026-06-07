@@ -29,8 +29,11 @@ export default async function NewVersionPage({
   // Resolve params
   const { id } = await params;
 
-  // Bind productId to the createVersion action
-  const createAction = createVersion.bind(null, id);
+  // Bind productId to the createVersion action, wrap to satisfy form action type
+  const handleCreate = async (formData: FormData) => {
+    "use server";
+    await createVersion(id, formData);
+  };
 
   return (
     <div>
@@ -40,7 +43,7 @@ export default async function NewVersionPage({
         title="Create Version"
         desc="Add a new version to this product. Versions start as draft and can be released later."
       >
-        <form action={async (formData: FormData) => { await createAction(formData); }} className="space-y-5">
+        <form action={handleCreate} className="space-y-5">
           {/* Version string (semver) */}
           <div>
             <label
