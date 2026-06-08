@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Modal } from "@/components/ui/modal";
 import { AlertTriangle, CheckCircle, Circle, Loader2 } from "lucide-react";
 import { restoreBackupAction } from "@/app/(admin)/actions/admin-backup";
+import Button from "@/components/ui/button/Button";
 
 // ──────────────────────────────────────────────
 // Types
@@ -164,20 +165,16 @@ export default function RestoreDialog({
               </p>
             </div>
             <div className="flex gap-3 justify-center">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03]"
-              >
+              <Button variant="outline" size="sm" onClick={handleClose}>
                 Cancel
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                size="sm"
                 onClick={handleStartRestore}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-error-700"
+                className="!bg-error-500 !text-white hover:!bg-error-700"
               >
                 Restore
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -247,13 +244,9 @@ export default function RestoreDialog({
               The database has been successfully restored from{" "}
               <span className="font-mono">{backup.filename}</span>.
             </p>
-            <button
-              type="button"
-              onClick={handleClose}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700"
-            >
+            <Button size="sm" onClick={handleClose}>
               Close
-            </button>
+            </Button>
           </div>
         </Modal>
       )}
@@ -276,13 +269,9 @@ export default function RestoreDialog({
                 </p>
               </div>
             )}
-            <button
-              type="button"
-              onClick={handleClose}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700"
-            >
+            <Button size="sm" onClick={handleClose}>
               Close
-            </button>
+            </Button>
           </div>
         </Modal>
       )}
