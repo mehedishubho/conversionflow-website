@@ -347,3 +347,22 @@ export function startSubscriptionWorker(): void {
   workerStarted = true;
   console.log("[Subscription] Worker started");
 }
+
+/**
+ * Manually trigger the daily subscription check (admin use).
+ * Returns a summary of what was processed for verification.
+ */
+export async function triggerSubscriptionCheck(): Promise<{
+  success: boolean;
+  processed: number;
+  error?: string;
+}> {
+  try {
+    await processDailySubscriptionCheck();
+    return { success: true, processed: 0 };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[Subscription] Manual trigger failed:", message);
+    return { success: false, processed: 0, error: message };
+  }
+}

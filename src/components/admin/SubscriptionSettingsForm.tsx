@@ -4,7 +4,7 @@ import React, { useState, useTransition } from "react";
 import ComponentCard from "@/components/common/ComponentCard";
 import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
-import { saveSubscriptionSettings } from "@/app/(admin)/actions/admin-settings";
+import { saveSubscriptionSettings, triggerSubscriptionCheck } from "@/app/(admin)/actions/admin-settings";
 
 interface SubscriptionSettingsFormProps {
   initialData: {
@@ -111,7 +111,28 @@ export default function SubscriptionSettingsForm({
         </div>
 
         {/* Submit */}
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isPending}
+            onClick={() => {
+              setMessage(null);
+              startTransition(async () => {
+                const result = await triggerSubscriptionCheck();
+                if (result.error) {
+                  setMessage({ type: "error", text: result.error });
+                } else {
+                  setMessage({
+                    type: "success",
+                    text: "Subscription check triggered successfully. Check server logs for details.",
+                  });
+                }
+              });
+            }}
+          >
+            {isPending ? "Running..." : "Run Subscription Check Now"}
+          </Button>
           <Button type="submit" disabled={isPending}>
             {isPending ? "Saving..." : "Save Settings"}
           </Button>

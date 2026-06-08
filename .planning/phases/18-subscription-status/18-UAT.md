@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 18-subscription-status
 source: 18-01-SUMMARY.md, 18-02-SUMMARY.md
 started: 2026-06-08T12:00:00Z
-updated: 2026-06-08T12:30:00Z
+updated: 2026-06-08T12:35:00Z
 ---
 
 ## Current Test
@@ -69,6 +69,9 @@ skipped: 0
   reason: "User reported: Created Jun 8, 2026, Expiry Jun 6, 2026 — expiry date is 2 days BEFORE creation date"
   severity: major
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "ExpiryCalculator.calculateExpiry() hardcodes 12 for 'yearly' billing cycle, ignoring billingDurationMonths. Professional plan has billingCycle=yearly with billingDurationMonths=24 but gets only 12 months. Fix: use billingDurationMonths ?? 12 for yearly plans too."
+  artifacts:
+    - path: "src/modules/licensing/application/services/ExpiryCalculator.ts"
+      issue: "Line 33: billingCycle === 'yearly' ? 12 — ignores billingDurationMonths"
+  missing:
+    - "Change yearly logic to: billingDurationMonths ?? 12 (respect plan-specific duration)"

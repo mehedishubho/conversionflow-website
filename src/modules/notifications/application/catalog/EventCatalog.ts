@@ -35,8 +35,11 @@ export const EVENT_CATALOG: Record<string, EventCatalogEntry> = {
     category: "billing",
     title: "Order Confirmed",
   },
+  // in_app only — the billing OrderCompletedHandler sends the correct email
+  // directly with licenseKey/apiToken. Email channel here would cause a duplicate
+  // without those credentials.
   "license.created": {
-    channels: ["email", "in_app"],
+    channels: ["in_app"],
     template: "sendOrderConfirmationEmail",
     category: "license",
     title: "License Key Generated",

@@ -519,3 +519,35 @@ export async function getLicenseEngineStatus() {
     migrationComplete: migrationRow.length > 0 && migrationRow[0].value === "true",
   };
 }
+
+// ──────────────────────────────────────────────
+// Subscription Lifecycle Manual Trigger
+// ──────────────────────────────────────────────
+
+export async function triggerSubscriptionCheck(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  const { session } = await requireAdmin();
+
+  try {
+    const { triggerSubscriptionCheck: runCheck } = await import(
+      "@/jobs/workers/subscription-lifecycle"
+    );
+    const result = await runCheck();
+
+    await createAuditLog({
+      actorId: session.user.id,
+      actorRole: "admin",
+      action: "subscription.check_triggered",
+      targetType: "system",
+      targetId: "subscription-worker",
+      details: { success: result.success },
+    });
+
+    return result;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
