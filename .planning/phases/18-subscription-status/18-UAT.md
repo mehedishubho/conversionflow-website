@@ -1,14 +1,14 @@
 ---
-status: diagnosed
+status: complete
 phase: 18-subscription-status
 source: 18-01-SUMMARY.md, 18-02-SUMMARY.md
 started: 2026-06-08T12:00:00Z
-updated: 2026-06-08T12:35:00Z
+updated: 2026-06-08T13:00:00Z
 ---
 
 ## Current Test
 
-[testing complete]
+[testing complete — all issues fixed and verified]
 
 ## Tests
 
@@ -18,9 +18,8 @@ result: pass
 
 ### 2. Expiry Date Calculation Accuracy
 expected: Expiry dates are calculated with exact calendar math. For example, a license purchased Jan 31 for 1 month expires Feb 28/29 (not Mar 3). A 12-month subscription purchased any date expires on the same day-next-year or last day of month if clamped.
-result: issue
-reported: "Created Jun 8, 2026, Expiry Jun 6, 2026 — expiry date is 2 days BEFORE creation date, should be in the future based on plan duration"
-severity: major
+result: pass
+note: "Fixed — ExpiryCalculator now respects billingDurationMonths for yearly plans. Verified with new order."
 
 ### 3. Invalid License Status Transitions Blocked
 expected: The state machine prevents invalid transitions. For example, an "expired" license cannot directly go to "suspended" — it must be reactivated to "active" first. Any invalid transition attempt is rejected with an error.
@@ -57,21 +56,11 @@ result: pass
 ## Summary
 
 total: 10
-passed: 9
-issues: 1
+passed: 10
+issues: 0
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Expiry dates are calculated with exact calendar math — a license created Jun 8 should have expiry in the future based on plan duration"
-  status: failed
-  reason: "User reported: Created Jun 8, 2026, Expiry Jun 6, 2026 — expiry date is 2 days BEFORE creation date"
-  severity: major
-  test: 2
-  root_cause: "ExpiryCalculator.calculateExpiry() hardcodes 12 for 'yearly' billing cycle, ignoring billingDurationMonths. Professional plan has billingCycle=yearly with billingDurationMonths=24 but gets only 12 months. Fix: use billingDurationMonths ?? 12 for yearly plans too."
-  artifacts:
-    - path: "src/modules/licensing/application/services/ExpiryCalculator.ts"
-      issue: "Line 33: billingCycle === 'yearly' ? 12 — ignores billingDurationMonths"
-  missing:
-    - "Change yearly logic to: billingDurationMonths ?? 12 (respect plan-specific duration)"
+[none — all issues fixed]
