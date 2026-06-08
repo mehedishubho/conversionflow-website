@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import {
   orders,
   coupons,
+  couponApplicablePlans,
   paymentAccounts,
   settings,
   paymentMethodEnum,
@@ -107,10 +108,12 @@ type VatResult = {
 /**
  * Validate a coupon code and reserve its usage within a transaction.
  * Prevents race conditions on currentUses exceeding maxUses (T-04-03).
+ * Also checks scope applicability (all / product / plan).
  */
 export async function validateCoupon(
   code: string,
-  orderAmount: number
+  orderAmount: number,
+  planName?: string
 ): Promise<CouponResult> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
@@ -151,6 +154,44 @@ export async function validateCoupon(
           error: `Minimum order amount for this coupon is ${coupon.minOrderAmount} BDT`,
         };
       }
+
+      // ── Scope applicability check ──
+      const scope = (coupon as Record<string, unknown>).scope as string | undefined;
+
+      if (scope === "product" && (coupon as Record<string, unknown>).applicableProductId) {
+        if (!planName) {
+          return { error: "Cannot verify coupon applicability without a plan" };
+        }
+        const planPrices = await getPlanPrices();
+        const checkoutPlan = planPrices[planName];
+        if (!checkoutPlan) {
+          return { error: "Invalid plan for coupon check" };
+        }
+        const [applicableProduct] = await tx
+          .select({ slug: products.slug })
+          .from(products)
+          .where(eq(products.id, (coupon as Record<string, unknown>).applicableProductId as string))
+          .limit(1);
+        if (!applicableProduct || applicableProduct.slug !== checkoutPlan.productId) {
+          return { error: "This coupon does not apply to the selected product" };
+        }
+      }
+
+      if (scope === "plan") {
+        if (!planName) {
+          return { error: "Cannot verify coupon applicability without a plan" };
+        }
+        const applicablePlanRows = await tx
+          .select({ planName: productPlans.name })
+          .from(couponApplicablePlans)
+          .innerJoin(productPlans, eq(couponApplicablePlans.planId, productPlans.id))
+          .where(eq(couponApplicablePlans.couponId, coupon.id));
+        const applicablePlanNames = applicablePlanRows.map((r) => r.planName);
+        if (!applicablePlanNames.includes(planName)) {
+          return { error: "This coupon does not apply to the selected plan" };
+        }
+      }
+      // scope === "all" or undefined → no check needed
 
       // Calculate discount
       let discount: number;

@@ -60,6 +60,12 @@ export const couponTypeEnum = pgEnum("coupon_type", [
   "flat",
 ]);
 
+export const couponScopeEnum = pgEnum("coupon_scope", [
+  "all",
+  "product",
+  "plan",
+]);
+
 export const redirectTypeEnum = pgEnum("redirect_type", ["301", "302"]);
 
 export const redirectStatusEnum = pgEnum("redirect_status", [
@@ -444,12 +450,37 @@ export const coupons = pgTable("coupons", {
   currentUses: integer("current_uses").default(0),
   expiresAt: timestamp("expires_at"),
   active: boolean("active").default(true),
+  scope: couponScopeEnum("scope").notNull().default("all"),
+  applicableProductId: uuid("applicable_product_id").references(
+    () => products.id,
+    { onDelete: "set null" }
+  ),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export const couponApplicablePlans = pgTable(
+  "coupon_applicable_plans",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    couponId: uuid("coupon_id")
+      .notNull()
+      .references(() => coupons.id, { onDelete: "cascade" }),
+    planId: uuid("plan_id")
+      .notNull()
+      .references(() => productPlans.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    unique("coupon_applicable_plans_coupon_plan_unique").on(
+      table.couponId,
+      table.planId
+    ),
+    index("coupon_applicable_plans_coupon_id_idx").on(table.couponId),
+  ]
+);
 
 export const paymentAccounts = pgTable("payment_accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -875,6 +906,26 @@ export const webhookDeliveriesRelations = relations(webhookDeliveries, ({ one })
 export const productsRelations = relations(products, ({ many }) => ({
   versions: many(productVersions),
   plans: many(productPlans),
+  applicableCoupons: many(coupons),
+}));
+
+export const couponsRelations = relations(coupons, ({ one, many }) => ({
+  applicableProduct: one(products, {
+    fields: [coupons.applicableProductId],
+    references: [products.id],
+  }),
+  applicablePlans: many(couponApplicablePlans),
+}));
+
+export const couponApplicablePlansRelations = relations(couponApplicablePlans, ({ one }) => ({
+  coupon: one(coupons, {
+    fields: [couponApplicablePlans.couponId],
+    references: [coupons.id],
+  }),
+  plan: one(productPlans, {
+    fields: [couponApplicablePlans.planId],
+    references: [productPlans.id],
+  }),
 }));
 
 export const productVersionsRelations = relations(productVersions, ({ one }) => ({
@@ -884,9 +935,10 @@ export const productVersionsRelations = relations(productVersions, ({ one }) => 
   }),
 }));
 
-export const productPlansRelations = relations(productPlans, ({ one }) => ({
+export const productPlansRelations = relations(productPlans, ({ one, many }) => ({
   product: one(products, {
     fields: [productPlans.productId],
     references: [products.id],
   }),
+  couponApplicabilities: many(couponApplicablePlans),
 }));

@@ -4,17 +4,44 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button/Button";
 
-interface CouponCreateFormProps {
-  action: (formData: FormData) => Promise<{ success?: boolean; error?: string; couponId?: string }>;
+interface ProductOption {
+  id: string;
+  name: string;
+  slug: string;
 }
 
-export default function CouponCreateForm({ action }: CouponCreateFormProps) {
+interface PlanOption {
+  id: string;
+  productId: string;
+  name: string;
+}
+
+interface CouponCreateFormProps {
+  action: (formData: FormData) => Promise<{ success?: boolean; error?: string; couponId?: string }>;
+  products: ProductOption[];
+  plans: PlanOption[];
+}
+
+export default function CouponCreateForm({ action, products, plans }: CouponCreateFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [scope, setScope] = useState<"all" | "product" | "plan">("all");
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [selectedPlanIds, setSelectedPlanIds] = useState<string[]>([]);
 
   const handleSubmit = (formData: FormData) => {
     setError(null);
+    // Append scope-specific hidden fields
+    if (scope === "product" && selectedProductId) {
+      formData.set("applicableProductId", selectedProductId);
+    }
+    if (scope === "plan") {
+      formData.delete("planIds");
+      for (const planId of selectedPlanIds) {
+        formData.append("planIds", planId);
+      }
+    }
     startTransition(async () => {
       const result = await action(formData);
       if (result.error) {
@@ -91,6 +118,89 @@ export default function CouponCreateForm({ action }: CouponCreateFormProps) {
         </p>
       </div>
 
+      {/* ── Applicability Scope ── */}
+      <div>
+        <label htmlFor="scope" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Applies To <span className="text-error-500">*</span>
+        </label>
+        <select
+          id="scope"
+          name="scope"
+          value={scope}
+          onChange={(e) => {
+            setScope(e.target.value as "all" | "product" | "plan");
+            setSelectedProductId("");
+            setSelectedPlanIds([]);
+          }}
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+        >
+          <option value="all">All Products &amp; Plans</option>
+          <option value="product">Specific Product</option>
+          <option value="plan">Specific Plans</option>
+        </select>
+      </div>
+
+      {/* Product selector — shown when scope="product" */}
+      {scope === "product" && (
+        <div>
+          <label htmlFor="applicableProductId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            Select Product <span className="text-error-500">*</span>
+          </label>
+          <select
+            id="applicableProductId"
+            name="applicableProductId"
+            value={selectedProductId}
+            onChange={(e) => setSelectedProductId(e.target.value)}
+            required
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+          >
+            <option value="">-- Choose Product --</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Plan checkboxes — shown when scope="plan" */}
+      {scope === "plan" && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            Select Plans <span className="text-error-500">*</span>
+          </label>
+          <div className="space-y-2 rounded-lg border border-gray-300 p-3 dark:border-gray-700">
+            {plans.map((p) => {
+              const product = products.find((pr) => pr.id === p.productId);
+              const label = product ? `${product.name} — ${p.name}` : p.name;
+              const checked = selectedPlanIds.includes(p.id);
+              return (
+                <label key={p.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => {
+                      setSelectedPlanIds((prev) =>
+                        prev.includes(p.id)
+                          ? prev.filter((id) => id !== p.id)
+                          : [...prev, p.id]
+                      );
+                    }}
+                    className="rounded border-gray-300 text-brand-500 focus:ring-brand-500/10 dark:border-gray-600"
+                  />
+                  {label}
+                </label>
+              );
+            })}
+            {plans.length === 0 && (
+              <p className="text-xs text-gray-500">No active plans found.</p>
+            )}
+          </div>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Select at least one plan. The coupon will only apply to checked plans.
+          </p>
+        </div>
+      )}
+
       {/* Min Order Amount */}
       <div>
         <label htmlFor="minOrderAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -141,7 +251,6 @@ export default function CouponCreateForm({ action }: CouponCreateFormProps) {
       <div className="flex items-center gap-3 pt-2">
         <Button
           type="submit"
-          size="default"
           disabled={isPending}
         >
           {isPending ? "Creating..." : "Create Coupon"}
@@ -149,7 +258,6 @@ export default function CouponCreateForm({ action }: CouponCreateFormProps) {
         <Button
           type="button"
           variant="outline"
-          size="default"
           onClick={() => router.push("/admin/coupons")}
         >
           Cancel

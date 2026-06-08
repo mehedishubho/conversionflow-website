@@ -112,7 +112,7 @@ function CheckoutContent() {
       setCouponLoading(true);
       setCouponError(null);
       try {
-        const result = await validateCoupon(code, basePrice) as Record<string, unknown>;
+        const result = await validateCoupon(code, basePrice, tier!.plan) as Record<string, unknown>;
         if ("error" in result && typeof result.error === "string") {
           setCouponError(result.error);
         } else if ("success" in result && result.success) {
@@ -125,7 +125,7 @@ function CheckoutContent() {
         setCouponLoading(false);
       }
     },
-    [basePrice]
+    [basePrice, tier]
   );
 
   const handleRemoveCoupon = useCallback(() => {

@@ -4,7 +4,12 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { coupons } from "@/lib/db/schema";
+import {
+  coupons,
+  couponApplicablePlans,
+  products,
+  productPlans,
+} from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 
@@ -34,18 +39,58 @@ async function requireAdmin() {
 // ──────────────────────────────────────────────
 
 /**
- * List all coupons ordered by creation date (newest first).
+ * List all coupons with scope info (product name, applicable plans).
  */
 export async function listCoupons() {
   const { userId, role } = await requireAdmin();
 
   try {
     const rows = await db
-      .select()
+      .select({
+        id: coupons.id,
+        code: coupons.code,
+        type: coupons.type,
+        value: coupons.value,
+        minOrderAmount: coupons.minOrderAmount,
+        maxUses: coupons.maxUses,
+        currentUses: coupons.currentUses,
+        expiresAt: coupons.expiresAt,
+        active: coupons.active,
+        createdAt: coupons.createdAt,
+        scope: coupons.scope,
+        applicableProductId: coupons.applicableProductId,
+        productName: products.name,
+      })
       .from(coupons)
+      .leftJoin(products, eq(coupons.applicableProductId, products.id))
       .orderBy(desc(coupons.createdAt));
 
-    return { success: true as const, coupons: rows };
+    // Fetch plan applicabilities for all coupons with scope="plan"
+    const planApplicabilities = await db
+      .select({
+        couponId: couponApplicablePlans.couponId,
+        planName: productPlans.name,
+      })
+      .from(couponApplicablePlans)
+      .innerJoin(
+        productPlans,
+        eq(couponApplicablePlans.planId, productPlans.id)
+      );
+
+    // Group plan names by couponId
+    const planMap = new Map<string, string[]>();
+    for (const a of planApplicabilities) {
+      const arr = planMap.get(a.couponId) ?? [];
+      arr.push(a.planName);
+      planMap.set(a.couponId, arr);
+    }
+
+    const couponsWithScope = rows.map((row) => ({
+      ...row,
+      applicablePlans: planMap.get(row.id) ?? [],
+    }));
+
+    return { success: true as const, coupons: couponsWithScope };
   } catch (error) {
     console.error("[Admin] Failed to list coupons:", error);
     return { success: true as const, coupons: [] };
@@ -54,7 +99,7 @@ export async function listCoupons() {
 
 /**
  * Create a new coupon from form data.
- * Validates code, type, value, and optional fields.
+ * Validates code, type, value, scope, and optional fields.
  */
 export async function createCoupon(formData: FormData) {
   const { userId, role } = await requireAdmin();
@@ -101,6 +146,22 @@ export async function createCoupon(formData: FormData) {
     return { error: "Invalid expiry date." };
   }
 
+  // Validate scope
+  const scope = (formData.get("scope") as string) || "all";
+  if (!["all", "product", "plan"].includes(scope)) {
+    return { error: "Invalid scope value." };
+  }
+
+  const applicableProductId = formData.get("applicableProductId") as string | null;
+  if (scope === "product" && !applicableProductId) {
+    return { error: "Please select a product when scope is 'product'." };
+  }
+
+  const planIds = formData.getAll("planIds") as string[];
+  if (scope === "plan" && planIds.length === 0) {
+    return { error: "Please select at least one plan when scope is 'plan'." };
+  }
+
   try {
     const [coupon] = await db
       .insert(coupons)
@@ -112,8 +173,20 @@ export async function createCoupon(formData: FormData) {
         maxUses: maxUses ?? undefined,
         expiresAt: expiresAt ?? undefined,
         active: true,
+        scope: scope as "all" | "product" | "plan",
+        applicableProductId: scope === "product" ? applicableProductId : null,
       })
       .returning();
+
+    // Insert junction rows for plan scope
+    if (scope === "plan" && planIds.length > 0) {
+      await db.insert(couponApplicablePlans).values(
+        planIds.map((planId) => ({
+          couponId: coupon.id,
+          planId,
+        }))
+      );
+    }
 
     await createAuditLog({
       actorId: userId,
@@ -121,13 +194,12 @@ export async function createCoupon(formData: FormData) {
       action: "coupon.created",
       targetType: "coupon",
       targetId: coupon.id,
-      details: { code, type, value },
+      details: { code, type, value, scope, applicableProductId, planIds },
     });
 
     return { success: true as const, couponId: coupon.id };
   } catch (error) {
     console.error("[Admin] Failed to create coupon:", error);
-    // Unique constraint violation on code
     if (error instanceof Error && error.message.includes("unique")) {
       return { error: `Coupon code "${code}" already exists.` };
     }

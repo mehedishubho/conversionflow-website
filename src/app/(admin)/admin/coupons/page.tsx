@@ -1,11 +1,8 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { db } from "@/lib/db";
-import { coupons } from "@/lib/db/schema";
-import { desc } from "drizzle-orm";
+import { listCoupons, toggleCouponActive, deleteCoupon } from "@/app/(admin)/actions/admin-coupons";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import CouponsTable from "@/components/admin/CouponsTable";
-import { toggleCouponActive, deleteCoupon } from "@/app/(admin)/actions/admin-coupons";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -14,11 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminCouponsPage() {
   await requireAdmin();
 
-  // Query all coupons
-  const couponRows = await db
-    .select()
-    .from(coupons)
-    .orderBy(desc(coupons.createdAt));
+  const { coupons: couponRows } = await listCoupons();
 
   return (
     <div>
@@ -49,6 +42,9 @@ export default async function AdminCouponsPage() {
             expiresAt: row.expiresAt ?? null,
             active: row.active ?? true,
             createdAt: row.createdAt,
+            scope: row.scope ?? "all",
+            productName: row.productName ?? null,
+            applicablePlans: row.applicablePlans ?? [],
           }))}
           onToggleActive={toggleCouponActive}
           onDelete={deleteCoupon}

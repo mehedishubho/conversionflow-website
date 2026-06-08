@@ -40,8 +40,15 @@ export const customerNavItems: NavItem[] = [
 export const adminNavItems: NavItem[] = [
   { name: "Overview", icon: BarChart3, path: "/admin/dashboard" },
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
-  { name: "Products", icon: Package, path: "/admin/products" },
-  { name: "Coupons", icon: Ticket, path: "/admin/coupons" },
+  {
+    name: "Products",
+    icon: Package,
+    path: "/admin/products",
+    subItems: [
+      { name: "All Products", path: "/admin/products" },
+      { name: "Coupons", path: "/admin/coupons" },
+    ],
+  },
   {
     name: "Licenses",
     icon: Key,

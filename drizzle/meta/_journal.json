@@ -8,6 +8,13 @@
       "when": 1779214356767,
       "tag": "0000_overrated_prima",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779300000000,
+      "tag": "0001_coupon_scope",
+      "breakpoints": true
     }
   ]
 }

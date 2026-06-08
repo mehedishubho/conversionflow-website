@@ -165,13 +165,13 @@ export default async function OrderDetailPage({
             {(order.discountAmount ?? 0) > 0 && (
               <div className="flex items-center justify-between">
                 <dt className="text-sm text-gray-500 dark:text-gray-400">Discount</dt>
-                <dd className="text-sm text-success-600 dark:text-success-400">-{formatBDT(order.discountAmount)}</dd>
+                <dd className="text-sm text-success-600 dark:text-success-400">-{formatBDT(order.discountAmount ?? 0)}</dd>
               </div>
             )}
             {(order.taxAmount ?? 0) > 0 && (
               <div className="flex items-center justify-between">
                 <dt className="text-sm text-gray-500 dark:text-gray-400">Tax (VAT)</dt>
-                <dd className="text-sm text-gray-700 dark:text-gray-300">{formatBDT(order.taxAmount)}</dd>
+                <dd className="text-sm text-gray-700 dark:text-gray-300">{formatBDT(order.taxAmount ?? 0)}</dd>
               </div>
             )}
             <div className="flex items-center justify-between">

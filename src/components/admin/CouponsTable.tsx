@@ -19,6 +19,7 @@ import { Trash2, Power, PowerOff } from "lucide-react";
 // ──────────────────────────────────────────────
 
 type CouponType = "percentage" | "flat";
+type CouponScope = "all" | "product" | "plan";
 
 interface CouponRow {
   id: string;
@@ -31,6 +32,9 @@ interface CouponRow {
   expiresAt: Date | null;
   active: boolean | null;
   createdAt: Date;
+  scope: CouponScope;
+  productName: string | null;
+  applicablePlans: string[];
 }
 
 interface CouponsTableProps {
@@ -52,27 +56,23 @@ export default function CouponsTable({
   const [isPending, startTransition] = useTransition();
   const [actionError, setActionError] = useState<string | null>(null);
 
-  // Delete confirmation modal
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
     couponId: string;
     couponCode: string;
   }>({ open: false, couponId: "", couponCode: "" });
 
-  // Format value display
   const formatValue = (type: CouponType, value: number) => {
     if (type === "percentage") return `${value}%`;
     return `${value.toLocaleString("en-BD")} BDT`;
   };
 
-  // Format uses
   const formatUses = (current: number | null, max: number | null) => {
     const c = current ?? 0;
     if (max !== null) return `${c} / ${max}`;
     return `${c} / ∞`;
   };
 
-  // Format date
   const formatDate = (date: Date | null) => {
     if (!date) return "—";
     return new Date(date).toLocaleDateString("en-US", {
@@ -82,7 +82,26 @@ export default function CouponsTable({
     });
   };
 
-  // Handlers
+  const formatScope = (coupon: CouponRow) => {
+    if (coupon.scope === "all") {
+      return <Badge variant="light" color="success" size="sm">All Products</Badge>;
+    }
+    if (coupon.scope === "product") {
+      return (
+        <Badge variant="light" color="info" size="sm">
+          {coupon.productName ?? "Unknown Product"}
+        </Badge>
+      );
+    }
+    return (
+      <span className="text-xs text-gray-600 dark:text-gray-300">
+        {coupon.applicablePlans.length > 0
+          ? coupon.applicablePlans.join(", ")
+          : "No plans"}
+      </span>
+    );
+  };
+
   const handleToggle = (couponId: string) => {
     setActionError(null);
     startTransition(async () => {
@@ -110,14 +129,12 @@ export default function CouponsTable({
 
   return (
     <div className="space-y-4">
-      {/* Error display */}
       {actionError && (
         <div className="p-3 rounded-lg bg-error-50 text-error-600 text-sm dark:bg-error-500/10 dark:text-error-400">
           {actionError}
         </div>
       )}
 
-      {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
         <Table>
           <TableHeader>
@@ -130,6 +147,9 @@ export default function CouponsTable({
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
                 Value
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
+                Applies To
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
                 Min Order
@@ -151,7 +171,7 @@ export default function CouponsTable({
           <TableBody>
             {coupons.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
+                <TableCell colSpan={9} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
                   No coupons created yet.
                 </TableCell>
               </TableRow>
@@ -178,6 +198,9 @@ export default function CouponsTable({
                     <TableCell className="px-5 py-3 text-sm font-medium text-gray-800 dark:text-white/90">
                       {formatValue(coupon.type, coupon.value)}
                     </TableCell>
+                    <TableCell className="px-5 py-3 text-sm">
+                      {formatScope(coupon)}
+                    </TableCell>
                     <TableCell className="px-5 py-3 text-sm text-gray-700 dark:text-gray-300">
                       {coupon.minOrderAmount
                         ? `${coupon.minOrderAmount.toLocaleString("en-BD")} BDT`
@@ -191,17 +214,11 @@ export default function CouponsTable({
                     </TableCell>
                     <TableCell className="px-5 py-3 text-sm">
                       {isExpired ? (
-                        <Badge variant="light" color="error" size="sm">
-                          Expired
-                        </Badge>
+                        <Badge variant="light" color="error" size="sm">Expired</Badge>
                       ) : coupon.active ? (
-                        <Badge variant="light" color="success" size="sm">
-                          Active
-                        </Badge>
+                        <Badge variant="light" color="success" size="sm">Active</Badge>
                       ) : (
-                        <Badge variant="light" color="light" size="sm">
-                          Inactive
-                        </Badge>
+                        <Badge variant="light" color="light" size="sm">Inactive</Badge>
                       )}
                     </TableCell>
                     <TableCell className="px-5 py-3 text-sm">
@@ -213,11 +230,7 @@ export default function CouponsTable({
                           onClick={() => handleToggle(coupon.id)}
                           disabled={isPending}
                         >
-                          {coupon.active ? (
-                            <PowerOff className="w-4 h-4" />
-                          ) : (
-                            <Power className="w-4 h-4" />
-                          )}
+                          {coupon.active ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
                         </button>
                         <button
                           type="button"
@@ -257,7 +270,7 @@ export default function CouponsTable({
           Delete coupon &ldquo;{deleteModal.couponCode}&rdquo;?
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          This will permanently delete the coupon. Any customers currently using this code will no longer receive the discount. This action cannot be undone.
+          This will permanently delete the coupon. This action cannot be undone.
         </p>
         <div className="flex items-center justify-end gap-3">
           <Button
