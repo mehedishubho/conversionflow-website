@@ -35,6 +35,7 @@ interface BackupTableProps {
   backups: BackupRecord[];
   onRestore: (backup: BackupRecord) => void;
   onDelete: (backup: BackupRecord) => void;
+  restoreDisabled?: boolean;
 }
 
 // ──────────────────────────────────────────────
@@ -96,6 +97,7 @@ export default function BackupTable({
   backups,
   onRestore,
   onDelete,
+  restoreDisabled = false,
 }: BackupTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -326,8 +328,8 @@ export default function BackupTable({
                         <button
                           type="button"
                           onClick={() => onRestore(backup)}
-                          disabled={backup.status === "in_progress"}
-                          title="Restore"
+                          disabled={backup.status === "in_progress" || restoreDisabled}
+                          title={restoreDisabled ? "Restore unavailable (psql not installed)" : "Restore"}
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                         >
                           <RotateCcw className="w-4 h-4" />

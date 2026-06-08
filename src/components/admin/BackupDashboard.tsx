@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { HardDrive, Clock, CalendarClock, Database } from "lucide-react";
+import { HardDrive, Clock, CalendarClock, Database, AlertTriangle } from "lucide-react";
 import {
   createBackupAction,
   deleteBackupAction,
@@ -139,10 +139,12 @@ export default function BackupDashboard({
   const [selectedBackup, setSelectedBackup] = useState<BackupRecord | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   // ── Create Backup ──
   const handleCreateBackup = async () => {
     setIsCreating(true);
+    setCreateError(null);
     try {
       const result = await createBackupAction();
       if (result.success) {
@@ -163,9 +165,11 @@ export default function BackupDashboard({
           completedAt: null,
         };
         setBackups((prev) => [newBackup, ...prev]);
+      } else {
+        setCreateError(result.error || "Backup creation failed.");
       }
     } catch {
-      // Silent — action already handles errors
+      setCreateError("An unexpected error occurred.");
     } finally {
       setIsCreating(false);
     }
@@ -207,6 +211,9 @@ export default function BackupDashboard({
     setDeleteConfirmId(null);
   };
 
+  const pgDumpAvailable = dashboardData.binaryAvailability.pg_dump;
+  const psqlAvailable = dashboardData.binaryAvailability.psql;
+
   // ── Render ──
   return (
     <div>
@@ -215,10 +222,43 @@ export default function BackupDashboard({
         <h1 className="text-theme-xl font-bold text-gray-800 dark:text-white/90">
           Backups
         </h1>
-        <Button onClick={handleCreateBackup} disabled={isCreating}>
+        <Button onClick={handleCreateBackup} disabled={isCreating || !pgDumpAvailable}>
           {isCreating ? "Creating..." : "Create Backup"}
         </Button>
       </div>
+
+      {/* Binary Availability Warning Banner */}
+      {(!pgDumpAvailable || !psqlAvailable) && (
+        <div className="mb-6 rounded-xl border border-warning-200 bg-warning-50 px-5 py-4 dark:border-warning-800 dark:bg-warning-900/20">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-warning-600 dark:text-warning-400" />
+            <div className="space-y-1 text-sm">
+              {!pgDumpAvailable && (
+                <p className="text-warning-700 dark:text-warning-300">
+                  <strong>pg_dump</strong> is not available on this server. Backups cannot be created until PostgreSQL client tools are installed.
+                </p>
+              )}
+              {!psqlAvailable && (
+                <p className="text-warning-700 dark:text-warning-300">
+                  <strong>psql</strong> is not available. Restore operations will not work until PostgreSQL client tools are installed.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Error Alert */}
+      {createError && (
+        <div className="mb-6 rounded-xl border border-error-200 bg-error-50 px-5 py-4 dark:border-error-800 dark:bg-error-900/20">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-error-600 dark:text-error-400" />
+            <p className="text-sm text-error-700 dark:text-error-300">
+              {createError}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -253,7 +293,7 @@ export default function BackupDashboard({
             Create your first backup to protect your database.
           </p>
           <div className="mt-6">
-            <Button onClick={handleCreateBackup} disabled={isCreating}>
+            <Button onClick={handleCreateBackup} disabled={isCreating || !pgDumpAvailable}>
               Create First Backup
             </Button>
           </div>
@@ -273,6 +313,7 @@ export default function BackupDashboard({
             backups={backups}
             onRestore={handleRestore}
             onDelete={handleDeleteRequest}
+            restoreDisabled={!psqlAvailable}
           />
           {/* Delete Confirmation Dialog */}
           {deleteConfirmId && (
