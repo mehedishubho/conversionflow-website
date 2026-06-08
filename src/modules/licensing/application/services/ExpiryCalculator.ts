@@ -30,7 +30,7 @@ export class ExpiryCalculator {
       billingCycle === "monthly"
         ? 1
         : billingCycle === "yearly"
-          ? 12
+          ? (billingDurationMonths ?? 12)
           : (billingDurationMonths ?? 12);
 
     const result = new Date(startDate);
