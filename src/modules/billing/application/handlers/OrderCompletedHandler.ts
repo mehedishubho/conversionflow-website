@@ -39,8 +39,6 @@ export class OrderCompletedHandler {
       userId: string;
     };
 
-    console.log(`[Billing] OrderCompletedHandler: START — orderId=${orderId}, userId=${userId}`);
-
     // 1. Fetch order from DB
     const orderRows = await db
       .select()
@@ -56,7 +54,6 @@ export class OrderCompletedHandler {
     }
 
     const order = orderRows[0];
-    console.log(`[Billing] OrderCompletedHandler: Found order — productId=${order.productId}, plan=${order.plan}, amount=${order.amount}`);
 
     // 2. Idempotency check — query licenses by orderId
     const existingLicenses = await db
@@ -71,17 +68,12 @@ export class OrderCompletedHandler {
     if (existingLicenses.length > 0) {
       // License already exists for this order — skip generation
       licenseKey = existingLicenses[0].licenseKey;
-      console.log(
-        `[Billing] OrderCompletedHandler: License already exists for order ${orderId}, key=${licenseKey}`,
-      );
     } else {
       // 3. Resolve plan details
-      console.log(`[Billing] OrderCompletedHandler: Resolving plan — productId=${order.productId}, plan=${order.plan}`);
       const { maxActivations, expiresAt } = await this.resolvePlanDetails(
         order.productId,
         order.plan,
       );
-      console.log(`[Billing] OrderCompletedHandler: Plan resolved — maxActivations=${maxActivations}, expiresAt=${expiresAt}`);
 
       // 4. Generate license
       const result = await GenerateLicenseHandler.execute({
@@ -92,8 +84,6 @@ export class OrderCompletedHandler {
         expiresAt,
         orderId,
       });
-
-      console.log(`[Billing] OrderCompletedHandler: Generate result — success=${result.success}, error=${result.error ?? 'none'}`);
 
       if (result.success && result.license) {
         licenseKey = result.license.licenseKey;
@@ -157,8 +147,6 @@ export class OrderCompletedHandler {
         emailError,
       );
     }
-
-    console.log(`[Billing] OrderCompletedHandler: COMPLETE — orderId=${orderId}, licenseKey=${licenseKey ?? 'NONE'}`);
   }
 
   /**
@@ -220,6 +208,4 @@ export function registerBillingHandlers(): void {
       console.error("[Billing] OrderCompletedHandler UNHANDLED ERROR:", err);
     });
   });
-
-  console.log("[Billing] Registered OrderCompleted handler");
 }

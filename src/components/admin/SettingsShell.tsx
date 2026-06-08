@@ -26,6 +26,8 @@ import {
   Zap,
   LineChart,
   Layers,
+  Webhook,
+  CalendarClock,
 } from "lucide-react";
 
 const SETTINGS_NAV = [
@@ -61,6 +63,8 @@ const SETTINGS_NAV = [
   { label: "Subscription", href: "/admin/settings/subscription", icon: Clock },
   { label: "License Transfer", href: "/admin/settings/transfer", icon: ArrowRightLeft },
   { label: "Backup", href: "/admin/settings/backup", icon: Database },
+  { label: "Webhooks", href: "/admin/settings/webhooks", icon: Webhook },
+  { label: "Cron Jobs", href: "/admin/settings/cron-jobs", icon: CalendarClock },
 ];
 
 export function SettingsShell({ children }: { children: React.ReactNode }) {

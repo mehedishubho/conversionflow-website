@@ -50,9 +50,6 @@ export class NotificationService {
     }
 
     this.initialized = true;
-    console.log(
-      `[Notifications] Module initialized, subscribed to ${eventTypes.length} event types`,
-    );
   }
 
   /**

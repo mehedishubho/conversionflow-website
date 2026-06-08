@@ -32,5 +32,4 @@ export function initializeNotificationsModule(): void {
   startNotificationWorker();
 
   initialized = true;
-  console.log("[Notifications] Module initialized");
 }

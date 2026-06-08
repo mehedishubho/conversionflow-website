@@ -37,11 +37,8 @@ async function enrichGeoIPs(): Promise<void> {
     .limit(500); // Process in batches of 500
 
   if (unenriched.length === 0) {
-    console.log("[Analytics] No un-enriched IPs found. Skipping geo enrichment.");
     return;
   }
-
-  console.log(`[Analytics] Enriching ${unenriched.length} IPs with geo data`);
   let enrichedCount = 0;
 
   for (const row of unenriched) {
@@ -62,15 +59,12 @@ async function enrichGeoIPs(): Promise<void> {
     }
   }
 
-  console.log(`[Analytics] Enriched ${enrichedCount}/${unenriched.length} IPs`);
 }
 
 /**
  * Main processing function: compute snapshot + enrich geo-IPs.
  */
 async function processDailyAnalyticsAggregation(): Promise<void> {
-  console.log("[Analytics] Starting daily aggregation...");
-
   // 1. Compute current snapshot from live data (D-05, D-06)
   const analyticsService = new LicenseAnalyticsService();
   const snapshot = await analyticsService.computeSnapshot();
@@ -100,13 +94,6 @@ async function processDailyAnalyticsAggregation(): Promise<void> {
   // 4. Write snapshot to cache
   const cacheRepo = new AnalyticsCacheRepository();
   await cacheRepo.writeSnapshot(snapshot);
-
-  console.log("[Analytics] Daily aggregation completed", {
-    total: snapshot.totalLicenses,
-    active: snapshot.activeLicenses,
-    activationRate: snapshot.activationRate + "%",
-    countries: Object.keys(geoDistribution).length,
-  });
 }
 
 /** Schedule the daily repeatable job (1:00 AM UTC, before subscription worker at 2 AM) */
@@ -126,8 +113,6 @@ export async function scheduleAnalyticsJob(): Promise<void> {
       backoff: { type: "exponential", delay: 60000 },
     },
   );
-
-  console.log("[Analytics] Daily job scheduled (cron: 0 1 * * *)");
 }
 
 /** Start the worker to process analytics jobs */
@@ -153,10 +138,27 @@ export function startAnalyticsWorker(): void {
     console.error(`[Analytics] Job ${job?.id} failed:`, err.message);
   });
 
-  worker.on("completed", (job) => {
-    console.log(`[Analytics] Job ${job?.id} completed`);
+  worker.on("completed", () => {
+    // Job completed successfully
   });
 
   workerStarted = true;
-  console.log("[Analytics] Worker started");
+}
+
+/**
+ * Manually trigger the daily analytics aggregation (admin use).
+ * Returns a summary for verification.
+ */
+export async function triggerAnalyticsAggregation(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    await processDailyAnalyticsAggregation();
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[Analytics] Manual trigger failed:", message);
+    return { success: false, error: message };
+  }
 }

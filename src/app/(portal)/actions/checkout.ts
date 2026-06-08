@@ -58,7 +58,6 @@ export async function getPlanPrices(): Promise<Record<string, { amount: number; 
           productId: row.productSlug,
         };
       }
-      console.log("[Checkout] Plan prices resolved from DB:", Object.keys(cachedPlanPrices));
       return cachedPlanPrices;
     }
   } catch (error) {

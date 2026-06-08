@@ -8,6 +8,9 @@ import {
   Mail,
   Search,
   ArrowRightLeft,
+  Database,
+  Webhook,
+  CalendarClock,
 } from "lucide-react";
 
 interface SettingsOverviewCardsProps {
@@ -51,6 +54,24 @@ const CARDS: CardConfig[] = [
     description: "Transfer limits and ownership settings",
     href: "/admin/settings/transfer",
     icon: ArrowRightLeft,
+  },
+  {
+    label: "Backup",
+    description: "Database backup and cloud storage settings",
+    href: "/admin/settings/backup",
+    icon: Database,
+  },
+  {
+    label: "Webhooks",
+    description: "Manage webhook endpoints and delivery logs",
+    href: "/admin/settings/webhooks",
+    icon: Webhook,
+  },
+  {
+    label: "Cron Jobs",
+    description: "View and manage scheduled background jobs",
+    href: "/admin/settings/cron-jobs",
+    icon: CalendarClock,
   },
 ];
 

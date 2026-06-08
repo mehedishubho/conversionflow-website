@@ -51,5 +51,4 @@ export function initializeLicensingModule(): void {
   registerCacheInvalidationHandlers();
 
   initialized = true;
-  console.log("[Licensing] Module initialized with cache invalidation handlers");
 }

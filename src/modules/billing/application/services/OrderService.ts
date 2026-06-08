@@ -41,13 +41,11 @@ export class OrderService {
       .where(eq(orders.id, orderId));
 
     // 2. Publish OrderCompleted event (triggers license generation synchronously)
-    console.log(`[OrderService] Publishing ORDER_COMPLETED — orderId=${orderId}, userId=${userId}`);
     await inProcessPublisher.publish(
       createOrderEvent(ORDER_EVENTS.ORDER_COMPLETED, orderId, {
         orderId,
         userId,
       }),
     );
-    console.log(`[OrderService] ORDER_COMPLETED published for orderId=${orderId}`);
   }
 }

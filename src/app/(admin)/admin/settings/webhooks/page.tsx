@@ -10,7 +10,7 @@ import WebhookDeliveriesTable from "@/components/admin/WebhookDeliveriesTable";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminWebhooksPage() {
+export default async function WebhooksSettingsPage() {
   await requireAdmin();
 
   const [webhookList, deliveries] = await Promise.all([
@@ -20,7 +20,7 @@ export default async function AdminWebhooksPage() {
 
   return (
     <div className="space-y-6">
-      <PageBreadcrumb pageTitle="Webhooks" basePath="/admin/dashboard" />
+      <PageBreadcrumb pageTitle="Webhooks" basePath="/admin/settings" />
       <ComponentCard
         title="Webhook Endpoints"
         desc="Manage webhook endpoints to receive real-time event notifications when things happen in your system."

@@ -134,3 +134,21 @@ export function startBackupWorker(): void {
   workerStarted = true;
   console.log("[Backup] Worker started");
 }
+
+/**
+ * Manually trigger a backup (admin use).
+ * Returns a summary for verification.
+ */
+export async function triggerBackupJob(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    await processScheduledBackup();
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[Backup] Manual trigger failed:", message);
+    return { success: false, error: message };
+  }
+}
