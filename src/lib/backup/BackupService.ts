@@ -1,39 +1,22 @@
-import { execFileSync, execSync } from "child_process";
+import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { db } from "@/lib/db";
 import { backups } from "@/lib/db/schema";
 import { createAuditLog } from "@/lib/audit";
 import { eq, desc, asc, sql } from "drizzle-orm";
+import {
+  resolvePgDumpPath,
+  checkBinaryAvailability as resolveBinaries,
+} from "./binary-resolver";
 
 export class BackupService {
   /**
-   * Check if pg_dump and psql binaries are available on the system PATH.
-   * Uses cross-platform detection (which on Unix, where on Windows).
+   * Check if pg_dump and psql binaries are available.
+   * Delegates to binary-resolver for multi-strategy path detection.
    */
   static checkBinaryAvailability(): { pg_dump: boolean; psql: boolean } {
-    let pgDumpAvailable = false;
-    let psqlAvailable = false;
-
-    try {
-      execSync("which pg_dump 2>/dev/null || where pg_dump 2>nul", {
-        stdio: "pipe",
-      });
-      pgDumpAvailable = true;
-    } catch {
-      // Binary not found
-    }
-
-    try {
-      execSync("which psql 2>/dev/null || where psql 2>nul", {
-        stdio: "pipe",
-      });
-      psqlAvailable = true;
-    } catch {
-      // Binary not found
-    }
-
-    return { pg_dump: pgDumpAvailable, psql: psqlAvailable };
+    return resolveBinaries();
   }
 
   /**
@@ -89,7 +72,8 @@ export class BackupService {
 
     try {
       // Run pg_dump with array args (no shell injection)
-      execFileSync("pg_dump", [process.env.DATABASE_URL!, "-f", filePath], {
+      const pgDumpPath = resolvePgDumpPath();
+      execFileSync(pgDumpPath, [process.env.DATABASE_URL!, "-f", filePath], {
         stdio: "pipe",
         timeout: 300000, // 5 minute timeout
       });

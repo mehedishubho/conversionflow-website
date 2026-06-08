@@ -14,6 +14,7 @@ import { eq, sql } from "drizzle-orm";
 import { kvGet, kvSet, kvDelete } from "@/lib/redis";
 import { BackupService } from "@/lib/backup/BackupService";
 import { createAuditLog } from "@/lib/audit";
+import { resolvePsqlPath, checkBinaryAvailability } from "./binary-resolver";
 
 type RestoreStage =
   | "pre_backup"
@@ -94,6 +95,16 @@ export class RestoreOrchestrator {
       throw new Error("Restore already in progress");
     }
 
+    // Check psql availability before starting
+    const binaries = checkBinaryAvailability();
+    if (!binaries.psql) {
+      throw new Error(
+        "psql is not installed or not on PATH. Install PostgreSQL client tools."
+      );
+    }
+
+    const psqlPath = resolvePsqlPath();
+
     // Set initial status
     const status: RestoreStatus = {
       stage: "pre_backup",
@@ -133,7 +144,7 @@ export class RestoreOrchestrator {
       }
 
       try {
-        await execFileAsync("psql", [
+        await execFileAsync(psqlPath, [
           databaseUrl,
           "-c",
           "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()",
@@ -160,7 +171,7 @@ export class RestoreOrchestrator {
         throw new Error(`Backup record not found: ${backupId}`);
       }
 
-      await execFileAsync("psql", [databaseUrl, "-f", backupRecord.filePath], {
+      await execFileAsync(psqlPath, [databaseUrl, "-f", backupRecord.filePath], {
         timeout: 300000, // 5-minute timeout for large restores
       });
 
@@ -206,7 +217,7 @@ export class RestoreOrchestrator {
             const databaseUrl = process.env.DATABASE_URL;
             if (databaseUrl) {
               await execFileAsync(
-                "psql",
+                psqlPath,
                 [databaseUrl, "-f", preBackupRecord.filePath],
                 { timeout: 300000 }
               );

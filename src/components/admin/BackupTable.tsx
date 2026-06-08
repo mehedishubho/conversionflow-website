@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, RotateCcw, Trash2, ArrowUpDown } from "lucide-react";
+import Link from "next/link";
+import { Download, RotateCcw, Trash2, ArrowUpDown, HardDrive } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -10,6 +11,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import Badge from "@/components/ui/badge/Badge";
+import Button from "@/components/ui/button/Button";
 
 // ──────────────────────────────────────────────
 // Types
@@ -36,6 +38,9 @@ interface BackupTableProps {
   onRestore: (backup: BackupRecord) => void;
   onDelete: (backup: BackupRecord) => void;
   restoreDisabled?: boolean;
+  onCreateBackup?: () => void;
+  isCreating?: boolean;
+  createDisabled?: boolean;
 }
 
 // ──────────────────────────────────────────────
@@ -98,6 +103,9 @@ export default function BackupTable({
   onRestore,
   onDelete,
   restoreDisabled = false,
+  onCreateBackup,
+  isCreating = false,
+  createDisabled = false,
 }: BackupTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -246,7 +254,38 @@ export default function BackupTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {backups.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="px-5 py-12 text-center"
+                >
+                  <HardDrive className="mx-auto size-12 text-gray-300 dark:text-gray-600" />
+                  <h3 className="mt-3 text-theme-lg font-bold text-gray-800 dark:text-white/90">
+                    No backups yet
+                  </h3>
+                  <p className="mt-1 text-theme-sm text-gray-500 dark:text-gray-400">
+                    Create your first backup to protect your database.
+                  </p>
+                  {onCreateBackup && (
+                    <div className="mt-4">
+                      <Button onClick={onCreateBackup} disabled={isCreating || createDisabled}>
+                        {isCreating ? "Creating..." : "Create First Backup"}
+                      </Button>
+                    </div>
+                  )}
+                  <p className="mt-3 text-theme-xs text-gray-400">
+                    Or{" "}
+                    <Link
+                      href="/admin/settings/backup"
+                      className="text-brand-500 hover:underline"
+                    >
+                      set up automatic backups
+                    </Link>
+                  </p>
+                </TableCell>
+              </TableRow>
+            ) : filtered.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}

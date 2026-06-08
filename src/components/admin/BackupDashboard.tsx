@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { HardDrive, Clock, CalendarClock, Database, AlertTriangle } from "lucide-react";
 import {
   createBackupAction,
@@ -282,71 +281,47 @@ export default function BackupDashboard({
         ))}
       </div>
 
-      {/* Content: Empty State or Table */}
-      {backups.length === 0 ? (
-        <div className="py-16 text-center">
-          <HardDrive className="mx-auto size-16 text-gray-300 dark:text-gray-600" />
-          <h3 className="mt-4 text-theme-xl font-bold text-gray-800 dark:text-white/90">
-            No backups yet
-          </h3>
-          <p className="mt-2 text-theme-sm text-gray-500 dark:text-gray-400">
-            Create your first backup to protect your database.
-          </p>
-          <div className="mt-6">
-            <Button onClick={handleCreateBackup} disabled={isCreating || !pgDumpAvailable}>
-              Create First Backup
-            </Button>
-          </div>
-          <p className="mt-3 text-theme-xs text-gray-400">
-            Or{" "}
-            <Link
-              href="/admin/settings/backup"
-              className="text-brand-500 hover:underline"
-            >
-              set up automatic backups
-            </Link>
-          </p>
-        </div>
-      ) : (
-        <>
-          <BackupTable
-            backups={backups}
-            onRestore={handleRestore}
-            onDelete={handleDeleteRequest}
-            restoreDisabled={!psqlAvailable}
+      {/* Content: Always show table (empty state is inside the table) */}
+      <BackupTable
+        backups={backups}
+        onRestore={handleRestore}
+        onDelete={handleDeleteRequest}
+        restoreDisabled={!psqlAvailable}
+        onCreateBackup={handleCreateBackup}
+        isCreating={isCreating}
+        createDisabled={!pgDumpAvailable}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-gray-400/50 backdrop-blur-[32px]"
+            onClick={handleDeleteCancel}
           />
-          {/* Delete Confirmation Dialog */}
-          {deleteConfirmId && (
-            <div className="fixed inset-0 z-[99999] flex items-center justify-center">
-              <div
-                className="fixed inset-0 bg-gray-400/50 backdrop-blur-[32px]"
-                onClick={handleDeleteCancel}
-              />
-              <div className="relative w-full max-w-md rounded-3xl bg-white p-8 dark:bg-gray-900">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                  Delete Backup
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                  Are you sure you want to delete this backup? This cannot be
-                  undone.
-                </p>
-                <div className="flex items-center justify-end gap-3">
-                  <Button variant="outline" size="sm" onClick={handleDeleteCancel}>
-                    Cancel
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleDeleteConfirm}
-                    disabled={isDeleting}
-                    className="!bg-error-500 !text-white hover:!bg-error-700"
-                  >
-                    {isDeleting ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </div>
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-8 dark:bg-gray-900">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+              Delete Backup
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              Are you sure you want to delete this backup? This cannot be
+              undone.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <Button variant="outline" size="sm" onClick={handleDeleteCancel}>
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="!bg-error-500 !text-white hover:!bg-error-700"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
             </div>
-          )}
-        </>
+          </div>
+        </div>
       )}
 
       {/* Restore Dialog */}
