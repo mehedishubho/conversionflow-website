@@ -12,7 +12,8 @@ import {
 import Badge from "@/components/ui/badge/Badge";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
-import { Trash2, Power, PowerOff } from "lucide-react";
+import { Trash2, Power, PowerOff, Pencil } from "lucide-react";
+import Link from "next/link";
 
 // ──────────────────────────────────────────────
 // Types
@@ -223,6 +224,13 @@ export default function CouponsTable({
                     </TableCell>
                     <TableCell className="px-5 py-3 text-sm">
                       <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/coupons/${coupon.id}`}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                          title="Edit"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Link>
                         <button
                           type="button"
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
