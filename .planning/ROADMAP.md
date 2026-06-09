@@ -491,7 +491,12 @@ Plans:
   3. GET /api/v1/license/status returns full license info including all activations, tier, features, and expiry
   4. ZIP file storage and version management integrated with existing product_versions table
   5. Update check supports WordPress plugin info API format (slug, version, download_url, sections)
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 ### Phase 33: Feature Flags & Tier Enforcement
@@ -504,7 +509,12 @@ Plans:
   3. Admin UI for managing features per plan per product
   4. Platform-specific feature sets (WP features differ from Laravel features)
   5. Customer portal shows available vs locked features for their tier
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 ### Phase 34: Multi-Gateway Payment System
@@ -518,7 +528,12 @@ Plans:
   4. bKash automatic API gateway for BD customers
   5. Gateway abstraction layer — common interface for adding/replacing gateways
   6. Admin can enable/disable individual gateways from settings
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 ### Phase 35: WordPress SDK
@@ -532,7 +547,12 @@ Plans:
   4. Domain activation and verification helpers
   5. Composer package for distribution (conversionflow/sdk-php)
   6. Works on shared hosting, WP-CLI, and managed WordPress environments
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 ### Phase 36: Laravel SDK
@@ -545,7 +565,12 @@ Plans:
   3. Artisan commands: activate, deactivate, check, status
   4. Config and views publishable
   5. Caching layer (24h) to minimize API calls
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 ### Phase 37: Shopify App Integration
@@ -558,7 +583,12 @@ Plans:
   3. Webhook handlers for install/uninstall/billing events
   4. Installation flow creates ConversionFlow license automatically
   5. License status syncs bidirectionally between Shopify and ConversionFlow
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 ### Phase 38: Next.js SDK & API Security
@@ -571,7 +601,12 @@ Plans:
   3. Standardized API key authentication for SDK clients
   4. Rate limiting per platform (WP, Laravel, Shopify, Next.js)
   5. API key rotation support in admin dashboard
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
+- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
+- [ ] 32-03-PLAN.md — API routes and portal download integration
+- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
 **Status:** 🔲 Planned
 
 </details>
