@@ -9,6 +9,8 @@ import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 import { clearPlanPricesCache } from "@/app/(portal)/actions/checkout";
 import { revalidatePath } from "next/cache";
+import fs from "fs";
+import path from "path";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -40,6 +42,55 @@ function generateSlug(name: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+/**
+ * Validate and save a ZIP file upload.
+ * Per D-01: stored in uploads/products/{slug}/
+ * Per D-02: named {slug}-{version}.zip
+ * Per D-03: max 50MB
+ * Per D-04: magic bytes check, extension enforcement, filename sanitization
+ */
+async function handleZipUpload(
+  zipFile: File,
+  productSlug: string,
+  version: string
+): Promise<{ path: string } | { error: string }> {
+  // Size check (50MB per D-03)
+  if (zipFile.size > 50 * 1024 * 1024) {
+    return { error: "ZIP file must be under 50 MB." };
+  }
+
+  // Extension check
+  if (!zipFile.name.toLowerCase().endsWith(".zip")) {
+    return { error: "Only .zip files are accepted." };
+  }
+
+  // Read file and validate magic bytes (PK header: 50 4B 03 04)
+  const buffer = Buffer.from(await zipFile.arrayBuffer());
+  if (buffer.length < 4 || buffer.toString("hex", 0, 4) !== "504b0304") {
+    return { error: "File is not a valid ZIP archive." };
+  }
+
+  // Filename sanitization (per D-04)
+  const safeSlug = productSlug.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  const safeVersion = version.replace(/[^a-z0-9.]/gi, "");
+  const fileName = `${safeSlug}-${safeVersion}.zip`;
+
+  // Construct upload path
+  const uploadDir = path.join(process.cwd(), "uploads", "products", safeSlug);
+  const filePath = path.join(uploadDir, fileName);
+
+  // Create directory if needed (D-01, handles first deployment)
+  fs.mkdirSync(uploadDir, { recursive: true });
+
+  // Write file (use temp + rename for atomic write)
+  const tempPath = filePath + ".tmp";
+  fs.writeFileSync(tempPath, buffer);
+  fs.renameSync(tempPath, filePath);
+
+  // Return relative path (per D-06: stored as relative path within uploads/)
+  return { path: `products/${safeSlug}/${fileName}` };
 }
 
 // ──────────────────────────────────────────────
@@ -94,6 +145,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   const name = formData.get("name") as string | null;
   const description = formData.get("description") as string | null;
   const currentVersion = formData.get("currentVersion") as string | null;
+  const pluginSlug = formData.get("pluginSlug") as string | null;
 
   const updateData: Record<string, unknown> = {};
   if (name !== null && name.trim().length > 0) {
@@ -105,6 +157,9 @@ export async function updateProduct(productId: string, formData: FormData) {
   }
   if (currentVersion !== null) {
     updateData.currentVersion = currentVersion.trim();
+  }
+  if (pluginSlug !== null) {
+    updateData.pluginSlug = pluginSlug.trim() || null;
   }
 
   try {
@@ -166,8 +221,8 @@ export async function createVersion(productId: string, formData: FormData) {
   }
 
   const version = formData.get("version") as string;
-  const downloadUrl = formData.get("downloadUrl") as string | null;
   const changelog = formData.get("changelog") as string | null;
+  const zipFile = formData.get("zipFile") as File | null;
 
   if (!version || version.trim().length === 0) {
     return { error: "Version string is required." };
@@ -179,12 +234,33 @@ export async function createVersion(productId: string, formData: FormData) {
   }
 
   try {
+    // Handle ZIP file upload if provided
+    let downloadPath: string | null = null;
+    if (zipFile && zipFile.size > 0) {
+      // Look up product to get its slug
+      const [product] = await db
+        .select({ slug: products.slug })
+        .from(products)
+        .where(eq(products.id, productId))
+        .limit(1);
+
+      if (!product) {
+        return { error: "Product not found." };
+      }
+
+      const result = await handleZipUpload(zipFile, product.slug, version.trim());
+      if ("error" in result) {
+        return { error: result.error };
+      }
+      downloadPath = result.path;
+    }
+
     const [versionRecord] = await db
       .insert(productVersions)
       .values({
         productId,
         version: version.trim(),
-        downloadUrl: downloadUrl?.trim() || null,
+        downloadUrl: downloadPath,
         changelog: changelog?.trim() || null,
         status: "draft",
       })
@@ -196,7 +272,7 @@ export async function createVersion(productId: string, formData: FormData) {
       action: "product.version.created",
       targetType: "product_version",
       targetId: versionRecord.id,
-      details: { productId, version: version.trim(), status: "draft" },
+      details: { productId, version: version.trim(), status: "draft", hasZip: !!downloadPath },
     });
 
     return { success: true, versionId: versionRecord.id };
@@ -214,13 +290,12 @@ export async function updateVersion(versionId: string, formData: FormData) {
   }
 
   const version = formData.get("version") as string | null;
-  const downloadUrl = formData.get("downloadUrl") as string | null;
   const changelog = formData.get("changelog") as string | null;
   const status = formData.get("status") as string | null;
+  const zipFile = formData.get("zipFile") as File | null;
 
   const updateData: Record<string, unknown> = {};
   if (version !== null) updateData.version = version.trim();
-  if (downloadUrl !== null) updateData.downloadUrl = downloadUrl.trim() || null;
   if (changelog !== null) updateData.changelog = changelog.trim() || null;
   if (status !== null) {
     const validStatuses = ["stable", "beta", "draft"] as const;
@@ -235,6 +310,51 @@ export async function updateVersion(versionId: string, formData: FormData) {
   }
 
   try {
+    // Handle ZIP file replacement if provided
+    if (zipFile && zipFile.size > 0) {
+      // Look up existing version to get product info
+      const [existingVersion] = await db
+        .select({
+          productId: productVersions.productId,
+          version: productVersions.version,
+          downloadUrl: productVersions.downloadUrl,
+        })
+        .from(productVersions)
+        .where(eq(productVersions.id, versionId))
+        .limit(1);
+
+      if (!existingVersion) {
+        return { error: "Version not found." };
+      }
+
+      // Look up product to get its slug
+      const [product] = await db
+        .select({ slug: products.slug })
+        .from(products)
+        .where(eq(products.id, existingVersion.productId))
+        .limit(1);
+
+      if (!product) {
+        return { error: "Product not found." };
+      }
+
+      const effectiveVersion = (version?.trim() || existingVersion.version);
+      const result = await handleZipUpload(zipFile, product.slug, effectiveVersion);
+      if ("error" in result) {
+        return { error: result.error };
+      }
+
+      // Delete old ZIP file if one exists
+      if (existingVersion.downloadUrl) {
+        const oldPath = path.join(process.cwd(), "uploads", existingVersion.downloadUrl);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+
+      updateData.downloadUrl = result.path;
+    }
+
     await db
       .update(productVersions)
       .set(updateData)
@@ -264,7 +384,22 @@ export async function deleteVersion(versionId: string) {
   }
 
   try {
+    // Look up the version to get its downloadUrl for file cleanup (per D-07)
+    const [existingVersion] = await db
+      .select({ downloadUrl: productVersions.downloadUrl })
+      .from(productVersions)
+      .where(eq(productVersions.id, versionId))
+      .limit(1);
+
     await db.delete(productVersions).where(eq(productVersions.id, versionId));
+
+    // Delete the associated ZIP file from disk (per D-07)
+    if (existingVersion?.downloadUrl) {
+      const filePath = path.join(process.cwd(), "uploads", existingVersion.downloadUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
 
     await createAuditLog({
       actorId: userId,
