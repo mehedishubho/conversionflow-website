@@ -57,13 +57,20 @@ export function DownloadsList({
               </p>
             </div>
             <div>
-              <a
-                href={`/api/v1/update/download?token=${latest.downloadToken}`}
-                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors dark:bg-brand-500 dark:hover:bg-brand-600"
-              >
-                <Download className="h-4 w-4" />
-                Download Latest
-              </a>
+              {latest.downloadToken ? (
+                <a
+                  href={`/api/v1/update/download?token=${latest.downloadToken}`}
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors dark:bg-brand-500 dark:hover:bg-brand-600"
+                >
+                  <Download className="h-4 w-4" />
+                  Download Latest
+                </a>
+              ) : (
+                <span className="inline-flex items-center gap-2 rounded-lg bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-500">
+                  <Download className="h-4 w-4" />
+                  No Active License
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -94,13 +101,19 @@ export function DownloadsList({
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <a
-                      href={`/api/v1/update/download?token=${download.downloadToken}`}
-                      className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-500"
-                      aria-label={`Download version ${download.version}`}
-                    >
-                      <Download className="h-5 w-5" />
-                    </a>
+                    {download.downloadToken ? (
+                      <a
+                        href={`/api/v1/update/download?token=${download.downloadToken}`}
+                        className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-500"
+                        aria-label={`Download version ${download.version}`}
+                      >
+                        <Download className="h-5 w-5" />
+                      </a>
+                    ) : (
+                      <span className="text-gray-300 dark:text-gray-600 cursor-not-allowed" aria-label="No active license">
+                        <Download className="h-5 w-5" />
+                      </span>
+                    )}
                   </div>
                 </div>
                 {download.changelog !== undefined && (
