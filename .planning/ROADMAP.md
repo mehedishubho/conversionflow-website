@@ -2,7 +2,7 @@
 
 ## Overview
 
-Transform the ConversionFlow marketing website into a full SaaS platform with Customer Portal, Admin BI Dashboard, Marketing/SEO Settings, and a completely self-contained licensing architecture. v1.x built the marketing site. v2.0 added authentication, database, customer portal, checkout, admin BI, webhooks, and license intelligence. v2.1 added comprehensive SEO & Marketing settings. v3.0 refactors the platform into a self-contained licensing system with modular monolith architecture — managing all products, customers, licenses, subscriptions, activations, and analytics internally without external dependencies.
+Transform the ConversionFlow marketing website into a full SaaS platform with Customer Portal, Admin BI Dashboard, Marketing/SEO Settings, and a completely self-contained licensing architecture. v1.x built the marketing site. v2.0 added authentication, database, customer portal, checkout, admin BI, webhooks, and license intelligence. v2.1 added comprehensive SEO & Marketing settings. v3.0 refactored the platform into a self-contained licensing system with modular monolith architecture. v4.0 transforms ConversionFlow into a **multi-platform license server** — serving WordPress, Laravel, Shopify, and Next.js clients with platform SDKs, update delivery, multi-gateway payments (Stripe/Paddle/bKash API), feature flags per tier, and API security.
 
 ## Milestones
 
@@ -13,12 +13,15 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | M3 | **v2.0 Dual Portal SaaS Platform** | 11–18 | ✅ Shipped | 2026-05-19 |
 | M4 | **v2.1 Marketing & SEO Settings Dashboard** | 19–23 | ✅ Shipped | 2026-05-30 |
 | M5 | **v3.0 Self-Contained Licensing Architecture** | 24–31 | ✅ Shipped | — |
+| M6 | **v4.0 Multi-Platform License Server & SDK Distribution** | 32–38 | 🔲 Planned | — |
 
 ## Current Milestone
 
-- **v3.0 Self-Contained Licensing Architecture** — Phases 24–31
+- **v4.0 Multi-Platform License Server & SDK Distribution** — Phases 32–38
 
-**Milestone Goal:** Refactor ConversionFlow into a completely self-contained licensing platform where all licensing, subscriptions, customers, products, activations, domains, orders, and analytics are managed directly within ConversionFlow — no external licensing dependencies. Build a modular monolith with Domain-Driven Design, Service Layer Pattern, Repository Pattern, and event-driven internal actions.
+**Milestone Goal:** Transform ConversionFlow into a multi-platform license server serving WordPress, Laravel, Shopify, and Next.js clients. Build platform-specific SDKs, complete the update delivery system, add automatic payment gateways (Stripe, Paddle, bKash API), enforce feature flags per tier, and harden API security with HMAC signing. ConversionFlow IS the license server — no 3rd party handles licensing. Dual payment system: Manual (bKash/Nagad/Rocket/Bank) + Real automatic gateways (SSL Commerz, Stripe, Paddle).
+
+**Context:** See `.planning/phases/32-v4-milestone/v4-MILESTONE-CONTEXT.md`
 
 ---
 
@@ -57,6 +60,13 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | 29 | Portal & Analytics Enhancements | v3.0 | ✅ Complete | ✅ |
 | 30 | Migration & External API Removal | v3.0 | ✅ Complete | ✅ |
 | 31 | Backup & Restore System | v3.0 | ✅ Complete | ✅ |
+| 32 | Update Delivery System | v4.0 | 🔲 Planned | — |
+| 33 | Feature Flags & Tier Enforcement | v4.0 | 🔲 Planned | — |
+| 34 | Multi-Gateway Payment System | v4.0 | 🔲 Planned | — |
+| 35 | WordPress SDK | v4.0 | 🔲 Planned | — |
+| 36 | Laravel SDK | v4.0 | 🔲 Planned | — |
+| 37 | Shopify App Integration | v4.0 | 🔲 Planned | — |
+| 38 | Next.js SDK & API Security | v4.0 | 🔲 Planned | — |
 
 ---
 
@@ -468,6 +478,104 @@ Plans:
 
 </details>
 
+<details>
+<summary><strong>M6 — v4.0 Multi-Platform License Server & SDK Distribution</strong> (Phases 32–38) · Planned</summary>
+
+### Phase 32: Update Delivery System
+**Milestone:** v4.0
+**Goal:** Build update check and download endpoints so WordPress (and other) plugins can auto-update from ConversionFlow server. Add license status endpoint for full license info retrieval.
+**Depends on:** Phase 31 (v3.0 complete)
+**Success Criteria:**
+  1. WordPress plugin checks for updates via /api/v1/update/check and receives update info in WordPress-compatible format
+  2. Authenticated download endpoint /api/v1/update/download serves ZIP files only to valid license holders
+  3. GET /api/v1/license/status returns full license info including all activations, tier, features, and expiry
+  4. ZIP file storage and version management integrated with existing product_versions table
+  5. Update check supports WordPress plugin info API format (slug, version, download_url, sections)
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+### Phase 33: Feature Flags & Tier Enforcement
+**Milestone:** v4.0
+**Goal:** Add feature flag definitions per plan/tier so the validate endpoint returns what features are allowed, enabling fine-grained access control across platforms.
+**Depends on:** Phase 32
+**Success Criteria:**
+  1. Feature flag definitions stored in product_plans (JSONB column or dedicated table)
+  2. /api/v1/license/validate returns allowed features list in response
+  3. Admin UI for managing features per plan per product
+  4. Platform-specific feature sets (WP features differ from Laravel features)
+  5. Customer portal shows available vs locked features for their tier
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+### Phase 34: Multi-Gateway Payment System
+**Milestone:** v4.0
+**Goal:** Refactor payment into a dual-system model (Manual + Real automatic gateways). Add Stripe, Paddle, and bKash automatic API as extensible gateways alongside existing SSL Commerz.
+**Depends on:** Phase 33
+**Success Criteria:**
+  1. Payment settings UI reorganized into dual-system model: Manual (bKash, Nagad, Rocket, Bank) and Real (SSL Commerz, Stripe, Paddle, bKash API)
+  2. Stripe integration with Checkout Sessions, Webhooks, and subscription support
+  3. Paddle integration as Merchant of Record for international sales with tax handling
+  4. bKash automatic API gateway for BD customers
+  5. Gateway abstraction layer — common interface for adding/replacing gateways
+  6. Admin can enable/disable individual gateways from settings
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+### Phase 35: WordPress SDK
+**Milestone:** v4.0
+**Goal:** Build a PHP client library (conversionflow-sdk-php) that ships inside the WordPress plugin, handling license activation, validation, auto-updates, and domain management.
+**Depends on:** Phase 32, Phase 33
+**Success Criteria:**
+  1. PHP SDK class with activate(), deactivate(), validate(), check_update() methods
+  2. Auto-update integration hooks into WordPress native plugin update system
+  3. Admin settings page helper (license key input, status display, activation management)
+  4. Domain activation and verification helpers
+  5. Composer package for distribution (conversionflow/sdk-php)
+  6. Works on shared hosting, WP-CLI, and managed WordPress environments
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+### Phase 36: Laravel SDK
+**Milestone:** v4.0
+**Goal:** Build a Laravel package (conversionflow/laravel) with ServiceProvider, Facade, middleware, and Artisan commands for license management in Laravel applications.
+**Depends on:** Phase 35
+**Success Criteria:**
+  1. Laravel auto-discovery package with ServiceProvider and Facade
+  2. License validation middleware for route protection
+  3. Artisan commands: activate, deactivate, check, status
+  4. Config and views publishable
+  5. Caching layer (24h) to minimize API calls
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+### Phase 37: Shopify App Integration
+**Milestone:** v4.0
+**Goal:** Build Shopify app integration with Shopify Billing API syncing to ConversionFlow licenses, App Bridge auth, and webhook handlers.
+**Depends on:** Phase 36
+**Success Criteria:**
+  1. Shopify app scaffold with App Bridge authentication
+  2. Shopify Billing API mapped to ConversionFlow license system
+  3. Webhook handlers for install/uninstall/billing events
+  4. Installation flow creates ConversionFlow license automatically
+  5. License status syncs bidirectionally between Shopify and ConversionFlow
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+### Phase 38: Next.js SDK & API Security
+**Milestone:** v4.0
+**Goal:** Build npm package (@conversionflow/license-sdk) for Next.js self-hosted deployments and harden all API endpoints with HMAC request signing and standardized API key auth. Package compatible with both npm and pnpm.
+**Depends on:** Phase 37
+**Success Criteria:**
+  1. npm/pnpm package with useLicense() hook and proxy.ts (middleware) helpers for route protection
+  2. All /api/v1/* endpoints secured with HMAC request signing
+  3. Standardized API key authentication for SDK clients
+  4. Rate limiting per platform (WP, Laravel, Shopify, Next.js)
+  5. API key rotation support in admin dashboard
+**Plans:** TBD
+**Status:** 🔲 Planned
+
+</details>
+
 ---
 
 ## Dependency Chain
@@ -482,6 +590,10 @@ v3.0: 24 → 25 → 26 → 27 → 28 → 29 → 30 → 31
        24 → 25 → 26     28 → 29
                        ↗         ↘
                  24+25 → 27 → 28 → 29 → 30 → 31
+v4.0: 32 → 33 → 34 (parallel gateways)
+                ↙
+           35 → 36 → 37 → 38
+           (WP)  (Laravel) (Shopify) (Next.js+Security)
 ```
 
 ---
@@ -495,11 +607,13 @@ v3.0: 24 → 25 → 26 → 27 → 28 → 29 → 30 → 31
 | v2.0 Dual Portal SaaS | 11–18 | 8 | 6 | 2 | 2 (planned + deferred) |
 | v2.1 Marketing & SEO | 19–23 | 5 | 5 | 1 | 0 |
 | v3.0 Licensing Architecture | 24–31 | 8 | 8 | 8 | 0 |
-| **Total** | | **31** | **29** | **15** | **2** |
+| v4.0 Multi-Platform License Server | 32–38 | 7 | 0 | 0 | 7 |
+| **Total** | | **38** | **29** | **15** | **9** |
 
 **Notes:**
 - Phase 17 (Notification Engine): 4 plans created, ready for execution
 - Phase 18 (Affiliate Network): Fully deferred to post-MVP
+- v4.0 milestone context: `.planning/phases/32-v4-milestone/v4-MILESTONE-CONTEXT.md`
 
 ---
-*Last updated: 2026-06-06*
+*Last updated: 2026-06-09*
