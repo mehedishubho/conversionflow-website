@@ -50,3 +50,6 @@ backenddashboard/
 
 # GeoIP database files (large binary, download separately)
 data/geoip/*.mmdb
+
+# Uploaded product files (ZIP packages)
+uploads/

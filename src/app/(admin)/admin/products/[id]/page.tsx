@@ -39,6 +39,7 @@ export default async function ProductOverviewPage({
       slug: products.slug,
       description: products.description,
       currentVersion: products.currentVersion,
+      pluginSlug: products.pluginSlug,
       createdAt: products.createdAt,
       updatedAt: products.updatedAt,
     })
@@ -97,6 +98,16 @@ export default async function ProductOverviewPage({
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Current Version</dt>
             <dd className="mt-1 text-sm text-gray-800 dark:text-white/90">
               {product.currentVersion ?? <span className="text-gray-400 dark:text-gray-500">&mdash;</span>}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Plugin Slug</dt>
+            <dd className="mt-1 text-sm">
+              {product.pluginSlug ? (
+                <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/10 font-mono">{product.pluginSlug}</code>
+              ) : (
+                <span className="text-gray-400 dark:text-gray-500">&mdash;</span>
+              )}
             </dd>
           </div>
           <div>

@@ -11,7 +11,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
-import { Rocket, ExternalLink, Loader2, Edit, Trash2 } from "lucide-react";
+import { Rocket, Loader2, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ──────────────────────────────────────────────
@@ -130,7 +130,7 @@ export default function ProductVersionsTable({
                 Status
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
-                Download
+                File
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
                 Released
@@ -184,20 +184,15 @@ export default function ProductVersionsTable({
                       </span>
                     </TableCell>
 
-                    {/* Download URL */}
+                    {/* ZIP File Status */}
                     <TableCell className="px-5 py-3 text-sm text-gray-700 dark:text-gray-300">
                       {v.downloadUrl ? (
-                        <a
-                          href={v.downloadUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          Download
-                        </a>
+                        <span className="inline-flex items-center gap-1 text-success-600 dark:text-success-400">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          ZIP uploaded
+                        </span>
                       ) : (
-                        <span className="text-gray-400 dark:text-gray-500">&mdash;</span>
+                        <span className="text-gray-400 dark:text-gray-500">No file</span>
                       )}
                     </TableCell>
 
