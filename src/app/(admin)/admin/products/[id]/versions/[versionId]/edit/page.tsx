@@ -58,7 +58,7 @@ export default async function EditVersionPage({
 
       <ComponentCard
         title={`Edit Version ${version.version}`}
-        desc="Update download URL, changelog, or status for this version."
+        desc="Update changelog, upload/replace ZIP, or change status for this version."
       >
         <form action={handleUpdate} className="space-y-5">
           {/* Version string (read-only) */}
@@ -97,22 +97,40 @@ export default async function EditVersionPage({
             </select>
           </div>
 
-          {/* Download URL */}
+          {/* ZIP File Upload / Status (per D-05, D-06) */}
           <div>
             <label
-              htmlFor="downloadUrl"
+              htmlFor="zipFile"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
             >
-              Download URL
+              Plugin ZIP File
             </label>
+            {version.downloadUrl ? (
+              <div className="mb-3 flex items-center gap-2 rounded-lg border border-success-200 bg-success-50 px-3 py-2 dark:border-success-500/20 dark:bg-success-500/10">
+                <svg className="w-4 h-4 text-success-600 dark:text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-sm text-success-700 dark:text-success-400">
+                  Current file: <code className="font-mono">{version.downloadUrl.split('/').pop()}</code>
+                </span>
+              </div>
+            ) : null}
             <input
-              type="url"
-              id="downloadUrl"
-              name="downloadUrl"
-              defaultValue={version.downloadUrl ?? ""}
-              placeholder="https://downloads.example.com/v1.2.0/plugin.zip"
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+              type="file"
+              id="zipFile"
+              name="zipFile"
+              accept=".zip"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:file:bg-brand-900/30 dark:file:text-brand-400"
             />
+            {version.downloadUrl ? (
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Upload a new file to replace the current one. Leave empty to keep existing file.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                No file uploaded yet. Upload a ZIP file (max 50 MB).
+              </p>
+            )}
           </div>
 
           {/* Changelog */}

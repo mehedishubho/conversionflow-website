@@ -67,21 +67,24 @@ export default async function NewVersionPage({
             </p>
           </div>
 
-          {/* Download URL */}
+          {/* ZIP File Upload (per D-05) */}
           <div>
             <label
-              htmlFor="downloadUrl"
+              htmlFor="zipFile"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
             >
-              Download URL
+              Plugin ZIP File
             </label>
             <input
-              type="url"
-              id="downloadUrl"
-              name="downloadUrl"
-              placeholder="https://downloads.example.com/v1.2.0/plugin.zip"
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-600"
+              type="file"
+              id="zipFile"
+              name="zipFile"
+              accept=".zip"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:file:bg-brand-900/30 dark:file:text-brand-400"
             />
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Upload the plugin ZIP file (max 50 MB). Optional -- can be added later via edit.
+            </p>
           </div>
 
           {/* Changelog */}
