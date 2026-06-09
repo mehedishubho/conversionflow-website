@@ -23,6 +23,11 @@ export { GenerateLicenseHandler } from "./application/commands/GenerateLicenseHa
 export { performDeactivation } from "./application/commands/deactivationService";
 export { GetActivationHistoryHandler } from "./application/queries/GetActivationHistoryHandler";
 export { GetActiveDomainsHandler } from "./application/queries/GetActiveDomainsHandler";
+export { UpdateCheckHandler } from "./application/commands/UpdateCheckHandler";
+export { UpdateInfoHandler } from "./application/commands/UpdateInfoHandler";
+export { DownloadHandler } from "./application/commands/DownloadHandler";
+export { LicenseStatusHandler } from "./application/commands/LicenseStatusHandler";
+export { DownloadTokenService } from "./application/services/DownloadTokenService";
 
 // Infrastructure exports
 export { LicenseRepository } from "./infrastructure/repositories/LicenseRepository";

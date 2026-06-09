@@ -57,13 +57,13 @@ export function DownloadsList({
               </p>
             </div>
             <div>
-              <button
-                disabled
-                className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white opacity-60 dark:bg-brand-500"
+              <a
+                href={`/api/v1/update/download?token=${latest.downloadToken}`}
+                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors dark:bg-brand-500 dark:hover:bg-brand-600"
               >
                 <Download className="h-4 w-4" />
                 Download Latest
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -94,13 +94,13 @@ export function DownloadsList({
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button
-                      disabled
-                      className="cursor-not-allowed text-gray-400 opacity-60 hover:text-gray-500 dark:text-gray-500"
+                    <a
+                      href={`/api/v1/update/download?token=${download.downloadToken}`}
+                      className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-500"
                       aria-label={`Download version ${download.version}`}
                     >
                       <Download className="h-5 w-5" />
-                    </button>
+                    </a>
                   </div>
                 </div>
                 {download.changelog !== undefined && (
