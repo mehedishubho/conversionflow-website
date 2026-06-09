@@ -126,6 +126,12 @@ export const deliveryStatusEnum = pgEnum("delivery_status", [
   "failed",
 ]);
 
+export const updateLogActionEnum = pgEnum("update_log_action", [
+  "check",
+  "info",
+  "download",
+]);
+
 export const notificationChannelEnum = pgEnum("notification_channel", [
   "email",
   "in_app",
@@ -555,6 +561,7 @@ export const products = pgTable("products", {
   slug: text("slug").notNull().unique(),
   description: text("description"),
   currentVersion: text("current_version"),
+  pluginSlug: text("plugin_slug").unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -780,6 +787,32 @@ export const backups = pgTable(
     index("backups_status_idx").on(table.status),
     index("backups_type_idx").on(table.type),
     index("backups_created_at_idx").on(table.createdAt),
+  ]
+);
+
+// ──────────────────────────────────────────────
+// Update Logs Table
+// ──────────────────────────────────────────────
+
+export const updateLogs = pgTable(
+  "update_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    productId: text("product_id").notNull(),
+    licenseId: text("license_id").notNull(),
+    action: updateLogActionEnum("action").notNull(),
+    versionFrom: text("version_from"),
+    versionTo: text("version_to"),
+    domain: text("domain").notNull(),
+    ipAddress: text("ip_address").notNull(),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("update_logs_product_id_idx").on(table.productId),
+    index("update_logs_license_id_idx").on(table.licenseId),
+    index("update_logs_action_idx").on(table.action),
+    index("update_logs_created_at_idx").on(table.createdAt),
   ]
 );
 
