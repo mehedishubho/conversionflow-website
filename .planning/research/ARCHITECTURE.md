@@ -1,601 +1,819 @@
-# Architecture Patterns
+# Architecture Patterns: v4.0 Multi-Platform License Server
 
-**Domain:** Self-Contained Licensing System for ConversionFlow v3.0
-**Researched:** 2026-05-29
-**Overall confidence:** HIGH
+**Domain:** Multi-platform SDKs, update delivery, multi-gateway payments, feature flags, HMAC API security
+**Researched:** 2026-06-09
+**Overall confidence:** HIGH (codebase-verified for existing; MEDIUM for new patterns based on training data)
 
 ## Executive Summary
 
-The v3.0 self-contained licensing system requires a significant architectural refactoring from the current v2.1 architecture that depends on an external licensing API at `license.devsroom.com`. The research reveals that a **Modular Monolith architecture with Domain-Driven Design (DDD) principles** provides the optimal balance between maintainability and scalability for this transition. This architecture organizes code into **bounded contexts** (Licensing, Billing, Customers, Products, Analytics) that communicate through **domain events**, with business logic abstracted into a **Service Layer** and data access through the **Repository Pattern**. The existing PostgreSQL + Drizzle ORM + Redis infrastructure already supports these patterns, making the transition feasible without infrastructure changes.
+ConversionFlow v4.0 extends the existing modular monolith with five new bounded-context-level capabilities. The critical architectural insight is that the existing DDD foundation (bounded contexts, domain events, repositories, service layer) is already well-suited for these additions. No structural rewrite is needed. The work falls into two categories: **new bounded contexts** (update-delivery, payments) that integrate via domain events, and **extensions to existing contexts** (feature flags in products, HMAC security in a shared middleware layer, rate-limiting enhancements to the existing RateLimiter).
 
-## Key Findings
-
-**Stack:** Leveraging existing PostgreSQL, Drizzle ORM, Redis (ioredis), BullMQ - no new infrastructure dependencies needed for DDD implementation
-**Architecture:** Modular Monolith with DDD bounded contexts - allows future microservice extraction while maintaining single-instance deployment simplicity
-**Critical integration points:** The current `central-api.ts` client and webhook handlers need to be replaced with internal domain services and event handlers
-**Background jobs:** BullMQ already integrated - needs expansion for license expiration checks and renewal reminders
+The `productPlans.features` column already stores `Record<string, boolean>` -- feature flags per plan are partially implemented in the data model. The `productVersions` table already has `downloadUrl`, `changelog`, and `status` fields -- the update delivery system builds on this existing foundation rather than introducing new tables. The payment gateway abstraction layer is the most architecturally significant new addition, requiring a new bounded context that mediates between external gateway SDKs and the existing billing context.
 
 ## Recommended Architecture
 
-### Modular Monolith with DDD Bounded Contexts
-
-**What:** A single deployable application organized into isolated modules (bounded contexts) that communicate through well-defined interfaces and domain events. Each module owns its domain logic, database schema, and API contracts.
-
-**Why:**
-- Maintains deployment simplicity (single Next.js application)
-- Allows clear separation of concerns (Licensing domain, Billing domain, Customer domain)
-- Enables future extraction to microservices if needed
-- Reduces coupling between business capabilities
-- Aligns with DDD principles for complex business domains
-
-**Bounded Contexts for ConversionFlow v3.0:**
+### System Context Diagram
 
 ```
-src/
-├── modules/
-│   ├── licensing/              # Licensing Bounded Context
-│   │   ├── domain/             # Domain models, value objects, domain events
-│   │   │   ├── entities/       # License, Activation, Product, Plan
-│   │   │   ├── value-objects/  # LicenseKey, ExpirationDate, ActivationDomain
-│   │   │   ├── events/         # LicenseCreated, LicenseActivated, LicenseExpired
-│   │   │   └── services/       # LicenseGenerationService, LicenseValidationService
-│   │   ├── application/        # Use cases, application services
-│   │   │   ├── commands/       # GenerateLicenseCommand, ActivateLicenseCommand
-│   │   │   ├── queries/        # GetLicenseQuery, ValidateLicenseQuery
-│   │   │   └── handlers/       # Command handlers, query handlers
-│   │   ├── infrastructure/     # Repository implementations, external integrations
-│   │   │   ├── repositories/   # LicenseRepository, ActivationRepository
-│   │   │   └── events/         # Event publishers, subscribers
-│   │   └── api/                # Context-specific API routes
-│   │       └── routes/         # Public license validation endpoints
-│   │
-│   ├── billing/                # Billing Bounded Context
-│   │   ├── domain/             # Order, Payment, Invoice, Coupon
-│   │   ├── application/        # CreateOrderUseCase, ProcessPaymentUseCase
-│   │   ├── infrastructure/     # Payment gateway integrations
-│   │   └── api/                # Billing API routes
-│   │
-│   ├── customers/              # Customer Bounded Context
-│   │   ├── domain/             # Customer, Profile, Preferences
-│   │   ├── application/        # GetCustomerUseCase, UpdateProfileUseCase
-│   │   ├── infrastructure/     # CustomerRepository
-│   │   └── api/                # Customer API routes
-│   │
-│   ├── products/               # Product Bounded Context
-│   │   ├── domain/             # Product, Version, Plan, Download
-│   │   ├── application/        # GetProductUseCase, CreateVersionUseCase
-│   │   ├── infrastructure/     # ProductRepository
-│   │   └── api/                # Product API routes
-│   │
-│   └── analytics/              # Analytics Bounded Context
-│       ├── domain/             # Metrics, Reports, Aggregates
-│       ├── application/        # CalculateRevenueUseCase, GetChurnMetricsUseCase
-│       ├── infrastructure/     # Query builders, caching
-│       └── api/                # Analytics API routes
-│
-├── shared/                     # Shared kernel (utilities, types that don't belong to any context)
-│   ├── domain/                 # Shared value objects (Money, Email, Uuid)
-│   ├── infrastructure/         # Database connection, Redis client, event bus
-│   └── api/                    # Shared API utilities
-│
-└── app/                        # Next.js App Router (thin layer, delegates to modules)
-    ├── (portal)/               # Customer portal (uses licensing, billing, customers modules)
-    ├── (admin)/                # Admin dashboard (uses all modules)
-    └── api/                    # API gateway (routes to module-specific handlers)
+                    EXTERNAL CLIENTS
+                    ================
+     WordPress Plugin --|                    |-- Laravel App (Composer SDK)
+                        |                    |
+     Shopify App -------+----> /api/v1/* <---+-- Next.js App (npm SDK)
+                        |       (HMAC)       |
+     Customer Portal ---+                    |-- Admin Dashboard
+                    ================
+
+                         |
+                         v
+
+              CONVERSIONFLOW (Next.js 16)
+              ============================
+              
+  ┌─────────────────────────────────────────────────────────┐
+  │                  Shared Infrastructure                   │
+  │  Event Bus │ HMAC Middleware │ Rate Limiter │ Redis Cache│
+  └──────┬──────────┬──────────────────┬──────────────┬─────┘
+         │          │                  │              │
+  ┌──────▼──┐ ┌─────▼──────┐ ┌────────▼───────┐ ┌───▼──────┐
+  │Products │ │ Licensing  │ │   Billing      │ │Analytics │
+  │(extend) │ │ (extend)   │ │  (extend)      │ │(extend)  │
+  │+features│ │+status API │ │+gateway layer  │ │+platform │
+  └─────────┘ └────────────┘ └────────────────┘ └──────────┘
+       │            │                  │
+  ┌────▼────────────▼──────────────────▼──────┐
+  │              Update Delivery (NEW)         │
+  │    /update/check  /update/download         │
+  └────────────────────────────────────────────┘
+       │            │                  │
+  ┌────▼─────┐ ┌────▼───────┐ ┌───────▼──────┐
+  │ WordPress│ │  Stripe    │ │   Paddle     │
+  │ Transient│ │  Adapter   │ │   Adapter    │
+  │ Format   │ │            │ │   (MoR)      │
+  └──────────┘ └────────────┘ └──────────────┘
 ```
 
 ### Component Boundaries
 
-| Bounded Context | Responsibility | Communicates With |
-|----------------|----------------|-------------------|
-| **Licensing** | License generation, validation, activation, expiration, revocation | Billing (on order completion), Customers (for user data), Products (for plan rules) |
-| **Billing** | Order processing, payment handling, invoice generation, coupon management | Licensing (to generate licenses), Customers (for billing info) |
-| **Customers** | Customer profiles, account management, activity tracking | Billing (for billing history), Licensing (for licenses) |
-| **Products** | Product catalog, version management, plan configuration, downloads | Licensing (for licensing rules), Billing (for pricing) |
-| **Analytics** | Revenue metrics, license analytics, customer growth, performance tracking | All contexts (read-only, aggregates data) |
+| Component | Type | Responsibility | Communicates With |
+|-----------|------|----------------|-------------------|
+| **Update Delivery** | NEW bounded context | Plugin update checks, authenticated ZIP downloads, version resolution | Products (reads versions), Licensing (validates license for download), Analytics (tracks downloads) |
+| **Payment Gateways** | NEW bounded context | Multi-gateway abstraction (Stripe, Paddle, bKash API), unified interface, webhook normalization | Billing (triggers OrderCompleted on payment success), Products (reads plan pricing) |
+| **HMAC Middleware** | NEW shared infrastructure | Request signing verification for all /api/v1/* endpoints | All API routes (cross-cutting) |
+| **Feature Flags** | EXTENSION to Products context | Per-plan feature definitions, platform-specific feature sets, enforcement in validate response | Licensing (includes features in validation response), Admin UI (CRUD for feature config) |
+| **Platform Rate Limiting** | EXTENSION to existing RateLimiter | Per-platform, per-API-key rate limiting with configurable tiers | All API routes (cross-cutting) |
+| **License Status API** | EXTENSION to Licensing context | GET endpoint returning full license info + activations | Customer portal, SDKs |
+
+### New vs Modified Components
+
+**NEW files/modules to create:**
+
+```
+src/
+├── shared/
+│   └── infrastructure/
+│       ├── middleware/
+│       │   ├── hmacVerifier.ts           # HMAC signature verification
+│       │   ├── apiKeyAuth.ts             # API key authentication
+│       │   └── platformRateLimit.ts      # Per-platform rate limiting
+│       └── security/
+│           └── hmacSigner.ts             # HMAC signature generation (for SDK docs)
+│
+├── modules/
+│   ├── update/                           # NEW bounded context
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   └── UpdatePackage.ts      # ZIP package metadata
+│   │   │   └── services/
+│   │   │       └── VersionResolver.ts    # Latest version resolution logic
+│   │   ├── application/
+│   │   │   ├── commands/
+│   │   │   │   └── CheckUpdateHandler.ts
+│   │   │   └── queries/
+│   │   │       └── GetDownloadUrlHandler.ts
+│   │   └── infrastructure/
+│   │       ├── repositories/
+│   │       │   └── UpdateRepository.ts   # Reads productVersions
+│   │       └── storage/
+│   │           └── ZipStorage.ts         # File system / S3 ZIP storage
+│   │
+│   └── payments/                         # NEW bounded context
+│       ├── domain/
+│       │   ├── GatewayInterface.ts       # Abstract gateway contract
+│       │   ├── entities/
+│       │   │   └── GatewayConfig.ts      # Per-gateway configuration
+│       │   └── events/
+│       │       └── PaymentEvents.ts      # PaymentCompleted, PaymentFailed
+│       ├── application/
+│       │   ├── services/
+│       │   │   ├── PaymentGatewayFactory.ts  # Factory pattern
+│       │   │   └── PaymentService.ts         # Orchestrates gateway calls
+│       │   └── handlers/
+│       │       └── WebhookHandler.ts     # Normalized webhook processing
+│       └── infrastructure/
+│           ├── adapters/
+│           │   ├── StripeAdapter.ts      # Stripe SDK wrapper
+│           │   ├── PaddleAdapter.ts      # Paddle SDK wrapper
+│           │   ├── BkashApiAdapter.ts    # bKash automatic API
+│           │   ├── SslCommerzAdapter.ts  # Existing SSL Commerz refactored
+│           │   └── ManualAdapter.ts      # Manual payment (admin verify)
+│           └── repositories/
+│               └── PaymentRepository.ts  # Gateway config persistence
+│
+├── app/
+│   └── api/
+│       └── v1/
+│           ├── update/
+│           │   ├── check/route.ts        # POST /api/v1/update/check
+│           │   └── download/route.ts     # GET /api/v1/update/download
+│           ├── license/
+│           │   ├── validate/route.ts     # MODIFIED: add features to response
+│           │   ├── status/route.ts       # NEW: GET /api/v1/license/status
+│           │   ├── activate/route.ts     # MODIFIED: add HMAC verification
+│           │   └── deactivate/route.ts   # MODIFIED: add HMAC verification
+│           └── payments/
+│               ├── stripe/
+│               │   ├── checkout/route.ts # Stripe checkout session
+│               │   └── webhook/route.ts  # Stripe webhook handler
+│               ├── paddle/
+│               │   ├── checkout/route.ts # Paddle checkout
+│               │   └── webhook/route.ts  # Paddle webhook handler
+│               └── bkash/
+│                   ├── create/route.ts   # bKash API create
+│                   ├── execute/route.ts  # bKash API execute
+│                   └── callback/route.ts # bKash callback
+```
+
+**MODIFIED existing files:**
+
+```
+src/lib/db/schema.ts                       # Add payment_gateways table, update paymentMethodEnum
+src/modules/licensing/application/commands/ValidateLicenseHandler.ts  # Add features to response
+src/modules/licensing/infrastructure/adapters/RateLimiter.ts           # Per-platform keys
+src/app/api/v1/license/validate/route.ts   # Add HMAC middleware
+src/app/api/v1/license/activate/route.ts   # Add HMAC middleware
+src/app/api/v1/license/deactivate/route.ts # Add HMAC middleware
+src/modules/products/domain/entities/ProductPlan.ts  # Already has features field -- validate platform-specific features
+```
 
 ### Data Flow
 
-**Request Flow (License Generation):**
+**Flow 1: Update Check (WordPress plugin calling server)**
 
 ```
-[Customer submits checkout]
-    |
-    v
-[Billing Context] CreateOrderUseCase
-    |-- Validates coupon
-    |-- Calculates tax
-    |-- Creates order (pending)
-    |
-    v
-[Payment Gateway] Customer pays
-    |
-    v
-[Billing Context] ProcessPaymentUseCase
-    |-- Updates order (completed)
-    |-- Publishes OrderCompleted event
-    |
-    v
-[Event Bus] OrderCompleted event
-    |
-    v
-[Licensing Context] OrderCompleted event handler
-    |-- Generates license key (local algorithm)
-    |-- Creates license record
-    |-- Publishes LicenseCreated event
-    |
-    v
-[Notification Service] LicenseCreated event handler
-    |-- Sends confirmation email
-    |-- Creates notification
+[WordPress Plugin] -- wp_remote_post -->
+    POST /api/v1/update/check
+    Headers: X-API-Key, X-Signature, X-Timestamp
+    Body: { license_key, domain, product_slug, installed_version, platform: "wordpress" }
+        |
+        v
+    [HMAC Middleware] Verify signature + timestamp freshness
+        |
+        v
+    [Rate Limiter] Check per-platform (wordpress) per-API-key limit
+        |
+        v
+    [Update Context] CheckUpdateHandler
+        |-- LicenseRepository.findByKey(license_key) -> validate active
+        |-- ProductRepository.findBySlug(product_slug) -> get product
+        |-- ProductVersionRepository.findLatest(productId) -> compare versions
+        |-- If new version available:
+        |       Return WordPress transient format:
+        |       { new_version, package: signed-download-url, url, requires, tested }
+        |-- If no update:
+        |       Return { new_version: null } (WordPress treats as no update)
 ```
 
-**License Validation Flow (Public API):**
+**Flow 2: Authenticated ZIP Download**
 
 ```
-[WordPress plugin calls license validation API]
-    |
-    v
-[Licensing Context] ValidateLicenseQuery
-    |-- LicenseRepository.findByKey(licenseKey)
-    |-- Checks status (active, expired, revoked, suspended)
-    |-- Checks activation limits
-    |-- Checks domain binding
-    |-- Returns validation result
-    |
-    v
-[API Response] { valid: boolean, payload: {...} }
+[WordPress Plugin] -- wp_remote_get -->
+    GET /api/v1/update/download?token=<signed-token>&license=<key>&version=<x.y.z>
+        |
+        v
+    [Download Token Validation]
+        |-- Token is HMAC-signed JSON: { licenseId, version, expiresAt, productId }
+        |-- Verify HMAC signature with server secret
+        |-- Check token not expired (15-minute TTL)
+        |-- Verify license still active
+        |
+        v
+    [ZipStorage] Stream ZIP file from disk/S3
+        |
+        v
+    [Analytics] Track download event
+        |
+        v
+    [Response] Streaming ZIP with Content-Disposition header
+```
+
+**Flow 3: Multi-Gateway Payment (Stripe example)**
+
+```
+[Customer selects plan, chooses Stripe]
+        |
+        v
+    [Billing Context] POST /api/v1/payments/stripe/checkout
+        |-- PaymentService.resolveGateway("stripe")
+        |-- StripeAdapter.createCheckoutSession({ plan, user, successUrl, cancelUrl })
+        |-- Return { sessionUrl } -> redirect customer
+        |
+        v
+[Customer pays on Stripe hosted checkout]
+        |
+        v
+    [Stripe Webhook] POST /api/v1/payments/stripe/webhook
+        |-- Verify Stripe webhook signature
+        |-- StripeAdapter.handleWebhook(payload, signature)
+        |-- Normalize to: { type: "checkout.completed", provider: "stripe", data: {...} }
+        |
+        v
+    [Payment Context] WebhookHandler.handleNormalizedEvent()
+        |-- Extract: userId, productId, plan, amount, currency
+        |-- Create/update order record
+        |-- Publish PaymentCompleted event
+        |
+        v
+    [Event Bus] PaymentCompleted event
+        |
+        v
+    [Billing Context] OrderCompletedHandler (existing)
+        |-- Generate license (existing flow)
+        |-- Send confirmation email (existing flow)
+```
+
+**Flow 4: Feature Flag Enforcement (License Validation)**
+
+```
+[SDK calls /api/v1/license/validate]
+        |
+        v
+    [ValidateLicenseHandler] (existing, modified)
+        |-- Existing: validate key, check status, check domain
+        |-- NEW: look up ProductPlan.features for this license's plan
+        |-- NEW: filter features by platform dimension
+        |-- Return: { valid: true, plan: "...", features: { analytics: true, exports: false, ... } }
+        |
+        v
+    [SDK receives features map]
+        |-- Plugin code checks: if (response.features.advanced_analytics) { ... }
 ```
 
 ## Patterns to Follow
 
-### Pattern 1: Repository Pattern for Data Access
+### Pattern 1: Payment Gateway Interface (Strategy + Factory)
 
-**What:** Abstract database access behind repository interfaces. Each bounded context has its own repositories that encapsulate data access logic.
+**What:** Define a common TypeScript interface that all payment gateways implement. A factory resolves the correct adapter based on configuration. This is the Strategy pattern combined with Factory.
 
-**When:** Use for all database operations. Never query directly from application services.
+**When:** Every payment gateway integration must implement this interface. Never call a gateway SDK directly from business logic.
 
 **Example:**
 
 ```typescript
-// modules/licensing/infrastructure/repositories/LicenseRepository.ts
-import { db } from "@/shared/infrastructure/db";
-import { licenses } from "@/shared/infrastructure/db/schema";
-import { eq, and } from "drizzle-orm";
-import type { License } from "../../domain/entities/License";
+// modules/payments/domain/GatewayInterface.ts
 
-export interface ILicenseRepository {
-  findById(id: string): Promise<License | null>;
-  findByKey(key: string): Promise<License | null>;
-  findByUserId(userId: string): Promise<License[]>;
-  save(license: License): Promise<License>;
-  delete(id: string): Promise<void>;
+export interface CheckoutParams {
+  userId: string;
+  productId: string;
+  plan: string;
+  amount: number;
+  currency: string;
+  successUrl: string;
+  cancelUrl: string;
+  metadata?: Record<string, string>;
 }
 
-export class LicenseRepository implements ILicenseRepository {
-  async findById(id: string): Promise<License | null> {
-    const result = await db
-      .select()
-      .from(licenses)
-      .where(eq(licenses.id, id))
-      .limit(1);
-    return result[0] ? this.mapToEntity(result[0]) : null;
+export interface CheckoutResult {
+  sessionId: string;
+  checkoutUrl: string;
+  provider: GatewayProvider;
+}
+
+export interface RefundParams {
+  transactionId: string;
+  amount: number;
+  reason?: string;
+}
+
+export interface NormalizedWebhookEvent {
+  type: "checkout.completed" | "checkout.failed" | "subscription.cancelled" | "subscription.renewed" | "payment.refunded";
+  provider: GatewayProvider;
+  providerEventId: string;
+  data: {
+    userId?: string;
+    orderId?: string;
+    amount?: number;
+    currency?: string;
+    productId?: string;
+    plan?: string;
+    raw: unknown;
+  };
+}
+
+export type GatewayProvider = "stripe" | "paddle" | "bkash_api" | "ssl_commerz" | "manual";
+
+export interface IPaymentGateway {
+  readonly provider: GatewayProvider;
+
+  createCheckoutSession(params: CheckoutParams): Promise<CheckoutResult>;
+  handleWebhook(payload: string | Buffer, signature: string): Promise<NormalizedWebhookEvent>;
+  refund(params: RefundParams): Promise<{ success: boolean; refundId: string }>;
+  verifyPayment(transactionId: string): Promise<{ status: string; amount: number }>;
+}
+```
+
+```typescript
+// modules/payments/application/services/PaymentGatewayFactory.ts
+
+export class PaymentGatewayFactory {
+  private static adapters = new Map<GatewayProvider, IPaymentGateway>();
+
+  static register(provider: GatewayProvider, adapter: IPaymentGateway): void {
+    this.adapters.set(provider, adapter);
   }
 
-  async findByKey(key: string): Promise<License | null> {
-    const result = await db
-      .select()
-      .from(licenses)
-      .where(eq(licenses.licenseKey, key))
-      .limit(1);
-    return result[0] ? this.mapToEntity(result[0]) : null;
+  static get(provider: GatewayProvider): IPaymentGateway {
+    const adapter = this.adapters.get(provider);
+    if (!adapter) throw new Error(`Payment gateway not configured: ${provider}`);
+    return adapter;
   }
 
-  async save(license: License): Promise<License> {
-    const [result] = await db
-      .insert(licenses)
-      .values({
-        userId: license.userId,
-        licenseKey: license.key.value(),
-        productId: license.productId,
-        plan: license.plan,
-        status: license.status,
-        activationDomains: license.domains,
-        maxActivations: license.maxActivations,
-        currentActivations: license.currentActivations,
-        expiresAt: license.expiresAt,
-      })
-      .returning();
-    return this.mapToEntity(result);
-  }
-
-  private mapToEntity(row: any): License {
-    return License.create({
-      id: row.id,
-      userId: row.userId,
-      key: LicenseKey.create(row.licenseKey),
-      productId: row.productId,
-      plan: row.plan,
-      status: row.status,
-      domains: row.activationDomains || [],
-      maxActivations: row.maxActivations,
-      currentActivations: row.currentActivations,
-      expiresAt: row.expiresAt,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    });
+  static getActive(): GatewayProvider[] {
+    return Array.from(this.adapters.keys());
   }
 }
 ```
 
-### Pattern 2: Service Layer for Business Logic
+**Rationale:** The existing codebase already has `ssl-commerz.ts` as a standalone utility. Rather than refactoring it all at once, the factory pattern allows incremental adoption: register the existing SSL Commerz as the first adapter, then add Stripe, Paddle, and bKash API adapters one at a time. Each adapter is independently testable and deployable.
 
-**What:** Application services coordinate use cases by orchestrating domain objects and repositories. They contain business logic that doesn't naturally fit within a single domain entity.
+### Pattern 2: HMAC Request Signing Middleware
 
-**When:** Use for use cases that involve multiple domain objects or external integrations.
+**What:** A shared middleware function that verifies HMAC-SHA256 signatures on all incoming /api/v1/* requests. SDKs concatenate `method + path + timestamp + bodyHash`, sign with the license's API token, and include the signature in headers.
+
+**When:** Every API route under /api/v1/* must pass through this verification. This applies to all platform SDKs (WordPress, Laravel, Shopify, Next.js).
 
 **Example:**
 
 ```typescript
-// modules/licensing/application/services/LicenseGenerationService.ts
-import type { ILicenseRepository } from "../../infrastructure/repositories/LicenseRepository";
-import type { IProductRepository } from "../../../products/infrastructure/repositories/ProductRepository";
-import { License } from "../../domain/entities/License";
-import { LicenseKey } from "../../domain/value-objects/LicenseKey";
-import { LicenseCreatedEvent } from "../../domain/events/LicenseCreatedEvent";
+// shared/infrastructure/middleware/hmacVerifier.ts
 
-export class LicenseGenerationService {
-  constructor(
-    private licenseRepo: ILicenseRepository,
-    private productRepo: IProductRepository,
-    private eventPublisher: IEventPublisher
-  ) {}
+import crypto from "crypto";
 
-  async generateForOrder(command: GenerateLicenseForOrderCommand): Promise<License> {
-    // 1. Get product to determine activation limits
-    const product = await this.productRepo.findById(command.productId);
-    if (!product) {
-      throw new Error(`Product not found: ${command.productId}`);
+interface HmacVerificationResult {
+  valid: boolean;
+  error?: string;
+  apiKey?: string;
+}
+
+export async function verifyHmacSignature(
+  request: Request
+): Promise<HmacVerificationResult> {
+  const signature = request.headers.get("x-signature");
+  const timestamp = request.headers.get("x-timestamp");
+  const apiKey = request.headers.get("x-api-key");
+
+  if (!signature || !timestamp || !apiKey) {
+    return { valid: false, error: "MISSING_HEADERS" };
+  }
+
+  // Replay protection: reject requests older than 5 minutes
+  const requestTime = parseInt(timestamp, 10);
+  const now = Date.now();
+  if (Math.abs(now - requestTime) > 5 * 60 * 1000) {
+    return { valid: false, error: "REQUEST_EXPIRED" };
+  }
+
+  // Look up the API token hash for this key
+  // (The API token is cf_live_xxxx; the hash is stored in licenses.apiTokenHash)
+  const license = await findLicenseByApiToken(apiKey);
+  if (!license) {
+    return { valid: false, error: "INVALID_API_KEY" };
+  }
+
+  // Rebuild canonical string: METHOD\nPATH\nTIMESTAMP\nBODY_HASH
+  const url = new URL(request.url);
+  const body = await request.clone().text();
+  const bodyHash = crypto.createHash("sha256").update(body).digest("hex");
+  const canonical = `${request.method}\n${url.pathname}\n${timestamp}\n${bodyHash}`;
+
+  // Compute expected HMAC using the plaintext API token as the secret
+  // (The SDK has the plaintext token; the server stores only the hash.
+  //  Solution: use a separate HMAC secret per license, stored alongside the token hash.)
+  const expected = crypto
+    .createHmac("sha256", license.hmacSecret)
+    .update(canonical)
+    .digest("hex");
+
+  // Timing-safe comparison
+  const a = Buffer.from(signature, "hex");
+  const b = Buffer.from(expected, "hex");
+  if (a.length !== b.length) return { valid: false, error: "INVALID_SIGNATURE" };
+
+  const valid = crypto.timingSafeEqual(a, b);
+  return valid
+    ? { valid: true, apiKey }
+    : { valid: false, error: "INVALID_SIGNATURE" };
+}
+```
+
+**Key design decision:** Each license needs an `hmacSecret` field (separate from `apiTokenHash`). The API token identifies the license; the HMAC secret signs requests. During license generation, both are created and the HMAC secret is returned alongside the API token. This matches the existing `ApiTokenGenerator` pattern.
+
+**Schema addition required:**
+
+```typescript
+// Add to licenses table:
+hmacSecret: text("hmac_secret"),  // HMAC signing secret per license
+```
+
+### Pattern 3: WordPress-Compatible Update Transient Format
+
+**What:** The /api/v1/update/check endpoint must return data in WordPress's expected `update_plugins` transient format so that the WordPress SDK can inject it directly into `pre_set_site_transient_update_plugins`.
+
+**When:** Only when the `platform` parameter is "wordpress". Other platforms receive a simpler JSON response.
+
+**Example response for WordPress:**
+
+```json
+{
+  "slug": "conversionflow-wp",
+  "plugin": "conversionflow-wp/conversionflow-wp.php",
+  "new_version": "2.1.0",
+  "package": "https://conversionflow.com/api/v1/update/download?token=HMAC_SIGNED_TOKEN&license=CF-XXXX&version=2.1.0",
+  "url": "https://conversionflow.com/changelog",
+  "requires": "6.0",
+  "tested": "6.7",
+  "requires_php": "8.0",
+  "sections": {
+    "changelog": "<h4>2.1.0</h4><ul><li>New feature: X</li></ul>"
+  }
+}
+```
+
+**Rationale:** WordPress expects this exact format. The `package` URL must be a signed, time-limited download link (HMAC-signed token with 15-minute TTL) so that the download endpoint can verify authenticity without requiring the license key in the URL (which would be logged in access logs).
+
+### Pattern 4: Feature Flag Resolution (JSONB + Platform Dimension)
+
+**What:** The `productPlans.features` column already stores `Record<string, boolean>`. For v4.0, extend this to support platform-specific features by using a nested structure or a separate platform_features JSONB column.
+
+**When:** Feature enforcement happens during license validation. The validate response includes a `features` object that SDKs check locally.
+
+**Schema approach -- extend existing features column:**
+
+```typescript
+// Current: features: Record<string, boolean>
+// Example: { "analytics": true, "exports": true, "priority_support": false }
+
+// v4.0 approach: features: Record<string, boolean | Record<string, boolean>>
+// Example:
+{
+  "analytics": true,                       // All platforms
+  "exports": { "wordpress": true, "laravel": true, "nextjs": false },
+  "priority_support": true,                // All platforms
+  "auto_updates": { "wordpress": true, "laravel": true, "shopify": false },
+  "advanced_seo": { "wordpress": true, "nextjs": true, "laravel": false }
+}
+```
+
+**Resolution logic in ValidateLicenseHandler:**
+
+```typescript
+function resolveFeatures(
+  planFeatures: Record<string, unknown>,
+  platform: string
+): Record<string, boolean> {
+  const resolved: Record<string, boolean> = {};
+  for (const [key, value] of Object.entries(planFeatures)) {
+    if (typeof value === "boolean") {
+      resolved[key] = value;
+    } else if (typeof value === "object" && value !== null) {
+      resolved[key] = (value as Record<string, boolean>)[platform] ?? false;
     }
-
-    const planConfig = product.getPlanConfig(command.plan);
-    
-    // 2. Generate license key using local algorithm
-    const licenseKey = LicenseKey.generate({
-      productId: product.id,
-      plan: command.plan,
-      timestamp: Date.now(),
-    });
-
-    // 3. Create license entity
-    const license = License.create({
-      userId: command.userId,
-      orderId: command.orderId,
-      productId: product.id,
-      plan: command.plan,
-      key: licenseKey,
-      status: "active",
-      maxActivations: planConfig.maxActivations,
-      currentActivations: 0,
-      domains: [],
-      expiresAt: planConfig.lifetime ? null : this.calculateExpiration(planConfig.duration),
-    });
-
-    // 4. Save license
-    const savedLicense = await this.licenseRepo.save(license);
-
-    // 5. Publish domain event
-    await this.eventPublisher.publish(
-      new LicenseCreatedEvent({
-        licenseId: savedLicense.id,
-        userId: command.userId,
-        orderId: command.orderId,
-        licenseKey: licenseKey.value(),
-        productId: product.id,
-        plan: command.plan,
-      })
-    );
-
-    return savedLicense;
   }
-
-  private calculateExpiration(duration: number): Date {
-    return new Date(Date.now() + duration * 24 * 60 * 60 * 1000); // days to ms
-  }
+  return resolved;
 }
 ```
 
-### Pattern 3: Domain Events for Decoupling
+**Rationale:** Using the existing JSONB column avoids schema migrations for feature definitions. The nested platform dimension is backward-compatible: existing flat boolean features still work, and new platform-specific features add the nesting. This is simpler than a separate feature flags table and keeps all plan configuration in one place.
 
-**What:** Domain events represent something that happened in the domain that other parts of the system may be interested in. Events are published and subscribed to asynchronously.
+### Pattern 5: Per-Platform Rate Limiting (Extends Existing RateLimiter)
 
-**When:** Use for cross-context communication (e.g., order completion triggers license generation).
+**What:** Extend the existing `RateLimiter` (which uses Redis sorted-set sliding window) to support per-platform and per-API-key rate limiting, not just per-IP.
+
+**When:** Every /api/v1/* request passes through rate limiting. Different platforms may have different rate tiers.
 
 **Example:**
 
 ```typescript
-// modules/licensing/domain/events/LicenseCreatedEvent.ts
-export class LicenseCreatedEvent extends DomainEvent {
-  constructor(
-    public readonly data: {
-      licenseId: string;
-      userId: string;
-      orderId: string;
-      licenseKey: string;
-      productId: string;
-      plan: string;
-    }
-  ) {
-    super("LicenseCreated", data.licenseId);
-  }
-}
+// shared/infrastructure/middleware/platformRateLimit.ts
 
-// shared/infrastructure/events/InMemoryEventBus.ts
-import { EventEmitter } from "events";
-
-export class InMemoryEventBus implements IEventPublisher, IEventSubscriber {
-  private emitter = new EventEmitter();
-
-  async publish(event: DomainEvent): Promise<void> {
-    this.emitter.emit(event.eventType, event);
-  }
-
-  subscribe(eventType: string, handler: (event: DomainEvent) => Promise<void>): void {
-    this.emitter.on(eventType, handler);
-  }
-}
-
-// modules/billing/application/handlers/LicenseCreatedHandler.ts
-export class LicenseCreatedHandler {
-  async handle(event: LicenseCreatedEvent): Promise<void> {
-    // Update order with license reference
-    await this.orderRepo.updateLicenseId(
-      event.data.orderId,
-      event.data.licenseId
-    );
-
-    // Send notification
-    await this.notificationService.sendLicenseActivated({
-      userId: event.data.userId,
-      licenseKey: event.data.licenseKey,
-    });
-  }
-}
-```
-
-### Pattern 4: Background Jobs with BullMQ
-
-**What:** Recurring and delayed tasks run in background workers using BullMQ queues backed by Redis.
-
-**When:** Use for license expiration checks, renewal reminders, scheduled analytics reports.
-
-**Example:**
-
-```typescript
-// jobs/workers/license-worker.ts
-import { Worker, Job } from "bullmq";
-import { db } from "@/lib/db";
-import { licenses } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-
-// Check for expiring licenses (runs daily)
-const checkExpiringLicenses = async (job: Job) => {
-  const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  
-  const expiringLicenses = await db
-    .select()
-    .from(licenses)
-    .where(
-      and(
-        eq(licenses.status, "active"),
-        // Expires within 30 days, has not been notified
-        // ...additional conditions
-      )
-    );
-
-  for (const license of expiringLicenses) {
-    // Queue renewal reminder email
-    await emailQueue.add("renewal-reminder", {
-      userId: license.userId,
-      licenseId: license.id,
-      licenseKey: license.licenseKey,
-      expiresAt: license.expiresAt,
-    });
-  }
-
-  return { processed: expiringLicenses.length };
+const PLATFORM_LIMITS: Record<string, { windowSeconds: number; maxRequests: number }> = {
+  wordpress: { windowSeconds: 60, maxRequests: 60 },
+  laravel:   { windowSeconds: 60, maxRequests: 60 },
+  shopify:   { windowSeconds: 60, maxRequests: 120 },
+  nextjs:    { windowSeconds: 60, maxRequests: 60 },
+  default:   { windowSeconds: 60, maxRequests: 100 },  // existing D-08 limit
 };
 
-// Create worker
-const licenseWorker = new Worker("license-jobs", async (job) => {
-  if (job.name === "check-expiring") {
-    return await checkExpiringLicenses(job);
+export class PlatformRateLimiter {
+  /**
+   * Check rate limit for a given platform and API key.
+   * Uses the same Redis sorted-set sliding window as existing RateLimiter.
+   * Key format: ratelimit:v2:{platform}:{api_key_hash}
+   */
+  static async check(
+    platform: string,
+    apiKey: string
+  ): Promise<{ allowed: boolean; retryAfter: number; remaining: number }> {
+    const limits = PLATFORM_LIMITS[platform] ?? PLATFORM_LIMITS.default;
+    const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex").slice(0, 16);
+    const key = `ratelimit:v2:${platform}:${keyHash}`;
+    // ... same ZADD/ZREMRANGEBYSCORE/ZCARD pipeline as existing RateLimiter
   }
-}, { connection: redisConnection });
-
-// Scheduler in queues.ts
-export const scheduleLicenseJobs = async () => {
-  await licenseQueue.add(
-    "check-expiring",
-    {},
-    {
-      repeat: { pattern: "0 9 * * *" }, // Daily at 9 AM
-    }
-  );
-};
+}
 ```
+
+**Rationale:** The existing RateLimiter already implements the sorted-set sliding window pattern. Rather than replacing it, this extends the key scheme from `ratelimit:v1:{ip}` to `ratelimit:v2:{platform}:{api_key_hash}`. The v1 limiter stays active for non-authenticated endpoints; v2 handles SDK-authenticated requests.
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Direct Database Queries from API Routes
+### Anti-Pattern 1: Gateway SDK Calls from Business Logic
 
-**What:** Querying the database directly from Next.js API routes or server actions without repository abstraction.
+**What:** Calling Stripe or Paddle SDK methods directly from order processing or checkout handlers.
 
-**Why bad:** Ties API to database schema, makes testing difficult, violates separation of concerns.
+**Why bad:** Ties business logic to a specific gateway's API surface. Switching gateways means rewriting business logic. Testing requires mocking external SDKs throughout the codebase.
 
-**Instead:** API routes delegate to application services, which use repositories for data access.
+**Instead:** All gateway calls go through the `IPaymentGateway` interface. Business logic never imports `stripe` or `@paddle/paddle-node-sdk` directly. Only the adapter files import gateway SDKs.
 
-### Anti-Pattern 2: Domain Logic in Controllers
+### Anti-Pattern 2: Storing Plaintext API Tokens or HMAC Secrets
 
-**What:** Putting business logic (license validation rules, activation limit enforcement) in API route handlers.
+**What:** Storing the HMAC secret or API token in plaintext in the database.
 
-**Why bad:** Violates single responsibility, makes logic hard to reuse, difficult to test.
+**Why bad:** Database compromise exposes all request-signing secrets. Attackers can forge authenticated requests.
 
-**Instead:** Business logic lives in domain entities and application services. Controllers are thin.
+**Instead:** Store SHA-256 hashes of API tokens (existing pattern in `apiTokenHash`). For HMAC secrets, store them encrypted with a server-level encryption key (AES-256-GCM) in the database. The decryption happens at startup or per-request with the server's master key from environment variables.
 
-### Anti-Pattern 3: Tight Coupling Between Contexts
+### Anti-Pattern 3: Feature Flag Database Table (Over-Engineering)
 
-**What:** Billing context directly calling Licensing context's internal functions.
+**What:** Creating a separate `features` table, `plan_features` junction table, and `feature_overrides` table with full CRUD.
 
-**Why bad:** Defeats the purpose of bounded contexts, creates spaghetti dependencies.
+**Why bad:** The existing `productPlans.features` JSONB column already serves this purpose. A normalized feature schema adds JOINs, migrations, and admin UI complexity for a system with fewer than 50 features across 4 plans.
 
-**Instead:** Use domain events for cross-context communication. Billing publishes `OrderCompleted`, Licensing subscribes and generates license.
+**Instead:** Use the existing JSONB column with the nested platform dimension pattern. Add admin UI that reads/writes the JSONB structure directly. Only migrate to a normalized schema if feature count exceeds 100 or if per-customer overrides are needed.
 
-### Anti-Pattern 4: Anemic Domain Models
+### Anti-Pattern 4: Monolithic Webhook Handler
 
-**What:** Domain entities with only getters/setters, no business logic (data transfer objects).
+**What:** A single webhook handler that switches on gateway type with deeply nested if/else blocks.
 
-**Why bad:** Business logic ends up in services or controllers, violating encapsulation.
+**Why bad:** Each gateway has different signature verification, event types, and payload formats. Mixing them creates unmaintainable spaghetti code.
 
-**Instead:** Rich domain models with behavior. `License.activate(domain)` should enforce activation limits internally.
+**Instead:** Each gateway adapter implements `handleWebhook()` which returns a `NormalizedWebhookEvent`. The central webhook handler receives normalized events and dispatches to domain event publishers. Gateway-specific logic stays in adapters.
 
-## Scalability Considerations
+### Anti-Pattern 5: Including License Key in Download URLs
 
-| Concern | At 500 licenses | At 10K licenses | At 100K licenses |
-|---------|----------------|-----------------|------------------|
-| License validation queries | Direct DB queries fine | Add Redis caching for active licenses | Dedicated read replica for validation, cache warming |
-| Domain activation checks | In-memory counter | Redis counters per license | Redis cluster, sharded by license prefix |
-| Expiration batch jobs | Single worker, daily run | Single worker, daily run | Multiple workers, sharded by expiration date |
-| Event handling | In-memory event bus | In-memory event bus fine | Redis Streams or RabbitMQ for reliability |
+**What:** Passing the license key as a query parameter in the download URL: `/api/v1/update/download?license_key=CF-XXXX-XXXX`.
 
-### Scaling Priorities
+**Why bad:** License keys appear in server access logs, CDN logs, browser history, and HTTP referrer headers. This exposes sensitive credentials.
 
-1. **First bottleneck:** License validation API calls. Mitigate with Redis caching of active licenses from day one.
-2. **Second bottleneck:** Background job processing for expiration checks. Mitigate with BullMQ job batching.
-3. **Third bottleneck:** Event bus reliability. Consider Redis Streams for guaranteed delivery.
+**Instead:** Generate a short-lived HMAC-signed download token that encodes `{ licenseId, version, expiresAt }`. The download endpoint verifies the token's HMAC signature, not the license key directly. Tokens expire in 15 minutes.
 
-## Integration Points
+## Integration Points with Existing Bounded Contexts
 
-### External Services
+### Update Delivery <-> Products (Existing)
 
-| Service | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| Payment Gateways (SSL Commerz, bKash, etc.) | Service Layer abstraction | Existing `checkout.ts` actions become Billing Context services |
-| Email Service (Resend/Ses) | Domain event handlers | LicenseCreated, OrderCompleted events trigger emails |
-| Redis (caching, queues) | Infrastructure layer | Shared across all bounded contexts |
+```
+Update Delivery reads:
+  - products (by slug) -- to resolve product
+  - productVersions (by productId) -- to get latest version, downloadUrl, changelog
 
-### Internal Boundaries (New for v3.0)
+No modifications to Products context needed.
+ProductVersionRepository already exists and is reused.
+```
 
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| Billing <-> Licensing | Domain events (OrderCompleted) | Billing publishes, Licensing subscribes |
-| Licensing <-> Customers | Repository queries (user lookup) | Licensing queries Customer repository |
-| Products <-> All Contexts | Repository queries (read-only) | All contexts read product/plan configuration |
-| Analytics <-> All Contexts | Event subscriptions (read-only) | Analytics subscribes to all events for aggregation |
+### Update Delivery <-> Licensing (Existing)
+
+```
+Update Delivery reads:
+  - licenses (by key) -- to verify license is active before serving update
+  - licenseActivations (by licenseId + domain) -- to verify domain is activated
+
+No modifications to Licensing context needed.
+LicenseRepository and ActivationRepository already exist and are reused.
+```
+
+### Payment Gateways <-> Billing (Existing)
+
+```
+Payment Gateways publishes:
+  - PaymentCompleted event (normalized)
+
+Billing subscribes:
+  - Existing OrderCompletedHandler processes the event
+  - OR: PaymentCompleted triggers OrderCompleted via a bridge handler
+
+The cleanest integration:
+  PaymentCompleted handler in payments context ->
+    calls OrderService.completeOrder(orderId, userId) ->
+      OrderService publishes OrderCompleted event ->
+        existing OrderCompletedHandler generates license
+```
+
+This means the payments context does NOT need to know about license generation. It completes orders, and the existing event pipeline handles the rest. This preserves the existing domain event flow without modification.
+
+### Feature Flags <-> Licensing (Existing)
+
+```
+ValidateLicenseHandler (existing, modified):
+  - After validation succeeds, look up ProductPlan.features
+  - Apply platform dimension resolution
+  - Include resolved features in response
+
+Modification is minimal: add ~15 lines to the existing handler
+to fetch plan features and include them in the response payload.
+```
+
+### HMAC Middleware <-> All API Routes (Cross-Cutting)
+
+```
+New shared middleware wraps all /api/v1/* routes.
+
+Implementation approach:
+  - NOT Next.js middleware (project uses proxy.ts, not middleware.ts)
+  - Helper function called at the top of each route handler
+  - Could be extracted into a withHmacAuth() wrapper
+
+  export async function POST(request: NextRequest) {
+    const auth = await verifyHmacSignature(request);
+    if (!auth.valid) return NextResponse.json({ error: auth.error }, { status: 401 });
+    // ... existing route logic
+  }
+
+The validate route currently uses RateLimiter + body parsing.
+HMAC verification goes BETWEEN rate limiting and body parsing
+(because HMAC needs the raw body to verify signature).
+```
+
+## Database Schema Changes
+
+### New Tables
+
+```typescript
+// Payment gateway configuration (stores API keys, webhook secrets, etc.)
+export const paymentGateways = pgTable("payment_gateways", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  provider: text("provider").notNull(), // "stripe", "paddle", "bkash_api", "ssl_commerz"
+  name: text("name").notNull(),         // Display name "Stripe (International)"
+  config: jsonb("config").notNull(),    // Encrypted gateway-specific config
+  active: boolean("active").default(true),
+  sandbox: boolean("sandbox").default(false),
+  priority: integer("priority").default(0), // Order of preference
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").$onUpdate(() => new Date()).notNull(),
+});
+```
+
+### Modified Tables
+
+```typescript
+// licenses table -- add HMAC signing secret
+// Add column:
+hmacSecret: text("hmac_secret"),  // AES-encrypted HMAC signing secret
+
+// productPlans table -- features column already exists, no schema change needed
+// The JSONB structure changes from flat to nested, but no migration required
+
+// Extend paymentMethodEnum to include new gateways:
+// Add to existing enum: "stripe", "paddle", "bkash_api"
+```
 
 ## Build Order (Dependency Chain)
 
 ```
-Phase 1: Shared Infrastructure
-├── Database connection and migration setup
-├── Redis client and BullMQ queues
-├── Event bus implementation
-├── Shared value objects (Money, Email, Uuid)
-└── Repository base interfaces
+Phase 1: API Security Foundation (cross-cutting, blocks all SDK work)
+├── HMAC middleware (verifyHmacSignature)
+├── API key authentication (extend existing ApiTokenGenerator)
+├── Add hmacSecret field to licenses table
+├── Per-platform rate limiting (extend existing RateLimiter)
+└── Apply to existing /api/v1/license/* routes
 
-Phase 2: Products Bounded Context
-├── Product domain entities
-├── Product repository
-├── Product application services
-├── Product API routes
-└── Seed data (existing products)
+Phase 2: Update Delivery System (depends on Phase 1)
+├── Update bounded context (domain entities, version resolver)
+├── /api/v1/update/check endpoint (WordPress-compatible format)
+├── /api/v1/update/download endpoint (signed download tokens)
+├── ZIP file storage (local filesystem or S3)
+├── Integration with existing ProductVersionRepository
+└── Download analytics (events to analytics context)
 
-Phase 3: Customers Bounded Context
-├── Customer domain entities
-├── Customer repository (wraps existing Better Auth user table)
-├── Customer application services
-└── Customer API routes
+Phase 3: License Status API + Feature Flags (depends on Phase 1)
+├── GET /api/v1/license/status endpoint
+├── Extend ValidateLicenseHandler to include features in response
+├── Platform-dimension feature resolution (nested JSONB)
+├── Admin UI for managing features per plan per platform
+└── Feature gating in customer portal
 
-Phase 4: Licensing Bounded Context (Core for v3.0)
-├── License domain entities and value objects
-├── License generation algorithm (local, replaces central API)
-├── License validation service
-├── License repository
-├── License application services
-├── License events and handlers
-├── Public license validation API
-└── Background jobs (expiration checks)
+Phase 4: Payment Gateway Abstraction (depends on Phase 3 partially)
+├── PaymentGatewayInterface definition
+├── PaymentGatewayFactory
+├── paymentGateways table migration
+├── ManualAdapter (wrap existing manual payment flow)
+├── SslCommerzAdapter (wrap existing ssl-commerz.ts)
+├── StripeAdapter (new: Checkout Sessions + Webhooks)
+├── PaddleAdapter (new: Checkout + Webhooks + MoR)
+├── BkashApiAdapter (new: automatic bKash API)
+├── Normalized webhook handler
+├── PaymentCompleted -> OrderService.completeOrder bridge
+└── Admin UI for gateway management
 
-Phase 5: Billing Bounded Context
-├── Refactor existing checkout.ts actions to Billing services
-├── Order domain entities
-├── Payment processing services
-├── Invoice generation
-├── Billing repository
-├── Integration with Licensing context (via events)
-└── Billing API routes
-
-Phase 6: Analytics Bounded Context
-├── Analytics domain (metrics, aggregations)
-├── Query services for BI dashboard
-├── Event subscriptions for data collection
-├── Caching layer for expensive queries
-└── Analytics API routes
-
-Phase 7: Cleanup
-├── Remove central-api.ts client
-├── Remove centralOrderId, centralLicenseId, centralUserId fields
-├── Remove webhook handlers for central API
-└── Update admin dashboard to use new services
+Phase 5: Platform SDKs (depends on Phases 1-3)
+├── WordPress SDK (PHP: license helpers + auto-update hooks)
+├── Laravel SDK (Composer: ServiceProvider + middleware + Artisan)
+├── Shopify Integration (App scaffold + Billing API sync)
+└── Next.js SDK (npm: useLicense hook + middleware helpers)
 ```
 
-**Key dependency:** Shared infrastructure (Phase 1) must be complete before any bounded context implementation. Products (Phase 2) and Customers (Phase 3) are foundational. Licensing (Phase 4) is the core of v3.0. Billing (Phase 5) depends on Licensing. Analytics (Phase 6) depends on all other contexts.
+**Phase ordering rationale:**
+- Phase 1 (API Security) must come first because all SDKs depend on HMAC signing. Without it, SDK endpoints are unauthenticated.
+- Phase 2 (Update Delivery) and Phase 3 (Status API + Feature Flags) are parallel after Phase 1. Both are required before SDK work.
+- Phase 4 (Payment Gateways) can proceed in parallel with Phases 2-3 since it integrates with the billing context via events (no direct dependency on update/status APIs).
+- Phase 5 (SDKs) comes last because SDKs are thin wrappers around the APIs built in Phases 1-3.
+
+## Scalability Considerations
+
+| Concern | At 500 licenses | At 10K licenses | At 100K licenses |
+|---------|-----------------|-----------------|------------------|
+| Update check API | Direct DB query per check | Redis cache for latest version per product (key: `update:latest:{productSlug}`) | CDN-cached version info, signed download URLs offloaded to S3 presigned URLs |
+| Feature flag resolution | Read from DB on each validate (plan features rarely change) | Cache resolved features per plan in Redis (key: `features:{planId}:{platform}`) | Cache at edge, invalidate on plan update |
+| HMAC verification | In-process crypto (sub-ms) | Same -- crypto is fast | Same -- no scaling concern |
+| Webhook processing | Sequential processing | BullMQ queue for webhook normalization | Multiple webhook workers, idempotency key on providerEventId |
+| Rate limiting | Redis sorted set per key | Same (Redis handles this efficiently) | Redis Cluster for sharding |
+| ZIP file downloads | Local filesystem | S3 / object storage | CDN-backed S3 with presigned URLs |
 
 ## Architecture Decision Records
 
-### ADR-1: Modular Monolith over Microservices
+### ADR-5: Payment Context as Separate Bounded Context
 
-**Decision:** Implement licensing as bounded contexts within a single monolith, not as separate microservices.
+**Decision:** Create a new `payments` bounded context rather than adding gateway logic to the existing `billing` context.
 
-**Context:** Need to maintain self-hosted VPS deployment simplicity while preparing for future scaling. Microservices add operational complexity (multiple deployments, inter-service communication).
+**Context:** The billing context currently handles order lifecycle and payment method tracking. Adding Stripe, Paddle, and bKash API adapters directly into billing would bloat it with external SDK dependencies and gateway-specific webhook handling.
 
-**Consequence:** Single Next.js application with clear module boundaries. Can extract to microservices later if needed without major refactoring.
+**Consequence:** The payments context owns gateway adapters and normalized webhook processing. It communicates with billing via domain events (PaymentCompleted). The billing context remains focused on order lifecycle. This mirrors the existing pattern where billing communicates with licensing via OrderCompleted events.
 
-### ADR-2: Domain Events over Direct Service Calls
+### ADR-6: HMAC Secret Per License (Not Global)
 
-**Decision:** Bounded contexts communicate via domain events, not direct function calls.
+**Decision:** Generate a unique HMAC signing secret per license rather than using a global server secret.
 
-**Context:** Need loose coupling between Billing and Licensing. Direct calls create circular dependencies and tight coupling.
+**Context:** A global HMAC secret means compromising one secret exposes all API communications. Per-license secrets limit blast radius. The existing pattern of per-license API tokens (`cf_live_xxx`) provides precedent.
 
-**Consequence:** Event-driven architecture with in-memory event bus. Events can be persisted to Redis Streams for reliability if needed.
+**Consequence:** Each license record stores an encrypted HMAC secret alongside the API token hash. SDK configuration includes both the API token and HMAC secret. Key rotation is per-license. Adds one column to the licenses table.
 
-### ADR-3: Local License Generation over External API
+### ADR-7: JSONB Feature Flags Over Normalized Tables
 
-**Decision:** Generate license keys locally using a deterministic algorithm, not by calling an external API.
+**Decision:** Use the existing `productPlans.features` JSONB column with nested platform dimensions rather than creating a normalized feature_flags + plan_features schema.
 
-**Context:** v3.0 requirement is self-contained licensing. External API (license.devsroom.com) is being removed.
+**Context:** ConversionFlow has 4 products with 3-4 plans each (12-16 plan records total). Each plan has approximately 10-20 features. A normalized schema (features table + plan_features junction) adds JOINs and admin complexity for a dataset of ~200 feature rows.
 
-**Consequence:** Need to implement a secure license key generation algorithm. License keys remain valid even if the system is reinstalled (same algorithm + same seed = same key for same order).
+**Consequence:** Feature definitions are managed as a JSONB document per plan. Admin UI reads and writes the JSONB directly. Platform-specific features use nested objects. If feature count grows beyond 50 per plan or per-customer overrides are needed, migrate to normalized tables at that point.
 
-### ADR-4: Repository Pattern over Direct Drizzle Queries
+### ADR-8: Update Context Reads Existing Repositories (No New Tables)
 
-**Decision:** All database access goes through repository interfaces, not direct Drizzle queries scattered across the codebase.
+**Decision:** The update delivery system reads from existing `productVersions` and `products` tables via existing repositories. No new database tables for version tracking.
 
-**Context:** Need testability and clear separation between data access and business logic. Direct queries create tight coupling to schema.
+**Context:** `productVersions` already has `version`, `downloadUrl`, `changelog`, `status` (stable/beta/draft), and `releasedAt`. The update check endpoint only needs to find the latest stable version for a product -- a query already supported by `ProductVersionRepository`.
 
-**Consequence:** More boilerplate code but better testability, clearer architecture, easier to swap implementations.
+**Consequence:** The update bounded context is read-only against the products context's data. ZIP file storage is filesystem/S3 only (not tracked in DB separately). Download tracking uses the existing `downloads` table with a signed download token. Minimal new code, maximum reuse.
+
+## Confidence Assessment
+
+| Area | Confidence | Reason |
+|------|------------|--------|
+| Payment gateway abstraction | HIGH | Strategy + Factory pattern is well-established. Training data covers Stripe and Paddle SDK patterns extensively. Existing billing context provides clear integration point. |
+| HMAC API security | HIGH | Node.js crypto module is well-documented. Existing ApiTokenGenerator and RateLimiter demonstrate the team's security patterns. Canonical string signing is standard. |
+| Update delivery (WordPress format) | HIGH | WordPress transient format is well-documented and stable. ProductVersions table already has all needed fields. |
+| Feature flag resolution | HIGH | JSONB features column already exists. Resolution logic is straightforward. Platform dimension is a clean extension. |
+| Per-platform rate limiting | HIGH | Existing RateLimiter already implements Redis sorted-set sliding window. Extension to per-platform keys is trivial. |
+| Shopify Billing API integration | MEDIUM | Shopify's Billing API has specific requirements (OAuth, App Bridge, mandatory GDPR webhooks). Training data covers these but verification against current Shopify API version is recommended during implementation. |
+| bKash Automatic API | MEDIUM | bKash's merchant API documentation is not as readily available as Stripe/Paddle. The existing `bkash-payment` npm package may provide patterns but the actual API behavior should be verified. |
+| SDK package distribution | MEDIUM | PHP (Composer) and npm package structures are standard. Shopify app scaffold follows Shopify's documented patterns. Each SDK is primarily a thin API client calling /api/v1/* endpoints. |
+
+## Gaps Requiring Phase-Specific Research
+
+1. **Stripe API version compatibility** -- Verify which Stripe API version to target and what specific Checkout Session parameters are needed for one-time payments vs subscriptions.
+2. **Paddle Billing API specifics** -- Paddle's MoR model has unique requirements for pricing catalogs, tax handling, and checkout. Verify against current Paddle documentation.
+3. **bKash Automatic API merchant onboarding** -- Confirm API credentials process and token lifecycle management for bKash's merchant API.
+4. **Shopify mandatory webhooks** -- Shopify requires handling GDPR webhooks (`customers/data_request`, `customers/redact`, `shop/redact`). These must be implemented regardless of billing integration.
+5. **ZIP file integrity verification** -- Whether to add SHA-256 checksums to the download response for SDK-side verification.
+6. **HMAC secret encryption at rest** -- Decide between AES-256-GCM with server key vs simpler approach of storing HMAC secret as SHA-256 hash with a known-plaintext recovery mechanism.
 
 ## Sources
 
-- **Modular Monolith with DDD** - Medium article: "Modular Monoliths, DDD and Package Structure" by Kamil Toszek -- HIGH confidence
-- **Modular Monolith GitHub Repository** - kgrzybek/modular-monolith-with-ddd (.NET reference, patterns are language-agnostic) -- HIGH confidence  
-- **WordPress License Key Algorithms** - Vollstart, Keyforge.dev guides on plugin licensing systems -- MEDIUM confidence
-- **Event-Driven Architecture** - SAP documentation on EDA integration models, Azure deep dive on license renewal events -- MEDIUM confidence
-- **Next.js Service Layer Pattern** - GitHub: ugurkellecioglu/nextjs-service-layer-pattern, nikolovlazar/nextjs-clean-architecture -- HIGH confidence
-- **Repository Pattern with Drizzle** - Community patterns and general architecture principles -- HIGH confidence (based on existing codebase and Drizzle ORM capabilities)
-- **BullMQ Background Jobs** - Official BullMQ documentation (referenced via research summary due to rate limit) -- HIGH confidence (library already in use)
-- **Existing Codebase Analysis** - src/lib/db/schema.ts, src/lib/central-api.ts, src/app/(admin)/actions/admin-orders.ts, src/app/(portal)/actions/checkout.ts -- HIGH confidence (direct code analysis)
+- **Existing codebase analysis** -- src/lib/db/schema.ts, src/modules/* (all bounded contexts), src/shared/infrastructure/eventBus/*, src/app/api/v1/license/validate/route.ts -- HIGH confidence (direct code analysis)
+- **WordPress Plugin Update API** -- WordPress developer documentation on `pre_set_site_transient_update_plugins` hook and transient format -- HIGH confidence (well-documented, stable API)
+- **Node.js Crypto Module** -- Official Node.js documentation for HMAC-SHA256, timingSafeEqual, createHash -- HIGH confidence
+- **Stripe Node.js SDK** -- stripe npm package patterns for Checkout Sessions and Webhook handling -- HIGH confidence (training data, well-established SDK)
+- **Paddle Node.js SDK** -- @paddle/paddle-node-sdk patterns for MoR billing -- MEDIUM confidence (training data, Paddle API has evolved)
+- **Payment Gateway Abstraction Pattern** -- Strategy + Factory pattern for multi-gateway -- HIGH confidence (standard GoF pattern, widely implemented)
+- **Feature Flag Storage in JSONB** -- PostgreSQL JSONB capabilities for nested feature maps -- HIGH confidence (standard PostgreSQL feature)
+- **Redis Sorted Set Sliding Window** -- Rate limiting algorithm already implemented in existing RateLimiter.ts -- HIGH confidence (verified in codebase)
 
 ---
-*Architecture research for: ConversionFlow v3.0 Self-Contained Licensing System*
-*Researched: 2026-05-29*
+*Architecture research for: ConversionFlow v4.0 Multi-Platform License Server*
+*Researched: 2026-06-09*
