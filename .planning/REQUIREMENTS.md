@@ -1,172 +1,118 @@
-# Requirements: v3.0 Self-Contained Licensing Architecture
+# Requirements: v4.0 Multi-Platform License Server & SDK Distribution
 
 **Status:** Active
-**Last Updated:** 2026-05-30
+**Last Updated:** 2026-06-09
 
-## Product & Plan Management (PROD)
+## Update Delivery (UPDT)
 
-- [ ] **PROD-01**: Admin can create products with name, slug, description, and current version
-- [ ] **PROD-02**: Admin can manage product versions with download URLs and changelogs
-- [ ] **PROD-03**: Admin can create plans for each product with pricing, activation limits, and feature flags
-- [ ] **PROD-04**: Plans support lifetime licenses (no expiration) and subscription licenses (duration-based)
-- [ ] **PROD-05**: Plans define maximum activation limits (1, 3, 5, unlimited)
-- [ ] **PROD-06**: Plan pricing supports multiple currencies (BDT, USD)
-- [ ] **PROD-07**: Product and plan data is accessible via admin dashboard UI
+- [ ] **UPDT-01**: WordPress plugin checks for updates via /api/v1/update/check in WordPress-compatible format (slug, version, download_url, sections)
+- [ ] **UPDT-02**: Authenticated download endpoint /api/v1/update/download serves ZIP files only to valid license holders via signed download tokens
+- [ ] **UPDT-03**: GET /api/v1/license/status returns full license info including all activations, tier, features, and expiry
+- [ ] **UPDT-04**: Admin can upload and manage ZIP files per product version with automatic version tracking integrated with product_versions table
+- [ ] **UPDT-05**: Update check supports WordPress plugin info API format including requires, tested, and requires_php fields
 
-## License Generation & Validation (LGEN)
+## Feature Flags & Tier Enforcement (FF)
 
-- [ ] **LGEN-01**: System generates unique license keys using Node.js `crypto.randomBytes()` (25-32 characters, segmented format)
-- [ ] **LGEN-02**: License keys are case-insensitive with no ambiguous characters (exclude: 0, O, 1, l, I)
-- [ ] **LGEN-03**: License keys have UNIQUE database constraint to prevent duplicates
-- [ ] **LGEN-04**: License generation happens locally (no external API calls to license.devsroom.com)
-- [ ] **LGEN-05**: Public API endpoint `/api/v1/license/validate` validates license keys and returns status, expiry, plan details
-- [ ] **LGEN-06**: Validation API uses Redis caching with 5-15 minute TTL
-- [ ] **LGEN-07**: Validation API cache invalidates immediately on license status changes (revoke, suspend, expire)
-- [ ] **LGEN-08**: Public API has rate limiting (100 requests/minute per IP)
-- [ ] **LGEN-09**: Validation API returns identical error for all failures (no information leakage about expired vs revoked vs not found)
+- [ ] **FF-01**: Feature flag definitions stored per plan with platform dimension (JSONB with nested platform keys like `{ "exports": { "wordpress": true, "laravel": false } }`)
+- [ ] **FF-02**: /api/v1/license/validate returns allowed features list for the license's platform and tier in response
+- [ ] **FF-03**: Admin can manage features per plan per product via dedicated admin UI with platform toggle matrix
+- [ ] **FF-04**: Platform-specific feature sets (WordPress features differ from Laravel/Shopify/Next.js features)
+- [ ] **FF-05**: Customer portal shows available vs locked features for their current tier and platform
 
-## Activation & Domain Tracking (ACT)
+## Multi-Gateway Payments (PAY)
 
-- [ ] **ACT-01**: System tracks domain activations per license with timestamps, IP addresses, and geo-location
-- [ ] **ACT-02**: Domain normalization strips protocol (https://), www prefix, and trailing slashes
-- [ ] **ACT-03**: Activation limit enforcement uses atomic database operations to prevent race conditions
-- [ ] **ACT-04**: System enforces max activations per plan (rejects activation if limit reached)
-- [ ] **ACT-05**: Domain activation requires verification (DNS TXT record, file upload, or meta tag)
-- [ ] **ACT-06**: Public API endpoints `/api/v1/license/activate` and `/api/v1/license/deactivate` for plugin integration
-- [ ] **ACT-07**: Customers can view and manage their active domains in customer portal
-- [ ] **ACT-08**: Admin can view activation history and detect suspicious patterns
+- [ ] **PAY-01**: Gateway abstraction layer with common IPaymentGateway interface using Strategy + Factory pattern — new gateways added via adapter
+- [ ] **PAY-02**: Stripe integration with Checkout Sessions, Webhooks, and subscription support for international card payments
+- [ ] **PAY-03**: Paddle integration as Merchant of Record with Checkout, Webhooks, and automatic tax/compliance handling
+- [ ] **PAY-04**: bKash Tokenized Checkout API for automatic BD payments (verify v1.2.0-beta endpoints before implementation)
+- [ ] **PAY-05**: Admin can enable/disable individual gateways from payment settings UI
+- [ ] **PAY-06**: Payment settings UI reorganized into dual-system model: Manual (bKash/Nagad/Rocket/Bank) vs Real (SSL Commerz/Stripe/Paddle/bKash API)
 
-## License Status & Subscriptions (LSTAT)
+## WordPress SDK (WPSDK)
 
-- [ ] **LSTAT-01**: License status supports: active, expired, revoked, suspended, grace_period
-- [ ] **LSTAT-02**: Subscription licenses have `expires_at` timestamp in UTC
-- [ ] **LSTAT-03**: Grace period of 7-30 days after expiration (license remains valid during grace period)
-- [ ] **LSTAT-04**: Lifetime licenses have null or far-future `expires_at` (never expire)
-- [ ] **LSTAT-05**: Admin can manually revoke or suspend licenses with reason
-- [ ] **LSTAT-06**: License status changes trigger audit log entries and customer notifications
-- [ ] **LSTAT-07**: Background job checks for expiring licenses daily and sends reminder emails (30, 14, 7, 3, 1 days before)
+- [ ] **WPSDK-01**: PHP client library with activate(), deactivate(), validate(), check_update() methods calling /api/v1/* endpoints
+- [ ] **WPSDK-02**: Auto-update integration hooks into WordPress native plugin update system (pre_set_site_transient_update_plugins)
+- [ ] **WPSDK-03**: Admin settings page helper (license key input, status display, activation management) for WordPress admin panel
+- [ ] **WPSDK-04**: Composer package (conversionflow/sdk-php) for distribution via Packagist
+- [ ] **WPSDK-05**: Domain activation and verification helpers working on shared hosting, WP-CLI, and managed WordPress environments
 
-## Architecture & Migration (ARCH)
+## Laravel SDK (LVSDK)
 
-- [ ] **ARCH-01**: Codebase organized into modular monolith with DDD bounded contexts (Licensing, Billing, Customers, Products, Analytics)
-- [ ] **ARCH-02**: Service Layer Pattern abstracts business logic from API routes and controllers
-- [ ] **ARCH-03**: Repository Pattern abstracts data access from services
-- [ ] **ARCH-04**: Domain events enable loose coupling between bounded contexts (OrderCompleted → LicenseCreated)
-- [ ] **ARCH-05**: Event bus implemented with EventEmitter (in-process) and Redis Pub/Sub (cross-process)
-- [ ] **ARCH-06**: Remove `src/lib/central-api.ts` file (external license API client)
-- [ ] **ARCH-07**: Remove database fields: `centralOrderId`, `centralLicenseId`, `centralUserId`
-- [ ] **ARCH-08**: Remove webhook handlers for central license API events
-- [ ] **ARCH-09**: Data migration strategy includes verification, rollback plan, and gradual feature flag rollout
-- [ ] **ARCH-10**: Migration preserves all existing license data without loss
+- [ ] **LVSDK-01**: Laravel auto-discovery package with ServiceProvider and Facade (conversionflow/laravel)
+- [ ] **LVSDK-02**: License validation middleware for route protection — blocks routes when license is invalid/expired
+- [ ] **LVSDK-03**: Artisan commands: license:activate, license:deactivate, license:check, license:status
+- [ ] **LVSDK-04**: Config and views publishable with 24h caching layer to minimize API calls to ConversionFlow server
 
-## Analytics Dashboard (ANLT)
+## Shopify Integration (SHPFY)
 
-- [ ] **ANLT-01**: Admin dashboard shows license analytics overview (total, active, expired, revoked counts)
-- [ ] **ANLT-02**: Revenue analytics display total revenue, MRR, ARR, and trend indicators
-- [ ] **ANLT-03**: Product performance metrics show sales by product and plan
-- [ ] **ANLT-04**: Customer growth tracking displays daily/weekly/monthly signups
-- [ ] **ANLT-05**: Activation statistics show current activations, activation rate, geographic distribution
+- [ ] **SHPFY-01**: Shopify app scaffold with App Bridge authentication and OAuth flow (requires Shopify Partner account)
+- [ ] **SHPFY-02**: Shopify Billing API mapped to ConversionFlow license system with bidirectional sync
+- [ ] **SHPFY-03**: Webhook handlers for app install/uninstall and billing events with HMAC signature verification
+- [ ] **SHPFY-04**: Installation flow creates ConversionFlow license automatically on Shopify app install and deactivates on uninstall
 
-## Public API Endpoints (API)
+## Next.js SDK & API Security (NXSDK)
 
-- [ ] **API-01**: `/api/v1/license/validate` endpoint accepts license_key and domain, returns validation result
-- [ ] **API-02**: `/api/v1/license/activate` endpoint binds license to domain after verification
-- [ ] **API-03**: `/api/v1/license/deactivate` endpoint removes domain from license
-- [ ] **API-04**: API uses API token authentication for external requests
-- [ ] **API-05**: API responses follow consistent JSON format with error handling
+- [ ] **NXSDK-01**: npm/pnpm package (@conversionflow/license-sdk) with useLicense() hook and proxy.ts (middleware) helpers for route protection — compatible with npm and pnpm
+- [ ] **NXSDK-02**: All /api/v1/* endpoints secured with HMAC request signing (AWS Sig V4-style) using Node.js crypto
+- [ ] **NXSDK-03**: Standardized API key authentication for SDK clients with rotation support in admin dashboard
+- [ ] **NXSDK-04**: Per-platform rate limiting (WP, Laravel, Shopify, Next.js) via Redis sliding window using rate-limiter-flexible
+- [ ] **NXSDK-05**: HMAC secret per license, generated on activation and returned for SDK use
 
-## Background Jobs (JOBS)
+## Deferred (Post-v4.0)
 
-- [ ] **JOB-01**: BullMQ worker processes license expiration checks daily
-- [ ] **JOB-02**: BullMQ worker sends renewal reminder emails based on expiration date
-- [ ] **JOB-03**: BullMQ worker handles analytics aggregation for dashboard
-- [ ] **JOB-04**: Jobs use Redis for queue management and retry logic with exponential backoff
-
-## License Transfer System (XFER)
-
-- [ ] **XFER-01**: Customers can transfer license ownership to another account via transfer code
-- [ ] **XFER-02**: Customers can deactivate old domain and activate new domain (within transfer limits)
-- [ ] **XFER-03**: Transfer operations are logged in audit trail with timestamp and actor
-- [ ] **XFER-04**: Admin can configure maximum transfers per month per license
-
-## Deferred (Post-MVP)
-
-- [ ] **DEFER-01**: Cryptographic offline validation (public key embedded in plugin)
-- [ ] **DEFER-02**: Hardware fingerprinting for advanced anti-piracy
-- [ ] **DEFER-03**: Real-time analytics dashboard with live updates
-- [ ] **DEFER-04**: Automated compliance enforcement
-- [ ] **DEFER-05**: Advanced reporting with scheduled PDF exports
+- [ ] **DEFER-06**: Cryptographic offline validation (public key embedded in SDK)
+- [ ] **DEFER-07**: Hardware fingerprinting for advanced anti-piracy
+- [ ] **DEFER-08**: WordPress.org plugin directory hosting
+- [ ] **DEFER-09**: Shopify app store submission and review process
+- [ ] **DEFER-10**: Real-time analytics dashboard with live SDK telemetry
 
 ## Out of Scope
 
-- **WordPress plugin development** — v3.0 is the SaaS platform, not the plugin itself
+- **Building actual WordPress/Laravel/Shopify/Next.js products** — we build the license server and SDKs only, not the end-user products
+- **Redesigning existing dashboard UI** — admin UI additions match existing TailAdmin/backenddashboard design system
+- **Mobile app** — web-only platform
 - **Multi-tenant support** — single-instance platform for Devsroom only
-- **Redesigning existing marketing pages** — all v1.x/v2.x pages preserved as-is
-- **Redesigning dashboard UI** — use existing backenddashboard/ template design
+- **External licensing engines** — ConversionFlow IS the license server, no 3rd party ever
+- **Shopify app store submission** — scaffold and integration only, store submission deferred
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROD-01 | Phase 15 | Pending |
-| PROD-02 | Phase 15 | Pending |
-| PROD-03 | Phase 15 | Pending |
-| PROD-04 | Phase 15 | Pending |
-| PROD-05 | Phase 15 | Pending |
-| PROD-06 | Phase 15 | Pending |
-| PROD-07 | Phase 15 | Pending |
-| LGEN-01 | Phase 16 | Pending |
-| LGEN-02 | Phase 16 | Pending |
-| LGEN-03 | Phase 16 | Pending |
-| LGEN-04 | Phase 16 | Pending |
-| LGEN-05 | Phase 16 | Pending |
-| LGEN-06 | Phase 16 | Pending |
-| LGEN-07 | Phase 16 | Pending |
-| LGEN-08 | Phase 16 | Pending |
-| LGEN-09 | Phase 16 | Pending |
-| ACT-01 | Phase 16 | Pending |
-| ACT-02 | Phase 16 | Pending |
-| ACT-03 | Phase 16 | Pending |
-| ACT-04 | Phase 16 | Pending |
-| ACT-05 | Phase 16 | Pending |
-| ACT-06 | Phase 16 | Pending |
-| ACT-07 | Phase 16 | Pending |
-| ACT-08 | Phase 16 | Pending |
-| LSTAT-01 | Phase 18 | Pending |
-| LSTAT-02 | Phase 18 | Pending |
-| LSTAT-03 | Phase 18 | Pending |
-| LSTAT-04 | Phase 18 | Pending |
-| LSTAT-05 | Phase 17 | Pending |
-| LSTAT-06 | Phase 17 | Pending |
-| LSTAT-07 | Phase 18 | Pending |
-| ARCH-01 | Phase 14 | Pending |
-| ARCH-02 | Phase 14 | Pending |
-| ARCH-03 | Phase 14 | Pending |
-| ARCH-04 | Phase 14 | Pending |
-| ARCH-05 | Phase 14 | Pending |
-| ARCH-06 | Phase 17 | Pending |
-| ARCH-07 | Phase 20 | Pending |
-| ARCH-08 | Phase 17 | Pending |
-| ARCH-09 | Phase 20 | Pending |
-| ARCH-10 | Phase 20 | Pending |
-| ANLT-01 | Phase 19 | Pending |
-| ANLT-02 | Phase 19 | Pending |
-| ANLT-03 | Phase 19 | Pending |
-| ANLT-04 | Phase 19 | Pending |
-| ANLT-05 | Phase 19 | Pending |
-| API-01 | Phase 16 | Pending |
-| API-02 | Phase 16 | Pending |
-| API-03 | Phase 16 | Pending |
-| API-04 | Phase 16 | Pending |
-| API-05 | Phase 16 | Pending |
-| JOB-01 | Phase 18 | Pending |
-| JOB-02 | Phase 18 | Pending |
-| JOB-03 | Phase 19 | Pending |
-| JOB-04 | Phase 18 | Pending |
-| XFER-01 | Phase 19 | Pending |
-| XFER-02 | Phase 19 | Pending |
-| XFER-03 | Phase 19 | Pending |
-| XFER-04 | Phase 19 | Pending |
+| UPDT-01 | Phase 32 | Pending |
+| UPDT-02 | Phase 32 | Pending |
+| UPDT-03 | Phase 32 | Pending |
+| UPDT-04 | Phase 32 | Pending |
+| UPDT-05 | Phase 32 | Pending |
+| FF-01 | Phase 33 | Pending |
+| FF-02 | Phase 33 | Pending |
+| FF-03 | Phase 33 | Pending |
+| FF-04 | Phase 33 | Pending |
+| FF-05 | Phase 33 | Pending |
+| PAY-01 | Phase 34 | Pending |
+| PAY-02 | Phase 34 | Pending |
+| PAY-03 | Phase 34 | Pending |
+| PAY-04 | Phase 34 | Pending |
+| PAY-05 | Phase 34 | Pending |
+| PAY-06 | Phase 34 | Pending |
+| WPSDK-01 | Phase 35 | Pending |
+| WPSDK-02 | Phase 35 | Pending |
+| WPSDK-03 | Phase 35 | Pending |
+| WPSDK-04 | Phase 35 | Pending |
+| WPSDK-05 | Phase 35 | Pending |
+| LVSDK-01 | Phase 36 | Pending |
+| LVSDK-02 | Phase 36 | Pending |
+| LVSDK-03 | Phase 36 | Pending |
+| LVSDK-04 | Phase 36 | Pending |
+| SHPFY-01 | Phase 37 | Pending |
+| SHPFY-02 | Phase 37 | Pending |
+| SHPFY-03 | Phase 37 | Pending |
+| SHPFY-04 | Phase 37 | Pending |
+| NXSDK-01 | Phase 38 | Pending |
+| NXSDK-02 | Phase 38 | Pending |
+| NXSDK-03 | Phase 38 | Pending |
+| NXSDK-04 | Phase 38 | Pending |
+| NXSDK-05 | Phase 38 | Pending |
 
 ---
-*Last updated: 2026-05-30*
+*Last updated: 2026-06-09*
