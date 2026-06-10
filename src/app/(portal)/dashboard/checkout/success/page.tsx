@@ -3,10 +3,16 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import { CheckCircle2, ArrowRight, Copy, Check } from "lucide-react";
-import { getOrderDetails } from "@/app/(portal)/actions/checkout";
+import { CheckCircle2, ArrowRight, Copy, Check, ExternalLink, FileDown } from "lucide-react";
+import { getOrderForSuccessPage } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Badge from "@/components/ui/badge/Badge";
+
+type ReceiptInfo = {
+  type: "paddle" | "download_invoice" | "pending_verification";
+  url?: string;
+  label: string;
+};
 
 type OrderDetails = {
   id: string;
@@ -14,15 +20,22 @@ type OrderDetails = {
   amount: number;
   currency: string;
   paymentMethod: string | null;
+  gatewayId: string | null;
+  gatewayTransactionId: string | null;
   status: string;
   discountAmount: number | null;
   taxAmount: number | null;
   createdAt: Date;
   licenseKey: string | null;
+  receiptInfo: ReceiptInfo;
+  gatewayDisplayName: string;
 };
 
-function formatBDT(amount: number): string {
-  return amount.toLocaleString("en-BD") + " BDT";
+function formatAmount(amount: number, currency: string): string {
+  if (currency === "BDT") {
+    return amount.toLocaleString("en-BD") + " BDT";
+  }
+  return "$" + amount.toLocaleString("en-US");
 }
 
 const statusBadgeVariant: Record<string, "success" | "warning" | "error" | "light"> = {
@@ -45,7 +58,6 @@ function CopyButton({ text, label }: { text: string; label: string }) {
     try {
       await navigator.clipboard.writeText(text);
     } catch {
-      // Fallback for older browsers
       const textarea = document.createElement("textarea");
       textarea.value = text;
       document.body.appendChild(textarea);
@@ -90,7 +102,7 @@ function CheckoutSuccessContent() {
       return;
     }
 
-    getOrderDetails(orderId)
+    getOrderForSuccessPage(orderId)
       .then((result) => {
         if (!result) {
           setError("Order not found.");
@@ -158,7 +170,7 @@ function CheckoutSuccessContent() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             {isCompleted
               ? "Your payment was successful! Your license is ready."
-              : "Your payment is being verified. We will email your license key within 24 hours once confirmed."}
+              : "Your payment is being verified. This page will update automatically."}
           </p>
 
           <div className="rounded-lg bg-gray-50 dark:bg-gray-900 px-6 py-4 text-left space-y-3 mb-6">
@@ -183,9 +195,27 @@ function CheckoutSuccessContent() {
                 Amount
               </span>
               <span className="text-sm font-semibold text-gray-800 dark:text-white/90">
-                {formatBDT(order.amount)}
+                {formatAmount(order.amount, order.currency)}
               </span>
             </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Payment Method
+              </span>
+              <span className="text-sm font-medium text-gray-800 dark:text-white/90">
+                {order.gatewayDisplayName}
+              </span>
+            </div>
+            {order.gatewayTransactionId && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Transaction ID
+                </span>
+                <span className="font-mono text-sm text-gray-700 dark:text-gray-300">
+                  {order.gatewayTransactionId}
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Status
@@ -229,9 +259,48 @@ function CheckoutSuccessContent() {
                   API Token
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Your API token has been sent to your email. Check your inbox for the token — it will not be shown here for security.
+                  Your API token has been sent to your email. Check your inbox for the token -- it will not be shown here for security.
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* Gateway-specific receipt/invoice (D-33) */}
+          {order.receiptInfo && (
+            <div className="mb-6">
+              {order.receiptInfo.type === "paddle" && (
+                <Link
+                  href={order.receiptInfo.url || "#"}
+                  target="_blank"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  {order.receiptInfo.label}
+                </Link>
+              )}
+              {order.receiptInfo.type === "download_invoice" && (
+                <Link
+                  href={`/dashboard/billing/${order.id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
+                >
+                  <FileDown className="h-4 w-4" />
+                  {order.receiptInfo.label}
+                </Link>
+              )}
+              {order.receiptInfo.type === "pending_verification" && !isCompleted && (
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Your payment is being verified. We will email your license key once confirmed.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Pending state notice */}
+          {!isCompleted && effectiveStatus === "pending" && (
+            <div className="mb-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-left">
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                Your payment is being verified. This page will update automatically. Please reload to check the latest status.
+              </p>
             </div>
           )}
 

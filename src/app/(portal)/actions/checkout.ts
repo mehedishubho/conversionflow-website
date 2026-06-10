@@ -11,12 +11,15 @@ import {
   licenses,
   productPlans,
   products,
+  paymentGateways,
 } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAuditLog } from "@/lib/audit";
+import { PaymentService } from "@/modules/payments/application/PaymentService";
+import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
 
 // ── Server-side price map (authoritative, never trust client) ──
 // Dynamically resolved from product_plans table at first call.
@@ -435,4 +438,235 @@ export async function getOrderDetails(orderId: string) {
   }
 
   return { ...order, licenseKey };
+}
+
+// ──────────────────────────────────────────────
+// Gateway Checkout Actions (Phase 34)
+// ──────────────────────────────────────────────
+
+/**
+ * Create an order through an automatic gateway.
+ * Server-side price resolution (T-34-20, T-34-21).
+ * Returns redirectUrl from gateway session or error.
+ */
+export async function createGatewayOrder(params: {
+  plan: string;
+  gatewayId: string;
+  currency: string;
+  couponCode?: string;
+  discountAmount?: number;
+  taxAmount?: number;
+  totalAmount?: number;
+}): Promise<{ orderId: string; redirectUrl?: string; transactionId?: string; error?: string }> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/login");
+  const userId = session.user.id;
+
+  // Validate plan (T-34-20: server-side price resolution)
+  const planPrices = await getPlanPrices();
+  const planPrice = planPrices[params.plan];
+  if (!planPrice) {
+    return { error: "Invalid plan selected.", orderId: "" };
+  }
+
+  // Resolve currency-specific price
+  const planRow = await db
+    .select({
+      id: productPlans.id,
+      priceBDT: productPlans.priceBDT,
+      priceUSD: productPlans.priceUSD,
+      productId: productPlans.productId,
+    })
+    .from(productPlans)
+    .innerJoin(products, eq(productPlans.productId, products.id))
+    .where(eq(productPlans.name, params.plan))
+    .limit(1);
+
+  if (!planRow.length) {
+    return { error: "Plan not found.", orderId: "" };
+  }
+
+  const amount = params.currency === "USD"
+    ? planRow[0].priceUSD
+    : planRow[0].priceBDT;
+
+  // Validate gateway is active (T-34-21)
+  const registry = GatewayRegistry.getInstance();
+  const adapter = registry.get(params.gatewayId);
+  if (!adapter) {
+    return { error: "Invalid payment gateway.", orderId: "" };
+  }
+
+  // Check gateway supports selected currency
+  if (!adapter.supportedCurrencies.includes(params.currency)) {
+    return { error: `Gateway does not support ${params.currency}.`, orderId: "" };
+  }
+
+  // Check gateway is active in DB
+  const [gatewayRow] = await db
+    .select()
+    .from(paymentGateways)
+    .where(eq(paymentGateways.gatewayId, params.gatewayId))
+    .limit(1);
+
+  if (!gatewayRow || !gatewayRow.active) {
+    return { error: "Payment gateway is not available.", orderId: "" };
+  }
+
+  try {
+    const paymentService = new PaymentService();
+
+    // Create pending order
+    const orderId = await paymentService.createPendingOrder({
+      userId,
+      productId: planPrice.productId,
+      plan: params.plan,
+      amount,
+      currency: params.currency,
+      paymentMethod: params.gatewayId,
+      gatewayId: params.gatewayId,
+      couponCode: params.couponCode,
+      discountAmount: params.discountAmount,
+      taxAmount: params.taxAmount,
+    });
+
+    // Get user info for session
+    const session2 = await auth.api.getSession({ headers: await headers() });
+    const userEmail = session2?.user?.email ?? "";
+    const userName = session2?.user?.name ?? "";
+
+    // Create gateway session
+    const sessionResult = await paymentService.initiatePayment(orderId, params.gatewayId, {
+      orderId,
+      userId,
+      amount,
+      currency: params.currency,
+      productId: planPrice.productId,
+      plan: params.plan,
+      couponCode: params.couponCode,
+      customerEmail: userEmail,
+      customerName: userName,
+      successUrl: `${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/checkout/success?order=${orderId}`,
+      failUrl: `${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/checkout?plan=${params.plan.toLowerCase()}`,
+      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/checkout?plan=${params.plan.toLowerCase()}`,
+      webhookUrl: `${process.env.NEXT_PUBLIC_APP_URL || ""}/api/webhooks/${params.gatewayId === "ssl_commerz" ? "sslcommerz" : params.gatewayId}`,
+    });
+
+    // Audit log
+    await createAuditLog({
+      actorId: userId,
+      actorRole: session.user.role,
+      action: "order.gateway_created",
+      targetType: "order",
+      targetId: orderId,
+    });
+
+    return {
+      orderId,
+      redirectUrl: sessionResult.redirectUrl,
+      transactionId: sessionResult.transactionId,
+    };
+  } catch (err) {
+    console.error("[createGatewayOrder] Error:", err);
+    return { error: "Payment session creation failed. Please try again.", orderId: "" };
+  }
+}
+
+/**
+ * Get active gateways and manual payment methods for a given currency.
+ * Used by checkout GatewaySelector component.
+ */
+export async function getActiveGateways(currency: string): Promise<{
+  automatic: Array<{ gatewayId: string; name: string }>;
+  manual: Array<{ method: string; accountName: string }>;
+}> {
+  // Get automatic gateways that support this currency
+  const registry = GatewayRegistry.getInstance();
+  const adapters = registry.getForCurrency(currency);
+
+  // Check which have active DB configs
+  const activeGatewayRows = await db
+    .select()
+    .from(paymentGateways)
+    .where(eq(paymentGateways.active, true));
+
+  const activeGatewayIds = new Set(activeGatewayRows.map((r) => r.gatewayId));
+
+  const automatic = adapters
+    .filter((a) => activeGatewayIds.has(a.gatewayId))
+    .map((a) => ({ gatewayId: a.gatewayId, name: a.name }));
+
+  // Get manual payment accounts (only for BDT)
+  let manual: Array<{ method: string; accountName: string }> = [];
+  if (currency === "BDT") {
+    const accounts = await db
+      .select()
+      .from(paymentAccounts)
+      .where(eq(paymentAccounts.active, true));
+
+    manual = accounts.map((a) => ({
+      method: a.method,
+      accountName: a.accountName,
+    }));
+  }
+
+  return { automatic, manual };
+}
+
+/**
+ * Get order data for the unified success page.
+ * Returns order + license + gateway-aware receipt info.
+ */
+export async function getOrderForSuccessPage(orderId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/login");
+
+  const [order] = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.id, orderId), eq(orders.userId, session.user.id)));
+
+  if (!order) return null;
+
+  // Fetch license key for completed orders
+  let licenseKey: string | null = null;
+  if (order.status === "completed") {
+    const [license] = await db
+      .select({ licenseKey: licenses.licenseKey })
+      .from(licenses)
+      .where(eq(licenses.orderId, orderId))
+      .limit(1);
+    licenseKey = license?.licenseKey ?? null;
+  }
+
+  // Gateway-aware receipt info
+  const receiptInfo: {
+    type: "paddle" | "download_invoice" | "pending_verification";
+    url?: string;
+    label: string;
+  } = order.gatewayId === "paddle"
+    ? { type: "paddle", label: "View Receipt" }
+    : order.gatewayId === "ssl_commerz" || order.gatewayId === "bkash_api"
+      ? { type: "download_invoice", label: "Download Invoice" }
+      : { type: "pending_verification", label: "Pending admin verification" };
+
+  return {
+    ...order,
+    licenseKey,
+    receiptInfo,
+    gatewayDisplayName: getGatewayDisplayName(order.gatewayId),
+  };
+}
+
+/**
+ * Get human-readable gateway display name.
+ */
+function getGatewayDisplayName(gatewayId: string | null): string {
+  if (!gatewayId) return "Manual Payment";
+  const names: Record<string, string> = {
+    ssl_commerz: "SSL Commerz",
+    paddle: "Paddle",
+    bkash_api: "bKash (Auto)",
+  };
+  return names[gatewayId] ?? gatewayId;
 }

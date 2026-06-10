@@ -8,10 +8,14 @@ import { pricingTiers } from "@/data/pricing";
 import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts, getCheckoutPrices } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import OrderSummary from "@/components/checkout/OrderSummary";
-import PaymentMethodGrid from "@/components/checkout/PaymentMethodGrid";
+import GatewaySelector from "@/components/checkout/GatewaySelector";
+import CurrencyToggle from "@/components/checkout/CurrencyToggle";
 import CouponInput from "@/components/checkout/CouponInput";
 import ManualPaymentForm from "@/components/checkout/ManualPaymentForm";
 import PaymentInstructions from "@/components/checkout/PaymentInstructions";
+import SSLCommerzForm from "@/components/checkout/SSLCommerzForm";
+import BKashAPIForm from "@/components/checkout/BKashAPIForm";
+import PaddleRedirectButton from "@/components/checkout/PaddleRedirectButton";
 
 type PaymentAccount = {
   accountName: string;
@@ -33,11 +37,12 @@ function CheckoutContent() {
   );
 
   // State
+  const [currency, setCurrency] = useState<"BDT" | "USD">("BDT");
   const [planPriceMap, setPlanPriceMap] = useState<Record<string, number>>({});
   const basePrice = planPriceMap[planParam] ?? 0;
 
   // State
-  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [selectedGateway, setSelectedGateway] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
     discount: number;
@@ -55,18 +60,12 @@ function CheckoutContent() {
   const [paymentAccounts, setPaymentAccounts] = useState<
     Record<string, PaymentAccount[]>
   >({});
-  const [sslEnabled, setSslEnabled] = useState(true);
-  const [sslLoading, setSslLoading] = useState(false);
-  const [sslError, setSslError] = useState<string | null>(null);
 
-  // Disabled methods = those without active payment accounts (for manual methods) + SSL if disabled
+  // Manual methods list
   const manualMethods = ["bkash", "nagad", "rocket", "bank_transfer"];
-  const disabledMethods = [
-    ...manualMethods.filter(
-      (m) => !paymentAccounts[m] || paymentAccounts[m].length === 0
-    ),
-    ...(!sslEnabled ? ["ssl_commerz" as const] : []),
-  ];
+  const disabledMethods = manualMethods.filter(
+    (m) => !paymentAccounts[m] || paymentAccounts[m].length === 0
+  );
 
   // Load prices, VAT and payment accounts on mount
   useEffect(() => {
@@ -87,13 +86,17 @@ function CheckoutContent() {
           setVatInfo(vatResult);
         }
         setPaymentAccounts((paymentData as Record<string, unknown>).accounts as Record<string, PaymentAccount[]>);
-        setSslEnabled((paymentData as Record<string, unknown>).sslEnabled as boolean);
       } catch {
         // Silently handle -- components will show fallback
       }
     }
     load();
   }, [tier, planParam]);
+
+  // Clear gateway selection when currency changes (D-04)
+  useEffect(() => {
+    setSelectedGateway(null);
+  }, [currency]);
 
   // Computed values
   const discountAmount = appliedCoupon?.discount ?? 0;
@@ -141,7 +144,7 @@ function CheckoutContent() {
       try {
         const formData = new FormData();
         formData.append("plan", tier!.plan);
-        formData.append("paymentMethod", selectedMethod!);
+        formData.append("paymentMethod", selectedGateway!);
         formData.append("paymentRef", transactionId);
         if (appliedCoupon) {
           formData.append("couponCode", appliedCoupon.code);
@@ -164,44 +167,18 @@ function CheckoutContent() {
         setIsSubmitting(false);
       }
     },
-    [tier, selectedMethod, appliedCoupon, basePrice, vatAmount, discountAmount, router]
+    [tier, selectedGateway, appliedCoupon, basePrice, vatAmount, discountAmount, router]
   );
 
-  // SSL Commerce handler
-  const handleSSLPayment = useCallback(async () => {
-    if (!tier) return;
-    setSslLoading(true);
-    setSslError(null);
-    try {
-      const response = await fetch("/api/ssl-commerz/create-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plan: tier.plan,
-          couponCode: appliedCoupon?.code || null,
-          discountAmount: discountAmount,
-          taxAmount: vatAmount,
-          totalAmount: total,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setSslError(
-          data.error ||
-            "Unable to connect to payment gateway. Please try again or use a different payment method."
-        );
-      }
-    } catch {
-      setSslError(
-        "Unable to connect to payment gateway. Please try again or use a different payment method."
+  // Gateway order success handler
+  const handleGatewaySuccess = useCallback(
+    (orderId: string) => {
+      router.push(
+        `/dashboard/checkout/success?order=${orderId}`
       );
-    } finally {
-      setSslLoading(false);
-    }
-  }, [tier, appliedCoupon, discountAmount, vatAmount, total]);
+    },
+    [router]
+  );
 
   // Invalid plan state
   if (!tier || !basePrice) {
@@ -223,16 +200,20 @@ function CheckoutContent() {
     );
   }
 
-  // Get current payment account for selected method
+  // Get current payment account for selected manual method
   const currentAccount =
-    selectedMethod && paymentAccounts[selectedMethod]
-      ? paymentAccounts[selectedMethod][0]
+    selectedGateway && paymentAccounts[selectedGateway]
+      ? paymentAccounts[selectedGateway][0]
       : null;
 
   const isManual =
-    selectedMethod &&
-    manualMethods.includes(selectedMethod) &&
+    selectedGateway &&
+    manualMethods.includes(selectedGateway) &&
     currentAccount;
+
+  // Format currency display
+  const currencySymbol = currency === "BDT" ? "৳" : "$";
+  const currencyCode = currency;
 
   return (
     <div>
@@ -254,17 +235,23 @@ function CheckoutContent() {
                 : "Discount"
             }
             total={total}
-            currency="BDT"
+            currency={currencyCode}
           />
         </div>
 
         {/* Right Column: Payment */}
         <div className="space-y-6">
-          {/* Payment Method Selection */}
-          <PaymentMethodGrid
-            selectedMethod={selectedMethod}
-            onMethodSelect={setSelectedMethod}
-            disabledMethods={disabledMethods}
+          {/* Currency Toggle (D-19) */}
+          <CurrencyToggle
+            currency={currency}
+            onCurrencyChange={setCurrency}
+          />
+
+          {/* Gateway Selector (D-04, D-20) */}
+          <GatewaySelector
+            currency={currency}
+            selectedGateway={selectedGateway}
+            onGatewaySelect={setSelectedGateway}
           />
 
           {/* Coupon Input */}
@@ -277,11 +264,49 @@ function CheckoutContent() {
             isLoading={couponLoading}
           />
 
-          {/* Method-specific content */}
+          {/* Gateway-specific content */}
+          {selectedGateway === "ssl_commerz" && (
+            <SSLCommerzForm
+              plan={tier.plan}
+              currency={currency}
+              couponCode={appliedCoupon?.code}
+              discountAmount={discountAmount}
+              taxAmount={vatAmount}
+              totalAmount={total}
+              onSuccess={handleGatewaySuccess}
+            />
+          )}
+
+          {selectedGateway === "bkash_api" && (
+            <BKashAPIForm
+              plan={tier.plan}
+              currency={currency}
+              couponCode={appliedCoupon?.code}
+              discountAmount={discountAmount}
+              taxAmount={vatAmount}
+              totalAmount={total}
+              testMode={true}
+              onSuccess={handleGatewaySuccess}
+            />
+          )}
+
+          {selectedGateway === "paddle" && (
+            <PaddleRedirectButton
+              plan={tier.plan}
+              currency={currency}
+              couponCode={appliedCoupon?.code}
+              discountAmount={discountAmount}
+              taxAmount={vatAmount}
+              totalAmount={total}
+              onSuccess={handleGatewaySuccess}
+            />
+          )}
+
+          {/* Manual payment methods */}
           {isManual && currentAccount && (
             <>
               <PaymentInstructions
-                method={selectedMethod}
+                method={selectedGateway}
                 accountName={currentAccount.accountName}
                 accountNumber={currentAccount.accountNumber}
                 instructions={currentAccount.instructions || ""}
@@ -296,48 +321,6 @@ function CheckoutContent() {
                 error={submitError}
               />
             </>
-          )}
-
-          {/* SSL Commerce */}
-          {selectedMethod === "ssl_commerz" && (
-            <div className="space-y-4">
-              {sslError && (
-                <p className="text-sm text-error-500">{sslError}</p>
-              )}
-              <button
-                type="button"
-                onClick={handleSSLPayment}
-                disabled={sslLoading}
-                className="inline-flex items-center justify-center w-full px-5 py-3.5 text-sm font-medium rounded-lg bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                {sslLoading ? (
-                  <>
-                    <svg
-                      className="animate-spin h-4 w-4 mr-2"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      />
-                    </svg>
-                    Connecting...
-                  </>
-                ) : (
-                  "Pay with SSL Commerce"
-                )}
-              </button>
-            </div>
           )}
         </div>
       </div>
