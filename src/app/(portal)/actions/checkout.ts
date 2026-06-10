@@ -516,6 +516,15 @@ export async function createGatewayOrder(params: {
   try {
     const paymentService = new PaymentService();
 
+    // Validate discount server-side if coupon provided (WR-02: never trust client amounts)
+    let validatedDiscount = 0;
+    if (params.couponCode) {
+      const couponResult = await validateCoupon(params.couponCode, amount, params.plan);
+      if ("success" in couponResult && couponResult.success) {
+        validatedDiscount = couponResult.discount;
+      }
+    }
+
     // Create pending order
     const orderId = await paymentService.createPendingOrder({
       userId,
@@ -526,7 +535,7 @@ export async function createGatewayOrder(params: {
       paymentMethod: params.gatewayId,
       gatewayId: params.gatewayId,
       couponCode: params.couponCode,
-      discountAmount: params.discountAmount,
+      discountAmount: validatedDiscount,
       taxAmount: params.taxAmount,
     });
 
