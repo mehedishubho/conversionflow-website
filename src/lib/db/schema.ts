@@ -611,7 +611,7 @@ export const productPlans = pgTable(
     billingCycle: billingCycleEnum("billing_cycle"),
     billingDurationMonths: integer("billing_duration_months"),
     maxActivations: integer("max_activations").default(1),
-    features: jsonb("features").$type<Record<string, boolean>>().default({}),
+    features: jsonb("features").$type<Record<string, Record<string, boolean>>>().default({}),
     sortOrder: integer("sort_order").default(0),
     active: boolean("active").default(true),
     createdAt: timestamp("created_at").notNull().defaultNow(),

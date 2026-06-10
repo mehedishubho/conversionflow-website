@@ -29,7 +29,7 @@ interface PlanRow {
   billingCycle: string | null;
   billingDurationMonths: number | null;
   maxActivations: number | null;
-  features: Record<string, boolean>;
+  features: Record<string, Record<string, boolean>>;
   active: boolean | null;
   sortOrder: number | null;
 }
@@ -51,9 +51,9 @@ function formatBilling(cycle: string | null, months: number | null): string {
   return label;
 }
 
-function formatFeatures(features: Record<string, boolean>): string {
+function formatFeatures(features: Record<string, Record<string, boolean>>): string {
   const enabled = Object.entries(features)
-    .filter(([, v]) => v)
+    .filter(([, platformMap]) => typeof platformMap === "object" && Object.values(platformMap).some(Boolean))
     .map(([k]) => k.replace(/_/g, " "));
 
   if (enabled.length === 0) return "—";

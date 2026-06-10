@@ -48,7 +48,7 @@ export interface LicenseStatusResult {
   max_activations?: number;
   current_activations?: number;
   activations?: ActivationInfo[];
-  features?: Record<string, boolean>;
+  features?: Record<string, Record<string, boolean>>;
   license_type?: string;
 }
 
@@ -203,7 +203,7 @@ export class LicenseStatusHandler {
       max_activations: license.maxActivations,
       current_activations: license.currentActivations,
       activations: activationDetails,
-      features: (plan?.features as Record<string, boolean>) ?? {},
+      features: (plan?.features as Record<string, Record<string, boolean>>) ?? {},
       license_type: plan?.licenseType ?? "subscription",
     };
 

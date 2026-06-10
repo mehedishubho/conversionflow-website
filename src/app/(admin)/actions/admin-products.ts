@@ -513,8 +513,8 @@ export async function createPlan(productId: string, formData: FormData) {
     }
   }
 
-  // Parse and validate features JSON
-  let features: Record<string, boolean> = {};
+  // Parse and validate features JSON (nested per-platform format)
+  let features: Record<string, Record<string, boolean>> = {};
   if (featuresStr) {
     try {
       const parsed = JSON.parse(featuresStr);
@@ -522,11 +522,16 @@ export async function createPlan(productId: string, formData: FormData) {
         return { error: "Features must be a JSON object." };
       }
       for (const [key, value] of Object.entries(parsed)) {
-        if (typeof value !== "boolean") {
-          return { error: `Feature flag "${key}" must be a boolean value.` };
+        if (typeof value !== "object" || value === null) {
+          return { error: `Feature "${key}" must be a platform map object.` };
+        }
+        for (const [platform, enabled] of Object.entries(value)) {
+          if (typeof enabled !== "boolean") {
+            return { error: `Feature "${key}" platform "${platform}" must be a boolean.` };
+          }
         }
       }
-      features = parsed as Record<string, boolean>;
+      features = parsed as Record<string, Record<string, boolean>>;
     } catch {
       return { error: "Features must be a valid JSON string." };
     }
@@ -651,7 +656,7 @@ export async function updatePlan(planId: string, formData: FormData) {
       : null;
   }
 
-  // Parse and validate features JSON
+  // Parse and validate features JSON (nested per-platform format)
   if (featuresStr !== null) {
     try {
       const parsed = JSON.parse(featuresStr);
@@ -659,11 +664,16 @@ export async function updatePlan(planId: string, formData: FormData) {
         return { error: "Features must be a JSON object." };
       }
       for (const [key, value] of Object.entries(parsed)) {
-        if (typeof value !== "boolean") {
-          return { error: `Feature flag "${key}" must be a boolean value.` };
+        if (typeof value !== "object" || value === null) {
+          return { error: `Feature "${key}" must be a platform map object.` };
+        }
+        for (const [platform, enabled] of Object.entries(value)) {
+          if (typeof enabled !== "boolean") {
+            return { error: `Feature "${key}" platform "${platform}" must be a boolean.` };
+          }
         }
       }
-      updateData.features = parsed as Record<string, boolean>;
+      updateData.features = parsed as Record<string, Record<string, boolean>>;
     } catch {
       return { error: "Features must be a valid JSON string." };
     }

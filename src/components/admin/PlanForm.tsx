@@ -19,7 +19,7 @@ interface PlanData {
   billingCycle: string | null;
   billingDurationMonths: number | null;
   maxActivations: number;
-  features: Record<string, boolean>;
+  features: Record<string, Record<string, boolean>>;
   sortOrder: number;
   active: boolean;
 }
@@ -50,7 +50,7 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
   const [billingCycle, setBillingCycle] = useState<string>(
     plan?.billingCycle ?? "yearly"
   );
-  const [featureFlags, setFeatureFlags] = useState<Record<string, boolean>>(
+  const [featureFlags, setFeatureFlags] = useState<Record<string, Record<string, boolean>>>(
     plan?.features ?? {}
   );
   const [newFlagKey, setNewFlagKey] = useState("");
@@ -62,12 +62,14 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
   // Derived: whether billing fields should show
   const showBilling = licenseType === "subscription";
 
-  // Feature flag management
+  // Feature flag management (nested per-platform format)
+  const defaultPlatformMap = () => ({ wordpress: false, laravel: false, shopify: false, nextjs: false });
+
   const addFeatureFlag = () => {
     const key = newFlagKey.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_");
     if (!key) return;
     if (key in featureFlags) return;
-    setFeatureFlags((prev) => ({ ...prev, [key]: true }));
+    setFeatureFlags((prev) => ({ ...prev, [key]: { wordpress: true, laravel: false, shopify: false, nextjs: false } }));
     setNewFlagKey("");
   };
 
@@ -80,7 +82,14 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
   };
 
   const toggleFeatureFlag = (key: string) => {
-    setFeatureFlags((prev) => ({ ...prev, [key]: !prev[key] }));
+    setFeatureFlags((prev) => {
+      const currentMap = prev[key] ?? defaultPlatformMap();
+      const anyEnabled = Object.values(currentMap).some(Boolean);
+      const toggledMap = Object.fromEntries(
+        Object.entries(currentMap).map(([p, v]) => [p, anyEnabled ? false : (p === "wordpress" ? true : v)])
+      ) as Record<string, boolean>;
+      return { ...prev, [key]: toggledMap };
+    });
   };
 
   // Handle license type change — clear billing when switching to lifetime
@@ -338,14 +347,14 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
         </label>
 
         <div className="space-y-2">
-          {Object.entries(featureFlags).map(([key, value]) => (
+          {Object.entries(featureFlags).map(([key, platformMap]) => (
             <div
               key={key}
               className="flex items-center gap-3 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
             >
               <input
                 type="checkbox"
-                checked={value}
+                checked={typeof platformMap === "object" && Object.values(platformMap).some(Boolean)}
                 onChange={() => toggleFeatureFlag(key)}
                 className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
               />

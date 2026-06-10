@@ -79,7 +79,7 @@ export default async function ProductPlansPage({
           billingCycle: row.billingCycle,
           billingDurationMonths: row.billingDurationMonths,
           maxActivations: row.maxActivations,
-          features: (row.features ?? {}) as Record<string, boolean>,
+          features: (row.features ?? {}) as Record<string, Record<string, boolean>>,
           active: row.active,
           sortOrder: row.sortOrder,
         }))}
