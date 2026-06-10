@@ -62,7 +62,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | 31 | Backup & Restore System | v3.0 | ✅ Complete | ✅ |
 | 32 | Update Delivery System | 2/4 | Complete    | 2026-06-09 |
 | 33 | Feature Flags & Tier Enforcement | 4/3 | Complete    | 2026-06-10 |
-| 34 | Multi-Gateway Payment System | v4.0 | 🔲 Planned | — |
+| 34 | Multi-Gateway Payment System | 3/5 | Complete    | 2026-06-10 |
 | 35 | WordPress SDK | v4.0 | 🔲 Planned | — |
 | 36 | Laravel SDK | v4.0 | 🔲 Planned | — |
 | 37 | Shopify App Integration | v4.0 | 🔲 Planned | — |
@@ -530,11 +530,11 @@ Plans:
   6. Customer checkout has currency toggle (BDT/USD) with gateway filtering
 **Plans:** 5 plans
 Plans:
-- [ ] 34-01-PLAN.md — Payments module, schema, gateway abstraction (IPaymentGateway, GatewayRegistry, PaymentService, crypto)
+- [x] 34-01-PLAN.md — Payments module, schema, gateway abstraction (IPaymentGateway, GatewayRegistry, PaymentService, crypto)
 - [ ] 34-02-PLAN.md — SSL Commerz adapter extraction (wraps existing ssl-commerz.ts, unified webhook route)
 - [ ] 34-03-PLAN.md — Paddle adapter (Billing API, hosted checkout, HMAC webhook verification, price sync)
-- [ ] 34-04-PLAN.md — bKash adapter (Tokenized Checkout v1.2.0-beta, Redis token caching, inline SDK)
-- [ ] 34-05-PLAN.md — Admin settings UI + checkout UX restructure (two-tab layout, gateway cards, currency toggle, success page)
+- [x] 34-04-PLAN.md — bKash adapter (Tokenized Checkout v1.2.0-beta, Redis token caching, inline SDK)
+- [x] 34-05-PLAN.md — Admin settings UI + checkout UX restructure (two-tab layout, gateway cards, currency toggle, success page)
 **Status:** 🔲 Planned
 
 ### Phase 35: WordPress SDK
