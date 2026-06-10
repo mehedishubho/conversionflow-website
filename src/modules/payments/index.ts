@@ -10,6 +10,7 @@
 
 import { GatewayRegistry } from "./application/GatewayRegistry";
 import { SSLCommerzAdapter } from "./infrastructure/adapters/SSLCommerzAdapter";
+import { PaddleAdapter } from "./infrastructure/adapters/PaddleAdapter";
 
 /**
  * Initialize the Payments module.
@@ -23,10 +24,13 @@ export function initializePaymentsModule(): void {
 
   // Register SSL Commerz adapter (Plan 02)
   registry.register(new SSLCommerzAdapter());
-  console.log("[Payments] SSLCommerzAdapter registered");
+
+  // Register Paddle adapter (Plan 03)
+  registry.register(new PaddleAdapter());
+
+  console.log("[Payments] SSLCommerzAdapter + PaddleAdapter registered");
 
   // Adapters registered in subsequent plans:
-  // registry.register(new PaddleAdapter());  // Plan 03
   // registry.register(new BKashAdapter());   // Plan 04
 }
 
