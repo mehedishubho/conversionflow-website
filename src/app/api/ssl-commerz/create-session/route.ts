@@ -1,3 +1,8 @@
+/**
+ * @deprecated Use PaymentService.createPendingOrder + initiatePayment via checkout actions instead.
+ * This route creates orders without dedup checks and will be removed in a future release.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
