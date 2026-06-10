@@ -92,11 +92,13 @@ export default function GatewayCard({
   const handleTestConnection = () => {
     setTesting(true);
     setTestResult(null);
-    startTransition(async () => {
-      const result = await testGatewayConnection(gateway.gatewayId);
-      setTestResult(result);
-      setTesting(false);
-    });
+    testGatewayConnection(gateway.gatewayId)
+      .then((result) => {
+        setTestResult(result);
+      })
+      .finally(() => {
+        setTesting(false);
+      });
   };
 
   const handleActivate = () => {
