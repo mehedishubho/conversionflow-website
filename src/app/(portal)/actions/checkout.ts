@@ -530,10 +530,9 @@ export async function createGatewayOrder(params: {
       taxAmount: params.taxAmount,
     });
 
-    // Get user info for session
-    const session2 = await auth.api.getSession({ headers: await headers() });
-    const userEmail = session2?.user?.email ?? "";
-    const userName = session2?.user?.name ?? "";
+    // Get user info from existing session (no redundant fetch)
+    const userEmail = session.user.email ?? "";
+    const userName = session.user.name ?? "";
 
     // Create gateway session
     const sessionResult = await paymentService.initiatePayment(orderId, params.gatewayId, {
