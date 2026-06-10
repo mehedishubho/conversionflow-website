@@ -11,6 +11,7 @@
 import { GatewayRegistry } from "./application/GatewayRegistry";
 import { SSLCommerzAdapter } from "./infrastructure/adapters/SSLCommerzAdapter";
 import { PaddleAdapter } from "./infrastructure/adapters/PaddleAdapter";
+import { BKashAdapter } from "./infrastructure/adapters/BKashAdapter";
 
 /**
  * Initialize the Payments module.
@@ -28,10 +29,10 @@ export function initializePaymentsModule(): void {
   // Register Paddle adapter (Plan 03)
   registry.register(new PaddleAdapter());
 
-  console.log("[Payments] SSLCommerzAdapter + PaddleAdapter registered");
+  // Register bKash API adapter (Plan 04)
+  registry.register(new BKashAdapter());
 
-  // Adapters registered in subsequent plans:
-  // registry.register(new BKashAdapter());   // Plan 04
+  console.log("[Payments] SSLCommerzAdapter + PaddleAdapter + BKashAdapter registered");
 }
 
 // Re-export public API
