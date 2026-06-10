@@ -9,6 +9,7 @@
 import { initializeLicensingModule } from "@/modules/licensing";
 import { registerBillingHandlers } from "@/modules/billing";
 import { initializeNotificationsModule } from "@/modules/notifications";
+import { initializePaymentsModule } from "@/modules/payments";
 import { startSubscriptionWorker, scheduleSubscriptionJob } from "@/jobs/workers/subscription-lifecycle";
 import { startBackupWorker, scheduleBackupJob } from "@/jobs/workers/backup-worker";
 
@@ -25,6 +26,7 @@ export function initializeModules(): void {
   initializeLicensingModule();
   registerBillingHandlers();
   initializeNotificationsModule();
+  initializePaymentsModule();
 
   // Register subscription lifecycle worker (D-10: BullMQ in same process)
   startSubscriptionWorker();
