@@ -10,14 +10,15 @@
 
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 // ──────────────────────────────────────────────
 // Dynamic Configuration
 // ──────────────────────────────────────────────
 
 async function getSSLConfig() {
-  const rows = await db.select().from(settings);
+  const keys = ["ssl_commerz_store_id", "ssl_commerz_store_password", "ssl_commerz_sandbox"];
+  const rows = await db.select().from(settings).where(inArray(settings.key, keys));
   const get = (key: string) => rows.find(r => r.key === key)?.value;
 
   const storeId = get("ssl_commerz_store_id") || process.env.SSL_COMMERZ_STORE_ID || "";

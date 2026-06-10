@@ -24,6 +24,7 @@ import { PaymentError } from "../../domain/PaymentError";
 import { GatewayConfigRepository } from "../repositories/GatewayConfigRepository";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
 
 export class SSLCommerzAdapter implements IPaymentGateway {
   readonly gatewayId = "ssl_commerz";
@@ -54,7 +55,8 @@ export class SSLCommerzAdapter implements IPaymentGateway {
     }
 
     // Fallback to settings table for backward compatibility
-    const rows = await db.select().from(settings);
+    const sslKeys = ["ssl_commerz_store_id", "ssl_commerz_store_password", "ssl_commerz_sandbox"];
+    const rows = await db.select().from(settings).where(inArray(settings.key, sslKeys));
     const get = (key: string) =>
       rows.find((r) => r.key === key)?.value;
 
