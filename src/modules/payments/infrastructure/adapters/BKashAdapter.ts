@@ -461,7 +461,7 @@ export class BKashAdapter implements IPaymentGateway {
             "X-App-Key": config.appKey,
           },
           body: JSON.stringify({
-            paymentID: params.orderId,
+            paymentID: params.gatewayTransactionId,
             amount: params.amount.toString(),
             trxID: params.gatewayTransactionId,
             skus: "1",
