@@ -21,7 +21,6 @@ import TextArea from "@/components/form/input/TextArea";
 // ──────────────────────────────────────────────
 
 type OrderStatus = "pending" | "completed" | "failed" | "refunded";
-type PaymentMethod = "bkash" | "nagad" | "rocket" | "bank_transfer" | "ssl_commerz";
 
 interface OrderRow {
   id: string;
@@ -29,7 +28,7 @@ interface OrderRow {
   userEmail: string | null;
   plan: string;
   amount: number;
-  paymentMethod: PaymentMethod | null;
+  paymentMethod: string | null;
   status: OrderStatus;
   paymentRef: string | null;
   createdAt: Date;

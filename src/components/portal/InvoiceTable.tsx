@@ -14,13 +14,7 @@ type OrderRow = {
   plan: string;
   amount: number;
   currency: string;
-  paymentMethod:
-    | "bkash"
-    | "nagad"
-    | "rocket"
-    | "bank_transfer"
-    | "ssl_commerz"
-    | null;
+  paymentMethod: string | null;
   status: "pending" | "completed" | "failed" | "refunded";
   createdAt: Date;
 };

@@ -27,7 +27,7 @@ export class ProductPlan {
     public readonly billingCycle: BillingCycle | null,
     public readonly billingDurationMonths: number | null,
     public readonly maxActivations: number,
-    public readonly features: Record<string, Record<string, boolean>>,
+    public readonly features: Record<string, boolean>,
     public readonly sortOrder: number,
     public readonly active: boolean,
     public readonly createdAt: Date,
@@ -63,15 +63,10 @@ export class ProductPlan {
       throw new Error("Max activations cannot be negative");
     }
 
-    // D-07: Features must be nested per-platform boolean map
-    for (const [key, platformMap] of Object.entries(this.features)) {
-      if (typeof platformMap !== "object" || platformMap === null) {
-        throw new Error(`Feature "${key}" must be a platform map object`);
-      }
-      for (const [platform, value] of Object.entries(platformMap)) {
-        if (typeof value !== "boolean") {
-          throw new Error(`Feature "${key}" platform "${platform}" must be a boolean value`);
-        }
+    // D-07: Features must be flat boolean map
+    for (const [key, value] of Object.entries(this.features)) {
+      if (typeof value !== "boolean") {
+        throw new Error(`Feature flag "${key}" must be a boolean value`);
       }
     }
   }

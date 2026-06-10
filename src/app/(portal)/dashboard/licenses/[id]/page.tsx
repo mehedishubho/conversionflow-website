@@ -2,10 +2,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { licenses, settings, productPlans, products } from "@/lib/db/schema";
+import { licenses, settings } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
-import { FEATURE_CATALOG, resolveFeaturesForPlatform } from "@/lib/config/feature-catalog";
-import { Check, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { revalidatePath } from "next/cache";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
@@ -65,43 +63,6 @@ export default async function LicenseDetailPage({
     notFound();
   }
 
-  // Fetch plan features and product info for feature checklist (D-12, D-13)
-  let resolvedFeatures: Record<string, boolean> = {};
-  let productName: string | null = null;
-  try {
-    // Look up product for display name
-    const [productRow] = await db
-      .select({ name: products.name, slug: products.slug })
-      .from(products)
-      .where(eq(products.id, license.productId))
-      .limit(1);
-    productName = productRow?.name ?? null;
-
-    // Look up plan features
-    const [planRow] = await db
-      .select({ features: productPlans.features })
-      .from(productPlans)
-      .where(
-        and(
-          eq(productPlans.slug, license.plan),
-          eq(productPlans.productId, license.productId)
-        )
-      )
-      .limit(1);
-
-    if (planRow?.features) {
-      // D-13: Features filtered to customer product platform.
-      // v4.0: All products are WordPress. Update when multi-platform products are added.
-      // Future: Resolve platform from product.platform or product slug convention.
-      resolvedFeatures = resolveFeaturesForPlatform(
-        planRow.features as Record<string, Record<string, boolean>>,
-        "wordpress" // Default to wordpress for v4.0 (all existing products are WP)
-      );
-    }
-  } catch {
-    // Feature lookup failure — show empty checklist
-  }
-
   const domains = (license.activationDomains ?? []) as string[];
   const maskedBreadcrumbKey =
     license.licenseKey.length >= 8
@@ -157,7 +118,7 @@ export default async function LicenseDetailPage({
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Product</p>
             <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-              {productName ?? license.productId}
+              {license.productId}
             </p>
           </div>
           <div>
@@ -228,45 +189,6 @@ export default async function LicenseDetailPage({
             maxActivations={license.maxActivations ?? 1}
             currentActivations={license.currentActivations ?? 0}
           />
-        </div>
-
-        {/* Feature Checklist (D-12) */}
-        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
-          <h4 className="text-sm font-medium text-gray-800 dark:text-white/90 mb-3">
-            Plan Features
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {FEATURE_CATALOG.map((entry) => {
-              const isEnabled = !!resolvedFeatures[entry.key];
-              return (
-                <div
-                  key={entry.key}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border ${
-                    isEnabled
-                      ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
-                      : "border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
-                  }`}
-                >
-                  {isEnabled ? (
-                    <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                  ) : (
-                    <Lock className="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0" />
-                  )}
-                  <div className="min-w-0">
-                    <p
-                      className={`text-sm font-medium ${
-                        isEnabled
-                          ? "text-green-700 dark:text-green-300"
-                          : "text-gray-400 dark:text-gray-600"
-                      }`}
-                    >
-                      {entry.label}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </ComponentCard>
 

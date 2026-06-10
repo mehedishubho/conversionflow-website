@@ -25,12 +25,19 @@ export const orderStatusEnum = pgEnum("order_status", [
   "refunded",
 ]);
 
+// DEPRECATED: will be removed after migration
 export const paymentMethodEnum = pgEnum("payment_method", [
   "bkash",
   "nagad",
   "rocket",
   "bank_transfer",
   "ssl_commerz",
+]);
+
+export const gatewayStatusEnum = pgEnum("gateway_status", [
+  "draft",
+  "test",
+  "live",
 ]);
 
 export const licenseStatusEnum = pgEnum("license_status", [
@@ -237,12 +244,14 @@ export const orders = pgTable("orders", {
   plan: text("plan").notNull(),
   amount: integer("amount").notNull(),
   currency: text("currency").notNull().default("BDT"),
-  paymentMethod: paymentMethodEnum("payment_method"),
+  paymentMethod: text("payment_method"),
   paymentRef: text("payment_ref"),
   status: orderStatusEnum("status").notNull().default("pending"),
   couponCode: text("coupon_code"),
   discountAmount: integer("discount_amount").default(0),
   taxAmount: integer("tax_amount").default(0),
+  gatewayId: text("gateway_id"),
+  gatewayTransactionId: text("gateway_transaction_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -490,7 +499,7 @@ export const couponApplicablePlans = pgTable(
 
 export const paymentAccounts = pgTable("payment_accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
-  method: paymentMethodEnum("method").notNull(),
+  method: text("method").notNull(),
   accountName: text("account_name").notNull(),
   accountNumber: text("account_number").notNull(),
   bankName: text("bank_name"),
@@ -513,6 +522,44 @@ export const settings = pgTable("settings", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+// ──────────────────────────────────────────────
+// Payment Gateway Tables (Phase 34)
+// ──────────────────────────────────────────────
+
+export const paymentGateways = pgTable("payment_gateways", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  gatewayId: text("gateway_id").notNull().unique(),
+  name: text("name").notNull(),
+  config: jsonb("config").notNull(),
+  active: boolean("active").default(false),
+  testMode: boolean("test_mode").default(true),
+  status: gatewayStatusEnum("status").default("draft"),
+  priority: integer("priority").default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const paymentWebhookEvents = pgTable(
+  "payment_webhook_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    gatewayId: text("gateway_id").notNull(),
+    eventType: text("event_type").notNull(),
+    payload: jsonb("payload").notNull(),
+    processed: boolean("processed").default(false),
+    processedAt: timestamp("processed_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("payment_webhook_events_gateway_id_idx").on(table.gatewayId),
+    index("payment_webhook_events_processed_idx").on(table.processed),
+    index("payment_webhook_events_created_at_idx").on(table.createdAt),
+  ]
+);
 
 // ──────────────────────────────────────────────
 // Webhook Tables
@@ -611,7 +658,7 @@ export const productPlans = pgTable(
     billingCycle: billingCycleEnum("billing_cycle"),
     billingDurationMonths: integer("billing_duration_months"),
     maxActivations: integer("max_activations").default(1),
-    features: jsonb("features").$type<Record<string, Record<string, boolean>>>().default({}),
+    features: jsonb("features").$type<Record<string, boolean>>().default({}),
     sortOrder: integer("sort_order").default(0),
     active: boolean("active").default(true),
     createdAt: timestamp("created_at").notNull().defaultNow(),

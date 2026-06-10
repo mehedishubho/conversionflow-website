@@ -4,10 +4,9 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { products, productVersions, productPlans, licenses } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { products, productVersions, productPlans } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
-import { PLATFORMS, isValidFeatureKey } from "@/lib/config/feature-catalog";
 import { clearPlanPricesCache } from "@/app/(portal)/actions/checkout";
 import { revalidatePath } from "next/cache";
 import fs from "fs";
@@ -514,32 +513,20 @@ export async function createPlan(productId: string, formData: FormData) {
     }
   }
 
-  // Parse and validate features JSON (nested per-platform format with catalog validation)
-  let features: Record<string, Record<string, boolean>> = {};
+  // Parse and validate features JSON
+  let features: Record<string, boolean> = {};
   if (featuresStr) {
     try {
       const parsed = JSON.parse(featuresStr);
       if (typeof parsed !== "object" || Array.isArray(parsed)) {
         return { error: "Features must be a JSON object." };
       }
-      for (const [featureKey, platformMap] of Object.entries(parsed)) {
-        // Validate feature key is from catalog (D-03)
-        if (!isValidFeatureKey(featureKey)) {
-          return { error: `Unknown feature key "${featureKey}". Only catalog features are allowed.` };
-        }
-        if (typeof platformMap !== "object" || platformMap === null || Array.isArray(platformMap)) {
-          return { error: `Feature "${featureKey}" must be a platform map.` };
-        }
-        for (const [platform, value] of Object.entries(platformMap)) {
-          if (!PLATFORMS.includes(platform as any)) {
-            return { error: `Invalid platform "${platform}" in feature "${featureKey}". Valid platforms: ${PLATFORMS.join(", ")}.` };
-          }
-          if (typeof value !== "boolean") {
-            return { error: `Feature "${featureKey}" platform "${platform}" must be a boolean.` };
-          }
+      for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value !== "boolean") {
+          return { error: `Feature flag "${key}" must be a boolean value.` };
         }
       }
-      features = parsed as Record<string, Record<string, boolean>>;
+      features = parsed as Record<string, boolean>;
     } catch {
       return { error: "Features must be a valid JSON string." };
     }
@@ -638,16 +625,7 @@ export async function updatePlan(planId: string, formData: FormData) {
   }
 
   // Handle licenseType and billing validation
-  // Fetch existing plan to resolve current licenseType when not in payload
-  let finalLicenseType = (licenseType as string) || null;
-  if (!finalLicenseType) {
-    const [existing] = await db
-      .select({ licenseType: productPlans.licenseType })
-      .from(productPlans)
-      .where(eq(productPlans.id, planId))
-      .limit(1);
-    finalLicenseType = existing?.licenseType ?? null;
-  }
+  const effectiveLicenseType = licenseType || undefined;
   if (licenseType) {
     if (licenseType !== "lifetime" && licenseType !== "subscription") {
       return { error: "License type must be 'lifetime' or 'subscription'." };
@@ -673,36 +651,26 @@ export async function updatePlan(planId: string, formData: FormData) {
       : null;
   }
 
-  // Parse and validate features JSON (nested per-platform format with catalog validation)
+  // Parse and validate features JSON
   if (featuresStr !== null) {
     try {
       const parsed = JSON.parse(featuresStr);
       if (typeof parsed !== "object" || Array.isArray(parsed)) {
         return { error: "Features must be a JSON object." };
       }
-      for (const [featureKey, platformMap] of Object.entries(parsed)) {
-        if (!isValidFeatureKey(featureKey)) {
-          return { error: `Unknown feature key "${featureKey}". Only catalog features are allowed.` };
-        }
-        if (typeof platformMap !== "object" || platformMap === null || Array.isArray(platformMap)) {
-          return { error: `Feature "${featureKey}" must be a platform map.` };
-        }
-        for (const [platform, value] of Object.entries(platformMap)) {
-          if (!PLATFORMS.includes(platform as any)) {
-            return { error: `Invalid platform "${platform}" in feature "${featureKey}". Valid platforms: ${PLATFORMS.join(", ")}.` };
-          }
-          if (typeof value !== "boolean") {
-            return { error: `Feature "${featureKey}" platform "${platform}" must be a boolean.` };
-          }
+      for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value !== "boolean") {
+          return { error: `Feature flag "${key}" must be a boolean value.` };
         }
       }
-      updateData.features = parsed as Record<string, Record<string, boolean>>;
+      updateData.features = parsed as Record<string, boolean>;
     } catch {
       return { error: "Features must be a valid JSON string." };
     }
   }
 
   // Invariant validation for the effective state
+  const finalLicenseType = (updateData.licenseType as string) || effectiveLicenseType;
   if (finalLicenseType === "lifetime") {
     if (updateData.billingCycle !== undefined && updateData.billingCycle !== null) {
       return { error: "Lifetime plans must not have a billing cycle." };
@@ -749,21 +717,6 @@ export async function deletePlan(planId: string) {
   }
 
   try {
-    // Look up plan to get slug and productId for license check
-    const [plan] = await db.select().from(productPlans).where(eq(productPlans.id, planId)).limit(1);
-    if (!plan) return { error: "Plan not found." };
-
-    // Guard: prevent deletion if active licenses reference this plan
-    const affectedLicenses = await db
-      .select({ id: licenses.id })
-      .from(licenses)
-      .where(and(eq(licenses.plan, plan.slug), eq(licenses.productId, plan.productId)))
-      .limit(1);
-
-    if (affectedLicenses.length > 0) {
-      return { error: "Cannot delete plan with active licenses. Deactivate the plan instead." };
-    }
-
     await db.delete(productPlans).where(eq(productPlans.id, planId));
 
     await createAuditLog({

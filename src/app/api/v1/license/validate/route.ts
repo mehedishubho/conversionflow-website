@@ -16,7 +16,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RateLimiter } from "@/modules/licensing/infrastructure/adapters/RateLimiter";
 import { ValidateLicenseHandler } from "@/modules/licensing/application/commands/ValidateLicenseHandler";
-import { PLATFORMS } from "@/lib/config/feature-catalog";
 
 /**
  * Identical error response for all validation failures (LGEN-09, D-21).
@@ -60,19 +59,14 @@ export async function POST(request: NextRequest) {
   }
 
   // 2. Parse body
-  let body: { license_key?: string; domain?: string; api_token?: string; platform?: string };
+  let body: { license_key?: string; domain?: string; api_token?: string };
   try {
     body = await request.json();
   } catch {
     return INVALID_RESPONSE();
   }
 
-  if (!body.license_key || !body.domain || !body.api_token || !body.platform) {
-    return INVALID_RESPONSE();
-  }
-
-  // 2b. Validate platform against fixed enum (D-05)
-  if (!PLATFORMS.includes(body.platform as any)) {
+  if (!body.license_key || !body.domain || !body.api_token) {
     return INVALID_RESPONSE();
   }
 
@@ -81,7 +75,6 @@ export async function POST(request: NextRequest) {
     licenseKey: body.license_key,
     domain: body.domain,
     apiToken: body.api_token,
-    platform: body.platform,
   });
 
   if (!result.valid) return INVALID_RESPONSE();
@@ -95,7 +88,6 @@ export async function POST(request: NextRequest) {
     grace_period_expires_at: result.grace_period_expires_at?.toISOString() ?? null,
     max_activations: result.maxActivations,
     current_activations: result.currentActivations,
-    features: result.features,
     error: null,
   });
 }

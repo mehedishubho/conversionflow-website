@@ -15,7 +15,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RateLimiter } from "@/modules/licensing/infrastructure/adapters/RateLimiter";
 import { LicenseStatusHandler } from "@/modules/licensing/application/commands/LicenseStatusHandler";
-import { PLATFORMS } from "@/lib/config/feature-catalog";
 
 const INVALID_RESPONSE = () =>
   NextResponse.json(
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   // 2. Parse body
-  let body: { license_key?: string; domain?: string; api_token?: string; platform?: string };
+  let body: { license_key?: string; domain?: string; api_token?: string };
   try {
     body = await request.json();
   } catch {
@@ -47,17 +46,11 @@ export async function POST(request: NextRequest) {
     return INVALID_RESPONSE();
   }
 
-  // 2b. Validate platform if provided (D-08: optional param)
-  if (body.platform && !PLATFORMS.includes(body.platform as any)) {
-    return INVALID_RESPONSE();
-  }
-
   // 3. Delegate to handler (validates license, retrieves full profile with Redis cache)
   const result = await LicenseStatusHandler.execute({
     licenseKey: body.license_key,
     domain: body.domain,
     apiToken: body.api_token,
-    platform: body.platform,
   });
 
   if (!result || ("valid" in result && !result.valid)) {

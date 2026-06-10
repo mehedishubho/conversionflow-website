@@ -10,7 +10,7 @@ export type OrderWithUser = {
   plan: string;
   amount: number;
   currency: string;
-  paymentMethod: "bkash" | "nagad" | "rocket" | "bank_transfer" | "ssl_commerz" | null;
+  paymentMethod: string | null;
   paymentRef: string | null;
   status: "pending" | "completed" | "failed" | "refunded";
   couponCode: string | null;

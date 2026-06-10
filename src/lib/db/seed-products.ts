@@ -56,13 +56,13 @@ export async function seedProducts() {
       billingDurationMonths: 12,
       maxActivations: 1,
       features: {
-        all_modules: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        courier_sync: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        meta_capi: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        fraud_shield: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        one_year_updates: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        email_support: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        priority_support: { wordpress: false, laravel: false, shopify: false, nextjs: false },
+        all_modules: true,
+        courier_sync: true,
+        meta_capi: true,
+        fraud_shield: true,
+        one_year_updates: true,
+        email_support: true,
+        priority_support: false,
       },
       sortOrder: 1,
       active: true,
@@ -79,13 +79,13 @@ export async function seedProducts() {
       billingDurationMonths: 24,
       maxActivations: 3,
       features: {
-        all_modules: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        courier_sync: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        meta_capi: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        fraud_shield: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        lifetime_updates: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        priority_email_support: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        whatsapp_support: { wordpress: true, laravel: false, shopify: false, nextjs: false },
+        all_modules: true,
+        courier_sync: true,
+        meta_capi: true,
+        fraud_shield: true,
+        lifetime_updates: true,
+        priority_email_support: true,
+        whatsapp_support: true,
       },
       sortOrder: 2,
       active: true,
@@ -102,13 +102,13 @@ export async function seedProducts() {
       billingDurationMonths: null,
       maxActivations: 0,
       features: {
-        all_modules: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        courier_sync: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        meta_capi: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        fraud_shield: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        lifetime_updates: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        priority_whatsapp_support: { wordpress: true, laravel: false, shopify: false, nextjs: false },
-        white_label: { wordpress: true, laravel: false, shopify: false, nextjs: false },
+        all_modules: true,
+        courier_sync: true,
+        meta_capi: true,
+        fraud_shield: true,
+        lifetime_updates: true,
+        priority_whatsapp_support: true,
+        white_label: true,
       },
       sortOrder: 3,
       active: true,
@@ -116,10 +116,7 @@ export async function seedProducts() {
   ];
 
   for (const plan of plans) {
-    await db.insert(productPlans).values({
-      ...plan,
-      features: plan.features as Record<string, Record<string, boolean>>,
-    });
+    await db.insert(productPlans).values(plan as unknown as typeof productPlans.$inferInsert);
   }
 
   console.log(

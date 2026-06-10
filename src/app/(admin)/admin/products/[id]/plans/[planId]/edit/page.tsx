@@ -74,7 +74,7 @@ export default async function EditPlanPage({
             billingCycle: plan.billingCycle,
             billingDurationMonths: plan.billingDurationMonths,
             maxActivations: plan.maxActivations ?? 1,
-            features: (plan.features as Record<string, Record<string, boolean>>) ?? {},
+            features: (plan.features as Record<string, boolean>) ?? {},
             sortOrder: plan.sortOrder ?? 0,
             active: plan.active ?? true,
           }}

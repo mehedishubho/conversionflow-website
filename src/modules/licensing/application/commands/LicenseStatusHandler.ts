@@ -24,13 +24,11 @@ import { db } from "@/lib/db";
 import { products, productPlans, settings, licenseActivations } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { cacheGet, cacheSet } from "@/lib/redis";
-import { resolveFeaturesForPlatform } from "@/lib/config/feature-catalog";
 
 export interface LicenseStatusInput {
   licenseKey: string;
   domain: string;
   apiToken: string;
-  platform?: string;
 }
 
 export interface ActivationInfo {
@@ -50,7 +48,7 @@ export interface LicenseStatusResult {
   max_activations?: number;
   current_activations?: number;
   activations?: ActivationInfo[];
-  features?: Record<string, Record<string, boolean>> | Record<string, boolean>;
+  features?: Record<string, boolean>;
   license_type?: string;
 }
 
@@ -78,15 +76,14 @@ export class LicenseStatusHandler {
     }
 
     // 2. Normalize domain
-    let normalizedDomain: string;
     try {
-      normalizedDomain = Domain.create(input.domain).value;
+      Domain.create(input.domain);
     } catch {
       return INVALID;
     }
 
-    // 3. Check cache (D-21: license:status:<sha256(licenseKey+domain+platform)>)
-    const cacheKey = `license:status:${crypto.createHash("sha256").update(key.value + normalizedDomain + (input.platform ?? "")).digest("hex")}`;
+    // 3. Check cache (D-21: license:status:<sha256(licenseKey)>)
+    const cacheKey = `license:status:${crypto.createHash("sha256").update(key.value).digest("hex")}`;
     const cached = await cacheGet("LICENSE", cacheKey);
     if (cached) {
       try {
@@ -206,9 +203,7 @@ export class LicenseStatusHandler {
       max_activations: license.maxActivations,
       current_activations: license.currentActivations,
       activations: activationDetails,
-      features: input.platform
-        ? resolveFeaturesForPlatform(plan?.features as Record<string, Record<string, boolean>> | null, input.platform)
-        : (plan?.features as Record<string, Record<string, boolean>>) ?? {},
+      features: (plan?.features as Record<string, boolean>) ?? {},
       license_type: plan?.licenseType ?? "subscription",
     };
 

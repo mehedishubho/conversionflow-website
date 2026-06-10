@@ -26,7 +26,7 @@ export class ProductPlanMapper implements IMapper<ProductPlan, typeof productPla
       row.billingCycle,
       row.billingDurationMonths,
       row.maxActivations ?? 1,
-      (row.features as Record<string, Record<string, boolean>>) ?? {},
+      (row.features as Record<string, boolean>) ?? {},
       row.sortOrder ?? 0,
       row.active ?? true,
       row.createdAt,

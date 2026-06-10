@@ -3,14 +3,7 @@
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button/Button";
-import { Check } from "lucide-react";
-import {
-  FEATURE_CATALOG,
-  PLATFORMS,
-  PLATFORM_LABELS,
-  type Platform,
-  type FeatureMatrix,
-} from "@/lib/config/feature-catalog";
+import { Plus, X } from "lucide-react";
 
 // ──────────────────────────────────────────────
 // Types
@@ -26,7 +19,7 @@ interface PlanData {
   billingCycle: string | null;
   billingDurationMonths: number | null;
   maxActivations: number;
-  features: Record<string, Record<string, boolean>>;
+  features: Record<string, boolean>;
   sortOrder: number;
   active: boolean;
 }
@@ -57,39 +50,10 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
   const [billingCycle, setBillingCycle] = useState<string>(
     plan?.billingCycle ?? "yearly"
   );
-  // Feature matrix state: feature key -> platform -> enabled
-  // Initialize from plan features or empty matrix for all catalog features
-  const [featureMatrix, setFeatureMatrix] = useState<FeatureMatrix>(() => {
-    if (plan?.features && typeof plan.features === "object") {
-      // Deserialize from DB nested format
-      const matrix: FeatureMatrix = {};
-      for (const entry of FEATURE_CATALOG) {
-        const platformMap = plan.features[entry.key];
-        if (typeof platformMap === "object" && platformMap !== null) {
-          matrix[entry.key] = {} as Record<Platform, boolean>;
-          for (const p of PLATFORMS) {
-            matrix[entry.key][p] = !!(platformMap as Record<string, boolean>)[p];
-          }
-        } else {
-          // Old flat format or missing: treat as all disabled
-          matrix[entry.key] = {} as Record<Platform, boolean>;
-          for (const p of PLATFORMS) {
-            matrix[entry.key][p] = false;
-          }
-        }
-      }
-      return matrix;
-    }
-    // New plan: all features disabled
-    const matrix: FeatureMatrix = {};
-    for (const entry of FEATURE_CATALOG) {
-      matrix[entry.key] = {} as Record<Platform, boolean>;
-      for (const p of PLATFORMS) {
-        matrix[entry.key][p] = false;
-      }
-    }
-    return matrix;
-  });
+  const [featureFlags, setFeatureFlags] = useState<Record<string, boolean>>(
+    plan?.features ?? {}
+  );
+  const [newFlagKey, setNewFlagKey] = useState("");
   const [activeChecked, setActiveChecked] = useState(
     plan?.active ?? true
   );
@@ -98,33 +62,25 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
   // Derived: whether billing fields should show
   const showBilling = licenseType === "subscription";
 
-  // Toggle a single platform checkbox
-  const toggleFeaturePlatform = (featureKey: string, platform: Platform) => {
-    setFeatureMatrix((prev) => ({
-      ...prev,
-      [featureKey]: {
-        ...prev[featureKey],
-        [platform]: !prev[featureKey]?.[platform],
-      },
-    }));
+  // Feature flag management
+  const addFeatureFlag = () => {
+    const key = newFlagKey.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_");
+    if (!key) return;
+    if (key in featureFlags) return;
+    setFeatureFlags((prev) => ({ ...prev, [key]: true }));
+    setNewFlagKey("");
   };
 
-  // Toggle all platforms for a feature (select all / deselect all)
-  const toggleAllPlatforms = (featureKey: string) => {
-    setFeatureMatrix((prev) => {
-      const current = prev[featureKey];
-      const allEnabled = PLATFORMS.every((p) => current?.[p]);
-      return {
-        ...prev,
-        [featureKey]: {
-          ...prev[featureKey],
-          wordpress: !allEnabled,
-          laravel: !allEnabled,
-          shopify: !allEnabled,
-          nextjs: !allEnabled,
-        },
-      };
+  const removeFeatureFlag = (key: string) => {
+    setFeatureFlags((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
     });
+  };
+
+  const toggleFeatureFlag = (key: string) => {
+    setFeatureFlags((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   // Handle license type change — clear billing when switching to lifetime
@@ -151,15 +107,7 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
 
     // Override controlled fields that may differ from raw form inputs
     formData.set("licenseType", licenseType);
-    // Only include features that have at least one platform enabled
-    const activeFeatures: Record<string, Record<string, boolean>> = {};
-    for (const [key, platforms] of Object.entries(featureMatrix)) {
-      const hasEnabled = Object.values(platforms).some((v) => v);
-      if (hasEnabled) {
-        activeFeatures[key] = platforms;
-      }
-    }
-    formData.set("features", JSON.stringify(activeFeatures));
+    formData.set("features", JSON.stringify(featureFlags));
     formData.set("active", activeChecked ? "true" : "false");
 
     if (licenseType === "subscription" && billingCycle) {
@@ -383,85 +331,65 @@ export default function PlanForm({ productId, action, plan }: PlanFormProps) {
         </div>
       </div>
 
-      {/* Feature Flags - Platform Toggle Matrix (D-09, D-10, D-11) */}
+      {/* Feature Flags section */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Feature Flags (per platform)
+          Feature Flags
         </label>
 
-        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-white/5">
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Feature
-                </th>
-                <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                  All
-                </th>
-                {PLATFORMS.map((platform) => (
-                  <th
-                    key={platform}
-                    className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    {PLATFORM_LABELS[platform]}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {FEATURE_CATALOG.map((entry) => {
-                const allEnabled = PLATFORMS.every(
-                  (p) => featureMatrix[entry.key]?.[p]
-                );
-                return (
-                  <tr
-                    key={entry.key}
-                    className="hover:bg-gray-50 dark:hover:bg-white/[0.02]"
-                  >
-                    <td className="px-4 py-2.5">
-                      <div>
-                        <p className="font-medium text-gray-800 dark:text-white/90">
-                          {entry.label}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {entry.description}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2.5 text-center">
-                      <button
-                        type="button"
-                        onClick={() => toggleAllPlatforms(entry.key)}
-                        className={`inline-flex items-center justify-center w-6 h-6 rounded border transition-colors ${
-                          allEnabled
-                            ? "bg-brand-500 border-brand-500 text-white"
-                            : "border-gray-300 dark:border-gray-700 text-gray-400 hover:border-brand-300 dark:hover:border-brand-600"
-                        }`}
-                        title={allEnabled ? "Deselect all platforms" : "Select all platforms"}
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                    </td>
-                    {PLATFORMS.map((platform) => (
-                      <td key={platform} className="px-3 py-2.5 text-center">
-                        <input
-                          type="checkbox"
-                          checked={!!featureMatrix[entry.key]?.[platform]}
-                          onChange={() => toggleFeaturePlatform(entry.key, platform)}
-                          className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="space-y-2">
+          {Object.entries(featureFlags).map(([key, value]) => (
+            <div
+              key={key}
+              className="flex items-center gap-3 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+            >
+              <input
+                type="checkbox"
+                checked={value}
+                onChange={() => toggleFeatureFlag(key)}
+                className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+              />
+              <span className="flex-1 text-sm text-gray-800 dark:text-white/90 font-mono">
+                {key}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeFeatureFlag(key)}
+                className="inline-flex items-center justify-center w-6 h-6 rounded text-gray-400 hover:text-error-500 hover:bg-error-50 dark:hover:bg-error-500/10 transition-colors"
+                title="Remove flag"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Add new flag */}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={newFlagKey}
+            onChange={(e) => setNewFlagKey(e.target.value)}
+            placeholder="new_feature_name"
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-600 font-mono"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addFeatureFlag();
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={addFeatureFlag}
+            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-brand-500 bg-brand-50 hover:bg-brand-100 dark:text-brand-400 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add
+          </button>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Toggle features per platform. &quot;All&quot; column toggles all platforms at once.
-          Features come from the catalog (no custom keys).
+          Feature names are lowercase with underscores. Toggle each flag on/off.
         </p>
       </div>
 
