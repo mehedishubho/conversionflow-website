@@ -4,8 +4,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { products, productVersions, productPlans } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { products, productVersions, productPlans, licenses } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 import { PLATFORMS, isValidFeatureKey } from "@/lib/config/feature-catalog";
 import { clearPlanPricesCache } from "@/app/(portal)/actions/checkout";
@@ -741,6 +741,21 @@ export async function deletePlan(planId: string) {
   }
 
   try {
+    // Look up plan to get slug and productId for license check
+    const [plan] = await db.select().from(productPlans).where(eq(productPlans.id, planId)).limit(1);
+    if (!plan) return { error: "Plan not found." };
+
+    // Guard: prevent deletion if active licenses reference this plan
+    const affectedLicenses = await db
+      .select({ id: licenses.id })
+      .from(licenses)
+      .where(and(eq(licenses.plan, plan.slug), eq(licenses.productId, plan.productId)))
+      .limit(1);
+
+    if (affectedLicenses.length > 0) {
+      return { error: "Cannot delete plan with active licenses. Deactivate the plan instead." };
+    }
+
     await db.delete(productPlans).where(eq(productPlans.id, planId));
 
     await createAuditLog({
