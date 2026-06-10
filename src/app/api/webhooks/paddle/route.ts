@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
 
     // 4b. Amount verification: ensure paid amount matches order amount
     if (result.rawPayload && result.status === "completed") {
-      const paidAmount = parseFloat(String(result.rawPayload.amount)) || 0;
+      const data = (result.rawPayload as { data?: { details?: { totals?: { total?: string } } } })?.data;
+      const paidAmount = parseFloat(String(data?.details?.totals?.total ?? "0")) || 0;
       if (paidAmount > 0 && Math.abs(paidAmount - order.amount) > 1) {
         console.error(
           `[Webhook/Paddle] Amount mismatch: order=${order.amount}, paid=${paidAmount}`
