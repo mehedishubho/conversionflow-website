@@ -5,26 +5,29 @@
  * This is the only entry point for other modules to import Payments functionality.
  *
  * Module initialization registers gateway adapters in the GatewayRegistry.
- * Adapters are registered in Plans 02/03/04 (SSL Commerz, Paddle, bKash).
+ * Adapters: SSL Commerz (Plan 02), Paddle (Plan 03), bKash (Plan 04).
  */
 
 import { GatewayRegistry } from "./application/GatewayRegistry";
+import { SSLCommerzAdapter } from "./infrastructure/adapters/SSLCommerzAdapter";
 
 /**
  * Initialize the Payments module.
  *
- * Adapters register themselves when imported.
- * Individual adapter files are imported here.
- * For Phase 34 Plan 01, only the registry is initialized.
- * Adapter registration happens in Plans 02/03/04.
+ * Registers all gateway adapters in the GatewayRegistry.
+ * Each adapter implements IPaymentGateway and handles its own
+ * session creation, webhook processing, and credential management.
  */
 export function initializePaymentsModule(): void {
   const registry = GatewayRegistry.getInstance();
-  // Adapters will be registered here in Plans 02-04:
-  // registry.register(new SSLCommerzAdapter());
-  // registry.register(new PaddleAdapter());
-  // registry.register(new BKashAdapter());
-  console.log("[Payments] Module initialized (adapters register in Plans 02-04)");
+
+  // Register SSL Commerz adapter (Plan 02)
+  registry.register(new SSLCommerzAdapter());
+  console.log("[Payments] SSLCommerzAdapter registered");
+
+  // Adapters registered in subsequent plans:
+  // registry.register(new PaddleAdapter());  // Plan 03
+  // registry.register(new BKashAdapter());   // Plan 04
 }
 
 // Re-export public API

@@ -1,6 +1,9 @@
 /**
  * SSL Commerz Payment Gateway Client
  *
+ * This module is wrapped by SSLCommerzAdapter. Direct usage is deprecated
+ * but kept for backward compatibility during the transition period.
+ *
  * Direct fetch implementation (no npm package) for SSL Commerz v4 API.
  * Reads credentials from DB settings table (admin-configured) with env var fallback.
  */

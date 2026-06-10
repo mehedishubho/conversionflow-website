@@ -6,6 +6,8 @@ import { orders } from "@/lib/db/schema";
 import { createSSLSession } from "@/lib/ssl-commerz";
 import { createAuditLog } from "@/lib/audit";
 import { pricingTiers } from "@/data/pricing";
+import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
+import { PaymentService } from "@/modules/payments/application/PaymentService";
 
 // ──────────────────────────────────────────────
 // Server-side price map (T-04-07: authoritative source of truth)
@@ -100,45 +102,75 @@ export async function POST(request: NextRequest) {
       details: { plan, amount: baseAmount, totalAmount, couponCode },
     });
 
-    // 6. Build SSL Commerz session
+    // 6. Build SSL Commerz session via adapter (with fallback to legacy)
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-    const sslResponse = await createSSLSession({
-      totalAmount,
-      currency: "BDT",
-      tranId: order.id,
-      successUrl: `${appUrl}/api/ssl-commerz/success`,
-      failUrl: `${appUrl}/api/ssl-commerz/fail`,
-      cancelUrl: `${appUrl}/api/ssl-commerz/cancel`,
-      ipnUrl: `${appUrl}/api/ssl-commerz/ipn`,
-      productName: `ConversionFlow ${plan}`,
-      productCategory: "WordPress Plugin",
-      cusName: user.name,
-      cusEmail: user.email,
-      cusPhone: user.phone || "",
-      cusAdd1: "Dhaka",
-      cusCity: "Dhaka",
-      cusCountry: "Bangladesh",
-      valueA: order.id,
-      valueB: user.id,
-      valueC: plan,
-      valueD: couponCode || "",
-    });
+    const registry = GatewayRegistry.getInstance();
+    const adapter = registry.get("ssl_commerz");
 
-    if (!sslResponse.GatewayPageURL) {
-      return NextResponse.json(
+    let redirectUrl: string | undefined;
+
+    if (adapter) {
+      // Use the new adapter path via PaymentService
+      const paymentService = new PaymentService();
+      const sessionResult = await paymentService.initiatePayment(
+        order.id,
+        "ssl_commerz",
         {
-          error: "Failed to create payment session",
-          detail: sslResponse.failedreason,
-        },
+          orderId: order.id,
+          userId: user.id,
+          amount: totalAmount,
+          currency: "BDT",
+          productId: PRODUCT_ID,
+          plan,
+          couponCode: couponCode || undefined,
+          customerEmail: user.email,
+          customerName: user.name,
+          customerPhone: user.phone || undefined,
+          successUrl: `${appUrl}/api/ssl-commerz/success`,
+          failUrl: `${appUrl}/api/ssl-commerz/fail`,
+          cancelUrl: `${appUrl}/api/ssl-commerz/cancel`,
+          webhookUrl: `${appUrl}/api/ssl-commerz/ipn`,
+        }
+      );
+      redirectUrl = sessionResult.redirectUrl;
+    } else {
+      // Fallback to legacy createSSLSession during migration
+      const sslResponse = await createSSLSession({
+        totalAmount,
+        currency: "BDT",
+        tranId: order.id,
+        successUrl: `${appUrl}/api/ssl-commerz/success`,
+        failUrl: `${appUrl}/api/ssl-commerz/fail`,
+        cancelUrl: `${appUrl}/api/ssl-commerz/cancel`,
+        ipnUrl: `${appUrl}/api/ssl-commerz/ipn`,
+        productName: `ConversionFlow ${plan}`,
+        productCategory: "WordPress Plugin",
+        cusName: user.name,
+        cusEmail: user.email,
+        cusPhone: user.phone || "",
+        cusAdd1: "Dhaka",
+        cusCity: "Dhaka",
+        cusCountry: "Bangladesh",
+        valueA: order.id,
+        valueB: user.id,
+        valueC: plan,
+        valueD: couponCode || "",
+      });
+      redirectUrl = sslResponse.GatewayPageURL;
+    }
+
+    if (!redirectUrl) {
+      return NextResponse.json(
+        { error: "Failed to create payment session" },
         { status: 502 }
       );
     }
 
-    // 7. Return GatewayPageURL and orderId to client
+    // 7. Return redirect URL and orderId to client
     return NextResponse.json({
-      url: sslResponse.GatewayPageURL,
+      url: redirectUrl,
       orderId: order.id,
     });
   } catch (error) {
