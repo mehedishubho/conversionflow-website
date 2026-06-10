@@ -239,6 +239,18 @@ export class SSLCommerzAdapter implements IPaymentGateway {
    */
   async handleWebhook(request: Request): Promise<WebhookResult> {
     try {
+      // Validate request origin: SSL Commerz IPN comes as form-urlencoded
+      const contentType = request.headers.get("content-type") || "";
+      if (!contentType.includes("application/x-www-form-urlencoded") &&
+          !contentType.includes("multipart/form-data")) {
+        return {
+          success: false,
+          eventType: "ipn.invalid_content_type",
+          status: "failed",
+          rawPayload: {},
+        };
+      }
+
       const formData = await request.formData();
       const valId = formData.get("val_id") as string | null;
       const tranId = formData.get("tran_id") as string | null;
