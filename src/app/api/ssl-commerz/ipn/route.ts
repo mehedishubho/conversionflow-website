@@ -66,6 +66,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, message: "Already processed" });
     }
 
+    // 4b. Amount verification (WR-04): ensure paid amount matches order amount
+    const paidAmount = parseFloat(validation.amount) || 0;
+    if (paidAmount > 0 && Math.abs(paidAmount - order.amount) > 1) {
+      console.error(`[IPN] Amount mismatch: order=${order.amount}, paid=${paidAmount}`);
+      return NextResponse.json(
+        { error: "Amount mismatch" },
+        { status: 400 }
+      );
+    }
+
     // 5. Audit log: record the IPN-triggered status transition
     await createAuditLog({
       actorId: "system",
