@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { pricingTiers } from "@/data/pricing";
-import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts, getCheckoutPrices } from "@/app/(portal)/actions/checkout";
+import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts, getCheckoutPrices, getActiveGateways } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import GatewaySelector from "@/components/checkout/GatewaySelector";
@@ -60,6 +60,7 @@ function CheckoutContent() {
   const [paymentAccounts, setPaymentAccounts] = useState<
     Record<string, PaymentAccount[]>
   >({});
+  const [gatewayTestModes, setGatewayTestModes] = useState<Record<string, boolean>>({});
 
   // Manual methods list
   const manualMethods = ["bkash", "nagad", "rocket", "bank_transfer"];
@@ -73,10 +74,11 @@ function CheckoutContent() {
 
     async function load() {
       try {
-        const [prices, vat, paymentData] = await Promise.all([
+        const [prices, vat, paymentData, gateways] = await Promise.all([
           getCheckoutPrices(),
           calculateVAT(0), // will recalculate once we have basePrice
           getPaymentAccounts(),
+          getActiveGateways(currency),
         ]);
         setPlanPriceMap(prices);
         // Recalculate VAT with the actual price now
@@ -86,12 +88,18 @@ function CheckoutContent() {
           setVatInfo(vatResult);
         }
         setPaymentAccounts((paymentData as Record<string, unknown>).accounts as Record<string, PaymentAccount[]>);
+        // Store gateway testMode mapping
+        const testModeMap: Record<string, boolean> = {};
+        for (const g of gateways.automatic) {
+          testModeMap[g.gatewayId] = g.testMode;
+        }
+        setGatewayTestModes(testModeMap);
       } catch {
         // Silently handle -- components will show fallback
       }
     }
     load();
-  }, [tier, planParam]);
+  }, [tier, planParam, currency]);
 
   // Clear gateway selection when currency changes (D-04)
   useEffect(() => {
@@ -285,7 +293,7 @@ function CheckoutContent() {
               discountAmount={discountAmount}
               taxAmount={vatAmount}
               totalAmount={total}
-              testMode={true}
+              testMode={gatewayTestModes["bkash_api"] ?? true}
               onSuccess={handleGatewaySuccess}
             />
           )}

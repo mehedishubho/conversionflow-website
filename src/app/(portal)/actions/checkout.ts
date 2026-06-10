@@ -577,7 +577,7 @@ export async function createGatewayOrder(params: {
  * Used by checkout GatewaySelector component.
  */
 export async function getActiveGateways(currency: string): Promise<{
-  automatic: Array<{ gatewayId: string; name: string }>;
+  automatic: Array<{ gatewayId: string; name: string; testMode: boolean }>;
   manual: Array<{ method: string; accountName: string }>;
 }> {
   // Get automatic gateways that support this currency
@@ -591,10 +591,15 @@ export async function getActiveGateways(currency: string): Promise<{
     .where(eq(paymentGateways.active, true));
 
   const activeGatewayIds = new Set(activeGatewayRows.map((r) => r.gatewayId));
+  const activeGatewayMap = new Map(activeGatewayRows.map((r) => [r.gatewayId, r]));
 
   const automatic = adapters
     .filter((a) => activeGatewayIds.has(a.gatewayId))
-    .map((a) => ({ gatewayId: a.gatewayId, name: a.name }));
+    .map((a) => ({
+      gatewayId: a.gatewayId,
+      name: a.name,
+      testMode: activeGatewayMap.get(a.gatewayId)?.testMode ?? true,
+    }));
 
   // Get manual payment accounts (only for BDT)
   let manual: Array<{ method: string; accountName: string }> = [];
