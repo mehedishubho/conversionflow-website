@@ -246,7 +246,7 @@ export async function getPaymentSettings() {
     sslCommerzEnabled: sslEnabledRow.length > 0 ? sslEnabledRow[0].value !== "false" : true,
     sslCommerz: {
       storeId: sslDbStoreId,
-      storePassword: sslDbPassword,
+      storePassword: sslDbPassword ? "********" : "",
       dbSandbox: sslDbSandbox,
       storeIdConfigured: !!sslDbStoreId || (!!process.env.SSL_COMMERZ_STORE_ID && process.env.SSL_COMMERZ_STORE_ID !== "your_store_id"),
       storePasswordConfigured: !!sslDbPassword || (!!process.env.SSL_COMMERZ_STORE_PASSWORD && process.env.SSL_COMMERZ_STORE_PASSWORD !== "your_store_password"),
@@ -275,6 +275,11 @@ export async function saveSSLSettings(data: {
   ];
 
   for (const entry of entries) {
+    // Skip password update if the value is the masked placeholder
+    if (entry.key === "ssl_commerz_store_password" && entry.value === "********") {
+      continue;
+    }
+
     const existing = await db
       .select()
       .from(settings)
