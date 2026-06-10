@@ -24,6 +24,8 @@ export default async function AdminOrdersPage() {
       paymentMethod: orders.paymentMethod,
       status: orders.status,
       paymentRef: orders.paymentRef,
+      gatewayId: orders.gatewayId,
+      gatewayTransactionId: orders.gatewayTransactionId,
       createdAt: orders.createdAt,
     })
     .from(orders)
@@ -45,6 +47,8 @@ export default async function AdminOrdersPage() {
             paymentMethod: row.paymentMethod,
             status: row.status,
             paymentRef: row.paymentRef,
+            gatewayId: row.gatewayId,
+            gatewayTransactionId: row.gatewayTransactionId,
             createdAt: row.createdAt,
           }))}
           onVerify={verifyOrder}

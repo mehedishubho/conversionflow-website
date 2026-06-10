@@ -31,6 +31,8 @@ interface OrderRow {
   paymentMethod: string | null;
   status: OrderStatus;
   paymentRef: string | null;
+  gatewayId: string | null;
+  gatewayTransactionId: string | null;
   createdAt: Date;
 }
 
@@ -58,6 +60,14 @@ const paymentMethodLabels: Record<string, string> = {
   rocket: "Rocket",
   bank_transfer: "Bank Transfer",
   ssl_commerz: "SSL Commerce",
+  bkash_api: "bKash (Auto)",
+  paddle: "Paddle",
+};
+
+const gatewayDisplayNames: Record<string, string> = {
+  ssl_commerz: "SSL Commerz",
+  paddle: "Paddle",
+  bkash_api: "bKash (Auto)",
 };
 
 const statusFilterOptions = [
@@ -230,6 +240,9 @@ export default function OrdersTable({
                 Method
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
+                Gateway
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
                 Status
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400 text-start">
@@ -243,7 +256,7 @@ export default function OrdersTable({
           <TableBody>
             {filteredOrders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
+                <TableCell colSpan={9} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
                   No orders match your filters. Try adjusting the status, payment method, or date range.
                 </TableCell>
               </TableRow>
@@ -275,6 +288,11 @@ export default function OrdersTable({
                         ? paymentMethodLabels[order.paymentMethod] ?? order.paymentMethod
                         : "N/A"}
                     </TableCell>
+                    <TableCell className="px-5 py-3 text-sm text-gray-700 dark:text-gray-300">
+                      {order.gatewayId
+                        ? gatewayDisplayNames[order.gatewayId] ?? order.gatewayId
+                        : "Manual"}
+                    </TableCell>
                     <TableCell className="px-5 py-3 text-sm">
                       <Badge variant="light" color={badge.color} size="sm">
                         {badge.label}
@@ -291,7 +309,7 @@ export default function OrdersTable({
                         >
                           View Details
                         </Link>
-                        {order.status === "pending" && (
+                        {order.status === "pending" && !order.gatewayId && (
                           <>
                             <Button
                               size="sm"
@@ -313,6 +331,11 @@ export default function OrdersTable({
                               Reject
                             </Button>
                           </>
+                        )}
+                        {order.status === "pending" && order.gatewayId && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            Auto-verified via gateway
+                          </span>
                         )}
                         {order.status === "completed" && (
                           <>

@@ -4,9 +4,13 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { paymentAccounts, settings, licenses } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { paymentAccounts, settings, licenses, paymentGateways, paymentWebhookEvents } from "@/lib/db/schema";
+import { eq, sql, desc } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
+import { GatewayConfigRepository } from "@/modules/payments/infrastructure/repositories/GatewayConfigRepository";
+import { decryptConfig } from "@/modules/payments/infrastructure/crypto";
+import { PaymentService } from "@/modules/payments/application/PaymentService";
+import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -549,5 +553,341 @@ export async function triggerSubscriptionCheck(): Promise<{
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 11. Save Gateway Config (Phase 34, PAY-05)
+// ──────────────────────────────────────────────
+
+export async function saveGatewayConfig(
+  gatewayId: string,
+  config: Record<string, unknown>
+): Promise<{ success?: boolean; error?: string }> {
+  const { userId, role } = await requireAdmin();
+
+  if (!gatewayId) {
+    return { error: "Gateway ID is required." };
+  }
+
+  try {
+    const configRepo = new GatewayConfigRepository();
+
+    // Get adapter name for the config record
+    const registry = GatewayRegistry.getInstance();
+    const adapter = registry.get(gatewayId);
+    const name = adapter?.name ?? gatewayId;
+
+    await configRepo.saveConfig(gatewayId, config, name);
+
+    await createAuditLog({
+      actorId: userId,
+      actorRole: role,
+      action: "admin.gateway.config_saved",
+      targetType: "payment_gateway",
+      targetId: gatewayId,
+      details: { action: "config_saved" },
+    });
+
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Failed to save config: ${message}` };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 12. Toggle Gateway Active State (Phase 34)
+// ──────────────────────────────────────────────
+
+export async function toggleGateway(
+  gatewayId: string,
+  active: boolean
+): Promise<{ success?: boolean; error?: string }> {
+  const { userId, role } = await requireAdmin();
+
+  if (!gatewayId) {
+    return { error: "Gateway ID is required." };
+  }
+
+  try {
+    const configRepo = new GatewayConfigRepository();
+    await configRepo.toggleActive(gatewayId, active);
+
+    await createAuditLog({
+      actorId: userId,
+      actorRole: role,
+      action: "admin.gateway.toggled",
+      targetType: "payment_gateway",
+      targetId: gatewayId,
+      details: { active },
+    });
+
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Failed to toggle gateway: ${message}` };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 13. Toggle Gateway Test Mode (Phase 34)
+// ──────────────────────────────────────────────
+
+export async function toggleTestMode(
+  gatewayId: string,
+  testMode: boolean
+): Promise<{ success?: boolean; error?: string }> {
+  const { userId, role } = await requireAdmin();
+
+  if (!gatewayId) {
+    return { error: "Gateway ID is required." };
+  }
+
+  try {
+    const configRepo = new GatewayConfigRepository();
+    await configRepo.toggleTestMode(gatewayId, testMode);
+
+    await createAuditLog({
+      actorId: userId,
+      actorRole: role,
+      action: "admin.gateway.test_mode_changed",
+      targetType: "payment_gateway",
+      targetId: gatewayId,
+      details: { testMode },
+    });
+
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Failed to toggle test mode: ${message}` };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 14. Test Gateway Connection (D-30)
+// ──────────────────────────────────────────────
+
+export async function testGatewayConnection(
+  gatewayId: string
+): Promise<{ success: boolean; message: string }> {
+  await requireAdmin();
+
+  if (!gatewayId) {
+    return { success: false, message: "Gateway ID is required." };
+  }
+
+  try {
+    const paymentService = new PaymentService();
+    const connected = await paymentService.testConnection(gatewayId);
+
+    return connected
+      ? { success: true, message: "Connected" }
+      : { success: false, message: "Connection failed. Check credentials." };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, message: `Error: ${message}` };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 15. Activate Gateway (Draft -> Test -> Live, D-42)
+// ──────────────────────────────────────────────
+
+export async function activateGateway(
+  gatewayId: string
+): Promise<{ success?: boolean; error?: string }> {
+  const { userId, role } = await requireAdmin();
+
+  if (!gatewayId) {
+    return { error: "Gateway ID is required." };
+  }
+
+  try {
+    const configRepo = new GatewayConfigRepository();
+    const gateway = await configRepo.getByGatewayId(gatewayId);
+
+    if (!gateway) {
+      return { error: "Gateway not found. Save configuration first." };
+    }
+
+    let newStatus: "draft" | "test" | "live";
+
+    if (gateway.status === "draft") {
+      newStatus = "test";
+    } else if (gateway.status === "test") {
+      // Verify connection before going live
+      const paymentService = new PaymentService();
+      const connected = await paymentService.testConnection(gatewayId);
+      if (!connected) {
+        return { error: "Cannot go live: Test connection failed. Check credentials." };
+      }
+      newStatus = "live";
+    } else {
+      return { error: "Gateway is already live." };
+    }
+
+    await configRepo.updateStatus(gatewayId, newStatus);
+
+    await createAuditLog({
+      actorId: userId,
+      actorRole: role,
+      action: "admin.gateway.activated",
+      targetType: "payment_gateway",
+      targetId: gatewayId,
+      details: { from: gateway.status, to: newStatus },
+    });
+
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Failed to activate gateway: ${message}` };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 16. Get Webhook Events (D-29)
+// ──────────────────────────────────────────────
+
+export async function getWebhookEvents(
+  gatewayId?: string,
+  page?: number
+): Promise<Array<{
+  id: string;
+  gatewayId: string;
+  eventType: string;
+  payload: Record<string, unknown>;
+  processed: boolean;
+  processedAt: Date | null;
+  createdAt: Date;
+}>> {
+  await requireAdmin();
+
+  const pageSize = 20;
+  const offset = ((page ?? 1) - 1) * pageSize;
+
+  try {
+    let query = db
+      .select()
+      .from(paymentWebhookEvents)
+      .orderBy(desc(paymentWebhookEvents.createdAt))
+      .limit(pageSize)
+      .offset(offset);
+
+    if (gatewayId) {
+      const rows = await db
+        .select()
+        .from(paymentWebhookEvents)
+        .where(eq(paymentWebhookEvents.gatewayId, gatewayId))
+        .orderBy(desc(paymentWebhookEvents.createdAt))
+        .limit(pageSize)
+        .offset(offset);
+      return rows as Array<{
+        id: string;
+        gatewayId: string;
+        eventType: string;
+        payload: Record<string, unknown>;
+        processed: boolean;
+        processedAt: Date | null;
+        createdAt: Date;
+      }>;
+    }
+
+    const rows = await query;
+    return rows as Array<{
+      id: string;
+      gatewayId: string;
+      eventType: string;
+      payload: Record<string, unknown>;
+      processed: boolean;
+      processedAt: Date | null;
+      createdAt: Date;
+    }>;
+  } catch {
+    return [];
+  }
+}
+
+// ──────────────────────────────────────────────
+// 17. Get All Gateways (for admin UI)
+// ──────────────────────────────────────────────
+
+export async function getGateways(): Promise<Array<{
+  id: string;
+  gatewayId: string;
+  name: string;
+  config: Record<string, unknown>;
+  active: boolean;
+  testMode: boolean;
+  status: string;
+  priority: number;
+  createdAt: Date;
+  updatedAt: Date;
+}>> {
+  await requireAdmin();
+
+  try {
+    const configRepo = new GatewayConfigRepository();
+
+    // Get all registered adapters from the registry
+    const registry = GatewayRegistry.getInstance();
+    const adapters = registry.getAll();
+
+    // Get DB records for existing configs
+    const allRows = await db.select().from(paymentGateways);
+    const dbMap = new Map(allRows.map((r) => [r.gatewayId, r]));
+
+    // Build result: merge adapter info with DB config (or defaults)
+    const results: Array<{
+      id: string;
+      gatewayId: string;
+      name: string;
+      config: Record<string, unknown>;
+      active: boolean;
+      testMode: boolean;
+      status: string;
+      priority: number;
+      createdAt: Date;
+      updatedAt: Date;
+    }> = [];
+
+    for (const adapter of adapters) {
+      const dbRow = dbMap.get(adapter.gatewayId);
+      if (dbRow) {
+        const decryptedConfig = JSON.parse(
+          decryptConfig(dbRow.config as string)
+        );
+        results.push({
+          id: dbRow.id,
+          gatewayId: dbRow.gatewayId,
+          name: dbRow.name,
+          config: decryptedConfig,
+          active: dbRow.active ?? false,
+          testMode: dbRow.testMode ?? true,
+          status: dbRow.status ?? "draft",
+          priority: dbRow.priority ?? 0,
+          createdAt: dbRow.createdAt,
+          updatedAt: dbRow.updatedAt,
+        });
+      } else {
+        // Adapter registered but no DB config yet
+        results.push({
+          id: "",
+          gatewayId: adapter.gatewayId,
+          name: adapter.name,
+          config: {},
+          active: false,
+          testMode: true,
+          status: "draft",
+          priority: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    }
+
+    return results;
+  } catch {
+    return [];
   }
 }
