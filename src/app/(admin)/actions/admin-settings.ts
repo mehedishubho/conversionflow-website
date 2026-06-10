@@ -803,7 +803,8 @@ export async function getWebhookEvents(
       processedAt: Date | null;
       createdAt: Date;
     }>;
-  } catch {
+  } catch (err) {
+    console.error("[getWebhookEvents] Error:", err);
     return [];
   }
 }
@@ -887,7 +888,8 @@ export async function getGateways(): Promise<Array<{
     }
 
     return results;
-  } catch {
+  } catch (err) {
+    console.error("[getGateways] Error:", err);
     return [];
   }
 }
