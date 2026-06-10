@@ -78,14 +78,15 @@ export class LicenseStatusHandler {
     }
 
     // 2. Normalize domain
+    let normalizedDomain: string;
     try {
-      Domain.create(input.domain);
+      normalizedDomain = Domain.create(input.domain).value;
     } catch {
       return INVALID;
     }
 
-    // 3. Check cache (D-21: license:status:<sha256(licenseKey+platform)>)
-    const cacheKey = `license:status:${crypto.createHash("sha256").update(key.value + (input.platform ?? "")).digest("hex")}`;
+    // 3. Check cache (D-21: license:status:<sha256(licenseKey+domain+platform)>)
+    const cacheKey = `license:status:${crypto.createHash("sha256").update(key.value + normalizedDomain + (input.platform ?? "")).digest("hex")}`;
     const cached = await cacheGet("LICENSE", cacheKey);
     if (cached) {
       try {
