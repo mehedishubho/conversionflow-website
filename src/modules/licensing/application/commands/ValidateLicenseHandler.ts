@@ -18,13 +18,15 @@ import { ValidationCache } from "@/modules/licensing/infrastructure/adapters/Val
 import { LicenseKey } from "@/shared/domain/valueObjects/LicenseKey";
 import { Domain } from "@/shared/domain/valueObjects/Domain";
 import { db } from "@/lib/db";
-import { settings } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { settings, productPlans } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
+import { resolveFeaturesForPlatform } from "@/lib/config/feature-catalog";
 
 export interface ValidateInput {
   licenseKey: string;
   domain: string;
   apiToken: string;
+  platform: string;
 }
 
 export interface ValidateResult {
@@ -35,6 +37,7 @@ export interface ValidateResult {
   maxActivations: number | null;
   currentActivations: number | null;
   grace_period_expires_at?: Date;
+  features: Record<string, boolean> | null;
 }
 
 export class ValidateLicenseHandler {
@@ -77,6 +80,7 @@ export class ValidateLicenseHandler {
       expiresAt: null,
       maxActivations: null,
       currentActivations: null,
+      features: null,
     };
 
     // 1. Parse license key (accept legacy lengths via create())
@@ -119,7 +123,28 @@ export class ValidateLicenseHandler {
       return INVALID;
     }
 
-    // 7. Real-time expiry check (D-03: safety net, compares expires_at against current time)
+    // 7. Look up plan features and resolve for platform (D-06, D-07)
+    // Done before grace/success branches so features are available in both
+    let resolvedFeatures: Record<string, boolean> = {};
+    try {
+      const planRows = await db
+        .select({ features: productPlans.features })
+        .from(productPlans)
+        .where(
+          and(
+            eq(productPlans.slug, license.plan),
+            eq(productPlans.productId, license.productId)
+          )
+        )
+        .limit(1);
+
+      const nestedFeatures = planRows[0]?.features as Record<string, Record<string, boolean>> | undefined;
+      resolvedFeatures = resolveFeaturesForPlatform(nestedFeatures ?? null, input.platform);
+    } catch {
+      // Feature lookup failure — don't block validation, return empty features
+    }
+
+    // 8. Real-time expiry check (D-03: safety net, compares expires_at against current time)
     if (license.expiresAt && new Date() > license.expiresAt) {
       // License is past its expires_at timestamp
       const graceDays = await this.getGracePeriodDays();
@@ -138,6 +163,7 @@ export class ValidateLicenseHandler {
           maxActivations: license.maxActivations,
           currentActivations: license.currentActivations,
           grace_period_expires_at: graceEnd,
+          features: resolvedFeatures,
         };
 
         // Cache with shorter TTL during grace period (60 seconds)
@@ -145,15 +171,7 @@ export class ValidateLicenseHandler {
           await ValidationCache.set(
             key.value,
             domain,
-            JSON.stringify({
-              valid: true,
-              licenseId: license.id,
-              plan: license.plan,
-              expiresAt: license.expiresAt,
-              maxActivations: license.maxActivations,
-              currentActivations: license.currentActivations,
-              grace_period_expires_at: graceEnd,
-            }),
+            JSON.stringify(graceResult),
           );
         } catch {
           // Cache write failure — don't block validation
@@ -166,10 +184,10 @@ export class ValidateLicenseHandler {
       return INVALID;
     }
 
-    // 8. Check domain is in activation_domains
+    // 9. Check domain is in activation_domains
     if (!license.activationDomains.includes(domain)) return INVALID;
 
-    // 9. Build success response (D-23)
+    // 10. Build success response (D-23)
     const result: ValidateResult = {
       valid: true,
       licenseId: license.id,
@@ -177,9 +195,10 @@ export class ValidateLicenseHandler {
       expiresAt: license.expiresAt,
       maxActivations: license.maxActivations,
       currentActivations: license.currentActivations,
+      features: resolvedFeatures,
     };
 
-    // 10. Cache the result (D-19, TTL=600s)
+    // 11. Cache the result (D-19, TTL=600s)
     await ValidationCache.set(key.value, domain, JSON.stringify(result));
 
     return result;
