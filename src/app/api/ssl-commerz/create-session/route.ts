@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
           successUrl: `${appUrl}/api/ssl-commerz/success`,
           failUrl: `${appUrl}/api/ssl-commerz/fail`,
           cancelUrl: `${appUrl}/api/ssl-commerz/cancel`,
-          webhookUrl: `${appUrl}/api/ssl-commerz/ipn`,
+          webhookUrl: `${appUrl}/api/webhooks/sslcommerz`,
         }
       );
       redirectUrl = sessionResult.redirectUrl;
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         successUrl: `${appUrl}/api/ssl-commerz/success`,
         failUrl: `${appUrl}/api/ssl-commerz/fail`,
         cancelUrl: `${appUrl}/api/ssl-commerz/cancel`,
-        ipnUrl: `${appUrl}/api/ssl-commerz/ipn`,
+        ipnUrl: `${appUrl}/api/webhooks/sslcommerz`,
         productName: `ConversionFlow ${plan}`,
         productCategory: "WordPress Plugin",
         cusName: user.name,
