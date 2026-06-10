@@ -51,14 +51,34 @@ function formatBilling(cycle: string | null, months: number | null): string {
   return label;
 }
 
-function formatFeatures(features: Record<string, Record<string, boolean>>): string {
-  const enabled = Object.entries(features)
-    .filter(([, platformMap]) => typeof platformMap === "object" && Object.values(platformMap).some(Boolean))
+function formatFeatures(features: Record<string, Record<string, boolean>> | Record<string, boolean>): string {
+  if (!features || typeof features !== "object") return "—";
+
+  // Check if nested format (first value is an object, not a boolean)
+  const entries = Object.entries(features);
+  if (entries.length === 0) return "—";
+
+  const [firstKey] = entries[0];
+  const firstEntry = features[firstKey];
+
+  if (typeof firstEntry === "object" && firstEntry !== null) {
+    // Nested format: count features with at least one platform enabled
+    const enabled = entries.filter(([, platformMap]) =>
+      typeof platformMap === "object" && platformMap !== null && Object.values(platformMap).some(Boolean)
+    ).map(([key]) => key.replace(/_/g, " "));
+
+    if (enabled.length === 0) return "—";
+    if (enabled.length <= 3) return enabled.join(", ");
+    return `${enabled.slice(0, 3).join(", ")} +${enabled.length - 3} more`;
+  }
+
+  // Legacy flat format (backward compat during migration)
+  const enabled = entries
+    .filter(([, v]) => v)
     .map(([k]) => k.replace(/_/g, " "));
 
   if (enabled.length === 0) return "—";
   if (enabled.length <= 3) return enabled.join(", ");
-
   return `${enabled.slice(0, 3).join(", ")} +${enabled.length - 3} more`;
 }
 

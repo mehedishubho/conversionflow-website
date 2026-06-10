@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { products, productVersions, productPlans } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
+import { PLATFORMS, isValidFeatureKey } from "@/lib/config/feature-catalog";
 import { clearPlanPricesCache } from "@/app/(portal)/actions/checkout";
 import { revalidatePath } from "next/cache";
 import fs from "fs";
@@ -513,7 +514,7 @@ export async function createPlan(productId: string, formData: FormData) {
     }
   }
 
-  // Parse and validate features JSON (nested per-platform format)
+  // Parse and validate features JSON (nested per-platform format with catalog validation)
   let features: Record<string, Record<string, boolean>> = {};
   if (featuresStr) {
     try {
@@ -521,13 +522,20 @@ export async function createPlan(productId: string, formData: FormData) {
       if (typeof parsed !== "object" || Array.isArray(parsed)) {
         return { error: "Features must be a JSON object." };
       }
-      for (const [key, value] of Object.entries(parsed)) {
-        if (typeof value !== "object" || value === null) {
-          return { error: `Feature "${key}" must be a platform map object.` };
+      for (const [featureKey, platformMap] of Object.entries(parsed)) {
+        // Validate feature key is from catalog (D-03)
+        if (!isValidFeatureKey(featureKey)) {
+          return { error: `Unknown feature key "${featureKey}". Only catalog features are allowed.` };
         }
-        for (const [platform, enabled] of Object.entries(value)) {
-          if (typeof enabled !== "boolean") {
-            return { error: `Feature "${key}" platform "${platform}" must be a boolean.` };
+        if (typeof platformMap !== "object" || platformMap === null || Array.isArray(platformMap)) {
+          return { error: `Feature "${featureKey}" must be a platform map.` };
+        }
+        for (const [platform, value] of Object.entries(platformMap)) {
+          if (!PLATFORMS.includes(platform as any)) {
+            return { error: `Invalid platform "${platform}" in feature "${featureKey}". Valid platforms: ${PLATFORMS.join(", ")}.` };
+          }
+          if (typeof value !== "boolean") {
+            return { error: `Feature "${featureKey}" platform "${platform}" must be a boolean.` };
           }
         }
       }
@@ -656,20 +664,26 @@ export async function updatePlan(planId: string, formData: FormData) {
       : null;
   }
 
-  // Parse and validate features JSON (nested per-platform format)
+  // Parse and validate features JSON (nested per-platform format with catalog validation)
   if (featuresStr !== null) {
     try {
       const parsed = JSON.parse(featuresStr);
       if (typeof parsed !== "object" || Array.isArray(parsed)) {
         return { error: "Features must be a JSON object." };
       }
-      for (const [key, value] of Object.entries(parsed)) {
-        if (typeof value !== "object" || value === null) {
-          return { error: `Feature "${key}" must be a platform map object.` };
+      for (const [featureKey, platformMap] of Object.entries(parsed)) {
+        if (!isValidFeatureKey(featureKey)) {
+          return { error: `Unknown feature key "${featureKey}". Only catalog features are allowed.` };
         }
-        for (const [platform, enabled] of Object.entries(value)) {
-          if (typeof enabled !== "boolean") {
-            return { error: `Feature "${key}" platform "${platform}" must be a boolean.` };
+        if (typeof platformMap !== "object" || platformMap === null || Array.isArray(platformMap)) {
+          return { error: `Feature "${featureKey}" must be a platform map.` };
+        }
+        for (const [platform, value] of Object.entries(platformMap)) {
+          if (!PLATFORMS.includes(platform as any)) {
+            return { error: `Invalid platform "${platform}" in feature "${featureKey}". Valid platforms: ${PLATFORMS.join(", ")}.` };
+          }
+          if (typeof value !== "boolean") {
+            return { error: `Feature "${featureKey}" platform "${platform}" must be a boolean.` };
           }
         }
       }
