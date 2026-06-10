@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { createSSLSession } from "@/lib/ssl-commerz";
 import { createAuditLog } from "@/lib/audit";
 import { pricingTiers } from "@/data/pricing";
@@ -73,6 +74,19 @@ export async function POST(request: NextRequest) {
     const discount = Math.max(0, Number(discountAmount) || 0);
     const tax = Math.max(0, Number(taxAmount) || 0);
     const totalAmount = Math.max(baseAmount - discount + tax, 0);
+
+    // 4b. Dedup check: prevent duplicate pending orders for same user+plan
+    const existingOrder = await db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(and(eq(orders.userId, user.id), eq(orders.plan, plan), eq(orders.status, "pending")))
+      .limit(1);
+    if (existingOrder.length > 0) {
+      return NextResponse.json(
+        { error: "A pending order already exists for this plan. Please complete or cancel it first." },
+        { status: 409 }
+      );
+    }
 
     // 5. Create a pending order in DB (to get order ID as tranId)
     const [order] = await db
