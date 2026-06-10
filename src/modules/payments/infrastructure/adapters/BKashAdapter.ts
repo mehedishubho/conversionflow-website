@@ -30,8 +30,8 @@ import { PaymentError } from "../../domain/PaymentError";
 import { GatewayConfigRepository } from "../repositories/GatewayConfigRepository";
 import { kvGet, kvSet } from "@/lib/redis";
 
-/** Redis key for caching bKash OAuth2 token */
-const BKASH_TOKEN_KEY = "bkash:api_token";
+/** Redis key prefix for caching bKash OAuth2 token (suffix includes environment) */
+const BKASH_TOKEN_KEY_PREFIX = "bkash:api_token";
 
 /** Token TTL in seconds: 3500s (cached at ~80% of 3600s token expiry, D-21) */
 const BKASH_TOKEN_TTL = 3500;
@@ -148,8 +148,11 @@ export class BKashAdapter implements IPaymentGateway {
    * 4. Cache in Redis with 3500s TTL (80% of 3600s token lifetime)
    */
   private async getToken(testMode: boolean): Promise<string> {
+    // Environment-isolated cache key prevents sandbox/production token cross-use
+    const cacheKey = `${BKASH_TOKEN_KEY_PREFIX}:${testMode ? "sandbox" : "production"}`;
+
     // Check Redis cache first
-    const cached = await kvGet(BKASH_TOKEN_KEY);
+    const cached = await kvGet(cacheKey);
     if (cached) return cached;
 
     // Grant new token from bKash API
@@ -194,7 +197,7 @@ export class BKashAdapter implements IPaymentGateway {
       }
 
       // Cache in Redis with TTL (D-21: 3500s = ~80% of 3600s)
-      await kvSet(BKASH_TOKEN_KEY, data.id_token, BKASH_TOKEN_TTL);
+      await kvSet(cacheKey, data.id_token, BKASH_TOKEN_TTL);
       return data.id_token;
     } catch (error) {
       if (error instanceof PaymentError) throw error;
