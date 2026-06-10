@@ -638,7 +638,16 @@ export async function updatePlan(planId: string, formData: FormData) {
   }
 
   // Handle licenseType and billing validation
-  const effectiveLicenseType = licenseType || undefined;
+  // Fetch existing plan to resolve current licenseType when not in payload
+  let finalLicenseType = (licenseType as string) || null;
+  if (!finalLicenseType) {
+    const [existing] = await db
+      .select({ licenseType: productPlans.licenseType })
+      .from(productPlans)
+      .where(eq(productPlans.id, planId))
+      .limit(1);
+    finalLicenseType = existing?.licenseType ?? null;
+  }
   if (licenseType) {
     if (licenseType !== "lifetime" && licenseType !== "subscription") {
       return { error: "License type must be 'lifetime' or 'subscription'." };
@@ -694,7 +703,6 @@ export async function updatePlan(planId: string, formData: FormData) {
   }
 
   // Invariant validation for the effective state
-  const finalLicenseType = (updateData.licenseType as string) || effectiveLicenseType;
   if (finalLicenseType === "lifetime") {
     if (updateData.billingCycle !== undefined && updateData.billingCycle !== null) {
       return { error: "Lifetime plans must not have a billing cycle." };
