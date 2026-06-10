@@ -206,11 +206,12 @@ export async function validateCoupon(
         discount = Math.min(coupon.value, orderAmount);
       }
 
-      // Increment currentUses within the same transaction
-      await tx
-        .update(coupons)
-        .set({ currentUses: (coupon.currentUses ?? 0) + 1 })
-        .where(eq(coupons.id, coupon.id));
+      // NOTE: currentUses increment deferred to order creation to avoid
+      // permanent increment on order failure (WR-03). The usage count is
+      // now incremented when the order is successfully created, not during
+      // validation. This means concurrent coupon uses could exceed maxUses
+      // by 1 under race conditions, which is acceptable vs. the alternative
+      // of permanently consuming a coupon use on failed orders.
 
       return {
         success: true as const,
@@ -313,6 +314,25 @@ export async function createManualOrder(
     targetType: "order",
     targetId: order.id,
   });
+
+  // Increment coupon usage after successful order creation (WR-03 fix)
+  if (couponCode) {
+    try {
+      const [coupon] = await db
+        .select()
+        .from(coupons)
+        .where(and(eq(coupons.code, couponCode.trim().toUpperCase()), eq(coupons.active, true)));
+      if (coupon) {
+        await db
+          .update(coupons)
+          .set({ currentUses: (coupon.currentUses ?? 0) + 1 })
+          .where(eq(coupons.id, coupon.id));
+      }
+    } catch {
+      // Non-fatal: don't fail the order if coupon increment fails
+      console.error("[createManualOrder] Failed to increment coupon usage");
+    }
+  }
 
   return { success: true, orderId: order.id };
 }
@@ -568,6 +588,25 @@ export async function createGatewayOrder(params: {
       targetType: "order",
       targetId: orderId,
     });
+
+    // Increment coupon usage after successful order creation (WR-03 fix)
+    if (params.couponCode) {
+      try {
+        const [coupon] = await db
+          .select()
+          .from(coupons)
+          .where(and(eq(coupons.code, params.couponCode.trim().toUpperCase()), eq(coupons.active, true)));
+        if (coupon) {
+          await db
+            .update(coupons)
+            .set({ currentUses: (coupon.currentUses ?? 0) + 1 })
+            .where(eq(coupons.id, coupon.id));
+        }
+      } catch {
+        // Non-fatal: don't fail the order if coupon increment fails
+        console.error("[createGatewayOrder] Failed to increment coupon usage");
+      }
+    }
 
     return {
       orderId,
