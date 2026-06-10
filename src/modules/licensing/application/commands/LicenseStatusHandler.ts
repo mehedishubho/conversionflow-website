@@ -24,11 +24,13 @@ import { db } from "@/lib/db";
 import { products, productPlans, settings, licenseActivations } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { cacheGet, cacheSet } from "@/lib/redis";
+import { resolveFeaturesForPlatform } from "@/lib/config/feature-catalog";
 
 export interface LicenseStatusInput {
   licenseKey: string;
   domain: string;
   apiToken: string;
+  platform?: string;
 }
 
 export interface ActivationInfo {
@@ -48,7 +50,7 @@ export interface LicenseStatusResult {
   max_activations?: number;
   current_activations?: number;
   activations?: ActivationInfo[];
-  features?: Record<string, Record<string, boolean>>;
+  features?: Record<string, Record<string, boolean>> | Record<string, boolean>;
   license_type?: string;
 }
 
@@ -82,8 +84,8 @@ export class LicenseStatusHandler {
       return INVALID;
     }
 
-    // 3. Check cache (D-21: license:status:<sha256(licenseKey)>)
-    const cacheKey = `license:status:${crypto.createHash("sha256").update(key.value).digest("hex")}`;
+    // 3. Check cache (D-21: license:status:<sha256(licenseKey+platform)>)
+    const cacheKey = `license:status:${crypto.createHash("sha256").update(key.value + (input.platform ?? "")).digest("hex")}`;
     const cached = await cacheGet("LICENSE", cacheKey);
     if (cached) {
       try {
@@ -203,7 +205,9 @@ export class LicenseStatusHandler {
       max_activations: license.maxActivations,
       current_activations: license.currentActivations,
       activations: activationDetails,
-      features: (plan?.features as Record<string, Record<string, boolean>>) ?? {},
+      features: input.platform
+        ? resolveFeaturesForPlatform(plan?.features as Record<string, Record<string, boolean>> | null, input.platform)
+        : (plan?.features as Record<string, Record<string, boolean>>) ?? {},
       license_type: plan?.licenseType ?? "subscription",
     };
 

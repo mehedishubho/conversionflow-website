@@ -21,7 +21,7 @@ import { ApiTokenGenerator } from "@/modules/licensing/domain/services/ApiTokenG
 import { LicenseKey } from "@/shared/domain/valueObjects/LicenseKey";
 import { Domain } from "@/shared/domain/valueObjects/Domain";
 import { db } from "@/lib/db";
-import { products, productVersions, settings, updateLogs } from "@/lib/db/schema";
+import { products, productVersions, settings, updateLogs, productPlans } from "@/lib/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { DownloadTokenService } from "@/modules/licensing/application/services/DownloadTokenService";
 import { hasUpdate } from "@/modules/licensing/application/services/SemverCompare";
@@ -126,15 +126,39 @@ export class UpdateCheckHandler {
     // Verify license belongs to this product
     if (product.id !== license.productId) return UPDATE_NOT_AVAILABLE;
 
-    // 8. Find latest stable version (D-12: only stable)
+    // 7b. Check beta_channel feature flag (D-04: beta channel enables beta versions)
+    let includeBeta = false;
+    try {
+      const planRows = await db
+        .select({ features: productPlans.features })
+        .from(productPlans)
+        .where(
+          and(
+            eq(productPlans.slug, license.plan),
+            eq(productPlans.productId, license.productId)
+          )
+        )
+        .limit(1);
+
+      const planFeatures = planRows[0]?.features as Record<string, Record<string, boolean>> | undefined;
+      // For beta_channel check, use wordpress as default platform (v3.0 was WP-only)
+      // Future: accept platform from input when multi-platform products exist
+      includeBeta = !!planFeatures?.beta_channel?.wordpress;
+    } catch {
+      // Plan lookup failure — default to stable only
+    }
+
+    // 8. Find latest version (D-12 resolved: include beta if beta_channel flag enabled)
     const versionRows = await db
       .select()
       .from(productVersions)
       .where(
-        and(
-          eq(productVersions.productId, product.id),
-          eq(productVersions.status, "stable")
-        )
+        includeBeta
+          ? eq(productVersions.productId, product.id)
+          : and(
+              eq(productVersions.productId, product.id),
+              eq(productVersions.status, "stable")
+            )
       )
       .orderBy(desc(productVersions.createdAt))
       .limit(1);
