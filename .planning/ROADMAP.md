@@ -501,7 +501,7 @@ Plans:
 
 ### Phase 33: Feature Flags & Tier Enforcement
 **Milestone:** v4.0
-**Goal:** Add feature flag definitions per plan/tier so the validate endpoint returns what features are allowed, enabling fine-grained access control across platforms.
+**Goal:** Add feature flag definitions per plan/tier with a platform dimension, so the validate endpoint returns what features are allowed per platform, enabling fine-grained access control across WordPress, Laravel, Shopify, and Next.js clients.
 **Depends on:** Phase 32
 **Success Criteria:**
   1. Feature flag definitions stored in product_plans (JSONB column or dedicated table)
@@ -511,11 +511,10 @@ Plans:
   5. Customer portal shows available vs locked features for their tier
 **Plans:** 4 plans
 Plans:
-- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
-- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
-- [ ] 32-03-PLAN.md — API routes and portal download integration
-- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
-**Status:** 🔲 Planned
+- [ ] 33-01-PLAN.md — Feature catalog, schema type change, and seed data migration
+- [ ] 33-02-PLAN.md — API handler updates: validate, status, and beta channel
+- [ ] 33-03-PLAN.md — Admin UI: checkbox grid and nested features validation
+- [ ] 33-04-PLAN.md — Customer portal feature checklist
 
 ### Phase 34: Multi-Gateway Payment System
 **Milestone:** v4.0
@@ -651,4 +650,4 @@ v4.0: 32 → 33 → 34 (parallel gateways)
 - v4.0 milestone context: `.planning/phases/32-v4-milestone/v4-MILESTONE-CONTEXT.md`
 
 ---
-*Last updated: 2026-06-09*
+*Last updated: 2026-06-10*
