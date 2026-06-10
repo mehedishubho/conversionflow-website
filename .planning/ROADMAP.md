@@ -61,7 +61,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | 30 | Migration & External API Removal | v3.0 | ✅ Complete | ✅ |
 | 31 | Backup & Restore System | v3.0 | ✅ Complete | ✅ |
 | 32 | Update Delivery System | 2/4 | Complete    | 2026-06-09 |
-| 33 | Feature Flags & Tier Enforcement | v4.0 | 🔲 Planned | — |
+| 33 | Feature Flags & Tier Enforcement | 4/3 | Complete    | 2026-06-10 |
 | 34 | Multi-Gateway Payment System | v4.0 | 🔲 Planned | — |
 | 35 | WordPress SDK | v4.0 | 🔲 Planned | — |
 | 36 | Laravel SDK | v4.0 | 🔲 Planned | — |
@@ -501,7 +501,7 @@ Plans:
 
 ### Phase 33: Feature Flags & Tier Enforcement
 **Milestone:** v4.0
-**Goal:** Add feature flag definitions per plan/tier so the validate endpoint returns what features are allowed, enabling fine-grained access control across platforms.
+**Goal:** Add feature flag definitions per plan/tier with a platform dimension, so the validate endpoint returns what features are allowed per platform, enabling fine-grained access control across WordPress, Laravel, Shopify, and Next.js clients.
 **Depends on:** Phase 32
 **Success Criteria:**
   1. Feature flag definitions stored in product_plans (JSONB column or dedicated table)
@@ -511,29 +511,30 @@ Plans:
   5. Customer portal shows available vs locked features for their tier
 **Plans:** 4 plans
 Plans:
-- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
-- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
-- [ ] 32-03-PLAN.md — API routes and portal download integration
-- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
-**Status:** 🔲 Planned
+- [x] 33-01-PLAN.md — Feature catalog, schema type change, and seed data migration
+- [x] 33-02-PLAN.md — API handler updates: validate, status, and beta channel
+- [x] 33-03-PLAN.md — Admin UI: checkbox grid and nested features validation
+- [x] 33-04-PLAN.md — Customer portal feature checklist
 
 ### Phase 34: Multi-Gateway Payment System
 **Milestone:** v4.0
-**Goal:** Refactor payment into a dual-system model (Manual + Real automatic gateways). Add Stripe, Paddle, and bKash automatic API as extensible gateways alongside existing SSL Commerz.
+**Goal:** Refactor payment into a dual-system model (Manual + Real automatic gateways). Extract SSL Commerz into adapter, add Paddle (Merchant of Record) for international payments, add bKash Tokenized Checkout API for automatic BD payments. Stripe deferred to post-v4.0.
 **Depends on:** Phase 33
+**Requirements:** PAY-01, PAY-02, PAY-03, PAY-04, PAY-05, PAY-06
 **Success Criteria:**
-  1. Payment settings UI reorganized into dual-system model: Manual (bKash, Nagad, Rocket, Bank) and Real (SSL Commerz, Stripe, Paddle, bKash API)
-  2. Stripe integration with Checkout Sessions, Webhooks, and subscription support
-  3. Paddle integration as Merchant of Record for international sales with tax handling
-  4. bKash automatic API gateway for BD customers
-  5. Gateway abstraction layer — common interface for adding/replacing gateways
-  6. Admin can enable/disable individual gateways from settings
-**Plans:** 4 plans
+  1. Payment settings UI reorganized into dual-system model: Manual (bKash, Nagad, Rocket, Bank) and Automatic (SSL Commerz, Paddle, bKash API)
+  2. Paddle integration as Merchant of Record for international sales with tax handling (Stripe deferred)
+  3. bKash automatic API gateway for BD customers
+  4. Gateway abstraction layer — common IPaymentGateway interface for adding/replacing gateways
+  5. Admin can enable/disable individual gateways from settings with Draft->Test->Live activation flow
+  6. Customer checkout has currency toggle (BDT/USD) with gateway filtering
+**Plans:** 5 plans
 Plans:
-- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
-- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
-- [ ] 32-03-PLAN.md — API routes and portal download integration
-- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
+- [ ] 34-01-PLAN.md — Payments module, schema, gateway abstraction (IPaymentGateway, GatewayRegistry, PaymentService, crypto)
+- [ ] 34-02-PLAN.md — SSL Commerz adapter extraction (wraps existing ssl-commerz.ts, unified webhook route)
+- [ ] 34-03-PLAN.md — Paddle adapter (Billing API, hosted checkout, HMAC webhook verification, price sync)
+- [ ] 34-04-PLAN.md — bKash adapter (Tokenized Checkout v1.2.0-beta, Redis token caching, inline SDK)
+- [ ] 34-05-PLAN.md — Admin settings UI + checkout UX restructure (two-tab layout, gateway cards, currency toggle, success page)
 **Status:** 🔲 Planned
 
 ### Phase 35: WordPress SDK
@@ -651,4 +652,4 @@ v4.0: 32 → 33 → 34 (parallel gateways)
 - v4.0 milestone context: `.planning/phases/32-v4-milestone/v4-MILESTONE-CONTEXT.md`
 
 ---
-*Last updated: 2026-06-09*
+*Last updated: 2026-06-10*
