@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
 import { PaymentService } from "@/modules/payments/application/PaymentService";
+import { PaymentError } from "@/modules/payments/domain/PaymentError";
 import { db } from "@/lib/db";
 import { orders, paymentWebhookEvents } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -109,7 +110,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[Webhook/Paddle] Unhandled error:", error);
-    // Return 200 to prevent Paddle retries for transient errors
-    return NextResponse.json({ ok: true });
+    // Only swallow errors that Paddle retrying won't fix (e.g., invalid config, business logic)
+    if (error instanceof PaymentError) {
+      return NextResponse.json({ ok: true });
+    }
+    // For unknown/transient errors (DB connection, network), let Paddle retry
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
