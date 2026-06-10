@@ -76,6 +76,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, message: "Already processed" });
     }
 
+    // 5b. Amount verification: ensure paid amount matches order amount
+    if (result.rawPayload) {
+      const verification = result.rawPayload.verification as Record<string, unknown> | undefined;
+      const rawAmount = verification?.amount ?? result.rawPayload.amount;
+      const paidAmount = parseFloat(String(rawAmount)) || 0;
+      if (paidAmount > 0 && Math.abs(paidAmount - order.amount) > 1) {
+        console.error(
+          `[Webhook/bKash] Amount mismatch: order=${order.amount}, paid=${paidAmount}`
+        );
+        return NextResponse.json(
+          { error: "Amount mismatch" },
+          { status: 400 }
+        );
+      }
+    }
+
     // 6. Complete or fail order
     if (result.status === "completed") {
       const paymentService = new PaymentService();

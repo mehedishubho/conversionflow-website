@@ -66,6 +66,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, message: "Already processed" });
     }
 
+    // 4b. Amount verification: ensure paid amount matches order amount
+    if (result.rawPayload && result.status === "completed") {
+      const paidAmount = parseFloat(String(result.rawPayload.amount)) || 0;
+      if (paidAmount > 0 && Math.abs(paidAmount - order.amount) > 1) {
+        console.error(
+          `[Webhook/Paddle] Amount mismatch: order=${order.amount}, paid=${paidAmount}`
+        );
+        return NextResponse.json(
+          { error: "Amount mismatch" },
+          { status: 400 }
+        );
+      }
+    }
+
     // 5. Handle event type
     if (result.status === "completed") {
       const paymentService = new PaymentService();
