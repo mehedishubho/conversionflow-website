@@ -116,7 +116,10 @@ export async function seedProducts() {
   ];
 
   for (const plan of plans) {
-    await db.insert(productPlans).values(plan as unknown as typeof productPlans.$inferInsert);
+    await db.insert(productPlans).values({
+      ...plan,
+      features: plan.features as Record<string, Record<string, boolean>>,
+    });
   }
 
   console.log(
