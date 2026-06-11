@@ -161,5 +161,8 @@ class WpCron
         delete_option('conversionflow_expiry_warning');
         delete_option('conversionflow_license_expired');
         delete_option('conversionflow_last_check_failure');
+        delete_option('conversionflow_cached_validation');
+        delete_option('conversionflow_cache_expires');
+        delete_option('conversionflow_license_expires');
     }
 }
