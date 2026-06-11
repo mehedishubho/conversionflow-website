@@ -13,7 +13,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | M3 | **v2.0 Dual Portal SaaS Platform** | 11–18 | ✅ Shipped | 2026-05-19 |
 | M4 | **v2.1 Marketing & SEO Settings Dashboard** | 19–23 | ✅ Shipped | 2026-05-30 |
 | M5 | **v3.0 Self-Contained Licensing Architecture** | 24–31 | ✅ Shipped | — |
-| M6 | **v4.0 Multi-Platform License Server & SDK Distribution** | 32–38 | 🔲 Planned | — |
+| M6 | **v4.0 Multi-Platform License Server & SDK Distribution** | 32–38 | 🟢 Partially Shipped | — |
 
 ## Current Milestone
 
@@ -64,9 +64,9 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | 33 | Feature Flags & Tier Enforcement | 1/0 | Complete    | 2026-06-11 |
 | 34 | Multi-Gateway Payment System | 5/5 | Complete    | 2026-06-10 |
 | 35 | WordPress SDK | 3/3 | Complete    | 2026-06-11 |
-| 36 | Laravel SDK | v4.0 | 🔲 Planned | — |
-| 37 | Shopify App Integration | v4.0 | 🔲 Planned | — |
-| 38 | Next.js SDK & API Security | v4.0 | 🔲 Planned | — |
+| 36 | Laravel SDK | v4.0 | ⏸️ Deferred | — |
+| 37 | Shopify App Integration | v4.0 | ⏸️ Deferred | — |
+| 38 | Next.js SDK & API Security | v4.0 | ⏸️ Deferred | — |
 
 ---
 
@@ -479,7 +479,7 @@ Plans:
 </details>
 
 <details>
-<summary><strong>M6 — v4.0 Multi-Platform License Server & SDK Distribution</strong> (Phases 32–38) · Planned</summary>
+<summary><strong>M6 — v4.0 Multi-Platform License Server & SDK Distribution</strong> (Phases 32–38) · Partially Shipped (32–35 done, 36–38 deferred)</summary>
 
 ### Phase 32: Update Delivery System
 **Milestone:** v4.0
@@ -566,13 +566,8 @@ Plans:
   3. Artisan commands: activate, deactivate, check, status
   4. Config and views publishable
   5. Caching layer (24h) to minimize API calls
-**Plans:** 4 plans
-Plans:
-- [x] 32-01-PLAN.md — Schema extensions, core services, and command handlers
-- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
-- [x] 32-03-PLAN.md — API routes and portal download integration
-- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
-**Status:** 🔲 Planned
+**Plans:** 4 plans planned
+**Status:** ⏸️ Deferred to future milestone
 
 ### Phase 37: Shopify App Integration
 **Milestone:** v4.0
@@ -584,13 +579,8 @@ Plans:
   3. Webhook handlers for install/uninstall/billing events
   4. Installation flow creates ConversionFlow license automatically
   5. License status syncs bidirectionally between Shopify and ConversionFlow
-**Plans:** 4 plans
-Plans:
-- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
-- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
-- [ ] 32-03-PLAN.md — API routes and portal download integration
-- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
-**Status:** 🔲 Planned
+**Plans:** 4 plans planned
+**Status:** ⏸️ Deferred to future milestone
 
 ### Phase 38: Next.js SDK & API Security
 **Milestone:** v4.0
@@ -602,13 +592,8 @@ Plans:
   3. Standardized API key authentication for SDK clients
   4. Rate limiting per platform (WP, Laravel, Shopify, Next.js)
   5. API key rotation support in admin dashboard
-**Plans:** 4 plans
-Plans:
-- [ ] 32-01-PLAN.md — Schema extensions, core services, and command handlers
-- [ ] 32-02-PLAN.md — Admin ZIP file upload, config, and UI forms
-- [ ] 32-03-PLAN.md — API routes and portal download integration
-- [ ] 32-04-PLAN.md — Portal token generation, schema push, build verification
-**Status:** 🔲 Planned
+**Plans:** 4 plans planned
+**Status:** ⏸️ Deferred to future milestone
 
 </details>
 
@@ -643,13 +628,15 @@ v4.0: 32 → 33 → 34 (parallel gateways)
 | v2.0 Dual Portal SaaS | 11–18 | 8 | 6 | 2 | 2 (planned + deferred) |
 | v2.1 Marketing & SEO | 19–23 | 5 | 5 | 1 | 0 |
 | v3.0 Licensing Architecture | 24–31 | 8 | 8 | 8 | 0 |
-| v4.0 Multi-Platform License Server | 32–38 | 7 | 0 | 0 | 7 |
-| **Total** | | **38** | **29** | **15** | **9** |
+| v4.0 Multi-Platform License Server | 32–38 | 7 | 4 | 0 | 3 (deferred) |
+| **Total** | | **38** | **33** | **15** | **5** |
 
 **Notes:**
 - Phase 17 (Notification Engine): 4 plans created, ready for execution
 - Phase 18 (Affiliate Network): Fully deferred to post-MVP
+- Phases 36–38 (Laravel SDK, Shopify App, Next.js SDK): Deferred to future milestone
+- v4.0 shipped: Update Delivery, Feature Flags, Multi-Gateway Payments, WordPress SDK
 - v4.0 milestone context: `.planning/phases/32-v4-milestone/v4-MILESTONE-CONTEXT.md`
 
 ---
-*Last updated: 2026-06-10*
+*Last updated: 2026-06-11*

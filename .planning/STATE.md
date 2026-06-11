@@ -7,7 +7,7 @@ last_updated: "2026-06-11T12:40:04.825Z"
 last_activity: 2026-06-11
 progress:
   total_phases: 17
-  completed_phases: 11
+  completed_phases: 14
   total_plans: 49
   completed_plans: 47
   percent: 96
@@ -21,17 +21,17 @@ See: `.planning/PROJECT.md` (updated 2026-06-09)
 
 **Core value:** A production-grade, self-contained licensing platform where Bangladeshi WooCommerce store owners purchase ConversionFlow licenses, manage billing and downloads, get support — while Devsroom operators gain real-time business intelligence, revenue analytics, and complete control over the licensing lifecycle. All licensing operations are managed directly within ConversionFlow without external dependencies.
 
-**Current focus:** Phase 34 — multi-gateway-payment-system
+**Current focus:** v4.0 partially shipped (Phases 32–35 complete, 36–38 deferred)
 
 ## Current Position
 
-Phase: 18
-Plan: Not started
-Status: Executing Phase 34
+Phase: 35
+Plan: Complete
+Status: v4.0 Partially Shipped (32–35 done, 36–38 deferred)
 Last activity: 2026-06-11
 
 ```
-v4.0 Progress: [            ] 0%
+v4.0 Progress: [████████████░░░░] 57% (4/7 phases, 3 deferred)
 ```
 
 ## Performance Metrics
@@ -39,7 +39,7 @@ v4.0 Progress: [            ] 0%
 **Velocity:**
 
 - Total plans completed: 105 (v1.0/v1.1/v2.0/v2.1/v3.0 milestones)
-- v4.0 plans completed: 0
+- v4.0 plans completed: 13 (Phases 32–35)
 - Average duration: -
 - Total execution time: -
 
@@ -52,13 +52,13 @@ v4.0 Progress: [            ] 0%
 | v2.0 Phases 11-16 | 28/28 | Complete | Shipped 2026-05-19 |
 | v2.1 Phases 19-23 | 21/21 | Complete | Shipped 2026-05-30 |
 | v3.0 Phases 24-31 | 24/24 | Complete | All verified |
-| v4.0 Phase 32 | 0/TBD | Not Started | Update Delivery System |
-| v4.0 Phase 33 | 0/TBD | Not Started | Feature Flags & Tier Enforcement |
-| v4.0 Phase 34 | 0/TBD | Not Started | Multi-Gateway Payment System |
-| v4.0 Phase 35 | 0/TBD | Not Started | WordPress SDK |
-| v4.0 Phase 36 | 0/TBD | Not Started | Laravel SDK |
-| v4.0 Phase 37 | 0/TBD | Not Started | Shopify App Integration |
-| v4.0 Phase 38 | 0/TBD | Not Started | Next.js SDK & API Security |
+| v4.0 Phase 32 | 4/4 | Complete | Update Delivery System |
+| v4.0 Phase 33 | 1/1 | Complete | Feature Flags & Tier Enforcement |
+| v4.0 Phase 34 | 5/5 | Complete | Multi-Gateway Payment System |
+| v4.0 Phase 35 | 3/3 | Complete | WordPress SDK |
+| v4.0 Phase 36 | — | Deferred | Laravel SDK (future) |
+| v4.0 Phase 37 | — | Deferred | Shopify App Integration (future) |
+| v4.0 Phase 38 | — | Deferred | Next.js SDK & API Security (future) |
 
 ## Accumulated Context
 
@@ -110,13 +110,13 @@ src/
 
 **v4.0 Roadmap:**
 
-- [ ] Plan Phase 32: Update Delivery System
-- [ ] Plan Phase 33: Feature Flags & Tier Enforcement
-- [ ] Plan Phase 34: Multi-Gateway Payment System
-- [ ] Plan Phase 35: WordPress SDK
-- [ ] Plan Phase 36: Laravel SDK
-- [ ] Plan Phase 37: Shopify App Integration
-- [ ] Plan Phase 38: Next.js SDK & API Security
+- [x] Plan Phase 32: Update Delivery System ✅
+- [x] Plan Phase 33: Feature Flags & Tier Enforcement ✅
+- [x] Plan Phase 34: Multi-Gateway Payment System ✅
+- [x] Plan Phase 35: WordPress SDK ✅
+- [ ] ~~Plan Phase 36: Laravel SDK~~ → Deferred to future milestone
+- [ ] ~~Plan Phase 37: Shopify App Integration~~ → Deferred to future milestone
+- [ ] ~~Plan Phase 38: Next.js SDK & API Security~~ → Deferred to future milestone
 
 ### Open Questions
 
@@ -135,10 +135,10 @@ src/
 
 **Success Criteria:**
 
-- [ ] WordPress plugin can auto-update from ConversionFlow server
-- [ ] Each platform has a working SDK that calls /api/v1/license/*
-- [ ] Admin can configure multiple payment gateways (Manual + Real)
-- [ ] Stripe and Paddle process international payments automatically
-- [ ] Feature flags control what each plan tier can access
-- [ ] All API endpoints are secured with HMAC signing
-- [ ] Platform-specific analytics show WP/Laravel/Shopify/Next.js breakdowns
+- [x] WordPress plugin can auto-update from ConversionFlow server
+- [ ] ~~Each platform has a working SDK that calls /api/v1/license/*~~ → WP done, others deferred
+- [x] Admin can configure multiple payment gateways (Manual + Real)
+- [x] Stripe and Paddle process international payments automatically
+- [x] Feature flags control what each plan tier can access
+- [ ] ~~All API endpoints are secured with HMAC signing~~ → Deferred to Phase 38
+- [ ] ~~Platform-specific analytics show WP/Laravel/Shopify/Next.js breakdowns~~ → Deferred
