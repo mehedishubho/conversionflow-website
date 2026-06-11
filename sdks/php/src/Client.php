@@ -89,6 +89,19 @@ class Client
         $this->serverUrl = rtrim($serverUrl, '/');
         $this->licenseKey = $licenseKey;
         $this->apiToken = $apiToken;
+
+        // Enforce HTTPS for server URL (allow http for localhost/.test/.local development)
+        if (strpos($this->serverUrl, 'https://') !== 0) {
+            $isLocal = preg_match('/^https?:\/\/(localhost|127\.0\.0\.1|[^\/]+\.(test|local))(?::\d+)?(?:\/|$)/i', $this->serverUrl);
+            if (!$isLocal) {
+                throw new SdkException(
+                    'Server URL must use HTTPS. Got: ' . $this->serverUrl,
+                    0,
+                    ['serverUrl' => $this->serverUrl]
+                );
+            }
+        }
+
         $this->transport = new CurlTransport();
         $this->logger = new NullLogger();
 
