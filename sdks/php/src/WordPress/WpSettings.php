@@ -58,12 +58,14 @@ class WpSettings
 
         echo '<table class="form-table">';
 
-        // License Key field (masked for security)
+        // License Key field (masked for security, per T-35-08)
+        // Value is NEVER echoed in HTML -- password input is empty for existing keys.
+        // The masked display below shows last 4 chars so user knows a key is stored.
         echo '<tr>';
         echo '<th scope="row"><label for="conversionflow_license_key">License Key</label></th>';
         echo '<td>';
         echo '<input type="password" name="conversionflow_license_key" id="conversionflow_license_key" ';
-        echo 'value="' . esc_attr($licenseKey) . '" class="regular-text" />';
+        echo 'value="" class="regular-text" placeholder="Enter license key" />';
         if (!empty($licenseKey)) {
             $masked = str_repeat('*', strlen($licenseKey) - 4) . substr($licenseKey, -4);
             echo '<p class="description">Current: ' . esc_html($masked) . '</p>';
@@ -323,7 +325,8 @@ class WpSettings
      */
     private function saveSettings(): void
     {
-        if (isset($_POST['conversionflow_license_key'])) {
+        // Only update license key if a new value was provided (input is empty for existing keys)
+        if (isset($_POST['conversionflow_license_key']) && $_POST['conversionflow_license_key'] !== '') {
             update_option('conversionflow_license_key', sanitize_text_field($_POST['conversionflow_license_key']));
         }
         if (isset($_POST['conversionflow_server_url'])) {
