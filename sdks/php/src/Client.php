@@ -343,6 +343,18 @@ class Client
             ? CONVERSIONFLOW_API_TOKEN
             : get_option('conversionflow_api_token', '');
 
+        if (empty($serverUrl) || empty($licenseKey) || empty($apiToken)) {
+            throw new SdkException(
+                'ConversionFlow SDK not configured. Set server URL, license key, and API token via WordPress options or wp-config.php constants.',
+                0,
+                ['missing' => array_filter([
+                    'serverUrl' => empty($serverUrl),
+                    'licenseKey' => empty($licenseKey),
+                    'apiToken' => empty($apiToken),
+                ])]
+            );
+        }
+
         $client = new self($serverUrl, $licenseKey, $apiToken);
         $client->setTransport(new WpTransport());
         $client->setLogger(new WpLogger());
