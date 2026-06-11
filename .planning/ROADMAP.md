@@ -45,7 +45,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | 14 | Checkout and Payments | v2.0 | ✅ Complete | — |
 | 15 | Admin BI Dashboard | v2.0 | ✅ Complete | — |
 | 16 | Webhooks, Background Jobs & License Intelligence | v2.0 | ✅ Complete | — |
-| 17 | Multi-channel Notification Engine | v2.0 | 🔲 Planned | — |
+| 17 | Multi-channel Notification Engine | 2/4 | Complete    | 2026-06-11 |
 | 18 | Affiliate Network System | v2.0 | ⏸️ Deferred to post-MVP | — |
 | 19 | Settings Foundation | v2.1 | ✅ Complete | — |
 | 20 | Core SEO Configuration | v2.1 | ✅ Complete | — |
@@ -61,7 +61,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 | 30 | Migration & External API Removal | v3.0 | ✅ Complete | ✅ |
 | 31 | Backup & Restore System | v3.0 | ✅ Complete | ✅ |
 | 32 | Update Delivery System | 4/4 | Complete    | 2026-06-11 |
-| 33 | Feature Flags & Tier Enforcement | 4/3 | Complete    | 2026-06-10 |
+| 33 | Feature Flags & Tier Enforcement | 1/0 | Complete    | 2026-06-11 |
 | 34 | Multi-Gateway Payment System | 5/5 | Complete    | 2026-06-10 |
 | 35 | WordPress SDK | 3/3 | Complete    | 2026-06-11 |
 | 36 | Laravel SDK | v4.0 | 🔲 Planned | — |
@@ -230,7 +230,7 @@ Transform the ConversionFlow marketing website into a full SaaS platform with Cu
 Plans:
 - [ ] 17-01-PLAN.md — Unified email adapter, domain types, schema changes
 - [ ] 17-02-PLAN.md — NotificationService, EventCatalog, BullMQ workers, module-init wiring
-- [ ] 17-03-PLAN.md — 30s polling, preference persistence, channel toggles
+- [x] 17-03-PLAN.md — 30s polling, preference persistence, channel toggles
 - [ ] 17-04-PLAN.md — Admin delivery status, schema push
 **Status:** 🔲 Planned
 
