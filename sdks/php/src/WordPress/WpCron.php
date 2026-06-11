@@ -109,7 +109,7 @@ class WpCron
 
         // Only show on plugin-related admin pages
         $screen = get_current_screen();
-        if ($screen && $screen->base !== 'plugins' && strpos($screen->base, 'conversionflow') === false) {
+        if ($screen && $screen->base !== 'plugins' && stripos($screen->base, 'conversionflow') === false) {
             return;
         }
 
