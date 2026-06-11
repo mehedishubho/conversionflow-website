@@ -12,6 +12,8 @@ use ConversionFlow\Sdk\Response\ValidationResponse;
 use ConversionFlow\Sdk\Response\VerificationTokenResponse;
 use ConversionFlow\Sdk\Transport\CurlTransport;
 use ConversionFlow\Sdk\Transport\TransportInterface;
+use ConversionFlow\Sdk\WordPress\WpLogger;
+use ConversionFlow\Sdk\WordPress\WpTransport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -31,6 +33,12 @@ use Psr\Log\NullLogger;
  */
 class Client
 {
+    /**
+     * SDK version for version tracking (per D-34).
+     * Independent of WordPress plugin version. Follows semantic versioning.
+     */
+    public const VERSION = '1.0.0';
+
     /** @var string */
     private $serverUrl;
 
@@ -58,6 +66,10 @@ class Client
     /** Cache TTL in seconds (24 hours per D-17) */
     private const CACHE_TTL = 86400;
 
+    /** WordPress option names (per D-11) */
+    private const OPTION_CACHE = 'conversionflow_cached_validation';
+    private const OPTION_CACHE_EXPIRES = 'conversionflow_cache_expires';
+
     /** Endpoint paths */
     private const ENDPOINT_VALIDATE = '/api/v1/license/validate';
     private const ENDPOINT_ACTIVATE = '/api/v1/license/activate';
@@ -79,6 +91,11 @@ class Client
         $this->apiToken = $apiToken;
         $this->transport = new CurlTransport();
         $this->logger = new NullLogger();
+
+        // Define version constant if not already defined (per D-34)
+        if (!defined('CONVERSIONFLOW_SDK_VERSION')) {
+            define('CONVERSIONFLOW_SDK_VERSION', self::VERSION);
+        }
     }
 
     /**
@@ -244,6 +261,28 @@ class Client
     }
 
     /**
+     * Get plugin update info for WordPress "View details" popup.
+     *
+     * Calls POST /api/v1/update/info with product slug.
+     * Returns raw data array for WpUpdater to build plugin info object.
+     *
+     * @param string $productSlug The product slug configured on the server
+     * @return array
+     *
+     * @throws SdkException On connection failure or HTTP 5xx
+     */
+    public function getUpdateInfo(string $productSlug): array
+    {
+        $result = $this->callApi(self::ENDPOINT_UPDATE_INFO, [
+            'license_key' => $this->licenseKey,
+            'domain' => $this->detectDomain(),
+            'api_token' => $this->apiToken,
+            'product_slug' => $productSlug,
+        ]);
+        return $result['data'] ?? [];
+    }
+
+    /**
      * Check if a specific feature is enabled for the current license.
      *
      * Reads from the locally cached features map (updated on validate/getStatus).
@@ -280,6 +319,34 @@ class Client
 
         $result = $this->callApi(self::ENDPOINT_VERIFICATION_TOKEN, $body);
         return new VerificationTokenResponse($result['data']);
+    }
+
+    /**
+     * WordPress static factory. Auto-discovers config from WP options/constants.
+     *
+     * Per D-05: zero-config for plugin authors who use the admin settings page.
+     * Per D-12: constants take priority over options when both exist.
+     *
+     * @return self
+     */
+    public static function wordpress(): self
+    {
+        $serverUrl = defined('CONVERSIONFLOW_SERVER_URL')
+            ? CONVERSIONFLOW_SERVER_URL
+            : get_option('conversionflow_server_url', '');
+
+        $licenseKey = defined('CONVERSIONFLOW_LICENSE_KEY')
+            ? CONVERSIONFLOW_LICENSE_KEY
+            : get_option('conversionflow_license_key', '');
+
+        $apiToken = defined('CONVERSIONFLOW_API_TOKEN')
+            ? CONVERSIONFLOW_API_TOKEN
+            : get_option('conversionflow_api_token', '');
+
+        $client = new self($serverUrl, $licenseKey, $apiToken);
+        $client->setTransport(new WpTransport());
+        $client->setLogger(new WpLogger());
+        return $client;
     }
 
     /**
@@ -423,29 +490,35 @@ class Client
     /**
      * Retrieve cached validation data if within TTL.
      *
+     * Checks in-memory cache first, then WordPress options if available.
+     *
      * @return array|null Cached data or null if expired/missing
      */
     private function getFromCache(): ?array
     {
-        if ($this->cachedValidation === null || $this->cacheExpiresAt === null) {
-            return null;
-        }
-
-        if (time() < $this->cacheExpiresAt) {
+        // Check in-memory cache first
+        if ($this->cachedValidation !== null && $this->cacheExpiresAt !== null && time() < $this->cacheExpiresAt) {
             return $this->cachedValidation;
         }
 
-        // Cache expired
-        $this->cachedValidation = null;
-        $this->cacheExpiresAt = null;
+        // Check WordPress options if function_exists
+        if (function_exists('get_option')) {
+            $cached = get_option(self::OPTION_CACHE, null);
+            $expires = get_option(self::OPTION_CACHE_EXPIRES, null);
+            if ($cached && $expires && time() < (int) $expires) {
+                $this->cachedValidation = is_string($cached) ? json_decode($cached, true) : $cached;
+                $this->cacheExpiresAt = (int) $expires;
+                return $this->cachedValidation;
+            }
+        }
+
         return null;
     }
 
     /**
      * Store validation data in cache with 24h TTL.
      *
-     * For WordPress integration, these will be overridden by
-     * WpSettings reading from WP options. Core Client stores in memory.
+     * Stores in memory and in WordPress options if available.
      *
      * @param array $data The validation response data to cache
      * @return void
@@ -454,5 +527,11 @@ class Client
     {
         $this->cachedValidation = $data;
         $this->cacheExpiresAt = time() + self::CACHE_TTL;
+
+        // Store in WordPress options if available
+        if (function_exists('update_option')) {
+            update_option(self::OPTION_CACHE, json_encode($data));
+            update_option(self::OPTION_CACHE_EXPIRES, (string) $this->cacheExpiresAt);
+        }
     }
 }
