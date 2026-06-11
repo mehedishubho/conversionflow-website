@@ -82,12 +82,18 @@ class WpSettings
         echo '</td>';
         echo '</tr>';
 
-        // API Token field
+        // API Token field (masked for security, per T-35-08)
+        // Value is NEVER echoed in HTML -- password input is empty for existing tokens.
+        // The masked display below shows last 4 chars so user knows a token is stored.
         echo '<tr>';
         echo '<th scope="row"><label for="conversionflow_api_token">API Token</label></th>';
         echo '<td>';
         echo '<input type="password" name="conversionflow_api_token" id="conversionflow_api_token" ';
-        echo 'value="' . esc_attr($apiToken) . '" class="regular-text" />';
+        echo 'value="" class="regular-text" placeholder="Enter API token" />';
+        if (!empty($apiToken)) {
+            $masked = str_repeat('*', strlen($apiToken) - 4) . substr($apiToken, -4);
+            echo '<p class="description">Current: ' . esc_html($masked) . '</p>';
+        }
         echo '</td>';
         echo '</tr>';
 
@@ -314,7 +320,7 @@ class WpSettings
             'type' => $type,
         ], 60);
 
-        wp_redirect(admin_url($_SERVER['REQUEST_URI'] ?? ''));
+        wp_redirect(admin_url(sanitize_text_field($_SERVER['REQUEST_URI'] ?? '')));
         exit;
     }
 
@@ -332,7 +338,8 @@ class WpSettings
         if (isset($_POST['conversionflow_server_url'])) {
             update_option('conversionflow_server_url', esc_url_raw($_POST['conversionflow_server_url']));
         }
-        if (isset($_POST['conversionflow_api_token'])) {
+        // Only update API token if a new value was provided (input is empty for existing tokens)
+        if (isset($_POST['conversionflow_api_token']) && $_POST['conversionflow_api_token'] !== '') {
             update_option('conversionflow_api_token', sanitize_text_field($_POST['conversionflow_api_token']));
         }
         if (isset($_POST['conversionflow_product_slug'])) {
