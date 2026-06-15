@@ -12,16 +12,36 @@ import {
   testGatewayConnection,
   activateGateway,
 } from "@/app/(admin)/actions/admin-settings";
-import type { IPaymentGateway } from "@/modules/payments/domain/IPaymentGateway";
-import type { GatewayConfig } from "@/modules/payments/domain/value-objects/GatewayConfig";
+import type { ConfigFieldDefinition } from "@/modules/payments/domain/IPaymentGateway";
 
 // ──────────────────────────────────────────────
 // Types
 // ──────────────────────────────────────────────
 
+/**
+ * Gateway row as received from the getGateways() server action.
+ * Mirrors the GatewayConfig value object but with `status: string` since the
+ * server action's contract is `string` (read straight from the DB).
+ */
+interface GatewayCardGateway {
+  id: string;
+  gatewayId: string;
+  name: string;
+  config: Record<string, unknown>;
+  active: boolean;
+  testMode: boolean;
+  status: string;
+  priority: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface GatewayCardProps {
-  gateway: GatewayConfig;
-  adapter: IPaymentGateway;
+  gateway: GatewayCardGateway;
+  /** Display name for the gateway (server-provided, plain data). */
+  name: string;
+  /** Config field definitions for the gateway (server-provided, plain data). */
+  configFields: ConfigFieldDefinition[];
   onRefresh: () => void;
 }
 
@@ -31,7 +51,8 @@ interface GatewayCardProps {
 
 export default function GatewayCard({
   gateway,
-  adapter,
+  name,
+  configFields,
   onRefresh,
 }: GatewayCardProps) {
   const [isPending, startTransition] = useTransition();
@@ -61,8 +82,6 @@ export default function GatewayCard({
     test: { color: "warning", label: "Test" },
     live: { color: "success", label: "Live" },
   };
-
-  const configFields = adapter.getRequiredConfigFields();
 
   // Handlers
   const handleToggleGateway = () => {
@@ -141,7 +160,7 @@ export default function GatewayCard({
   const badge = statusBadge[gateway.status] ?? statusBadge.draft;
 
   return (
-    <ComponentCard title={adapter.name}>
+    <ComponentCard title={name}>
       <div className="space-y-4">
         {/* Header: Status + Toggles */}
         <div className="flex flex-wrap items-center gap-4">

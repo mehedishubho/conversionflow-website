@@ -11,6 +11,7 @@ import { GatewayConfigRepository } from "@/modules/payments/infrastructure/repos
 import { decryptConfig } from "@/modules/payments/infrastructure/crypto";
 import { PaymentService } from "@/modules/payments/application/PaymentService";
 import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
+import type { ConfigFieldDefinition } from "@/modules/payments/domain/IPaymentGateway";
 
 // ──────────────────────────────────────────────
 // Admin Role Guard
@@ -829,13 +830,13 @@ export async function getGateways(): Promise<Array<{
   priority: number;
   createdAt: Date;
   updatedAt: Date;
+  configFieldDefinitions: ConfigFieldDefinition[];
+  supportedCurrencies: string[];
 }>> {
   await requireAdmin();
 
   try {
-    const configRepo = new GatewayConfigRepository();
-
-    // Get all registered adapters from the registry
+    // Get all registered adapters from the registry (server-side only).
     const registry = GatewayRegistry.getInstance();
     const adapters = registry.getAll();
 
@@ -843,7 +844,11 @@ export async function getGateways(): Promise<Array<{
     const allRows = await db.select().from(paymentGateways);
     const dbMap = new Map(allRows.map((r) => [r.gatewayId, r]));
 
-    // Build result: merge adapter info with DB config (or defaults)
+    // Build result: merge adapter info with DB config (or defaults).
+    // Adapter metadata (configFieldDefinitions, supportedCurrencies) is plain
+    // serializable data so it is safe to ship to the client. This lets the
+    // admin "Automatic Gateways" tab render without touching the client-side
+    // registry singleton (which is empty in the browser — see PAY-34 fix).
     const results: Array<{
       id: string;
       gatewayId: string;
@@ -855,9 +860,15 @@ export async function getGateways(): Promise<Array<{
       priority: number;
       createdAt: Date;
       updatedAt: Date;
+      configFieldDefinitions: ConfigFieldDefinition[];
+      supportedCurrencies: string[];
     }> = [];
 
     for (const adapter of adapters) {
+      // Pull plain-data metadata from the adapter (server-only).
+      const configFieldDefinitions = adapter.getRequiredConfigFields();
+      const supportedCurrencies = adapter.supportedCurrencies;
+
       const dbRow = dbMap.get(adapter.gatewayId);
       if (dbRow) {
         const decryptedConfig = JSON.parse(
@@ -874,6 +885,8 @@ export async function getGateways(): Promise<Array<{
           priority: dbRow.priority ?? 0,
           createdAt: dbRow.createdAt,
           updatedAt: dbRow.updatedAt,
+          configFieldDefinitions,
+          supportedCurrencies,
         });
       } else {
         // Adapter registered but no DB config yet
@@ -888,6 +901,8 @@ export async function getGateways(): Promise<Array<{
           priority: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
+          configFieldDefinitions,
+          supportedCurrencies,
         });
       }
     }

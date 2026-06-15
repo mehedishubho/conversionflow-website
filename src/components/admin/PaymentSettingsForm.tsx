@@ -14,12 +14,32 @@ import {
 } from "@/app/(admin)/actions/admin-settings";
 import GatewayCard from "@/components/admin/GatewayCard";
 import WebhookEventLog from "@/components/admin/WebhookEventLog";
-import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
-import type { GatewayConfig } from "@/modules/payments/domain/value-objects/GatewayConfig";
+import type { ConfigFieldDefinition } from "@/modules/payments/domain/IPaymentGateway";
 
 // ──────────────────────────────────────────────
 // Types
 // ──────────────────────────────────────────────
+
+/**
+ * Shape returned by the getGateways() server action.
+ * Adapter metadata (configFieldDefinitions, supportedCurrencies) is plain
+ * serializable data shipped from the server so the admin UI never needs the
+ * client-side GatewayRegistry singleton (which is empty in the browser).
+ */
+interface AdminGateway {
+  id: string;
+  gatewayId: string;
+  name: string;
+  config: Record<string, unknown>;
+  active: boolean;
+  testMode: boolean;
+  status: string;
+  priority: number;
+  createdAt: Date;
+  updatedAt: Date;
+  configFieldDefinitions: ConfigFieldDefinition[];
+  supportedCurrencies: string[];
+}
 
 interface PaymentAccountRow {
   id: string;
@@ -99,8 +119,9 @@ export default function PaymentSettingsForm({
     text: string;
   } | null>(null);
 
-  // Gateway state for Automatic tab
-  const [gateways, setGateways] = useState<GatewayConfig[]>([]);
+  // Gateway state for Automatic tab (populated from the getGateways() server
+  // action — never from a client-side registry singleton).
+  const [gateways, setGateways] = useState<AdminGateway[]>([]);
   const [gatewaysLoading, setGatewaysLoading] = useState(false);
 
   // VAT state
@@ -156,7 +177,7 @@ export default function PaymentSettingsForm({
     startTransition(async () => {
       try {
         const result = await getGateways();
-        setGateways(result as unknown as GatewayConfig[]);
+        setGateways(result as unknown as AdminGateway[]);
       } catch {
         setGateways([]);
       } finally {
@@ -253,10 +274,6 @@ export default function PaymentSettingsForm({
     { value: "exclusive", label: "Exclusive" },
     { value: "inclusive", label: "Inclusive" },
   ];
-
-  // Get registered adapters for the Automatic tab
-  const registry = GatewayRegistry.getInstance();
-  const allAdapters = registry.getAll();
 
   return (
     <div className="space-y-6">
@@ -589,47 +606,30 @@ export default function PaymentSettingsForm({
             </div>
           ) : (
             <>
-              {/* Gateway Cards */}
-              {allAdapters.length === 0 ? (
+              {/* Gateway Cards — driven by server-returned gateway data */}
+              {gateways.length === 0 ? (
                 <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] px-6 py-12 text-center">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     No gateway adapters registered. Ensure the payments module is initialized.
                   </p>
                 </div>
               ) : (
-                allAdapters.map((adapter) => {
-                  const gateway = gateways.find(
-                    (g) => g.gatewayId === adapter.gatewayId
-                  );
-                  // If no config in DB yet, create a default stub
-                  const gatewayConfig: GatewayConfig = gateway ?? {
-                    id: "",
-                    gatewayId: adapter.gatewayId,
-                    name: adapter.name,
-                    config: {},
-                    active: false,
-                    testMode: true,
-                    status: "draft",
-                    priority: 0,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                  };
-                  return (
-                    <GatewayCard
-                      key={adapter.gatewayId}
-                      gateway={gatewayConfig}
-                      adapter={adapter}
-                      onRefresh={loadGateways}
-                    />
-                  );
-                })
+                gateways.map((g) => (
+                  <GatewayCard
+                    key={g.gatewayId}
+                    gateway={g}
+                    name={g.name}
+                    configFields={g.configFieldDefinitions}
+                    onRefresh={loadGateways}
+                  />
+                ))
               )}
 
               {/* Webhook Event Log */}
               <WebhookEventLog
-                gateways={allAdapters.map((a) => ({
-                  gatewayId: a.gatewayId,
-                  name: a.name,
+                gateways={gateways.map((g) => ({
+                  gatewayId: g.gatewayId,
+                  name: g.name,
                 }))}
               />
             </>
