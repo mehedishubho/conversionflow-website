@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { notifications, user, notificationDeliveries } from "@/lib/db/schema";
-import { eq, desc, ilike, and, or } from "drizzle-orm";
+import { eq, desc, ilike, and, or, gt, sql } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 
 async function requireAdmin() {
@@ -168,4 +168,55 @@ export async function deleteNotification(
   } catch {
     return { error: "Failed to delete notification" };
   }
+}
+
+export interface RecentAdminNotification {
+  id: string;
+  userId: string;
+  userName: string | null;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean | null;
+  createdAt: Date;
+}
+
+// Read-only recent activity feed for the admin bell dropdown.
+// Admins have no owned notifications, so this returns the most recent
+// system-wide notifications across ALL users with the target user's name.
+// `unreadCount` is a "recent activity" signal (notifications created in the
+// last 24h), NOT a per-admin unread tally. READ-ONLY by construction — no
+// mark-read mutation path exists here.
+export async function getRecentAdminNotifications(
+  limit = 8
+): Promise<{ notifications: RecentAdminNotification[]; unreadCount: number }> {
+  await requireAdmin();
+
+  const rows = await db
+    .select({
+      id: notifications.id,
+      userId: notifications.userId,
+      userName: user.name,
+      type: notifications.type,
+      title: notifications.title,
+      message: notifications.message,
+      read: notifications.read,
+      createdAt: notifications.createdAt,
+    })
+    .from(notifications)
+    .leftJoin(user, eq(notifications.userId, user.id))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+
+  // Recent-activity signal: count of notifications created in the last 24h.
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const [recentRow] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(notifications)
+    .where(gt(notifications.createdAt, since));
+
+  return {
+    notifications: rows,
+    unreadCount: Number(recentRow?.count ?? 0),
+  };
 }
