@@ -27,10 +27,6 @@ import {
   type ResolvedPlan,
 } from "@/lib/plans";
 
-// Re-export the plan-resolver types so callers can import them from the
-// server-action module without reaching into @/lib/plans directly.
-export type { PublicPlan, ResolvedPlan };
-
 // ── Public plan resolver actions (slug-keyed) ──
 // These are siblings to the legacy name-keyed helpers below. They resolve
 // plans from product_plans by slug for the marketing pricing page and the
@@ -38,6 +34,10 @@ export type { PublicPlan, ResolvedPlan };
 // getCheckoutPrices / clearPlanPricesCache) are unchanged because the
 // server-action validation path still keys by plan NAME (back-compat with
 // the form-submitted name; D-4).
+//
+// NOTE: Next.js "use server" modules may only export async functions.
+// Consumers import the PublicPlan/ResolvedPlan types directly from
+// @/lib/plans — do NOT re-export types from this file.
 
 /**
  * Server action: return all active plans for the displayed product,
