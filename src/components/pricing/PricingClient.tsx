@@ -7,10 +7,13 @@ import { PricingGrid } from "@/components/sections/PricingGrid";
 import { platforms, type PlatformKey } from "@/data/pricing";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
+import type { PublicPlan } from "@/lib/plans";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export default function PricingClient() {
+export type PlanWithPeriod = PublicPlan & { period: string };
+
+export default function PricingClient({ plans }: { plans: PlanWithPeriod[] }) {
   const { t } = useLanguage();
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformKey>("wordpress");
 
@@ -80,7 +83,7 @@ export default function PricingClient() {
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.4, ease }}
             >
-              <PricingGrid platform={selectedPlatform} />
+              <PricingGrid platform={selectedPlatform} plans={plans} />
             </motion.div>
           </AnimatePresence>
 

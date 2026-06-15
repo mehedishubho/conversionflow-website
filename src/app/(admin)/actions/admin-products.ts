@@ -8,6 +8,7 @@ import { products, productVersions, productPlans } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createAuditLog } from "@/lib/audit";
 import { clearPlanPricesCache } from "@/app/(portal)/actions/checkout";
+import { clearPublicPlansCache } from "@/lib/plans";
 import { revalidatePath } from "next/cache";
 import fs from "fs";
 import path from "path";
@@ -565,7 +566,9 @@ export async function createPlan(productId: string, formData: FormData) {
 
     // Invalidate checkout price cache so new plan prices are visible immediately
     clearPlanPricesCache();
+    clearPublicPlansCache();
     revalidatePath("/dashboard/checkout");
+    revalidatePath("/pricing");
 
     return { success: true, planId: plan.id };
   } catch (error) {
@@ -700,7 +703,9 @@ export async function updatePlan(planId: string, formData: FormData) {
 
     // Invalidate checkout price cache so updated prices are visible immediately
     clearPlanPricesCache();
+    clearPublicPlansCache();
     revalidatePath("/dashboard/checkout");
+    revalidatePath("/pricing");
 
     return { success: true };
   } catch (error) {
@@ -729,7 +734,9 @@ export async function deletePlan(planId: string) {
 
     // Invalidate checkout price cache after plan deletion
     clearPlanPricesCache();
+    clearPublicPlansCache();
     revalidatePath("/dashboard/checkout");
+    revalidatePath("/pricing");
 
     return { success: true };
   } catch (error) {

@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { pricingTiers, platforms, type PlatformKey } from "@/data/pricing";
+import { planPresentation, buildDefaultPresentation, platforms, type PlatformKey } from "@/data/pricing";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import type { PublicPlan } from "@/lib/plans";
+
+type PlanWithPeriod = PublicPlan & { period: string };
 
 function ComingSoonCard({ platform }: { platform: PlatformKey }) {
   const { t } = useLanguage();
@@ -82,14 +85,15 @@ function ComingSoonCard({ platform }: { platform: PlatformKey }) {
   );
 }
 
-export function PricingGrid({ platform }: { platform: PlatformKey }) {
+export function PricingGrid({
+  platform,
+  plans,
+}: {
+  platform: PlatformKey;
+  plans: PlanWithPeriod[];
+}) {
   const { t } = useLanguage();
   const [currency, setCurrency] = useState<"USD" | "BDT">("USD");
-
-  const getTier = (index: number) => {
-    const keys = ["starter", "professional", "agency"] as const;
-    return keys[index];
-  };
 
   const isAvailable = platforms.find((p) => p.key === platform)?.available ?? false;
 
@@ -97,6 +101,16 @@ export function PricingGrid({ platform }: { platform: PlatformKey }) {
   if (!isAvailable) {
     return <ComingSoonCard platform={platform} />;
   }
+
+  // Merge DB-driven plan values with curated presentation metadata (D-2 / D-6).
+  // Unknown slugs fall back to a sensible default so a newly-added plan never
+  // renders an empty card.
+  const tiers = plans.map((p) => {
+    const presentation =
+      planPresentation[p.slug] ??
+      buildDefaultPresentation(p.slug, p.name, p.maxActivations ?? 1, p.licenseType);
+    return { plan: p, presentation };
+  });
 
   // Available pricing for WordPress
   return (
@@ -117,20 +131,24 @@ export function PricingGrid({ platform }: { platform: PlatformKey }) {
       </div>
 
       <div className="price-grid">
-        {pricingTiers.map((tier, i) => {
-          const tierKey = getTier(i);
+        {tiers.map(({ plan: p, presentation }) => {
+          // tierKey matches the DB slug (starter|professional|agency) so
+          // existing i18n keys like pricing.starter.feature0 keep working.
+          const tierKey = p.slug;
+          const priceUSD = `$${p.priceUSD}`;
+          const priceBDT = `৳${p.priceBDT.toLocaleString()} BDT`;
           return (
-            <div key={tier.plan} className={`pc${tier.popular ? " pop" : ""}`}>
-              {tier.popular && <div className="pop-tag">{t("pricing.mostPopular")}</div>}
-              <div className="p-plan">{t(`pricing.${tierKey}.plan`)}</div>
+            <div key={p.slug} className={`pc${presentation.popular ? " pop" : ""}`}>
+              {presentation.popular && <div className="pop-tag">{t("pricing.mostPopular")}</div>}
+              <div className="p-plan">{p.name}</div>
               <div className="p-price">
-                {currency === "USD" ? tier.priceUSD : tier.priceBDT}
-                <span>{t(`pricing.${tierKey}.period`)}</span>
+                {currency === "USD" ? priceUSD : priceBDT}
+                <span>{p.period}</span>
               </div>
-              <div className="p-bdt">{currency === "USD" ? tier.priceBDT : tier.priceUSD}</div>
-              <div className="p-desc">{t(`pricing.${tierKey}.desc`)}</div>
+              <div className="p-bdt">{currency === "USD" ? priceBDT : priceUSD}</div>
+              <div className="p-desc">{p.description ?? ""}</div>
               <ul className="p-features">
-                {tier.features.map((f, j) => {
+                {presentation.features.map((f, j) => {
                   const localizedText = t(`pricing.${tierKey}.feature${j}`);
                   return (
                     <li key={j}>
@@ -141,16 +159,16 @@ export function PricingGrid({ platform }: { platform: PlatformKey }) {
                 })}
               </ul>
               <a
-                href={tier.checkoutUrl}
+                href={`/dashboard/checkout?plan=${p.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`btn ${tier.buttonStyle}`}
+                className={`btn ${presentation.buttonStyle}`}
                 style={{ width: "100%", justifyContent: "center", padding: "13px", cursor: "pointer" }}
               >
-                {t(`pricing.${tierKey}.buttonText`)}
+                {presentation.buttonText}
               </a>
               <a
-                href={`https://wa.me/8801721328992?text=${encodeURIComponent(tier.whatsappMessage)}`}
+                href={`https://wa.me/8801721328992?text=${encodeURIComponent(presentation.whatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-center text-[11px] text-muted mt-2 hover:text-accent transition-colors"

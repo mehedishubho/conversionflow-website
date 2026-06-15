@@ -1,5 +1,5 @@
 import { JsonLd } from "@/components/seo/JsonLd";
-import { pricingTiers } from "@/data/pricing";
+import { planPresentation, PRICING_SLUG_ORDER } from "@/data/pricing";
 import Link from "next/link";
 import { breadcrumbSchema, createPageMetadata, productSchema } from "@/lib/seo";
 
@@ -12,6 +12,20 @@ const matrix = [
   ["Tracking focus", "Meta CAPI + pixels", "API-ready event flows", "Server-side event infrastructure"],
   ["Operations focus", "Courier, COD, recovery", "Custom courier/payment logic", "Analytics/event data layer"],
 ];
+
+// Display-only plan cards for the comparison page. Sourced from the
+// presentation map (slug-keyed) so this page stays in sync with curated
+// marketing copy. Prices/period are not shown here — only feature bullets.
+const comparisonPlans = PRICING_SLUG_ORDER.map((slug) => {
+  const p = planPresentation[slug];
+  return {
+    slug,
+    name: slug.charAt(0).toUpperCase() + slug.slice(1),
+    features: p?.features ?? [],
+    buttonText: p?.buttonText ?? `Get ${slug}`,
+    checkoutUrl: `/dashboard/checkout?plan=${slug}`,
+  };
+});
 
 export default function PlatformComparisonPage() {
   return (
@@ -32,11 +46,9 @@ export default function PlatformComparisonPage() {
       <section className="sec">
         <div className="max-w-[1280px] mx-auto px-7">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-16">
-            {pricingTiers.map((tier) => (
-              <div key={tier.plan} className="pc">
-                <div className="p-plan">{tier.plan}</div>
-                <div className="p-desc">{tier.priceBDT}{tier.period}</div>
-                <p className="text-sm text-text2 leading-[1.8] mb-5">{tier.desc}</p>
+            {comparisonPlans.map((tier) => (
+              <div key={tier.slug} className="pc">
+                <div className="p-plan">{tier.name}</div>
                 <ul className="p-features">
                   {tier.features.map((feature) => (
                     <li key={feature.text}>

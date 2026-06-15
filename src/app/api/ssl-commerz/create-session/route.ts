@@ -11,7 +11,6 @@ import { orders } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { createSSLSession } from "@/lib/ssl-commerz";
 import { createAuditLog } from "@/lib/audit";
-import { pricingTiers } from "@/data/pricing";
 import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
 import { PaymentService } from "@/modules/payments/application/PaymentService";
 
@@ -60,16 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Validate plan exists in pricing tiers
-    const tier = pricingTiers.find((t) => t.plan === plan);
-    if (!tier) {
-      return NextResponse.json(
-        { error: "Plan not found" },
-        { status: 400 }
-      );
-    }
-
-    // 4. Compute authoritative price server-side (T-04-07)
+    // 3. Compute authoritative price server-side (T-04-07)
     const baseAmount = PLAN_PRICES_BDT[plan];
     const discount = Math.max(0, Number(discountAmount) || 0);
     const tax = Math.max(0, Number(taxAmount) || 0);

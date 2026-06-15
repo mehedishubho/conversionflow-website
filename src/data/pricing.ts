@@ -1,21 +1,11 @@
+import type { LicenseType } from "@/lib/plans";
+
 interface PricingFeature {
   text: string;
   included: boolean;
 }
 
-interface PricingTier {
-  plan: string;
-  priceUSD: string;
-  priceBDT: string;
-  period: string;
-  desc: string;
-  popular: boolean;
-  features: PricingFeature[];
-  buttonText: string;
-  buttonStyle: "btn-primary" | "btn-outline";
-  checkoutUrl: string;
-  whatsappMessage: string;
-}
+export type { PricingFeature };
 
 export type PlatformKey = "wordpress" | "laravel" | "shopify" | "nextjs";
 
@@ -58,13 +48,23 @@ export const platforms: PlatformInfo[] = [
   },
 ];
 
-export const pricingTiers: PricingTier[] = [
-  {
-    plan: "Starter",
-    priceUSD: "$18",
-    priceBDT: "≈ ৳2,150 BDT",
-    period: "/year",
-    desc: "For a single WooCommerce store — 1 year updates",
+// ── Presentation-only metadata keyed by plan slug (D-2 / D-6) ──
+// Plan name, price, period, and description come from the DB (product_plans).
+// Only the curated marketing feature bullet copy, the "Most Popular" badge,
+// button label/style, and the WhatsApp message live here.
+
+export interface PlanPresentation {
+  slug: string;
+  popular: boolean;
+  features: PricingFeature[]; // curated marketing bullet copy
+  buttonText: string;
+  buttonStyle: "btn-primary" | "btn-outline";
+  whatsappMessage: string;
+}
+
+export const planPresentation: Record<string, PlanPresentation> = {
+  starter: {
+    slug: "starter",
     popular: false,
     features: [
       { text: "1 WordPress Site", included: true },
@@ -78,15 +78,11 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Starter",
     buttonStyle: "btn-outline",
-    checkoutUrl: "/dashboard/checkout?plan=starter",
-    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Starter. I want to pay via bKash/Nagad.",
+    whatsappMessage:
+      "Hi, I'd like to purchase ConversionFlow Starter. I want to pay via bKash/Nagad.",
   },
-  {
-    plan: "Professional",
-    priceUSD: "$28",
-    priceBDT: "≈ ৳3,000 BDT",
-    period: "/2 years",
-    desc: "For agencies managing 3 stores — 2 year updates",
+  professional: {
+    slug: "professional",
     popular: true,
     features: [
       { text: "3 WordPress Sites", included: true },
@@ -100,15 +96,11 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Professional",
     buttonStyle: "btn-primary",
-    checkoutUrl: "/dashboard/checkout?plan=professional",
-    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Professional. I want to pay via bKash/Nagad.",
+    whatsappMessage:
+      "Hi, I'd like to purchase ConversionFlow Professional. I want to pay via bKash/Nagad.",
   },
-  {
-    plan: "Agency",
-    priceUSD: "$75",
-    priceBDT: "≈ ৳8,000 BDT",
-    period: "/lifetime",
-    desc: "Unlimited sites for agencies — lifetime updates",
+  agency: {
+    slug: "agency",
     popular: false,
     features: [
       { text: "Unlimited Sites", included: true },
@@ -122,14 +114,60 @@ export const pricingTiers: PricingTier[] = [
     ],
     buttonText: "Get Agency",
     buttonStyle: "btn-outline",
-    checkoutUrl: "/dashboard/checkout?plan=agency",
-    whatsappMessage: "Hi, I'd like to purchase ConversionFlow Agency. I want to pay via bKash/Nagad.",
+    whatsappMessage:
+      "Hi, I'd like to purchase ConversionFlow Agency. I want to pay via bKash/Nagad.",
   },
-];
+};
 
-export const platformPricing = pricingTiers.map((t) => ({
-  key: t.plan.toLowerCase(),
-  name: t.plan,
-  positioning: t.desc,
-  features: t.features.filter((f) => f.included).map((f) => f.text),
-}));
+/** The ordered slugs that drive platformPricing (stable marketing ordering). */
+export const PRICING_SLUG_ORDER: string[] = ["starter", "professional", "agency"];
+
+/**
+ * Sensible default presentation for any slug without curated copy (D-6).
+ * Used as a fallback so the page never renders an empty card if an admin
+ * adds a new plan whose slug isn't in planPresentation yet.
+ */
+export function buildDefaultPresentation(
+  slug: string,
+  planName: string,
+  maxActivations: number,
+  licenseType: LicenseType
+): PlanPresentation {
+  const sitesLabel =
+    maxActivations === 0
+      ? "Unlimited Sites"
+      : `${maxActivations} Site${maxActivations === 1 ? "" : "s"}`;
+  const updatesLabel =
+    licenseType === "lifetime" ? "Lifetime Updates" : "Updates Included";
+  return {
+    slug,
+    popular: false,
+    features: [
+      { text: sitesLabel, included: true },
+      { text: "All 6 Modules", included: true },
+      { text: updatesLabel, included: true },
+      { text: "Email Support", included: true },
+    ],
+    buttonText: `Get ${planName}`,
+    buttonStyle: "btn-outline",
+    whatsappMessage: `Hi, I'd like to purchase ConversionFlow ${planName}. I want to pay via bKash/Nagad.`,
+  };
+}
+
+/**
+ * Platform-level pricing positioning summary, derived from the presentation
+ * map for the three known slugs. Used elsewhere for platform positioning
+ * text (kept working after pricingTiers was removed).
+ */
+export const platformPricing = PRICING_SLUG_ORDER.map((slug) => {
+  const presentation = planPresentation[slug];
+  const includedFeatures = presentation
+    ? presentation.features.filter((f) => f.included).map((f) => f.text)
+    : [];
+  return {
+    key: slug,
+    name: slug.charAt(0).toUpperCase() + slug.slice(1),
+    positioning: includedFeatures[0] ?? "",
+    features: includedFeatures,
+  };
+});
