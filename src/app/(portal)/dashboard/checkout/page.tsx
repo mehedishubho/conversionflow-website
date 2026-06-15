@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { pricingTiers } from "@/data/pricing";
-import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts, getCheckoutPrices, getActiveGateways } from "@/app/(portal)/actions/checkout";
+import { validateCoupon, calculateVAT, createManualOrder, getPaymentAccounts, getActiveGateways, getPlanBySlugAction } from "@/app/(portal)/actions/checkout";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import GatewaySelector from "@/components/checkout/GatewaySelector";
@@ -26,22 +25,33 @@ type PaymentAccount = {
   instructions: string | null;
 };
 
+// Resolved plan shape used by the checkout page. The full ResolvedPlan
+// (from @/lib/plans via getPlanBySlugAction) includes more fields; we only
+// keep what the UI needs to avoid carrying unused state.
+type ResolvedPlan = {
+  slug: string;
+  name: string;
+  description: string | null;
+  priceBDT: number;
+  priceUSD: number;
+  maxActivations: number;
+};
+
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const planParam = searchParams.get("plan")?.toLowerCase() || "";
 
-  // Find matching pricing tier
-  const tier = pricingTiers.find(
-    (t) => t.plan.toLowerCase() === planParam
-  );
+  // ── Plan resolution state (D-3: decoupled from gateway/VAT/payment loading) ──
+  // The plan is resolved from the DB by slug, NOT from hardcoded pricingTiers.
+  // planExists: null = still resolving, true = found, false = confirmed missing.
+  const [plan, setPlan] = useState<ResolvedPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(true);
+  const [planExists, setPlanExists] = useState<boolean | null>(null);
 
-  // State
+  // ── Pricing / payment state ──
   const [currency, setCurrency] = useState<"BDT" | "USD">("BDT");
-  const [planPriceMap, setPlanPriceMap] = useState<Record<string, number>>({});
-  const basePrice = planPriceMap[planParam] ?? 0;
-
-  // State
+  const [basePrice, setBasePrice] = useState<number>(0);
   const [selectedGateway, setSelectedGateway] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
@@ -68,38 +78,103 @@ function CheckoutContent() {
     (m) => !paymentAccounts[m] || paymentAccounts[m].length === 0
   );
 
-  // Load prices, VAT and payment accounts on mount
+  // ── Effect 1: Resolve plan from DB by slug (runs once on mount) ──
+  // Independent of gateway/VAT/payment loading so a DB error here cannot be
+  // masked by an unrelated failure, and an unrelated failure cannot blank
+  // the plan.
   useEffect(() => {
-    if (!tier) return;
-
-    async function load() {
+    let cancelled = false;
+    async function resolvePlan() {
+      if (!planParam) {
+        if (!cancelled) {
+          setPlanExists(false);
+          setPlanLoading(false);
+        }
+        return;
+      }
       try {
-        const [prices, vat, paymentData, gateways] = await Promise.all([
-          getCheckoutPrices(),
-          calculateVAT(0), // will recalculate once we have basePrice
-          getPaymentAccounts(),
-          getActiveGateways(currency),
-        ]);
-        setPlanPriceMap(prices);
-        // Recalculate VAT with the actual price now
-        const actualPrice = prices[planParam] ?? 0;
-        if (actualPrice > 0) {
-          const vatResult = await calculateVAT(actualPrice);
-          setVatInfo(vatResult);
+        const resolved = await getPlanBySlugAction(planParam);
+        if (cancelled) return;
+        if (!resolved) {
+          setPlanExists(false);
+          setPlanLoading(false);
+          return;
         }
-        setPaymentAccounts((paymentData as Record<string, unknown>).accounts as Record<string, PaymentAccount[]>);
-        // Store gateway testMode mapping
-        const testModeMap: Record<string, boolean> = {};
-        for (const g of gateways.automatic) {
-          testModeMap[g.gatewayId] = g.testMode;
-        }
-        setGatewayTestModes(testModeMap);
+        setPlan({
+          slug: resolved.slug,
+          name: resolved.name,
+          description: resolved.description,
+          priceBDT: resolved.priceBDT,
+          priceUSD: resolved.priceUSD,
+          maxActivations: resolved.maxActivations,
+        });
+        setPlanExists(true);
+        setPlanLoading(false);
       } catch {
-        // Silently handle -- components will show fallback
+        if (!cancelled) {
+          setPlanExists(false);
+          setPlanLoading(false);
+        }
       }
     }
-    load();
-  }, [tier, planParam, currency]);
+    resolvePlan();
+    return () => {
+      cancelled = true;
+    };
+  }, [planParam]);
+
+  // ── Effect 2: Pricing + ancillary loading (VAT / payment accounts / gateways) ──
+  // basePrice comes directly from the resolved plan (authoritative DB value),
+  // NOT from a client-fetched price map. Each ancillary call gets its own
+  // try/catch so a gateway/VAT/payment-account failure cannot cascade and
+  // blank the price (the original "Invalid plan selected" root cause).
+  useEffect(() => {
+    if (!plan) return; // wait until the plan is resolved
+
+    let cancelled = false;
+    const initialPrice = currency === "BDT" ? plan.priceBDT : plan.priceUSD;
+    setBasePrice(initialPrice);
+
+    async function loadAncillary() {
+      // VAT — independent try/catch
+      try {
+        const vat = await calculateVAT(initialPrice);
+        if (!cancelled) setVatInfo(vat);
+      } catch {
+        /* VAT stays null → component falls back to no-VAT total */
+      }
+
+      // Payment accounts — independent try/catch
+      try {
+        const paymentData = await getPaymentAccounts();
+        if (!cancelled) {
+          setPaymentAccounts(
+            (paymentData as Record<string, unknown>).accounts as Record<string, PaymentAccount[]>
+          );
+        }
+      } catch {
+        /* paymentAccounts stays {} → manual methods disabled */
+      }
+
+      // Gateways — independent try/catch
+      try {
+        const gateways = await getActiveGateways(currency);
+        if (!cancelled) {
+          const testModeMap: Record<string, boolean> = {};
+          for (const g of gateways.automatic) {
+            testModeMap[g.gatewayId] = g.testMode;
+          }
+          setGatewayTestModes(testModeMap);
+        }
+      } catch {
+        /* gatewayTestModes stays {} */
+      }
+    }
+    loadAncillary();
+    return () => {
+      cancelled = true;
+    };
+  }, [plan, currency]);
 
   // Clear gateway selection when currency changes (D-04)
   useEffect(() => {
@@ -120,10 +195,11 @@ function CheckoutContent() {
   // Coupon handlers
   const handleApplyCoupon = useCallback(
     async (code: string) => {
+      if (!plan) return;
       setCouponLoading(true);
       setCouponError(null);
       try {
-        const result = await validateCoupon(code, basePrice, tier!.plan) as Record<string, unknown>;
+        const result = await validateCoupon(code, basePrice, plan.name) as Record<string, unknown>;
         if ("error" in result && typeof result.error === "string") {
           setCouponError(result.error);
         } else if ("success" in result && result.success) {
@@ -136,7 +212,7 @@ function CheckoutContent() {
         setCouponLoading(false);
       }
     },
-    [basePrice, tier]
+    [basePrice, plan]
   );
 
   const handleRemoveCoupon = useCallback(() => {
@@ -147,11 +223,12 @@ function CheckoutContent() {
   // Manual order submit
   const handleManualSubmit = useCallback(
     async (transactionId: string) => {
+      if (!plan) return;
       setIsSubmitting(true);
       setSubmitError(null);
       try {
         const formData = new FormData();
-        formData.append("plan", tier!.plan);
+        formData.append("plan", plan.name);
         formData.append("paymentMethod", selectedGateway!);
         formData.append("paymentRef", transactionId);
         if (appliedCoupon) {
@@ -175,7 +252,7 @@ function CheckoutContent() {
         setIsSubmitting(false);
       }
     },
-    [tier, selectedGateway, appliedCoupon, basePrice, vatAmount, discountAmount, router]
+    [plan, selectedGateway, appliedCoupon, basePrice, vatAmount, discountAmount, router]
   );
 
   // Gateway order success handler
@@ -188,8 +265,26 @@ function CheckoutContent() {
     [router]
   );
 
-  // Invalid plan state
-  if (!tier || !basePrice) {
+  // While resolving the plan, show the loading spinner (NOT the invalid-plan block).
+  // This prevents a false "Invalid plan selected" flash before the DB responds.
+  if (planLoading) {
+    return (
+      <div>
+        <PageBreadcrumb pageTitle="Checkout" basePath="/dashboard" />
+        <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] px-6 py-16 text-center">
+          <div className="animate-spin h-8 w-8 mx-auto mb-4 border-2 border-brand-500 border-t-transparent rounded-full" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Loading checkout...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show invalid-plan when the DB confirmed the plan does not exist.
+  // A gateway/VAT/payment-account failure can no longer trigger this block
+  // (the original root cause of the false "Invalid plan selected" error).
+  if (planExists === false || !plan) {
     return (
       <div>
         <PageBreadcrumb pageTitle="Checkout" basePath="/dashboard" />
@@ -231,7 +326,7 @@ function CheckoutContent() {
         {/* Left Column: Order Summary */}
         <div className="space-y-6">
           <OrderSummary
-            planName={tier.plan}
+            planName={plan.name}
             basePrice={basePrice}
             vatAmount={vatAmount}
             vatRate={vatRate}
@@ -275,7 +370,7 @@ function CheckoutContent() {
           {/* Gateway-specific content */}
           {selectedGateway === "ssl_commerz" && (
             <SSLCommerzForm
-              plan={tier.plan}
+              plan={plan.name}
               currency={currency}
               couponCode={appliedCoupon?.code}
               discountAmount={discountAmount}
@@ -287,7 +382,7 @@ function CheckoutContent() {
 
           {selectedGateway === "bkash_api" && (
             <BKashAPIForm
-              plan={tier.plan}
+              plan={plan.name}
               currency={currency}
               couponCode={appliedCoupon?.code}
               discountAmount={discountAmount}
@@ -300,7 +395,7 @@ function CheckoutContent() {
 
           {selectedGateway === "paddle" && (
             <PaddleRedirectButton
-              plan={tier.plan}
+              plan={plan.name}
               currency={currency}
               couponCode={appliedCoupon?.code}
               discountAmount={discountAmount}
