@@ -662,39 +662,54 @@ export async function getActiveGateways(currency: string): Promise<{
   automatic: Array<{ gatewayId: string; name: string; testMode: boolean }>;
   manual: Array<{ method: string; accountName: string }>;
 }> {
-  // Get automatic gateways that support this currency
-  const registry = GatewayRegistry.getInstance();
-  const adapters = registry.getForCurrency(currency);
+  // ── Automatic gateways (resilient) ──
+  // The payment_gateways table may be missing if the Phase 34 migration
+  // hasn't been applied yet, or the query may fail for other DB reasons.
+  // A failure here must NOT blank out manual payment methods — degrade to
+  // an empty automatic list and keep going so BDT manual checkout still works.
+  let automatic: Array<{ gatewayId: string; name: string; testMode: boolean }> = [];
+  try {
+    const registry = GatewayRegistry.getInstance();
+    const adapters = registry.getForCurrency(currency);
 
-  // Check which have active DB configs
-  const activeGatewayRows = await db
-    .select()
-    .from(paymentGateways)
-    .where(eq(paymentGateways.active, true));
+    const activeGatewayRows = await db
+      .select()
+      .from(paymentGateways)
+      .where(eq(paymentGateways.active, true));
 
-  const activeGatewayIds = new Set(activeGatewayRows.map((r) => r.gatewayId));
-  const activeGatewayMap = new Map(activeGatewayRows.map((r) => [r.gatewayId, r]));
+    const activeGatewayIds = new Set(activeGatewayRows.map((r) => r.gatewayId));
+    const activeGatewayMap = new Map(activeGatewayRows.map((r) => [r.gatewayId, r]));
 
-  const automatic = adapters
-    .filter((a) => activeGatewayIds.has(a.gatewayId))
-    .map((a) => ({
-      gatewayId: a.gatewayId,
-      name: a.name,
-      testMode: activeGatewayMap.get(a.gatewayId)?.testMode ?? true,
-    }));
+    automatic = adapters
+      .filter((a) => activeGatewayIds.has(a.gatewayId))
+      .map((a) => ({
+        gatewayId: a.gatewayId,
+        name: a.name,
+        testMode: activeGatewayMap.get(a.gatewayId)?.testMode ?? true,
+      }));
+  } catch (error) {
+    console.error(
+      "[getActiveGateways] automatic gateway lookup failed (payment_gateways table missing or DB error):",
+      error,
+    );
+  }
 
-  // Get manual payment accounts (only for BDT)
+  // ── Manual payment accounts (BDT only, resilient) ──
   let manual: Array<{ method: string; accountName: string }> = [];
   if (currency === "BDT") {
-    const accounts = await db
-      .select()
-      .from(paymentAccounts)
-      .where(eq(paymentAccounts.active, true));
+    try {
+      const accounts = await db
+        .select()
+        .from(paymentAccounts)
+        .where(eq(paymentAccounts.active, true));
 
-    manual = accounts.map((a) => ({
-      method: a.method,
-      accountName: a.accountName,
-    }));
+      manual = accounts.map((a) => ({
+        method: a.method,
+        accountName: a.accountName,
+      }));
+    } catch (error) {
+      console.error("[getActiveGateways] manual payment accounts lookup failed:", error);
+    }
   }
 
   return { automatic, manual };

@@ -10,8 +10,12 @@ interface OrderSummaryProps {
   currency: string;
 }
 
-function formatBDT(amount: number): string {
-  return amount.toLocaleString("en-BD") + " BDT";
+// Currency-aware formatter. The `currency` prop drives the symbol/suffix so
+// USD amounts render as "$18" instead of "18 BDT". BDT keeps its original
+// "N,NNN BDT" shape for backwards-compatible display.
+function formatCurrency(amount: number, currency: string): string {
+  if (currency === "USD") return `$${amount.toLocaleString("en-US")}`;
+  return `${amount.toLocaleString("en-BD")} BDT`;
 }
 
 export default function OrderSummary({
@@ -45,7 +49,7 @@ export default function OrderSummary({
             {planName} Plan
           </span>
           <span className="text-sm font-semibold text-gray-800 dark:text-white/90">
-            {formatBDT(basePrice)}
+            {formatCurrency(basePrice, currency)}
           </span>
         </div>
 
@@ -56,7 +60,7 @@ export default function OrderSummary({
               {vatLabel}
             </span>
             <span className="text-sm font-semibold text-gray-800 dark:text-white/90">
-              {vatMode === "inclusive" ? "Included" : formatBDT(vatAmount)}
+              {vatMode === "inclusive" ? "Included" : formatCurrency(vatAmount, currency)}
             </span>
           </div>
         )}
@@ -68,7 +72,7 @@ export default function OrderSummary({
               {discountLabel}
             </span>
             <span className="text-sm font-semibold text-success-500">
-              -{formatBDT(discountAmount)}
+              -{formatCurrency(discountAmount, currency)}
             </span>
           </div>
         )}
@@ -82,7 +86,7 @@ export default function OrderSummary({
             Total
           </span>
           <span className="text-lg font-bold text-gray-800 dark:text-white/90">
-            {formatBDT(total)}
+            {formatCurrency(total, currency)}
           </span>
         </div>
       </div>
