@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { Key, CreditCard, MessageSquare, Info } from "lucide-react";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
@@ -10,6 +11,10 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/app/(portal)/actions/notifications";
+import {
+  getRecentAdminNotifications,
+  type RecentAdminNotification,
+} from "@/app/(admin)/actions/admin-notifications";
 import { formatDistanceToNow } from "date-fns";
 
 type NotificationItem = {
@@ -52,6 +57,9 @@ function getNotificationIcon(type: string) {
 }
 
 export function NotificationDropdown() {
+  const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
+
   const [isOpen, setIsOpen] = useState(false);
   const [notificationList, setNotificationList] = useState<NotificationItem[]>(
     []
@@ -61,17 +69,35 @@ export function NotificationDropdown() {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const result = await getNotifications();
-      setNotificationList(
-        result.notifications as unknown as NotificationItem[]
-      );
-      setUnreadCount(result.unreadCount);
+      if (isAdmin) {
+        // Admin branch: read-only recent system-wide activity feed.
+        const result = await getRecentAdminNotifications(8);
+        setNotificationList(
+          result.notifications.map((n: RecentAdminNotification) => ({
+            id: n.id,
+            type: n.type,
+            title: n.title,
+            message: n.userName ? `${n.userName}: ${n.message}` : n.message,
+            data: null,
+            read: Boolean(n.read),
+            createdAt: n.createdAt,
+          }))
+        );
+        setUnreadCount(result.unreadCount);
+      } else {
+        // Customer branch: own notifications (unchanged behavior).
+        const result = await getNotifications();
+        setNotificationList(
+          result.notifications as unknown as NotificationItem[]
+        );
+        setUnreadCount(result.unreadCount);
+      }
     } catch {
       // Silently handle errors - show empty state
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     fetchNotifications();
@@ -110,6 +136,12 @@ export function NotificationDropdown() {
     notificationId: string,
     entityUrl?: string
   ) {
+    // Admin branch is READ-ONLY: never mutate other users' read state.
+    // Admin notifications belong to other users, so do not navigate either.
+    if (isAdmin) {
+      return;
+    }
+
     await markNotificationRead(notificationId);
 
     setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -165,7 +197,7 @@ export function NotificationDropdown() {
           <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             Notifications
           </h5>
-          {unreadCount > 0 && (
+          {!isAdmin && unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
               className="text-sm text-brand-500 hover:underline"
@@ -241,7 +273,7 @@ export function NotificationDropdown() {
           )}
         </ul>
         <Link
-          href="/dashboard/account"
+          href={isAdmin ? "/admin/notifications" : "/dashboard/notifications"}
           className="block px-4 py-2 mt-3 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
         >
           View All Notifications
