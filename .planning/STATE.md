@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-06-09)
 Phase: 35
 Plan: Complete
 Status: v4.0 Partially Shipped (32–35 done, 36–38 deferred)
-Last activity: 2026-06-11
+Last activity: 2026-06-15 - Completed quick task 260615-a94: Fix "Invalid plan selected" checkout + sync admin plans to pricing
 
 ```
 v4.0 Progress: [████████████░░░░] 57% (4/7 phases, 3 deferred)
@@ -125,6 +125,12 @@ src/
 3. **bKash API access** — Sandbox and production credentials process
 4. **SDK versioning strategy** — Semantic versioning across all SDKs
 5. **WordPress.org hosting** — Will SDK be distributed via wordpress.org or only via ConversionFlow?
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260615-a94 | Fix "Invalid plan selected" checkout error + sync admin product plans to marketing pricing page (DB-driven, slug-keyed, no schema change) | 2026-06-15 | 270671f | [260615-a94-fix-invalid-plan-selected-checkout-error](./quick/260615-a94-fix-invalid-plan-selected-checkout-error/) |
 
 ## Session Continuity
 
