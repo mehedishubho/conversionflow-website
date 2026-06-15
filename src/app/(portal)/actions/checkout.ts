@@ -20,6 +20,41 @@ import { redirect } from "next/navigation";
 import { createAuditLog } from "@/lib/audit";
 import { PaymentService } from "@/modules/payments/application/PaymentService";
 import { GatewayRegistry } from "@/modules/payments/application/GatewayRegistry";
+import {
+  getPublicPlans as getPublicPlansFromDb,
+  getPlanBySlug as getPlanBySlugFromDb,
+  type PublicPlan,
+  type ResolvedPlan,
+} from "@/lib/plans";
+
+// Re-export the plan-resolver types so callers can import them from the
+// server-action module without reaching into @/lib/plans directly.
+export type { PublicPlan, ResolvedPlan };
+
+// ── Public plan resolver actions (slug-keyed) ──
+// These are siblings to the legacy name-keyed helpers below. They resolve
+// plans from product_plans by slug for the marketing pricing page and the
+// checkout page (D-1 / D-3). The legacy helpers (getPlanPrices /
+// getCheckoutPrices / clearPlanPricesCache) are unchanged because the
+// server-action validation path still keys by plan NAME (back-compat with
+// the form-submitted name; D-4).
+
+/**
+ * Server action: return all active plans for the displayed product,
+ * ordered by sortOrder. Used by the marketing pricing page.
+ */
+export async function getPublicPlansAction(): Promise<PublicPlan[]> {
+  return getPublicPlansFromDb();
+}
+
+/**
+ * Server action: resolve a single plan by slug (case-insensitive).
+ * Returns null if the plan does not exist or is inactive. Used by the
+ * checkout page to resolve the selected plan from the ?plan=<slug> URL.
+ */
+export async function getPlanBySlugAction(slug: string): Promise<ResolvedPlan | null> {
+  return getPlanBySlugFromDb(slug);
+}
 
 // ── Server-side price map (authoritative, never trust client) ──
 // Dynamically resolved from product_plans table at first call.
